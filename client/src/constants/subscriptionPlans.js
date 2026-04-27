@@ -1,0 +1,32 @@
+export const subscriptionPlans = [
+  {
+    id: "free",
+    name: "Guest",
+    price: 0,
+    intervalLabel: "/ always",
+    description: "Subtili pradžia susipažinti su kolekcijomis, paskyra ir užsakymų istorija.",
+    provider: "internal",
+    badge: "Entry",
+    features: ["Account and order history", "Secure checkout access", "Receipt archive in profile"],
+  },
+  {
+    id: "pro",
+    name: "Circle",
+    price: 10,
+    intervalLabel: "/ month",
+    description: "Mėnesinė narystė pirkėjams, kurie nori ankstyvos prieigos ir išskirtinių pasiūlymų.",
+    provider: "stripe",
+    badge: "Most loved",
+    features: ["Early access to new drops", "Member pricing on selected pieces", "Priority support and billing"],
+  },
+  {
+    id: "business",
+    name: "Private",
+    price: 20,
+    intervalLabel: "/ month",
+    description: "Privatesnė narystė interjero projektams, dovanoms ir dažnesniems užsakymams.",
+    provider: "stripe",
+    badge: "Signature",
+    features: ["Everything in Circle", "Private sourcing assistance", "Priority fulfillment across orders"],
+  },
+];

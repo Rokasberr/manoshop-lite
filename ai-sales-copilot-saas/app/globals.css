@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+:root {
+  --font-body: "Manrope", sans-serif;
+  --font-heading: "Space Grotesk", sans-serif;
+}
+
+@theme inline {
+  --font-body: var(--font-body);
+  --font-heading: var(--font-heading);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body), sans-serif;
+}
+
+.font-heading {
+  font-family: var(--font-heading), sans-serif;
+}
+
+::selection {
+  background: rgba(34, 211, 238, 0.25);
+}

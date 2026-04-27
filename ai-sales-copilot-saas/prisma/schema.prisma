@@ -1,0 +1,189 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  MEMBER
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  HOT
+  CLOSED
+  LOST
+}
+
+enum DealStage {
+  QUALIFIED
+  PROPOSAL
+  NEGOTIATION
+  WON
+  LOST
+}
+
+enum MessageType {
+  EMAIL
+  AI
+  FOLLOW_UP
+  NOTE
+}
+
+enum ReplyStatus {
+  NONE
+  PENDING
+  REPLIED
+  FAILED
+  BOUNCED
+}
+
+enum SubscriptionPlan {
+  FREE_TRIAL
+  STARTER
+  GROWTH
+  AGENCY
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  INACTIVE
+}
+
+enum ActivityType {
+  CREATED
+  STATUS_CHANGED
+  NOTE_ADDED
+  SCORE_UPDATED
+  DEAL_UPDATED
+  EMAIL_SENT
+  REPLIED
+  FOLLOW_UP_QUEUED
+  FOLLOW_UP_SENT
+}
+
+model User {
+  id               String             @id @default(cuid())
+  email            String             @unique
+  name             String?
+  passwordHash     String?
+  image            String?
+  role             UserRole           @default(MEMBER)
+  currentPlan      SubscriptionPlan   @default(FREE_TRIAL)
+  stripeCustomerId String?
+  emailVerified    DateTime?
+  leads            Lead[]
+  deals            Deal[]
+  messages         Message[]
+  subscriptions    Subscription[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+}
+
+model Lead {
+  id               String         @id @default(cuid())
+  name             String
+  email            String
+  company          String
+  companySize      Int?
+  industry         String?
+  website          String?
+  source           String?
+  status           LeadStatus     @default(NEW)
+  score            Int            @default(35)
+  engagementScore  Int            @default(0)
+  responseBehavior String?
+  notes            String?
+  followUpStep     Int            @default(0)
+  nextFollowUpAt   DateTime?
+  lastContactedAt  DateTime?
+  repliedAt        DateTime?
+  lastInboundAt    DateTime?
+  userId           String
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deal             Deal?
+  messages         Message[]
+  activities       LeadActivity[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@index([userId, status])
+  @@index([userId, nextFollowUpAt])
+}
+
+model Deal {
+  id              String    @id @default(cuid())
+  leadId           String    @unique
+  userId           String
+  value            Int
+  stage            DealStage @default(QUALIFIED)
+  probability      Int       @default(35)
+  expectedCloseAt  DateTime?
+  aiInsight        String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  lead             Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, stage])
+}
+
+model Message {
+  id                String      @id @default(cuid())
+  leadId            String
+  userId            String
+  subject           String?
+  content           String
+  type              MessageType
+  tone              String?
+  providerMessageId String?
+  replyStatus       ReplyStatus @default(PENDING)
+  isAutomated       Boolean     @default(false)
+  sentAt            DateTime?
+  metadata          Json?
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  lead              Lead        @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([leadId, sentAt])
+}
+
+model LeadActivity {
+  id        String       @id @default(cuid())
+  leadId     String
+  type       ActivityType
+  message    String
+  metadata   Json?
+  createdAt  DateTime     @default(now())
+  lead       Lead         @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId, createdAt])
+}
+
+model Subscription {
+  id                  String             @id @default(cuid())
+  userId              String
+  plan                SubscriptionPlan
+  status              SubscriptionStatus @default(TRIALING)
+  stripeCustomerId    String?
+  stripeSubscriptionId String?           @unique
+  stripePriceId       String?
+  currentPeriodEnd    DateTime?
+  cancelAtPeriodEnd   Boolean            @default(false)
+  leadLimit           Int
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+}
