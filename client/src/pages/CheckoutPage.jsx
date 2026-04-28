@@ -59,7 +59,7 @@ const CheckoutPage = () => {
       <EmptyState
         title="Checkout laikinai sustabdytas"
         description={STORE_PURCHASES_PAUSED_MESSAGE}
-        actionLabel="Grįžti į launch soon"
+        actionLabel="Grįžti į Netrukus"
         actionTo="/launch-soon"
       />
     );

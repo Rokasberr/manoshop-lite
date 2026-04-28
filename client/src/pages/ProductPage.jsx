@@ -78,7 +78,7 @@ const ProductPage = () => {
 
       <div className="panel p-8">
         <Link to="/shop" className="eyebrow">
-          back to collection
+          grįžti į kolekciją
         </Link>
 
         <div className="mt-5 flex flex-wrap items-center gap-3">
@@ -90,12 +90,12 @@ const ProductPage = () => {
               className="rounded-full px-3 py-1 text-xs font-semibold text-white"
               style={{ backgroundColor: "rgb(var(--accent))" }}
             >
-              Editor's pick
+              Redakcijos pasirinkimas
             </span>
           )}
           {isDigital && (
             <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">
-              Instant download
+              Momentinis atsisiuntimas
             </span>
           )}
         </div>
@@ -108,17 +108,17 @@ const ProductPage = () => {
         <div className="soft-card-strong mt-8 rounded-[24px] p-6">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-muted">price</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-muted">kaina</p>
               <p className="mt-2 font-display text-4xl font-bold">{formatCurrency(product.price)}</p>
             </div>
             <p className="text-sm text-muted">
               {STORE_PURCHASES_PAUSED
-                ? "Temporarily unavailable"
+                ? "Laikinai neaktyvu"
                 : isDigital
-                ? "Delivered to your account after payment"
+                ? "Po apmokėjimo atsiras tavo paskyroje"
                 : product.stock > 0
-                  ? `${product.stock} pieces currently available`
-                  : "Currently unavailable"}
+                  ? `Šiuo metu likę ${product.stock} vnt.`
+                  : "Šiuo metu nepasiekiama"}
             </p>
           </div>
 
@@ -153,12 +153,12 @@ const ProductPage = () => {
             >
               <ShoppingCart size={16} />
               {STORE_PURCHASES_PAUSED
-                ? "Temporarily unavailable"
+                ? "Laikinai neaktyvu"
                 : isUnavailable
-                  ? "Sold out"
+                  ? "Išparduota"
                   : isDigital
-                    ? "Add digital product"
-                    : "Reserve this piece"}
+                    ? "Pridėti skaitmeninį produktą"
+                    : "Rezervuoti šį objektą"}
             </button>
           </div>
         </div>
@@ -172,9 +172,9 @@ const ProductPage = () => {
         <div className="premium-divider mt-8 pt-8">
           <div className="grid gap-4 sm:grid-cols-3">
             {[
-              "Secure Stripe checkout available",
-              "PDF receipt saved to your account",
-              isDigital ? "Download access appears in your profile after payment" : "Thoughtful delivery updates after purchase",
+              "Saugus Stripe apmokėjimas",
+              "PDF sąskaita išsaugoma tavo paskyroje",
+              isDigital ? "Atsisiuntimas atsiras profilyje po apmokėjimo" : "Aiškūs pristatymo atnaujinimai po pirkimo",
             ].map((item) => (
               <div key={item} className="flex items-start gap-3">
                 <CheckCircle2 size={16} className="mt-1" style={{ color: "rgb(var(--accent))" }} />

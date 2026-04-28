@@ -55,9 +55,9 @@ const ProductCard = ({ product }) => {
             <p className="mt-1 font-display text-2xl font-bold">{formatCurrency(product.price)}</p>
             <p className="mt-1 text-xs text-muted">
               {STORE_PURCHASES_PAUSED
-                ? "Temporarily unavailable"
+                ? "Laikinai neaktyvu"
                 : isDigital
-                  ? "Instant download after payment"
+                  ? "Atsisiuntimas po apmokėjimo"
                   : `Stock ${product.stock}`}
             </p>
           </div>
@@ -69,7 +69,7 @@ const ProductCard = ({ product }) => {
             className="button-primary gap-2 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <ShoppingCart size={16} />
-            {STORE_PURCHASES_PAUSED ? "Launch soon" : isUnavailable ? "Sold out" : isDigital ? "Add download" : "Reserve piece"}
+            {STORE_PURCHASES_PAUSED ? "Netrukus" : isUnavailable ? "Išparduota" : isDigital ? "Pridėti atsisiuntimą" : "Rezervuoti"}
           </button>
         </div>
       </div>

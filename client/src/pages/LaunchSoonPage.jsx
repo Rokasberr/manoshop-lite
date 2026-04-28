@@ -1,55 +1,158 @@
-import { ArrowRight, BookOpenText, Download, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpenText, Download } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+
+import { useLanguage } from "../context/LanguageContext";
 import launchSoonService from "../services/launchSoonService";
 
-const launchCards = [
+const launchCardsBase = [
   {
     key: "digital",
-    eyebrow: "Digital collection",
-    title: "Printable guides, bundles, and instant downloads",
-    description:
-      "The digital shelf is being refined so the first release feels complete, premium, and ready to buy without half-finished edges.",
-    bullets: ["Printable art bundles", "PDF guides and planners", "Cleaner launch sequence and bundle logic"],
     icon: Download,
     status: "In staging",
     target: "May 2026",
   },
   {
     key: "journal",
-    eyebrow: "Journal",
-    title: "A calmer editorial layer for members",
-    description:
-      "The Journal is being held back until the launch layer is tighter, so the private reading experience feels more considered from day one.",
-    bullets: ["Members-only articles", "Sharper editorial calendar", "More complete locked reading experience"],
     icon: BookOpenText,
     status: "Held for release",
     target: "After digital launch",
   },
 ];
 
-const focusContent = {
-  default: {
-    eyebrow: "Launch soon",
-    title: "Two premium sections are being prepared for launch.",
-    text: "Digital Collection and Journal are temporarily grouped here while we tighten the release, polish the flow, and make sure both sections feel fully ready.",
+const launchCopy = {
+  lt: {
+    focus: {
+      default: {
+        eyebrow: "Netrukus",
+        title: "Dvi sekcijos dar ruošiamos atidarymui.",
+        text: "Digital Collection ir Journal laikinai sugrupuoti čia, kol užveržiame paleidimo sluoksnį ir užtikriname, kad abi sekcijos atsidarytų pilnesnės.",
+      },
+      digital: {
+        eyebrow: "Digital collection",
+        title: "Skaitmeninė kolekcija ruošiama švaresniam atidarymui.",
+        text: "Produktai, bundle’ai ir instant-download patirtis dar tvarkomi prieš pilną atidarymą.",
+      },
+      journal: {
+        eyebrow: "Journal",
+        title: "Journal laikinai laikomas launch-soon režime.",
+        text: "Užrakintas editorial sluoksnis tvarkomas taip, kad nario skaitymo patirtis nuo pirmos dienos būtų verta atrakinti.",
+      },
+    },
+    cardsTitle: "Kas laikinai laikoma čia",
+    cardsText:
+      "Vietoje pusiau atidarytų sekcijų navigacijoje, abi zonos šiuo metu gyvena viename aiškesniame staging sluoksnyje.",
+    cards: {
+      digital: {
+        eyebrow: "Digital collection",
+        title: "Printable gidai, bundle’ai ir instant download produktai",
+        description:
+          "Digital lentyna dar tvarkoma, kad pirmas release jaustųsi pilnas, premium ir paruoštas pirkimui be nebaigtų kraštų.",
+        bullets: ["Printable art bundle’ai", "PDF gidai ir planneriai", "Švaresnė launch seka ir bundle logika"],
+      },
+      journal: {
+        eyebrow: "Journal",
+        title: "Ramesnis editorial sluoksnis nariams",
+        description:
+          "Journal laikomas atskirai iki stipresnio paleidimo sluoksnio, kad privatūs tekstai jaustųsi pilnai paruošti.",
+        bullets: ["Members-only straipsniai", "Aiškesnis editorial kalendorius", "Pilnesnė užrakinta skaitymo patirtis"],
+      },
+    },
+    statusLabel: "Statusas",
+    targetLabel: "Tikslas",
+    notifyEyebrow: "Pranešk man",
+    notifyTitle: "Leisk žmogui pakelti ranką dar prieš atsidarymą.",
+    notifyText:
+      "Vietoje aklavietės lankytojas supranta, kad sekcija dar ruošiama, ir gali palikti el. paštą, kad primintume vėliau.",
+    notifyButton: "Pranešk man, kai atsidarys",
+    notifyLoading: "Išsaugoma...",
+    contactCta: "Susisiekti",
+    notifyHint:
+      "Forma jau prijungta prie Brevo. Kai paleisime sekciją, šiuos kontaktus galėsime panaudoti švariam launch pranešimui.",
+    whileWaitingEyebrow: "Kol lauki",
+    whileWaitingTitle: "Gyvas sluoksnis vis dar atidarytas.",
+    whileWaitingText:
+      "Kol Digital Collection ir Journal dar ruošiami, gali peržiūrėti pagrindinę kolekciją, narystę ir Stilloak programą.",
+    browseCollection: "Peržiūrėti kolekciją",
+    viewMembership: "Peržiūrėti narystę",
+    launchMap: "Paleidimo planas",
+    stagingTag: "Laikinas staging",
+    invalidEmail: "Įvesk tvarkingą el. pašto adresą, kad galėtume išsaugoti tavo susidomėjimą.",
+    successDefault: "Susidomėjimas išsaugotas. Parašysime, kai ši sekcija atsidarys.",
+    errorDefault: "Nepavyko išsaugoti susidomėjimo. Pabandyk dar kartą kiek vėliau.",
   },
-  digital: {
-    eyebrow: "Digital collection",
-    title: "The digital collection is being prepared for a cleaner launch.",
-    text: "The products, bundles, and instant-download experience are being refined before the collection fully opens to customers.",
-  },
-  journal: {
-    eyebrow: "Journal",
-    title: "The Journal is temporarily held in launch-soon mode.",
-    text: "The locked editorial section is being polished so the member reading layer feels complete, consistent, and worth unlocking.",
+  en: {
+    focus: {
+      default: {
+        eyebrow: "Launch soon",
+        title: "Two sections are still being prepared for launch.",
+        text: "Digital Collection and Journal are temporarily grouped here while we tighten the release layer and make sure both sections open in a more complete state.",
+      },
+      digital: {
+        eyebrow: "Digital collection",
+        title: "The digital collection is being prepared for a cleaner launch.",
+        text: "Products, bundles, and the instant-download experience are still being refined before full release.",
+      },
+      journal: {
+        eyebrow: "Journal",
+        title: "The Journal is temporarily held in launch-soon mode.",
+        text: "The locked editorial layer is being refined so the member reading experience feels worth unlocking from day one.",
+      },
+    },
+    cardsTitle: "What is temporarily held here",
+    cardsText:
+      "Instead of leaving half-open sections in the navigation, both areas currently live inside one clearer staging layer.",
+    cards: {
+      digital: {
+        eyebrow: "Digital collection",
+        title: "Printable guides, bundles, and instant downloads",
+        description:
+          "The digital shelf is being refined so the first release feels complete, premium, and ready to buy without half-finished edges.",
+        bullets: ["Printable art bundles", "PDF guides and planners", "Cleaner launch sequence and bundle logic"],
+      },
+      journal: {
+        eyebrow: "Journal",
+        title: "A calmer editorial layer for members",
+        description:
+          "The Journal is being held back until the launch layer is tighter, so the private reading experience feels more considered from day one.",
+        bullets: ["Members-only articles", "Sharper editorial calendar", "A more complete locked reading experience"],
+      },
+    },
+    statusLabel: "Status",
+    targetLabel: "Target",
+    notifyEyebrow: "Notify me",
+    notifyTitle: "Let people raise a hand before the section opens.",
+    notifyText:
+      "Instead of sending visitors into a dead end, this keeps the page useful: they understand the section is coming, and they can leave an email to be notified later.",
+    notifyButton: "Notify me when it opens",
+    notifyLoading: "Saving interest...",
+    contactCta: "Contact the studio",
+    notifyHint:
+      "This form is already connected to Brevo, so the launch list can turn into a clean release email when the section is ready.",
+    whileWaitingEyebrow: "While you wait",
+    whileWaitingTitle: "The live layer is still open.",
+    whileWaitingText:
+      "While Digital Collection and Journal are still being prepared, you can browse the main collection, view membership, and explore Stilloak.",
+    browseCollection: "Browse collection",
+    viewMembership: "View membership",
+    launchMap: "Launch map",
+    stagingTag: "Temporary staging",
+    invalidEmail: "Enter a valid email address so we can save your interest.",
+    successDefault: "Interest saved. We’ll write when this section opens.",
+    errorDefault: "Could not save your interest. Please try again later.",
   },
 };
+
+["pl", "de", "fr", "es"].forEach((languageCode) => {
+  launchCopy[languageCode] = launchCopy.en;
+});
 
 const notifyStorageKey = "stilloak_launch_soon_interest";
 
 const LaunchSoonPage = ({ focus = "default" }) => {
-  const content = focusContent[focus] || focusContent.default;
+  const { language } = useLanguage();
+  const copy = launchCopy[language] || launchCopy.lt;
+  const content = copy.focus[focus] || copy.focus.default;
   const [email, setEmail] = useState("");
   const [notifyState, setNotifyState] = useState("idle");
   const [notifyMessage, setNotifyMessage] = useState("");
@@ -61,7 +164,7 @@ const LaunchSoonPage = ({ focus = "default" }) => {
 
     if (!isValidEmail) {
       setNotifyState("error");
-      setNotifyMessage("Įvesk tvarkingą el. pašto adresą, kad galėtume išsaugoti tavo susidomėjimą.");
+      setNotifyMessage(copy.invalidEmail);
       return;
     }
 
@@ -84,13 +187,11 @@ const LaunchSoonPage = ({ focus = "default" }) => {
       );
 
       setNotifyState("success");
-      setNotifyMessage(response.message || "Susidomėjimas išsaugotas. Parašysime, kai ši sekcija atsidarys.");
+      setNotifyMessage(response.message || copy.successDefault);
       setEmail("");
     } catch (error) {
       setNotifyState("error");
-      setNotifyMessage(
-        error.response?.data?.message || "Nepavyko išsaugoti susidomėjimo. Pabandyk dar kartą kiek vėliau."
-      );
+      setNotifyMessage(error.response?.data?.message || copy.errorDefault);
     }
   };
 
@@ -106,30 +207,20 @@ const LaunchSoonPage = ({ focus = "default" }) => {
             <p className="mt-6 max-w-2xl text-base leading-7 text-white/72 sm:text-lg">{content.text}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/shop" className="button-primary gap-2">
-                Explore current collection
+                {copy.browseCollection}
                 <ArrowRight size={16} />
               </Link>
               <Link to="/pricing" className="hero-outline-button">
-                View membership
+                {copy.viewMembership}
               </Link>
             </div>
           </div>
 
           <div className="grid gap-4">
             <div className="metric-card">
-              <p className="text-xs uppercase tracking-[0.3em] text-white/45">Status</p>
-              <p className="mt-3 font-display text-3xl font-bold">Launch soon</p>
-              <p className="mt-2 text-sm text-white/60">These sections are being tightened before full release.</p>
-            </div>
-            <div className="metric-card">
-              <p className="text-xs uppercase tracking-[0.3em] text-white/45">Why</p>
-              <p className="mt-3 font-display text-3xl font-bold">Cleaner first impression</p>
-              <p className="mt-2 text-sm text-white/60">The goal is to open them when the experience already feels complete.</p>
-            </div>
-            <div className="metric-card">
-              <p className="text-xs uppercase tracking-[0.3em] text-white/45">Current layer</p>
-              <p className="mt-3 font-display text-3xl font-bold">Story, shop, membership</p>
-              <p className="mt-2 text-sm text-white/60">The rest of the storefront stays open while these two sections are staged.</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-white/45">{copy.statusLabel}</p>
+              <p className="mt-3 font-display text-3xl font-bold">{content.eyebrow}</p>
+              <p className="mt-2 text-sm text-white/60">{content.text}</p>
             </div>
           </div>
         </div>
@@ -138,18 +229,16 @@ const LaunchSoonPage = ({ focus = "default" }) => {
       <section className="public-section">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <span className="eyebrow">Launch map</span>
-            <h2 className="mt-5 font-display text-4xl font-bold sm:text-5xl">What is temporarily grouped here</h2>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
-              Instead of leaving half-open sections in the navigation, both areas now live inside one clearer staging
-              layer until the launch is ready.
-            </p>
+            <span className="eyebrow">{copy.launchMap}</span>
+            <h2 className="mt-5 font-display text-4xl font-bold sm:text-5xl">{copy.cardsTitle}</h2>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-muted">{copy.cardsText}</p>
           </div>
-          <div className="premium-tag">Temporary staging</div>
+          <div className="premium-tag">{copy.stagingTag}</div>
         </div>
 
         <div className="mt-8 grid gap-5 lg:grid-cols-2">
-          {launchCards.map((card) => {
+          {launchCardsBase.map((card) => {
+            const localizedCard = copy.cards[card.key];
             const Icon = card.icon;
             const isFocused = focus === card.key;
 
@@ -162,29 +251,29 @@ const LaunchSoonPage = ({ focus = "default" }) => {
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.3em] text-muted">{card.eyebrow}</p>
-                    <h3 className="mt-4 font-display text-3xl font-bold text-[rgb(28,24,20)]">{card.title}</h3>
+                    <p className="text-xs uppercase tracking-[0.3em] text-muted">{localizedCard.eyebrow}</p>
+                    <h3 className="mt-4 font-display text-3xl font-bold text-[rgb(28,24,20)]">{localizedCard.title}</h3>
                   </div>
                   <div className="rounded-full bg-[rgb(var(--accent))]/10 p-3">
                     <Icon size={18} style={{ color: "rgb(var(--accent-strong))" }} />
                   </div>
                 </div>
 
-                <p className="mt-4 text-base leading-7 text-muted">{card.description}</p>
+                <p className="mt-4 text-base leading-7 text-muted">{localizedCard.description}</p>
 
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
                   <div className="rounded-[18px] border border-[rgb(238,231,223)] bg-[rgb(252,249,244)] px-4 py-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[rgb(128,90,42)]">Status</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[rgb(128,90,42)]">{copy.statusLabel}</p>
                     <p className="mt-2 text-sm text-[rgb(98,87,74)]">{card.status}</p>
                   </div>
                   <div className="rounded-[18px] border border-[rgb(238,231,223)] bg-[rgb(252,249,244)] px-4 py-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[rgb(128,90,42)]">Target</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[rgb(128,90,42)]">{copy.targetLabel}</p>
                     <p className="mt-2 text-sm text-[rgb(98,87,74)]">{card.target}</p>
                   </div>
                 </div>
 
                 <div className="mt-5 grid gap-3">
-                  {card.bullets.map((bullet) => (
+                  {localizedCard.bullets.map((bullet) => (
                     <div
                       key={bullet}
                       className="rounded-[18px] border border-[rgb(238,231,223)] bg-[rgb(252,249,244)] px-4 py-3 text-sm text-[rgb(98,87,74)]"
@@ -202,32 +291,27 @@ const LaunchSoonPage = ({ focus = "default" }) => {
       <section className="public-section">
         <div className="grid gap-8 lg:grid-cols-[0.92fr_1.08fr]">
           <div>
-            <span className="eyebrow">Notify me</span>
-            <h2 className="mt-5 max-w-xl font-display text-4xl font-bold sm:text-5xl">
-              Let people raise a hand before the section opens.
-            </h2>
-            <p className="mt-4 max-w-lg text-base leading-7 text-muted">
-              Instead of sending visitors into a dead end, this keeps the page useful: they understand the section is
-              coming, and they can leave an email to be notified later.
-            </p>
+            <span className="eyebrow">{copy.notifyEyebrow}</span>
+            <h2 className="mt-5 max-w-xl font-display text-4xl font-bold sm:text-5xl">{copy.notifyTitle}</h2>
+            <p className="mt-4 max-w-lg text-base leading-7 text-muted">{copy.notifyText}</p>
           </div>
 
           <div className="rounded-[32px] border border-[rgb(232,224,214)] bg-[rgb(34,28,24)] px-6 py-7 text-white">
-            <p className="text-xs uppercase tracking-[0.34em] text-white/42">Launch alert</p>
+            <p className="text-xs uppercase tracking-[0.34em] text-white/42">{copy.notifyEyebrow}</p>
             <form className="mt-5 space-y-4" onSubmit={handleNotifySubmit}>
               <input
                 type="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                placeholder="Your email address"
+                placeholder="email@example.com"
                 className="w-full rounded-full border border-white/10 bg-white/6 px-5 py-4 text-sm text-white outline-none placeholder:text-white/34"
               />
               <div className="flex flex-wrap gap-3">
                 <button type="submit" className="button-primary" disabled={notifyState === "loading"}>
-                  {notifyState === "loading" ? "Saving interest..." : "Notify me when it opens"}
+                  {notifyState === "loading" ? copy.notifyLoading : copy.notifyButton}
                 </button>
                 <Link to="/contact" className="hero-outline-button">
-                  Contact the studio
+                  {copy.contactCta}
                 </Link>
               </div>
             </form>
@@ -240,10 +324,7 @@ const LaunchSoonPage = ({ focus = "default" }) => {
                 {notifyMessage}
               </p>
             ) : (
-              <p className="mt-4 text-sm leading-6 text-white/60">
-                This form is ready to save real interest to Brevo once the API key and optional launch list ID are set
-                on the server.
-              </p>
+              <p className="mt-4 text-sm leading-6 text-white/60">{copy.notifyHint}</p>
             )}
           </div>
         </div>
@@ -254,22 +335,19 @@ const LaunchSoonPage = ({ focus = "default" }) => {
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.34em]" style={{ color: "rgb(var(--accent-strong))" }}>
-                While you wait
+                {copy.whileWaitingEyebrow}
               </p>
               <h2 className="mt-3 font-display text-3xl font-bold tracking-[-0.03em] text-[rgb(29,24,19)]">
-                The current live layer is still open.
+                {copy.whileWaitingTitle}
               </h2>
-              <p className="mt-2 max-w-3xl text-base leading-7 text-[rgb(98,87,74)]">
-                You can still browse the main collection, view membership, and explore Stilloak while Digital
-                Collection and Journal are being prepared for a stronger release.
-              </p>
+              <p className="mt-2 max-w-3xl text-base leading-7 text-[rgb(98,87,74)]">{copy.whileWaitingText}</p>
             </div>
             <div className="flex flex-wrap gap-3">
               <Link to="/shop" className="button-primary">
-                Browse collection
+                {copy.browseCollection}
               </Link>
               <Link to="/pricing" className="button-secondary">
-                View membership
+                {copy.viewMembership}
               </Link>
             </div>
           </div>

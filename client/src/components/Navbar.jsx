@@ -3,7 +3,101 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
+import { useLanguage } from "../context/LanguageContext";
 import { useTheme } from "../context/ThemeContext";
+
+const navbarCopy = {
+  lt: {
+    nav: {
+      story: "Story",
+      stilloak: "Stilloak",
+      membership: "Narystė",
+      launchSoon: "Netrukus",
+      admin: "Admin",
+    },
+    tagline: "ramesnis aiškumas",
+    bag: "Krepšelis",
+    signOut: "Atsijungti",
+    signIn: "Prisijungti",
+    join: "Atrakinti narystę",
+    languageLabel: "Kalba",
+  },
+  en: {
+    nav: {
+      story: "Story",
+      stilloak: "Stilloak",
+      membership: "Membership",
+      launchSoon: "Launch soon",
+      admin: "Admin",
+    },
+    tagline: "calmer clarity",
+    bag: "Bag",
+    signOut: "Sign out",
+    signIn: "Sign in",
+    join: "Unlock membership",
+    languageLabel: "Language",
+  },
+  pl: {
+    nav: {
+      story: "Historia",
+      stilloak: "Stilloak",
+      membership: "Członkostwo",
+      launchSoon: "Wkrótce",
+      admin: "Admin",
+    },
+    tagline: "spokojniejsza kontrola",
+    bag: "Koszyk",
+    signOut: "Wyloguj",
+    signIn: "Zaloguj",
+    join: "Odblokuj członkostwo",
+    languageLabel: "Język",
+  },
+  de: {
+    nav: {
+      story: "Story",
+      stilloak: "Stilloak",
+      membership: "Mitgliedschaft",
+      launchSoon: "Bald",
+      admin: "Admin",
+    },
+    tagline: "ruhigere klarheit",
+    bag: "Warenkorb",
+    signOut: "Abmelden",
+    signIn: "Anmelden",
+    join: "Mitgliedschaft freischalten",
+    languageLabel: "Sprache",
+  },
+  fr: {
+    nav: {
+      story: "Histoire",
+      stilloak: "Stilloak",
+      membership: "Abonnement",
+      launchSoon: "Bientôt",
+      admin: "Admin",
+    },
+    tagline: "une clarté plus calme",
+    bag: "Panier",
+    signOut: "Déconnexion",
+    signIn: "Connexion",
+    join: "Débloquer l’abonnement",
+    languageLabel: "Langue",
+  },
+  es: {
+    nav: {
+      story: "Historia",
+      stilloak: "Stilloak",
+      membership: "Membresía",
+      launchSoon: "Próximamente",
+      admin: "Admin",
+    },
+    tagline: "claridad más serena",
+    bag: "Bolsa",
+    signOut: "Salir",
+    signIn: "Entrar",
+    join: "Desbloquear membresía",
+    languageLabel: "Idioma",
+  },
+};
 
 const Navbar = () => {
   const location = useLocation();
@@ -11,11 +105,13 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const { cartCount } = useCart();
   const { theme, toggleTheme } = useTheme();
+  const { language, languageOptions, setLanguage } = useLanguage();
+  const copy = navbarCopy[language] || navbarCopy.lt;
   const publicLinks = [
-    { label: "Story", to: "/story" },
-    { label: "Stilloak", to: "/savings-studio" },
-    { label: "Membership", to: "/pricing" },
-    { label: "Launch soon", to: "/launch-soon" },
+    { label: copy.nav.story, to: "/story" },
+    { label: copy.nav.stilloak, to: "/savings-studio" },
+    { label: copy.nav.membership, to: "/pricing" },
+    { label: copy.nav.launchSoon, to: "/launch-soon" },
   ];
 
   const handleLogout = () => {
@@ -37,7 +133,7 @@ const Navbar = () => {
           </div>
           <div className="min-w-0">
             <p className="font-display text-[1.45rem] font-bold leading-none">Stilloak Studio</p>
-            <p className="text-[10px] uppercase tracking-[0.32em] text-muted">curated living</p>
+            <p className="text-[10px] uppercase tracking-[0.32em] text-muted">{copy.tagline}</p>
           </div>
         </Link>
 
@@ -62,12 +158,29 @@ const Navbar = () => {
                 location.pathname.startsWith("/admin") ? "nav-link-public-active" : ""
               }`}
             >
-              Admin
+              {copy.nav.admin}
             </Link>
           )}
         </nav>
 
         <div className="flex flex-wrap items-center justify-end gap-2">
+          <label className="sr-only" htmlFor="site-language-switcher">
+            {copy.languageLabel}
+          </label>
+          <select
+            id="site-language-switcher"
+            value={language}
+            onChange={(event) => setLanguage(event.target.value)}
+            className="button-secondary h-10 rounded-full px-4 text-sm"
+            aria-label={copy.languageLabel}
+          >
+            {languageOptions.map((option) => (
+              <option key={option.code} value={option.code}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+
           <button
             type="button"
             onClick={toggleTheme}
@@ -79,7 +192,7 @@ const Navbar = () => {
 
           <Link to="/cart" className="button-secondary gap-2 px-4">
             <ShoppingBag size={18} />
-            <span className="hidden sm:inline">Bag</span>
+            <span className="hidden sm:inline">{copy.bag}</span>
             {cartCount > 0 && (
               <span
                 className="rounded-full px-2 py-0.5 text-xs font-bold text-white"
@@ -97,17 +210,17 @@ const Navbar = () => {
                 <span className="hidden sm:inline">{user.name.split(" ")[0]}</span>
               </Link>
               <button type="button" onClick={handleLogout} className="button-secondary px-4">
-                Sign out
+                {copy.signOut}
               </button>
             </>
           ) : (
             <Link to="/login" className="button-secondary px-4">
-              Sign in
+              {copy.signIn}
             </Link>
           )}
 
           <Link to="/pricing" className="button-primary gap-2 px-4">
-            <span className="hidden sm:inline">Join the circle</span>
+            <span className="hidden sm:inline">{copy.join}</span>
             <ArrowRight size={16} />
           </Link>
         </div>
