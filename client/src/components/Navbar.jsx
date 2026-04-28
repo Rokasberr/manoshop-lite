@@ -11,14 +11,12 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const { cartCount } = useCart();
   const { theme, toggleTheme } = useTheme();
-  const isHomePage = location.pathname === "/";
-
   const publicLinks = [
-    { label: "Story", href: "/#story" },
-    { label: "Collection", href: "/shop" },
-    { label: "Digital", href: "/digital" },
-    { label: "Membership", href: "/pricing" },
-    { label: "Journal", href: "/#journal" },
+    { label: "Story", to: "/story" },
+    { label: "Collection", to: "/shop" },
+    { label: "Digital", to: "/digital" },
+    { label: "Membership", to: "/pricing" },
+    { label: "Journal", to: "/journal" },
   ];
 
   const handleLogout = () => {
@@ -45,31 +43,19 @@ const Navbar = () => {
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
-          {publicLinks.map((link) =>
-            link.href.startsWith("/#") ? (
-              <a
-                key={link.label}
-                href={link.href}
-                className={`nav-link-public ${
-                  isHomePage && location.hash === link.href.slice(1) ? "nav-link-public-active" : ""
-                }`}
-              >
-                {link.label}
-              </a>
-            ) : (
-              <Link
-                key={link.label}
-                to={link.href}
-                className={`nav-link-public ${
-                  location.pathname === link.href || location.pathname.startsWith(`${link.href}/`)
-                    ? "nav-link-public-active"
-                    : ""
-                }`}
-              >
-                {link.label}
-              </Link>
-            )
-          )}
+          {publicLinks.map((link) => (
+            <Link
+              key={link.label}
+              to={link.to}
+              className={`nav-link-public ${
+                location.pathname === link.to || location.pathname.startsWith(`${link.to}/`)
+                  ? "nav-link-public-active"
+                  : ""
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
           {user?.role === "admin" && (
             <Link
               to="/admin"

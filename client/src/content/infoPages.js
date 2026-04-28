@@ -13,10 +13,10 @@ export const clientCareLinks = [
 ];
 
 export const houseLinks = [
-  { label: "Our story", href: "/#story" },
+  { label: "Our story", to: "/story" },
   { label: "Collection", to: "/shop" },
   { label: "Membership", to: "/pricing" },
-  { label: "Journal", href: "/#journal" },
+  { label: "Journal", to: "/journal" },
 ];
 
 export const infoPages = {

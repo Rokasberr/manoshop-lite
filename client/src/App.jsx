@@ -5,6 +5,8 @@ import AdminPreviewLayout from "./components/admin-dashboard/AdminPreviewLayout"
 import ProtectedRoute from "./components/ProtectedRoute";
 import HomePage from "./pages/HomePage";
 import DigitalLandingPage from "./pages/DigitalLandingPage";
+import StoryPage from "./pages/StoryPage";
+import JournalPage from "./pages/JournalPage";
 import ShopPage from "./pages/ShopPage";
 import ProductPage from "./pages/ProductPage";
 import CartPage from "./pages/CartPage";
@@ -33,6 +35,8 @@ const App = () => (
 
     <Route element={<Layout />}>
       <Route path="/" element={<HomePage />} />
+      <Route path="/story" element={<StoryPage />} />
+      <Route path="/journal" element={<JournalPage />} />
       <Route path="/shop" element={<ShopPage />} />
       <Route path="/digital" element={<DigitalLandingPage />} />
       <Route path="/digital/collection" element={<ShopPage defaultProductType="digital" />} />
