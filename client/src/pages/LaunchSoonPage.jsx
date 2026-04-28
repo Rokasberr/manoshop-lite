@@ -268,8 +268,8 @@ const LaunchSoonPage = ({ focus = "default" }) => {
               <Link to="/shop" className="button-primary">
                 Browse collection
               </Link>
-              <Link to="/membership-preview" className="button-secondary">
-                Membership preview
+              <Link to="/pricing" className="button-secondary">
+                View membership
               </Link>
             </div>
           </div>

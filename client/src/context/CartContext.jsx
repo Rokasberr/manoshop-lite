@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { STORE_PURCHASES_PAUSED, STORE_PURCHASES_PAUSED_MESSAGE } from "../constants/storefront";
 
 const CartContext = createContext(null);
 const cartStorageKey = "manoshop_cart";
@@ -29,6 +30,11 @@ export const CartProvider = ({ children }) => {
   }, [cartItems]);
 
   const addToCart = (product, quantity = 1) => {
+    if (STORE_PURCHASES_PAUSED) {
+      toast.error(STORE_PURCHASES_PAUSED_MESSAGE);
+      return;
+    }
+
     setCartItems((currentItems) => {
       const existingItem = currentItems.find((item) => item.product === product._id);
 
@@ -103,6 +109,8 @@ export const CartProvider = ({ children }) => {
     updateQuantity,
     removeFromCart,
     clearCart,
+    purchasesPaused: STORE_PURCHASES_PAUSED,
+    purchasesPausedMessage: STORE_PURCHASES_PAUSED_MESSAGE,
     cartCount: cartItems.reduce((sum, item) => sum + item.quantity, 0),
     subtotal: cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
   };

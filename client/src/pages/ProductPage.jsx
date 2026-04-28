@@ -5,6 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import EmptyState from "../components/EmptyState";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useCart } from "../context/CartContext";
+import { STORE_PURCHASES_PAUSED, STORE_PURCHASES_PAUSED_MESSAGE } from "../constants/storefront";
 import productService from "../services/productService";
 import { formatCurrency } from "../utils/currency";
 
@@ -50,7 +51,7 @@ const ProductPage = () => {
 
   const isDigital = product.productType === "digital";
   const maxQuantity = isDigital ? 10 : product.stock;
-  const isUnavailable = !isDigital && product.stock === 0;
+  const isUnavailable = STORE_PURCHASES_PAUSED || (!isDigital && product.stock === 0);
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr]">
@@ -111,7 +112,9 @@ const ProductPage = () => {
               <p className="mt-2 font-display text-4xl font-bold">{formatCurrency(product.price)}</p>
             </div>
             <p className="text-sm text-muted">
-              {isDigital
+              {STORE_PURCHASES_PAUSED
+                ? "Temporarily unavailable"
+                : isDigital
                 ? "Delivered to your account after payment"
                 : product.stock > 0
                   ? `${product.stock} pieces currently available`
@@ -145,13 +148,26 @@ const ProductPage = () => {
               type="button"
               onClick={() => addToCart(product, quantity)}
               disabled={isUnavailable}
+              title={STORE_PURCHASES_PAUSED ? STORE_PURCHASES_PAUSED_MESSAGE : undefined}
               className="button-primary gap-2 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <ShoppingCart size={16} />
-              {isUnavailable ? "Sold out" : isDigital ? "Add digital product" : "Reserve this piece"}
+              {STORE_PURCHASES_PAUSED
+                ? "Temporarily unavailable"
+                : isUnavailable
+                  ? "Sold out"
+                  : isDigital
+                    ? "Add digital product"
+                    : "Reserve this piece"}
             </button>
           </div>
         </div>
+
+        {STORE_PURCHASES_PAUSED && (
+          <div className="mt-5 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+            {STORE_PURCHASES_PAUSED_MESSAGE}
+          </div>
+        )}
 
         <div className="premium-divider mt-8 pt-8">
           <div className="grid gap-4 sm:grid-cols-3">

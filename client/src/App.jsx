@@ -7,7 +7,6 @@ import HomePage from "./pages/HomePage";
 import DigitalLandingPage from "./pages/DigitalLandingPage";
 import StoryPage from "./pages/StoryPage";
 import LaunchSoonPage from "./pages/LaunchSoonPage";
-import MembershipPreviewPage from "./pages/MembershipPreviewPage";
 import JournalPage from "./pages/JournalPage";
 import JournalArticlePage from "./pages/JournalArticlePage";
 import SavingsStudioDemoPage from "./pages/SavingsStudioDemoPage";
@@ -42,7 +41,6 @@ const App = () => (
       <Route path="/" element={<HomePage />} />
       <Route path="/story" element={<StoryPage />} />
       <Route path="/launch-soon" element={<LaunchSoonPage />} />
-      <Route path="/membership-preview" element={<MembershipPreviewPage />} />
       <Route path="/journal" element={<LaunchSoonPage focus="journal" />} />
       <Route path="/journal/:slug" element={<LaunchSoonPage focus="journal" />} />
       <Route path="/savings-studio" element={<SavingsStudioDemoPage />} />

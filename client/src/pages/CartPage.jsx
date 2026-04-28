@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import EmptyState from "../components/EmptyState";
 import SectionTitle from "../components/SectionTitle";
 import { useCart } from "../context/CartContext";
+import { STORE_PURCHASES_PAUSED, STORE_PURCHASES_PAUSED_MESSAGE } from "../constants/storefront";
 import { formatCurrency } from "../utils/currency";
 
 const CartPage = () => {
@@ -28,6 +29,13 @@ const CartPage = () => {
         title="Tavo krepšelis realiu laiku"
         subtitle="Keisk kiekius, pašalink prekes ir matyk sumą iš karto per Context API."
       />
+
+      {STORE_PURCHASES_PAUSED && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+          {STORE_PURCHASES_PAUSED_MESSAGE} Jei krepšelyje liko senesnių prekių, jas gali pašalinti, bet checkout
+          laikinai sustabdytas.
+        </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-4">
@@ -101,9 +109,15 @@ const CartPage = () => {
             </div>
           </div>
 
-          <Link to="/checkout" className="button-primary mt-8 w-full">
-            Tęsti į checkout
-          </Link>
+          {STORE_PURCHASES_PAUSED ? (
+            <button type="button" disabled className="button-primary mt-8 w-full cursor-not-allowed opacity-60">
+              Checkout paused
+            </button>
+          ) : (
+            <Link to="/checkout" className="button-primary mt-8 w-full">
+              Tęsti į checkout
+            </Link>
+          )}
         </aside>
       </div>
     </div>

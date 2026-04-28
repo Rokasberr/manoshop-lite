@@ -6,6 +6,7 @@ import EmptyState from "../components/EmptyState";
 import SectionTitle from "../components/SectionTitle";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
+import { STORE_PURCHASES_PAUSED, STORE_PURCHASES_PAUSED_MESSAGE } from "../constants/storefront";
 import orderService from "../services/orderService";
 import { formatCurrency } from "../utils/currency";
 
@@ -49,6 +50,17 @@ const CheckoutPage = () => {
         title="Checkout negalimas"
         description="Pirmiausia įsidėk produktų į krepšelį."
         actionLabel="Eiti į parduotuvę"
+      />
+    );
+  }
+
+  if (STORE_PURCHASES_PAUSED) {
+    return (
+      <EmptyState
+        title="Checkout laikinai sustabdytas"
+        description={STORE_PURCHASES_PAUSED_MESSAGE}
+        actionLabel="Grįžti į launch soon"
+        actionTo="/launch-soon"
       />
     );
   }

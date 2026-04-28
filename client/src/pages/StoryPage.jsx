@@ -146,8 +146,8 @@ const StoryPage = () => (
             Unlock membership
             <ArrowRight size={16} />
           </Link>
-          <Link to="/membership-preview" className="button-secondary">
-            Membership preview
+          <Link to="/launch-soon" className="button-secondary">
+            Launch soon
           </Link>
         </div>
       </div>
@@ -258,12 +258,11 @@ const MemberExperienceShowcase = () => (
           <div>
             <p className="text-xs uppercase tracking-[0.22em] text-[rgb(128,90,42)]">Preview page</p>
             <p className="mt-2 text-sm leading-7 text-[rgb(98,87,74)]">
-              If you want to see the real screens, summary email example, and unlock flow visually, open the dedicated
-              Membership Preview page.
+              The visual membership preview layer is temporarily offline while the next launch stage is being tightened.
             </p>
           </div>
-          <Link to="/membership-preview" className="button-primary">
-            Open preview
+          <Link to="/launch-soon" className="button-primary">
+            View launch status
           </Link>
         </div>
       </div>

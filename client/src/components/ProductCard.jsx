@@ -2,12 +2,13 @@ import { ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { useCart } from "../context/CartContext";
+import { STORE_PURCHASES_PAUSED, STORE_PURCHASES_PAUSED_MESSAGE } from "../constants/storefront";
 import { formatCurrency } from "../utils/currency";
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
   const isDigital = product.productType === "digital";
-  const isUnavailable = !isDigital && product.stock === 0;
+  const isUnavailable = STORE_PURCHASES_PAUSED || (!isDigital && product.stock === 0);
 
   return (
     <div className="panel overflow-hidden">
@@ -53,17 +54,22 @@ const ProductCard = ({ product }) => {
             <p className="text-xs uppercase tracking-[0.3em] text-muted">from</p>
             <p className="mt-1 font-display text-2xl font-bold">{formatCurrency(product.price)}</p>
             <p className="mt-1 text-xs text-muted">
-              {isDigital ? "Instant download after payment" : `Stock ${product.stock}`}
+              {STORE_PURCHASES_PAUSED
+                ? "Temporarily unavailable"
+                : isDigital
+                  ? "Instant download after payment"
+                  : `Stock ${product.stock}`}
             </p>
           </div>
           <button
             type="button"
             onClick={() => addToCart(product)}
             disabled={isUnavailable}
+            title={STORE_PURCHASES_PAUSED ? STORE_PURCHASES_PAUSED_MESSAGE : undefined}
             className="button-primary gap-2 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <ShoppingCart size={16} />
-            {isUnavailable ? "Sold out" : isDigital ? "Add download" : "Reserve piece"}
+            {STORE_PURCHASES_PAUSED ? "Launch soon" : isUnavailable ? "Sold out" : isDigital ? "Add download" : "Reserve piece"}
           </button>
         </div>
       </div>
