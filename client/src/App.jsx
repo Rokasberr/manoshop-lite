@@ -7,8 +7,6 @@ import HomePage from "./pages/HomePage";
 import DigitalLandingPage from "./pages/DigitalLandingPage";
 import StoryPage from "./pages/StoryPage";
 import LaunchSoonPage from "./pages/LaunchSoonPage";
-import JournalPage from "./pages/JournalPage";
-import JournalArticlePage from "./pages/JournalArticlePage";
 import SavingsStudioDemoPage from "./pages/SavingsStudioDemoPage";
 import SavingsStudioPage from "./pages/SavingsStudioPage";
 import ShopPage from "./pages/ShopPage";
