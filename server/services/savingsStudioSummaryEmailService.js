@@ -15,7 +15,9 @@ const toneLabelMap = {
   info: "Signalas",
 };
 
-const buildAiCommentary = ({ frequency, summary }) => {
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+const buildPremiumEvaluation = ({ frequency, summary }) => {
   const strongestInsight =
     (summary.insights || []).find((insight) => insight.tone === "danger") ||
     (summary.insights || []).find((insight) => insight.tone === "warning") ||
@@ -27,6 +29,69 @@ const buildAiCommentary = ({ frequency, summary }) => {
     .sort((left, right) => Number(right.total) - Number(left.total))[0];
 
   const lines = [];
+  const strengths = [];
+  const risks = [];
+  const actions = [];
+  const fixedProjected = Number(summary.fixedVsFlexible?.fixedProjected || 0);
+  const flexibleSpent = Number(summary.fixedVsFlexible?.flexibleSpent || 0);
+  const projectedTotal = Number(summary.projectedMonthTotal || summary.monthTotal || 0);
+  const fixedShare = projectedTotal > 0 ? (fixedProjected / projectedTotal) * 100 : 0;
+  const biggestPressure = summary.categoryPressure?.[0] || null;
+  const safeToSaveAfterRecurring = Number(summary.safeToSaveAfterRecurring || 0);
+  const change = summary.change;
+  const dangerCount = (summary.insights || []).filter((insight) => insight.tone === "danger").length;
+  const warningCount = (summary.insights || []).filter((insight) => insight.tone === "warning").length;
+  const successCount = (summary.insights || []).filter((insight) => insight.tone === "success").length;
+  let score = 74;
+
+  score += successCount * 4;
+  score -= dangerCount * 12;
+  score -= warningCount * 6;
+
+  if (typeof change === "number") {
+    if (change <= -8) {
+      score += 6;
+    } else if (change >= 10) {
+      score -= 8;
+    }
+  }
+
+  if (summary.goalPace?.status === "on-track") {
+    score += 7;
+  } else if (summary.goalPace?.status === "tight") {
+    score -= 4;
+  } else if (summary.goalPace?.status === "behind") {
+    score -= 10;
+  }
+
+  if (fixedShare >= 55) {
+    score -= 6;
+  } else if (fixedShare <= 28 && projectedTotal > 0) {
+    score += 3;
+  }
+
+  if (safeToSaveAfterRecurring > 0) {
+    score += 5;
+  } else if (projectedTotal > 0) {
+    score -= 8;
+  }
+
+  if (biggestPressure?.status === "over") {
+    score -= 8;
+  } else if (biggestPressure?.status === "warning") {
+    score -= 4;
+  }
+
+  score = clamp(Math.round(score), 28, 96);
+
+  const level =
+    score >= 88
+      ? "Elite control"
+      : score >= 76
+      ? "Strong control"
+      : score >= 62
+      ? "Needs tightening"
+      : "Critical review";
 
   if (frequency === "weekly") {
     lines.push("Pagal šios savaitės vaizdą svarbiausia žiūrėti ne į visų išlaidų kiekį, o į vietą, kur mėnesis greičiausiai praranda kontrolę.");
@@ -42,22 +107,62 @@ const buildAiCommentary = ({ frequency, summary }) => {
 
   if (biggestWeek) {
     lines.push(`${biggestWeek.label} šiame mėnesyje kol kas yra brangiausia (${money.format(biggestWeek.total)}), todėl verta peržiūrėti, kokie pirkiniai susikoncentravo būtent tame ruože.`);
+    risks.push(`${biggestWeek.label} dabar yra brangiausia savaitė (${money.format(biggestWeek.total)}), todėl mėnesio spaudimas pas tave koncentruojasi ne tolygiai, o bangomis.`);
+    actions.push(`Peržiūrėk ${biggestWeek.label.toLowerCase()} pirkinius ir išskirk 2–3 išlaidas, kurias gali nukirpti kitą ciklą.`);
   }
 
   if (summary.recurringMonthlyTotal > 0) {
     lines.push(`Vien pastovios išlaidos sudaro apie ${money.format(summary.recurringMonthlyTotal)}, todėl net ir geras einamasis ritmas atrodys silpniau, jei recurring dalis nebus aiškiai kontroliuojama.`);
+    if (fixedShare >= 45) {
+      risks.push(`Pastovios išlaidos jau užima apie ${Math.round(fixedShare)}% projekcinio mėnesio, todėl lankstumo taupymui lieka mažiau nei norėtųsi.`);
+    } else {
+      strengths.push(`Pastovios išlaidos yra aiškiai matomos, todėl turi gerą pagrindą planuoti taupymą ne aklai, o pagal realią mėnesio struktūrą.`);
+    }
   }
 
   if (summary.goalPace?.recommendedMonthly) {
     if (summary.goalPace.status === "behind") {
       lines.push(`Pagal dabartinį tikslų tempą reikėtų atsidėti bent ${money.format(summary.goalPace.recommendedMonthly)} per mėnesį, todėl dabartinę išlaidų struktūrą verta koreguoti agresyviau.`);
+      risks.push(`Taupymo tikslas „${summary.goalPace.title}“ dabar juda per lėtai, nes reikalingas tempas yra ${money.format(summary.goalPace.recommendedMonthly)} per mėnesį.`);
+      actions.push(`Šią savaitę perskirstyk bent ${money.format(summary.goalPace.recommendedMonthly)} dydžio rezervą arba pakoreguok tikslą į realesnį terminą.`);
     } else if (summary.goalPace.status === "tight") {
       lines.push(`Tikslas dar pasiekiamas, bet tempas jau įtemptas: orientyras yra apie ${money.format(summary.goalPace.recommendedMonthly)} per mėnesį.`);
+      risks.push(`Tikslas „${summary.goalPace.title}“ dar pasiekiamas, bet dabar jis jau priklauso nuo disciplinos, ne nuo laisvo rezervo.`);
+      actions.push(`Užfiksuok automatinį atsidėjimą bent ${money.format(summary.goalPace.recommendedMonthly)} per mėnesį, kad tikslas neliktų tik intencija.`);
     } else {
       lines.push(`Gera žinia ta, kad dabartinis tikslų tempas atrodo tvarus: orientyras išlieka apie ${money.format(summary.goalPace.recommendedMonthly)} per mėnesį.`);
+      strengths.push(`Taupymo tikslas „${summary.goalPace.title}“ juda tvariu tempu, todėl šiuo metu turi ne tik planą, bet ir realų jo įvykdymo rezervą.`);
     }
   } else if (summary.safeToSaveAfterRecurring !== null && summary.safeToSaveAfterRecurring !== undefined) {
     lines.push(`Po pastovių išlaidų taupymui šiuo metu dar lieka apie ${money.format(summary.safeToSaveAfterRecurring)}, todėl svarbiausia neišbarstyti šios laisvos sumos smulkiais spontaniškais pirkimais.`);
+  }
+
+  if (typeof change === "number") {
+    if (change <= -8) {
+      strengths.push(`Palyginti su ankstesniu laikotarpiu, išlaidų ritmas gerėja (${change}%), vadinasi, tavo finansinis elgesys jau juda teisinga kryptimi.`);
+    } else if (change >= 10) {
+      risks.push(`Išlaidos kyla greičiau nei įprasta (+${change}%), todėl be korekcijos kitą etapą spaudimas taupymui tik didės.`);
+    }
+  }
+
+  if (safeToSaveAfterRecurring > 0) {
+    strengths.push(`Po projekcijų tau vis dar lieka apie ${money.format(safeToSaveAfterRecurring)} laisvos vietos taupymui, todėl mėnuo dar nėra prarastas.`);
+  } else if (projectedTotal > 0) {
+    risks.push("Po faktinių ir pasikartojančių išlaidų taupymui beveik nelieka laisvos erdvės, todėl dabartinį tempą verta peržiūrėti kuo anksčiau.");
+  }
+
+  if (biggestPressure?.status === "over") {
+    risks.push(`Didžiausias biudžeto spaudimas dabar ateina iš kategorijos „${biggestPressure.category}“, kuri jau peržengė planuotą ribą.`);
+    actions.push(`Iki kitos suvestinės sustabdyk nebūtinus pirkinius kategorijoje „${biggestPressure.category}“ ir stebėk, kiek tai atlaisvina mėnesio rezervą.`);
+  } else if (biggestPressure?.status === "healthy") {
+    strengths.push(`Svarbiausios biudžeto kategorijos kol kas laikosi tvarkingai, todėl mėnesio struktūra išlieka valdoma.`);
+  }
+
+  if (flexibleSpent > fixedProjected && flexibleSpent > 0) {
+    risks.push(`Lankstus išleidimas (${money.format(flexibleSpent)}) šiuo metu didesnis už fiksuotą projekciją, todėl didžiausias taupymo potencialas slypi įpročiuose, o ne sąskaitose.`);
+    actions.push("Artimiausias 7 dienas fiksuok kiekvieną nebūtiną pirkimą atskirai, kad aiškiai pamatytum, kurie įpročiai labiausiai išbarsto rezervą.");
+  } else if (flexibleSpent > 0) {
+    strengths.push("Lanksti išlaidų dalis dar atrodo kontroliuojama, todėl korekcijai gali užtekti kelių tikslių įpročių pakeitimų.");
   }
 
   const nextStep =
@@ -69,17 +174,46 @@ const buildAiCommentary = ({ frequency, summary }) => {
       ? "Pirmas veiksmas: padidink mėnesio atsidėjimą arba nukelk tikslą į realesnį terminą."
       : "Pirmas veiksmas: tęsk įrašų pildymą nuosekliai ir kartą per savaitę peržiūrėk didžiausią kategoriją.";
 
+  if (!actions.length) {
+    actions.push(nextStep);
+    actions.push("Dar kartą peržiūrėk didžiausią kategoriją ir palik tik tas išlaidas, kurios kuria realią vertę.");
+    actions.push("Prieš kitą suvestinę bent kartą eksportuok backup arba peržiūrėk recurring mokėjimus, kad kontrolė liktų nuosekli.");
+  }
+
+  if (!strengths.length) {
+    strengths.push("Turi pakankamai duomenų, kad sistema jau gali parodyti realų vaizdą, o ne tik bendrą jausmą apie išlaidas.");
+  }
+
+  if (!risks.length) {
+    risks.push("Didžiausia rizika šiuo metu yra ne viena katastrofiška kategorija, o smulkūs nepastebėti nukrypimai, kurie per mėnesį susideda į didesnį spaudimą.");
+  }
+
+  const verdict =
+    score >= 88
+      ? "Bendras vaizdas atrodo labai stiprus: finansinė disciplina jau matosi ne tik skaičiuose, bet ir stabilume po recurring bei tikslų tempe."
+      : score >= 76
+      ? "Bendras vaizdas atrodo tvirtas, bet didžiausią skirtumą dabar kurs ne dideli sprendimai, o keli tikslūs koregavimai."
+      : score >= 62
+      ? "Bendras vaizdas dar valdomas, tačiau jau reikia aiškesnės ribų kontrolės, kad mėnesis neperaugtų į nuolatinį spaudimą."
+      : "Bendras vaizdas signalizuoja, kad mėnesio struktūrą reikia peržiūrėti iš esmės, nes dabartinis tempas nepalieka pakankamai erdvės tikslams ir rezervui.";
+
   return {
     title: frequency === "monthly" ? "AI mėnesio komentaras" : "AI savaitės komentaras",
     body: lines.join(" "),
     nextStep,
+    score,
+    level,
+    verdict,
+    strengths: strengths.slice(0, 3),
+    risks: risks.slice(0, 3),
+    actions: actions.slice(0, 3),
   };
 };
 
 const buildSummaryEmail = ({ frequency, summary, userName }) => {
   const periodLabel = frequency === "monthly" ? "Mėnesio suvestinė" : "Savaitės suvestinė";
   const greetingName = userName?.trim() || "nary";
-  const aiCommentary = buildAiCommentary({ frequency, summary });
+  const premiumEvaluation = buildPremiumEvaluation({ frequency, summary });
   const insightItems = (summary.insights || [])
     .map(
       (insight) => `
@@ -127,13 +261,28 @@ const buildSummaryEmail = ({ frequency, summary, userName }) => {
                       <tr>
                         <td style="padding:20px;">
                           <p style="margin:0 0 10px 0;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:#8a6c46;">
-                            ${aiCommentary.title}
+                            ${premiumEvaluation.title}
                           </p>
                           <p style="margin:0;font-size:15px;line-height:1.75;color:#2b241d;">
-                            ${aiCommentary.body}
+                            ${premiumEvaluation.body}
                           </p>
                           <p style="margin:12px 0 0 0;font-size:14px;line-height:1.7;color:#6d5c4c;">
-                            <strong>Ką daryti toliau:</strong> ${aiCommentary.nextStep}
+                            <strong>Ką daryti toliau:</strong> ${premiumEvaluation.nextStep}
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 22px 0;border-collapse:separate;background:#2b241d;border-radius:16px;">
+                      <tr>
+                        <td style="padding:20px;color:#f7efe2;">
+                          <p style="margin:0 0 8px 0;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:#d9bc93;">
+                            Ultra pro evaluation
+                          </p>
+                          <p style="margin:0 0 6px 0;font-size:34px;font-weight:700;color:#ffffff;">${premiumEvaluation.score}/100</p>
+                          <p style="margin:0 0 14px 0;font-size:16px;font-weight:700;color:#f3d9b0;">${premiumEvaluation.level}</p>
+                          <p style="margin:0;font-size:15px;line-height:1.75;color:#f7efe2;">
+                            ${premiumEvaluation.verdict}
                           </p>
                         </td>
                       </tr>
@@ -179,6 +328,16 @@ const buildSummaryEmail = ({ frequency, summary, userName }) => {
                       ${insightItems || "<li>Kol kas dar trūksta duomenų, kad sistema galėtų parodyti aiškias rekomendacijas.</li>"}
                     </ul>
 
+                    <h2 style="margin:0 0 12px 0;font-size:20px;color:#2b241d;">Kas dabar veikia tavo naudai</h2>
+                    <ul style="padding-left:20px;margin:0 0 22px 0;font-size:15px;line-height:1.7;color:#2b241d;">
+                      ${premiumEvaluation.strengths.map((item) => `<li style="margin:0 0 10px 0;">${item}</li>`).join("")}
+                    </ul>
+
+                    <h2 style="margin:0 0 12px 0;font-size:20px;color:#2b241d;">Kur slypi pagrindinė rizika</h2>
+                    <ul style="padding-left:20px;margin:0 0 22px 0;font-size:15px;line-height:1.7;color:#2b241d;">
+                      ${premiumEvaluation.risks.map((item) => `<li style="margin:0 0 10px 0;">${item}</li>`).join("")}
+                    </ul>
+
                     <h2 style="margin:0 0 12px 0;font-size:20px;color:#2b241d;">Didžiausios kategorijos</h2>
                     <table style="width:100%;border-collapse:collapse;margin:0 0 22px 0;font-size:15px;">
                       <tbody>
@@ -202,6 +361,11 @@ const buildSummaryEmail = ({ frequency, summary, userName }) => {
                         : ""
                     }
 
+                    <h2 style="margin:0 0 12px 0;font-size:20px;color:#2b241d;">7 dienų veiksmų planas</h2>
+                    <ol style="padding-left:20px;margin:0 0 10px 0;font-size:15px;line-height:1.7;color:#2b241d;">
+                      ${premiumEvaluation.actions.map((item) => `<li style="margin:0 0 10px 0;">${item}</li>`).join("")}
+                    </ol>
+
                     <p style="margin:18px 0 0 0;font-size:14px;line-height:1.7;color:#6d5c4c;">
                       ${COMPANY_NAME}
                     </p>
@@ -223,12 +387,24 @@ const buildSummaryEmail = ({ frequency, summary, userName }) => {
     `Po recurring: ${money.format(summary.safeToSaveAfterRecurring || 0)}`,
     `Top kategorija: ${summary.topCategory || "Dar nėra duomenų"}`,
     "",
-    `${aiCommentary.title}:`,
-    aiCommentary.body,
-    `Ką daryti toliau: ${aiCommentary.nextStep}`,
+    `${premiumEvaluation.title}:`,
+    premiumEvaluation.body,
+    `Ką daryti toliau: ${premiumEvaluation.nextStep}`,
+    "",
+    `Ultra Pro Evaluation: ${premiumEvaluation.score}/100 (${premiumEvaluation.level})`,
+    premiumEvaluation.verdict,
+    "",
+    "Kas dabar veikia tavo naudai:",
+    ...premiumEvaluation.strengths.map((item) => `- ${item}`),
+    "",
+    "Kur slypi pagrindinė rizika:",
+    ...premiumEvaluation.risks.map((item) => `- ${item}`),
     "",
     "Svarbiausios įžvalgos:",
     ...(summary.insights || []).map((insight) => `- ${insight.title}${insight.metric ? ` (${insight.metric})` : ""}: ${insight.body}`),
+    "",
+    "7 dienų veiksmų planas:",
+    ...premiumEvaluation.actions.map((item, index) => `${index + 1}. ${item}`),
   ].join("\n");
 
   return { subject, html, text };
