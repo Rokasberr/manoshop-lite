@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
+import { useSearchParams } from "react-router-dom";
 
 import LoadingSpinner from "../components/LoadingSpinner";
 import SectionTitle from "../components/SectionTitle";
@@ -67,6 +68,7 @@ const ONBOARDING_STEPS = [
 
 const SavingsStudioPage = () => {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
   const [focusOptions, setFocusOptions] = useState(DEFAULT_FOCUS_OPTIONS);
   const [recurringFrequencies, setRecurringFrequencies] = useState(DEFAULT_RECURRING_FREQUENCIES);
@@ -105,7 +107,11 @@ const SavingsStudioPage = () => {
   const [savingRecurring, setSavingRecurring] = useState(false);
   const [savingEmailSettings, setSavingEmailSettings] = useState(false);
   const [sendingSummaryEmail, setSendingSummaryEmail] = useState(false);
-  const [importingCsv, setImportingCsv] = useState(false);
+  const [previewingCsv, setPreviewingCsv] = useState(false);
+  const [confirmingCsvImport, setConfirmingCsvImport] = useState(false);
+  const [downloadingBackup, setDownloadingBackup] = useState(false);
+  const [csvPreviewResult, setCsvPreviewResult] = useState(null);
+  const [csvFileName, setCsvFileName] = useState("");
   const [loggingRecurringId, setLoggingRecurringId] = useState("");
   const [deletingId, setDeletingId] = useState("");
   const [deletingGoalId, setDeletingGoalId] = useState("");
@@ -198,6 +204,12 @@ const SavingsStudioPage = () => {
     }
   }, [loading, selectedBudgetMonth]);
 
+  useEffect(() => {
+    if (searchParams.get("welcome") === "membership") {
+      toast.success("Narystė aktyvuota. Savings Studio laukia tavo pirmo setup.");
+    }
+  }, [searchParams]);
+
   const monthChoices = useMemo(() => buildMonthOptions(entries), [entries]);
 
   const filteredEntries = useMemo(
@@ -281,11 +293,23 @@ const SavingsStudioPage = () => {
   const goalPace = summary?.goalPace || null;
   const safeToSaveAfterRecurring = summary?.safeToSaveAfterRecurring;
   const projectedMonthTotal = summary?.projectedMonthTotal || 0;
-
-  const recurringMonthlyTotal = recurringExpenses.reduce(
-    (sum, recurringExpense) => sum + Number(recurringExpense.monthlyEquivalent || recurringMonthlyEquivalent(recurringExpense)),
-    0
-  );
+  const recurringMonthlyTotal =
+    summary?.recurringMonthlyTotal ??
+    recurringExpenses.reduce(
+      (sum, recurringExpense) =>
+        sum + Number(recurringExpense.monthlyEquivalent || recurringMonthlyEquivalent(recurringExpense)),
+      0
+    );
+  const fixedVsFlexible = summary?.fixedVsFlexible || {
+    loggedRecurring: 0,
+    recurringRemaining: 0,
+    fixedProjected: 0,
+    flexibleSpent: 0,
+  };
+  const categoryPressure = summary?.categoryPressure || [];
+  const savingsCapacity = summary?.savingsCapacity || null;
+  const weeklyTotalsCurrentMonth = summary?.weeklyTotalsCurrentMonth || [];
+  const highestWeeklyTotal = Math.max(...weeklyTotalsCurrentMonth.map((entry) => Number(entry.total || 0)), 1);
 
   const refreshSummaryAndEntries = async () => {
     const [entriesResult, summaryResult] = await Promise.all([
@@ -584,25 +608,78 @@ const SavingsStudioPage = () => {
       return;
     }
 
-    setImportingCsv(true);
+    setPreviewingCsv(true);
 
     try {
       const text = await file.text();
-      const rows = parseSavingsCsvText({ categories, text });
+      const rows = parseSavingsCsvText({ categories, includeIncomplete: true, text });
 
       if (!rows.length) {
         toast.error("Nepavyko rasti tinkamų CSV eilučių importui.");
         return;
       }
 
-      const result = await savingsStudioService.importEntries({ rows });
-      await refreshSummaryAndEntries();
-      toast.success(`Importuota ${result.importedCount} įrašų.`);
+      const preview = await savingsStudioService.previewEntriesImport({ rows });
+      setCsvPreviewResult(preview);
+      setCsvFileName(file.name);
+      toast.success(`Paruoštas preview: ${preview.validCount} tinkamų eilučių.`);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Nepavyko importuoti CSV failo.");
+      toast.error(error.response?.data?.message || "Nepavyko paruošti CSV preview.");
     } finally {
       event.target.value = "";
-      setImportingCsv(false);
+      setPreviewingCsv(false);
+    }
+  };
+
+  const handleConfirmCsvImport = async () => {
+    if (!csvPreviewResult?.validRows?.length) {
+      toast.error("Nėra ką importuoti.");
+      return;
+    }
+
+    setConfirmingCsvImport(true);
+
+    try {
+      const result = await savingsStudioService.importEntries({
+        rows: csvPreviewResult.validRows,
+      });
+      await refreshSummaryAndEntries();
+      setCsvPreviewResult(null);
+      setCsvFileName("");
+      toast.success(`Importuota ${result.importedCount} įrašų.`);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Nepavyko importuoti preview eilučių.");
+    } finally {
+      setConfirmingCsvImport(false);
+    }
+  };
+
+  const handleClearCsvPreview = () => {
+    setCsvPreviewResult(null);
+    setCsvFileName("");
+  };
+
+  const handleDownloadBackup = async () => {
+    setDownloadingBackup(true);
+
+    try {
+      const { blob, contentDisposition } = await savingsStudioService.downloadBackup();
+      const match = contentDisposition.match(/filename="?([^"]+)"?/i);
+      const filename = match?.[1] || `savings-studio-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success("Backup failas paruoštas atsisiųsti.");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Nepavyko paruošti backup failo.");
+    } finally {
+      setDownloadingBackup(false);
     }
   };
 
@@ -737,6 +814,29 @@ const SavingsStudioPage = () => {
         title="Savings Studio"
         subtitle="Privati nario darbo zona, kur matai, kur išeina pinigai, kaip keičiasi mėnesiai ir kur gali susigrąžinti finansinį aiškumą."
       />
+
+      {searchParams.get("welcome") === "membership" ? (
+        <section className="public-section">
+          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+            <div>
+              <span className="eyebrow">membership unlocked</span>
+              <h2 className="mt-5 text-5xl font-bold">Narystė aktyvi. Dabar pradėk nuo pirmo taupymo setup.</h2>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
+                Savings Studio jau atrakinta tavo paskyrai. Jei dar nebaigei pirmo setup, pradėk nuo pajamų,
+                mėnesio taupymo tikslo ir trijų svarbiausių biudžetų.
+              </p>
+            </div>
+            <div className="soft-card rounded-[28px] p-6">
+              <p className="text-xs uppercase tracking-[0.24em] text-muted">What opens now</p>
+              <div className="mt-4 space-y-3 text-sm leading-6 text-muted">
+                <p>1. Nustatai pirmą mėnesio planą.</p>
+                <p>2. Matai biudžetų spaudimą ir taupymo tempą.</p>
+                <p>3. Gali gauti summary email ir importuoti banko CSV.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {!profile?.onboardingCompleted && (
         <section className="public-section">
@@ -1360,6 +1460,150 @@ const SavingsStudioPage = () => {
         </div>
       </section>
 
+      <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr_1fr]">
+        <div className="panel p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow">weekly flow</p>
+              <h2 className="mt-4 text-4xl font-bold">Savaitinis mėnesio ritmas</h2>
+              <p className="mt-3 text-sm leading-6 text-muted">
+                Greitai pamatai, kuri mėnesio dalis suvalgo daugiausia pinigų ir kur prasideda tempas, kuris
+                išmuša visą mėnesio balansą.
+              </p>
+            </div>
+            <TrendingUp size={20} style={{ color: "rgb(var(--accent))" }} />
+          </div>
+
+          <div className="mt-6 grid h-[250px] grid-cols-5 items-end gap-3">
+            {weeklyTotalsCurrentMonth.map((entry) => {
+              const height = `${Math.max((Number(entry.total || 0) / highestWeeklyTotal) * 100, entry.total ? 16 : 8)}%`;
+
+              return (
+                <div key={entry.key} className="flex h-full flex-col items-center justify-end gap-3">
+                  <div className="relative h-full w-full overflow-hidden rounded-full bg-[rgb(var(--surface-soft))]">
+                    <div
+                      className="absolute inset-x-0 bottom-0 rounded-full"
+                      style={{
+                        height,
+                        background: "linear-gradient(180deg, rgb(var(--accent)), rgb(var(--accent-strong)))",
+                      }}
+                    />
+                  </div>
+                  <div className="text-center">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">{entry.label}</p>
+                    <p className="mt-1 text-sm font-semibold">{money.format(entry.total)}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="panel p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow">spend mix</p>
+              <h2 className="mt-4 text-4xl font-bold">Fiksuota vs lanksti dalis</h2>
+            </div>
+            <WalletCards size={20} style={{ color: "rgb(var(--accent))" }} />
+          </div>
+
+          <div className="mt-6 space-y-4">
+            <div className="soft-card rounded-[24px] p-5">
+              <div className="flex items-center justify-between gap-4">
+                <span className="font-medium">Jau užfiksuotos recurring išlaidos</span>
+                <span className="font-semibold">{money.format(fixedVsFlexible.loggedRecurring)}</span>
+              </div>
+              <p className="mt-2 text-sm text-muted">Mokėjimai, kuriuos jau pavertei tikrais mėnesio įrašais.</p>
+            </div>
+
+            <div className="soft-card rounded-[24px] p-5">
+              <div className="flex items-center justify-between gap-4">
+                <span className="font-medium">Dar likusios recurring projekcijos</span>
+                <span className="font-semibold">{money.format(fixedVsFlexible.recurringRemaining)}</span>
+              </div>
+              <p className="mt-2 text-sm text-muted">Pastovios išlaidos, kurios dar laukia savo mėnesio įrašo.</p>
+            </div>
+
+            <div className="soft-card rounded-[24px] p-5">
+              <div className="flex items-center justify-between gap-4">
+                <span className="font-medium">Lankstus išleidimas</span>
+                <span className="font-semibold">{money.format(fixedVsFlexible.flexibleSpent)}</span>
+              </div>
+              <p className="mt-2 text-sm text-muted">Tai dalis, kurią lengviausia optimizuoti per įpročius.</p>
+            </div>
+
+            {savingsCapacity ? (
+              <div className="soft-card rounded-[24px] p-5">
+                <p className="text-xs uppercase tracking-[0.18em] text-muted">Savings capacity</p>
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <p className="text-sm font-semibold text-muted">Po faktinių išlaidų</p>
+                    <p className="mt-1 text-lg font-semibold">{money.format(savingsCapacity.afterActual || 0)}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-muted">Po projekcijų</p>
+                    <p className="mt-1 text-lg font-semibold">{money.format(savingsCapacity.afterProjected || 0)}</p>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="panel p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow">category pressure</p>
+              <h2 className="mt-4 text-4xl font-bold">Kuri kategorija spaudžia labiausiai</h2>
+            </div>
+            <AlertTriangle size={20} style={{ color: "rgb(var(--accent))" }} />
+          </div>
+
+          <div className="mt-6 space-y-4">
+            {categoryPressure.length ? (
+              categoryPressure.map((entry) => (
+                <div key={entry.category} className="soft-card rounded-[24px] p-5">
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="font-medium">{entry.category}</span>
+                    <span
+                      className={`font-semibold ${
+                        entry.status === "over"
+                          ? "text-red-600"
+                          : entry.status === "warning"
+                          ? "text-amber-600"
+                          : ""
+                      }`}
+                    >
+                      {entry.shareOfProjected}%
+                    </span>
+                  </div>
+                  <div className="mt-3 h-2 overflow-hidden rounded-full bg-[rgb(var(--surface-soft))]">
+                    <div
+                      className={`h-full rounded-full ${
+                        entry.status === "over"
+                          ? "bg-red-500"
+                          : entry.status === "warning"
+                          ? "bg-amber-500"
+                          : "bg-[rgb(var(--accent))]"
+                      }`}
+                      style={{ width: `${Math.max(entry.shareOfProjected, 6)}%` }}
+                    />
+                  </div>
+                  <p className="mt-3 text-sm text-muted">
+                    {money.format(entry.projectedSpent)} iš {money.format(entry.limitAmount)} limito
+                  </p>
+                </div>
+              ))
+            ) : (
+              <div className="soft-card rounded-[24px] p-8 text-center text-muted">
+                Kai susikaups daugiau biudžetų ir išlaidų, čia matysi aiškiausią mėnesio spaudimą.
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
       <section className="grid gap-6 lg:grid-cols-2">
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
@@ -1776,17 +2020,79 @@ const SavingsStudioPage = () => {
                 type="file"
                 accept=".csv,text/csv"
                 onChange={handleCsvImport}
-                disabled={importingCsv}
+                disabled={previewingCsv || confirmingCsvImport}
                 className="input-field mt-3 file:mr-4 file:rounded-full file:border-0 file:bg-[rgb(var(--accent))] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-[rgb(var(--accent-contrast))]"
               />
             </label>
 
             <p className="mt-4 text-sm leading-6 text-muted">
-              {importingCsv
-                ? "CSV eilutės importuojamos, palauk kelias sekundes."
-                : "Sistema atpažįsta dažniausius stulpelius ir automatiškai pabando susieti kategorijas."}
+              {previewingCsv
+                ? "CSV preview ruošiamas, palauk kelias sekundes."
+                : confirmingCsvImport
+                ? "Preview eilutės importuojamos, palauk kelias sekundes."
+                : "Sistema atpažįsta dažniausius stulpelius ir prieš importą parodo, kaip jos bus suklasifikuotos."}
             </p>
           </div>
+
+          {csvPreviewResult ? (
+            <div className="mt-6 space-y-4">
+              <div className="soft-card rounded-[24px] p-5">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.18em] text-muted">Preview</p>
+                    <h3 className="mt-2 text-xl font-semibold">{csvFileName || "CSV failas"}</h3>
+                    <p className="mt-2 text-sm text-muted">
+                      Tinkamos eilutės: {csvPreviewResult.validCount} · Netinkamos: {csvPreviewResult.invalidCount}
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      className="button-primary gap-2"
+                      onClick={handleConfirmCsvImport}
+                      disabled={confirmingCsvImport || !csvPreviewResult.validCount}
+                    >
+                      <Download size={16} />
+                      {confirmingCsvImport ? "Importuojama..." : `Importuoti ${csvPreviewResult.validCount} eilučių`}
+                    </button>
+                    <button type="button" className="button-secondary" onClick={handleClearCsvPreview}>
+                      Išvalyti preview
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="soft-card rounded-[24px] p-5">
+                <p className="text-xs uppercase tracking-[0.18em] text-muted">Pirmos eilutės</p>
+                <div className="mt-4 space-y-3">
+                  {(csvPreviewResult.preview || []).map((row) => (
+                    <div
+                      key={`${row.rowNumber}-${row.status}`}
+                      className={`rounded-[18px] px-4 py-4 ${
+                        row.status === "ok"
+                          ? "bg-[rgb(var(--surface-soft))]"
+                          : "border border-red-200 bg-red-50"
+                      }`}
+                    >
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          <p className="text-sm font-semibold">Eilutė {row.rowNumber}</p>
+                          {row.status === "ok" ? (
+                            <p className="mt-1 text-sm text-muted">
+                              {row.normalized.title} · {money.format(row.normalized.amount)} · {row.normalized.category}
+                            </p>
+                          ) : (
+                            <p className="mt-1 text-sm text-red-600">{row.error}</p>
+                          )}
+                        </div>
+                        <span className="premium-tag">{row.status === "ok" ? "Tinkama" : "Tikrinti"}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : null}
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <div className="soft-card rounded-[24px] p-5">
@@ -1804,10 +2110,20 @@ const SavingsStudioPage = () => {
               <ol className="mt-3 space-y-2 text-sm leading-6 text-muted">
                 <li>1. Iš banko eksportuoji CSV.</li>
                 <li>2. Įkeli jį čia vienu veiksmu.</li>
-                <li>3. Savings Studio sukuria įrašus ir atnaujina suvestines.</li>
+                <li>3. Pirmiausia matai preview, tik tada patvirtini importą.</li>
               </ol>
             </div>
           </div>
+
+          <button
+            type="button"
+            className="button-secondary mt-6 w-full justify-center gap-2"
+            onClick={handleDownloadBackup}
+            disabled={downloadingBackup}
+          >
+            <Download size={16} />
+            {downloadingBackup ? "Ruošiama..." : "Atsisiųsti JSON backup"}
+          </button>
         </div>
       </section>
     </div>

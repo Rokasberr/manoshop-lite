@@ -10,6 +10,7 @@ const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const userRoutes = require("./routes/userRoutes");
 const savingsStudioRoutes = require("./routes/savingsStudioRoutes");
+const { startSavingsStudioSummaryScheduler } = require("./services/savingsStudioScheduler");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const { handleStripeWebhook } = require("./controllers/billingController");
 const { getConfiguredOrigins, isAllowedOrigin } = require("./utils/originMatcher");
@@ -62,6 +63,7 @@ app.use(errorHandler);
 const startServer = async () => {
   try {
     await connectDatabase();
+    startSavingsStudioSummaryScheduler();
     app.listen(port, () => {
       console.log(`Serveris paleistas: http://localhost:${port}`);
     });

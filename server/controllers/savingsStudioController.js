@@ -1,9 +1,11 @@
 const RecurringExpense = require("../models/RecurringExpense");
+const SavingsStudioAuditLog = require("../models/SavingsStudioAuditLog");
 const SavingsBudget = require("../models/SavingsBudget");
 const SavingsEntry = require("../models/SavingsEntry");
 const SavingsGoal = require("../models/SavingsGoal");
 const SavingsStudioProfile = require("../models/SavingsStudioProfile");
 const { sendSavingsSummaryEmail } = require("../services/savingsStudioSummaryEmailService");
+const { logSavingsAuditSafe } = require("../services/savingsStudioAuditService");
 
 const CATEGORIES = [
   "Būstas",
@@ -31,6 +33,11 @@ const RECURRING_FREQUENCIES = [
   { value: "quarterly", label: "Kas ketvirtį" },
   { value: "yearly", label: "Kartą per metus" },
 ];
+
+const MAX_TEXT_LENGTH = 80;
+const MAX_NOTES_LENGTH = 240;
+const MAX_IMPORT_ROWS = 300;
+const MAX_BACKUP_AUDIT_ROWS = 200;
 
 const currentMonthKey = () => new Date().toISOString().slice(0, 7);
 
@@ -105,6 +112,10 @@ const parseEntryInput = (input) => {
     throw createHttpError("Išlaidos pavadinimui reikia bent 2 simbolių.");
   }
 
+  if (title.length > MAX_TEXT_LENGTH) {
+    throw createHttpError("Išlaidos pavadinimas per ilgas.");
+  }
+
   if (!Number.isFinite(amount) || amount <= 0) {
     throw createHttpError("Suma turi būti didesnė už 0.");
   }
@@ -122,7 +133,7 @@ const parseEntryInput = (input) => {
     amount: roundCurrency(amount),
     category,
     date,
-    notes: notes.slice(0, 240),
+    notes: notes.slice(0, MAX_NOTES_LENGTH),
   };
 };
 
@@ -141,6 +152,10 @@ const parseBudgetPayload = (input) => {
     if (!CATEGORIES.includes(budget.category)) {
       throw createHttpError(`Biudžeto kategorija negalioja: ${budget.category}`);
     }
+  }
+
+  if (normalizedBudgets.length > CATEGORIES.length) {
+    throw createHttpError("Biudžetų eilučių per daug vienam mėnesiui.");
   }
 
   return {
@@ -163,6 +178,10 @@ const parseGoalInput = (input) => {
     throw createHttpError("Tikslo pavadinimui reikia bent 2 simbolių.");
   }
 
+  if (title.length > MAX_TEXT_LENGTH) {
+    throw createHttpError("Tikslo pavadinimas per ilgas.");
+  }
+
   if (!Number.isFinite(targetAmount) || targetAmount <= 0) {
     throw createHttpError("Tikslo suma turi būti didesnė už 0.");
   }
@@ -180,7 +199,7 @@ const parseGoalInput = (input) => {
     targetAmount: roundCurrency(targetAmount),
     currentAmount: roundCurrency(currentAmount),
     targetDate,
-    notes: notes.slice(0, 240),
+    notes: notes.slice(0, MAX_NOTES_LENGTH),
   };
 };
 
@@ -193,6 +212,10 @@ const parseRecurringInput = (input) => {
 
   if (title.length < 2) {
     throw createHttpError("Pasikartojančios išlaidos pavadinimui reikia bent 2 simbolių.");
+  }
+
+  if (title.length > MAX_TEXT_LENGTH) {
+    throw createHttpError("Pasikartojančios išlaidos pavadinimas per ilgas.");
   }
 
   if (!Number.isFinite(amount) || amount <= 0) {
@@ -212,7 +235,7 @@ const parseRecurringInput = (input) => {
     amount: roundCurrency(amount),
     category,
     frequency,
-    notes: notes.slice(0, 240),
+    notes: notes.slice(0, MAX_NOTES_LENGTH),
   };
 };
 
@@ -224,6 +247,10 @@ const parseProfileInput = (input) => {
 
   if (!Number.isFinite(monthlyIncome) || monthlyIncome < 0) {
     throw createHttpError("Mėnesio pajamos negali būti neigiamos.");
+  }
+
+  if (monthlyIncome > 100000000 || monthlySavingsTarget > 100000000) {
+    throw createHttpError("Įvesta suma per didelė.");
   }
 
   if (!Number.isFinite(monthlySavingsTarget) || monthlySavingsTarget < 0) {
@@ -255,6 +282,11 @@ const parseEmailSettingsInput = (input) => {
     summaryEmailFrequency,
   };
 };
+
+const buildImportSource = ({ system = "", entryId = "" } = {}) => ({
+  system: String(system || "").trim(),
+  entryId: String(entryId || "").trim(),
+});
 
 const recurringToMonthlyEquivalent = (expense) => {
   const amount = Number(expense.amount || 0);
@@ -304,6 +336,11 @@ const buildSummary = (entries) => {
     ...entry,
     total: 0,
   }));
+  const weeklyTotalsCurrentMonth = Array.from({ length: 5 }, (_, index) => ({
+    key: `week-${index + 1}`,
+    label: `${index + 1} sav.`,
+    total: 0,
+  }));
   const monthlyLookup = new Map(monthlyTotals.map((entry) => [entry.key, entry]));
   const categoryLookup = new Map();
 
@@ -319,6 +356,10 @@ const buildSummary = (entries) => {
 
     if (entryMonth === monthKey) {
       currentMonthTotal += amount;
+
+      const dayOfMonth = Number(entry.date.slice(-2));
+      const bucketIndex = Math.min(Math.max(Math.floor((dayOfMonth - 1) / 7), 0), weeklyTotalsCurrentMonth.length - 1);
+      weeklyTotalsCurrentMonth[bucketIndex].total += amount;
     }
 
     if (entryMonth === lastMonthKey) {
@@ -357,21 +398,36 @@ const buildSummary = (entries) => {
       ...entry,
       total: roundCurrency(entry.total),
     })),
+    weeklyTotalsCurrentMonth: weeklyTotalsCurrentMonth.map((entry) => ({
+      ...entry,
+      total: roundCurrency(entry.total),
+    })),
   };
 };
 
-const buildInsights = ({ budgets, goals, profile, recurringExpenses, summary }) => {
+const buildInsights = ({ budgets, entries, goals, profile, recurringExpenses, summary }) => {
+  const monthKey = currentMonthKey();
   const currentMonthSpent = Number(summary.monthTotal || 0);
-  const recurringMonthlyTotal = roundCurrency(
-    recurringExpenses.reduce((sum, recurringExpense) => sum + recurringToMonthlyEquivalent(recurringExpense), 0)
+  const outstandingRecurringExpenses = recurringExpenses.filter(
+    (recurringExpense) => recurringExpense.lastLoggedMonth !== monthKey
   );
-  const recurringByCategory = recurringExpenses.reduce((totals, recurringExpense) => {
+  const recurringMonthlyTotal = roundCurrency(
+    outstandingRecurringExpenses.reduce((sum, recurringExpense) => sum + recurringToMonthlyEquivalent(recurringExpense), 0)
+  );
+  const recurringByCategory = outstandingRecurringExpenses.reduce((totals, recurringExpense) => {
     const nextTotals = { ...totals };
     nextTotals[recurringExpense.category] = roundCurrency(
       Number(nextTotals[recurringExpense.category] || 0) + recurringToMonthlyEquivalent(recurringExpense)
     );
     return nextTotals;
   }, {});
+  const currentMonthEntries = entries.filter((entry) => entry.date.startsWith(monthKey));
+  const loggedRecurringTotal = roundCurrency(
+    currentMonthEntries
+      .filter((entry) => entry.importSource?.system === "recurring-expense")
+      .reduce((sum, entry) => sum + Number(entry.amount || 0), 0)
+  );
+  const flexibleSpendTotal = roundCurrency(Math.max(currentMonthSpent - loggedRecurringTotal, 0));
   const spentByCategory = new Map(
     (summary.categoryTotals || []).map((entry) => [entry.category, Number(entry.total || 0)])
   );
@@ -396,6 +452,34 @@ const buildInsights = ({ budgets, goals, profile, recurringExpenses, summary }) 
   const projectedMonthTotal = roundCurrency(currentMonthSpent + recurringMonthlyTotal);
   const safeToSaveAfterRecurring =
     profile.monthlyIncome > 0 ? roundCurrency(Number(profile.monthlyIncome) - projectedMonthTotal) : null;
+  const categoryPressure = budgetProgress
+    .slice(0, 5)
+    .map((entry) => ({
+      category: entry.category,
+      projectedSpent: entry.projectedSpent,
+      limitAmount: entry.limitAmount,
+      shareOfProjected: projectedMonthTotal > 0 ? roundCurrency((entry.projectedSpent / projectedMonthTotal) * 100) : 0,
+      status:
+        entry.projectedSpent > entry.limitAmount
+          ? "over"
+          : entry.projectedSpent >= entry.limitAmount * 0.85
+          ? "warning"
+          : "healthy",
+    }));
+  const savingsCapacity = {
+    income: Number(profile.monthlyIncome || 0),
+    currentMonthSpent,
+    projectedMonthTotal,
+    afterActual: profile.monthlyIncome > 0 ? roundCurrency(Number(profile.monthlyIncome) - currentMonthSpent) : null,
+    afterProjected: safeToSaveAfterRecurring,
+    target: Number(profile.monthlySavingsTarget || 0),
+  };
+  const fixedVsFlexible = {
+    loggedRecurring: loggedRecurringTotal,
+    recurringRemaining: recurringMonthlyTotal,
+    fixedProjected: roundCurrency(loggedRecurringTotal + recurringMonthlyTotal),
+    flexibleSpent: flexibleSpendTotal,
+  };
 
   const overBudget = budgetProgress.filter((entry) => entry.projectedSpent > entry.limitAmount);
   const warningBudget = budgetProgress.filter(
@@ -581,6 +665,9 @@ const buildInsights = ({ budgets, goals, profile, recurringExpenses, summary }) 
     safeToSaveAfterRecurring,
     projectedMonthTotal,
     goalPace,
+    categoryPressure,
+    fixedVsFlexible,
+    savingsCapacity,
     insights: insights.slice(0, 4),
   };
 };
@@ -597,6 +684,7 @@ const buildSavingsSummaryPayload = async (userId) => {
   const summary = buildSummary(entries);
   const insightPayload = buildInsights({
     budgets,
+    entries,
     goals,
     profile,
     recurringExpenses,
@@ -721,7 +809,64 @@ const createSavingsEntry = async (req, res) => {
     ...input,
   });
 
+  await logSavingsAuditSafe({
+    userId: req.user._id,
+    action: "entry-create",
+    entityType: "entry",
+    entityId: entry._id.toString(),
+    metadata: {
+      category: entry.category,
+      amount: entry.amount,
+    },
+  });
+
   res.status(201).json({ entry });
+};
+
+const previewSavingsEntriesImport = async (req, res) => {
+  const rows = Array.isArray(req.body.rows) ? req.body.rows : [];
+
+  if (!rows.length) {
+    throw createHttpError("CSV preview reikia bent vienos eilutės.");
+  }
+
+  if (rows.length > MAX_IMPORT_ROWS) {
+    throw createHttpError(`Vienu kartu galima preview'inti iki ${MAX_IMPORT_ROWS} eilučių.`);
+  }
+
+  const preview = rows.map((row, index) => {
+    try {
+      return {
+        rowNumber: index + 1,
+        status: "ok",
+        normalized: parseEntryInput(row),
+      };
+    } catch (error) {
+      return {
+        rowNumber: index + 1,
+        status: "error",
+        error: error.message,
+        raw: {
+          title: String(row.title || "").trim(),
+          amount: row.amount,
+          date: row.date,
+          category: row.category,
+        },
+      };
+    }
+  });
+
+  const validRows = preview.filter((entry) => entry.status === "ok").map((entry) => entry.normalized);
+  const invalidRows = preview.filter((entry) => entry.status === "error");
+
+  res.json({
+    totalRows: rows.length,
+    validCount: validRows.length,
+    invalidCount: invalidRows.length,
+    validRows,
+    invalidRows,
+    preview: preview.slice(0, 20),
+  });
 };
 
 const importSavingsEntries = async (req, res) => {
@@ -731,14 +876,27 @@ const importSavingsEntries = async (req, res) => {
     throw createHttpError("CSV importui reikia bent vienos eilutės.");
   }
 
+  if (rows.length > MAX_IMPORT_ROWS) {
+    throw createHttpError(`Vienu kartu galima importuoti iki ${MAX_IMPORT_ROWS} eilučių.`);
+  }
+
   const parsedRows = rows.map((row) => parseEntryInput(row));
   const importedEntries = await SavingsEntry.insertMany(
     parsedRows.map((entry) => ({
       user: req.user._id,
       ...entry,
-      importSource: "csv-upload",
+      importSource: buildImportSource({ system: "csv-upload" }),
     }))
   );
+
+  await logSavingsAuditSafe({
+    userId: req.user._id,
+    action: "entry-import",
+    entityType: "entry",
+    metadata: {
+      importedCount: importedEntries.length,
+    },
+  });
 
   res.status(201).json({
     importedCount: importedEntries.length,
@@ -760,6 +918,17 @@ const updateSavingsEntry = async (req, res) => {
   Object.assign(entry, input);
   await entry.save();
 
+  await logSavingsAuditSafe({
+    userId: req.user._id,
+    action: "entry-update",
+    entityType: "entry",
+    entityId: entry._id.toString(),
+    metadata: {
+      category: entry.category,
+      amount: entry.amount,
+    },
+  });
+
   res.json({ entry });
 };
 
@@ -774,6 +943,12 @@ const deleteSavingsEntry = async (req, res) => {
   }
 
   await entry.deleteOne();
+  await logSavingsAuditSafe({
+    userId: req.user._id,
+    action: "entry-delete",
+    entityType: "entry",
+    entityId: req.params.entryId,
+  });
   res.status(204).send();
 };
 
@@ -787,6 +962,16 @@ const createSavingsGoal = async (req, res) => {
   const goal = await SavingsGoal.create({
     user: req.user._id,
     ...input,
+  });
+
+  await logSavingsAuditSafe({
+    userId: req.user._id,
+    action: "goal-create",
+    entityType: "goal",
+    entityId: goal._id.toString(),
+    metadata: {
+      targetAmount: goal.targetAmount,
+    },
   });
 
   res.status(201).json({ goal });
@@ -806,6 +991,17 @@ const updateSavingsGoal = async (req, res) => {
   Object.assign(goal, input);
   await goal.save();
 
+  await logSavingsAuditSafe({
+    userId: req.user._id,
+    action: "goal-update",
+    entityType: "goal",
+    entityId: goal._id.toString(),
+    metadata: {
+      targetAmount: goal.targetAmount,
+      currentAmount: goal.currentAmount,
+    },
+  });
+
   res.json({ goal });
 };
 
@@ -820,6 +1016,12 @@ const deleteSavingsGoal = async (req, res) => {
   }
 
   await goal.deleteOne();
+  await logSavingsAuditSafe({
+    userId: req.user._id,
+    action: "goal-delete",
+    entityType: "goal",
+    entityId: req.params.goalId,
+  });
   res.status(204).send();
 };
 
@@ -835,6 +1037,17 @@ const createRecurringExpense = async (req, res) => {
   const recurringExpense = await RecurringExpense.create({
     user: req.user._id,
     ...input,
+  });
+
+  await logSavingsAuditSafe({
+    userId: req.user._id,
+    action: "recurring-create",
+    entityType: "recurring",
+    entityId: recurringExpense._id.toString(),
+    metadata: {
+      frequency: recurringExpense.frequency,
+      amount: recurringExpense.amount,
+    },
   });
 
   res.status(201).json({ recurringExpense: decorateRecurringExpense(recurringExpense) });
@@ -853,6 +1066,17 @@ const updateRecurringExpense = async (req, res) => {
 
   Object.assign(recurringExpense, input);
   await recurringExpense.save();
+
+  await logSavingsAuditSafe({
+    userId: req.user._id,
+    action: "recurring-update",
+    entityType: "recurring",
+    entityId: recurringExpense._id.toString(),
+    metadata: {
+      frequency: recurringExpense.frequency,
+      amount: recurringExpense.amount,
+    },
+  });
 
   res.json({ recurringExpense: decorateRecurringExpense(recurringExpense) });
 };
@@ -887,11 +1111,26 @@ const logRecurringExpenseAsEntry = async (req, res) => {
     notes: recurringExpense.notes
       ? `${recurringExpense.notes} | Sugeneruota iš pasikartojančios išlaidos.`
       : "Sugeneruota iš pasikartojančios išlaidos.",
-    importSource: "recurring-expense",
+    importSource: buildImportSource({
+      system: "recurring-expense",
+      entryId: recurringExpense._id.toString(),
+    }),
   });
 
   recurringExpense.lastLoggedMonth = month;
   await recurringExpense.save();
+
+  await logSavingsAuditSafe({
+    userId: req.user._id,
+    action: "recurring-log-to-entry",
+    entityType: "recurring",
+    entityId: recurringExpense._id.toString(),
+    metadata: {
+      month,
+      entryId: entry._id.toString(),
+      amount: entry.amount,
+    },
+  });
 
   res.status(201).json({
     entry,
@@ -910,6 +1149,12 @@ const deleteRecurringExpense = async (req, res) => {
   }
 
   await recurringExpense.deleteOne();
+  await logSavingsAuditSafe({
+    userId: req.user._id,
+    action: "recurring-delete",
+    entityType: "recurring",
+    entityId: req.params.recurringId,
+  });
   res.status(204).send();
 };
 
@@ -918,6 +1163,47 @@ const getSavingsSummary = async (req, res) => {
   res.json({
     summary,
   });
+};
+
+const exportSavingsBackup = async (req, res) => {
+  const [payload, allBudgets, auditLogs] = await Promise.all([
+    buildSavingsSummaryPayload(req.user._id),
+    SavingsBudget.find({ user: req.user._id }).sort({ month: -1, category: 1 }),
+    SavingsStudioAuditLog.find({ user: req.user._id }).sort({ createdAt: -1 }).limit(MAX_BACKUP_AUDIT_ROWS),
+  ]);
+
+  const fileKey = new Date().toISOString().slice(0, 10);
+  const backup = {
+    generatedAt: new Date().toISOString(),
+    user: {
+      id: req.user._id.toString(),
+      email: req.user.email,
+      subscription: req.user.subscription,
+    },
+    profile: payload.profile,
+    summary: payload.summary,
+    entries: payload.entries,
+    budgets: allBudgets,
+    goals: payload.goals,
+    recurringExpenses: payload.recurringExpenses,
+    auditLogs,
+  };
+
+  await logSavingsAuditSafe({
+    userId: req.user._id,
+    action: "backup-export",
+    entityType: "backup",
+    metadata: {
+      entryCount: payload.entries.length,
+      budgetCount: allBudgets.length,
+      goalCount: payload.goals.length,
+      recurringCount: payload.recurringExpenses.length,
+    },
+  });
+
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.setHeader("Content-Disposition", `attachment; filename=\"savings-studio-backup-${fileKey}.json\"`);
+  res.status(200).send(JSON.stringify(backup, null, 2));
 };
 
 const sendSavingsSummaryEmailNow = async (req, res) => {
@@ -936,6 +1222,17 @@ const sendSavingsSummaryEmailNow = async (req, res) => {
     user: req.user,
   });
 
+  await logSavingsAuditSafe({
+    userId: req.user._id,
+    action: result.sent ? "summary-email-manual" : "summary-email-manual-skipped",
+    entityType: "summary-email",
+    metadata: {
+      frequency,
+      skipped: Boolean(result.skipped),
+      reason: result.reason || "",
+    },
+  });
+
   res.json({
     ...result,
     frequency,
@@ -950,6 +1247,7 @@ module.exports = {
   getSavingsBudgets,
   getSavingsEntries,
   createSavingsEntry,
+  previewSavingsEntriesImport,
   importSavingsEntries,
   updateSavingsEntry,
   deleteSavingsEntry,
@@ -963,7 +1261,9 @@ module.exports = {
   logRecurringExpenseAsEntry,
   deleteRecurringExpense,
   getSavingsSummary,
+  exportSavingsBackup,
   sendSavingsSummaryEmailNow,
   upsertSavingsBudgets,
   CATEGORIES,
+  buildSavingsSummaryPayload,
 };

@@ -1,6 +1,6 @@
 import { CheckCircle2, Clock3 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import LoadingSpinner from "../components/LoadingSpinner";
 import SectionTitle from "../components/SectionTitle";
@@ -8,6 +8,7 @@ import { useAuth } from "../context/AuthContext";
 
 const BillingSuccessPage = () => {
   const { refreshProfile, user } = useAuth();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [statusMessage, setStatusMessage] = useState("Tikriname prenumeratos aktyvaciją...");
@@ -34,8 +35,13 @@ const BillingSuccessPage = () => {
             profile?.subscription?.provider === "stripe" &&
             ["active", "trialing"].includes(profile?.subscription?.status || "")
           ) {
-            setStatusMessage("Prenumerata aktyvuota sėkmingai.");
+            setStatusMessage("Prenumerata aktyvuota. Tuoj atidarysime Savings Studio.");
             setLoading(false);
+            setTimeout(() => {
+              if (!cancelled) {
+                navigate("/members/savings-studio?welcome=membership", { replace: true });
+              }
+            }, 1400);
             return;
           }
         } catch (_error) {
@@ -81,8 +87,8 @@ const BillingSuccessPage = () => {
               Session ID: <span className="font-semibold text-current">{searchParams.get("session_id") || "n/a"}</span>
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <Link to="/profile" className="button-primary">
-                Eiti į profilį
+              <Link to="/members/savings-studio?welcome=membership" className="button-primary">
+                Atidaryti Savings Studio
               </Link>
               <Link to="/pricing" className="button-secondary">
                 Peržiūrėti planus

@@ -244,7 +244,7 @@ const normalizeDateValue = (rawValue) => {
   return parsed.toISOString().slice(0, 10);
 };
 
-export const parseSavingsCsvText = ({ categories = DEFAULT_CATEGORIES, text }) => {
+export const parseSavingsCsvText = ({ categories = DEFAULT_CATEGORIES, includeIncomplete = false, text }) => {
   const trimmed = String(text || "").trim();
 
   if (!trimmed) {
@@ -267,7 +267,7 @@ export const parseSavingsCsvText = ({ categories = DEFAULT_CATEGORIES, text }) =
     return Object.fromEntries(headers.map((header, index) => [header, values[index] || ""]));
   });
 
-  return rows
+  const normalizedRows = rows
     .map((row) => {
       const title = findHeaderValue(row, ["title", "name", "description", "merchant", "payee", "details"]);
       const amount = normalizeAmount(findHeaderValue(row, ["amount", "sum", "value", "debit", "price"]));
@@ -282,6 +282,11 @@ export const parseSavingsCsvText = ({ categories = DEFAULT_CATEGORIES, text }) =
         category: categories.includes(categoryCandidate) ? categoryCandidate : "Kita",
         notes,
       };
-    })
-    .filter((row) => row.title && Number.isFinite(row.amount) && row.amount > 0 && row.date);
+    });
+
+  if (includeIncomplete) {
+    return normalizedRows;
+  }
+
+  return normalizedRows.filter((row) => row.title && Number.isFinite(row.amount) && row.amount > 0 && row.date);
 };

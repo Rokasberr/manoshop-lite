@@ -90,6 +90,11 @@ const createEntry = async (payload) => {
   return data;
 };
 
+const previewEntriesImport = async (payload) => {
+  const { data } = await api.post("/savings-studio/entries/import-preview", payload);
+  return data;
+};
+
 const importEntries = async (payload) => {
   const { data } = await api.post("/savings-studio/entries/import", payload);
   return data;
@@ -107,6 +112,17 @@ const deleteEntry = async (entryId) => {
 const sendSummaryEmail = async (payload) => {
   const { data } = await api.post("/savings-studio/summary-email", payload);
   return data;
+};
+
+const downloadBackup = async () => {
+  const response = await api.get("/savings-studio/backup", {
+    responseType: "blob",
+  });
+
+  return {
+    blob: response.data,
+    contentDisposition: response.headers["content-disposition"] || "",
+  };
 };
 
 export default {
@@ -127,9 +143,11 @@ export default {
   deleteRecurringExpense,
   getSummary,
   createEntry,
+  previewEntriesImport,
   importEntries,
   updateEntry,
   updateBudgets,
   deleteEntry,
   sendSummaryEmail,
+  downloadBackup,
 };
