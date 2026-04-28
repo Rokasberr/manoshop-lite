@@ -21,6 +21,7 @@ const navbarCopy = {
     signIn: "Prisijungti",
     join: "Atrakinti narystę",
     languageLabel: "Kalba",
+    studioLabel: "nario pinigų erdvė",
   },
   en: {
     nav: {
@@ -36,6 +37,7 @@ const navbarCopy = {
     signIn: "Sign in",
     join: "Unlock membership",
     languageLabel: "Language",
+    studioLabel: "member money space",
   },
   pl: {
     nav: {
@@ -51,6 +53,7 @@ const navbarCopy = {
     signIn: "Zaloguj",
     join: "Odblokuj członkostwo",
     languageLabel: "Język",
+    studioLabel: "prywatna przestrzeń finansów",
   },
   de: {
     nav: {
@@ -66,6 +69,7 @@ const navbarCopy = {
     signIn: "Anmelden",
     join: "Mitgliedschaft freischalten",
     languageLabel: "Sprache",
+    studioLabel: "private geldübersicht",
   },
   fr: {
     nav: {
@@ -81,6 +85,7 @@ const navbarCopy = {
     signIn: "Connexion",
     join: "Débloquer l’abonnement",
     languageLabel: "Langue",
+    studioLabel: "espace financier privé",
   },
   es: {
     nav: {
@@ -96,6 +101,7 @@ const navbarCopy = {
     signIn: "Entrar",
     join: "Desbloquear membresía",
     languageLabel: "Idioma",
+    studioLabel: "espacio privado financiero",
   },
 };
 
@@ -124,15 +130,27 @@ const Navbar = () => {
       <div className="header-shell mx-auto flex max-w-7xl items-center justify-between gap-4 rounded-[24px] px-4 py-3 shadow-[0_16px_45px_rgba(15,15,35,0.06)] backdrop-blur-xl">
         <Link to="/" className="flex min-w-0 items-center gap-3">
           <div
-            className="flex h-10 w-10 items-center justify-center rounded-2xl text-sm font-bold text-white"
+            className="flex h-11 w-11 items-center justify-center rounded-[18px] text-sm font-bold text-white"
             style={{
               background: "linear-gradient(135deg, rgb(var(--accent)), rgb(var(--accent-strong)))",
             }}
           >
-            SS
+            ST
           </div>
           <div className="min-w-0">
-            <p className="font-display text-[1.45rem] font-bold leading-none">Stilloak Studio</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="font-display text-[1.45rem] font-bold leading-none">Stilloak Studio</p>
+              <span
+                className="hidden rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] xl:inline-flex"
+                style={{
+                  border: "1px solid rgb(var(--line) / 0.85)",
+                  backgroundColor: "rgb(255 255 255 / 0.62)",
+                  color: "rgb(var(--accent-strong))",
+                }}
+              >
+                {copy.studioLabel}
+              </span>
+            </div>
             <p className="text-[10px] uppercase tracking-[0.32em] text-muted">{copy.tagline}</p>
           </div>
         </Link>

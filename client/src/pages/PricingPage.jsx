@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2, CreditCard, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle2, CreditCard, ShieldCheck, Sparkles } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -11,90 +11,112 @@ import { formatCurrency } from "../utils/currency";
 
 const pricingCopy = {
   lt: {
-    featurePills: [
+    pills: [
       "Pilna Stilloak prieiga",
       "AI savaitinės ir mėnesinės suvestinės",
-      "Privatus paskyros archyvas",
+      "Privatus nario archyvas",
       "Members-only Journal",
-      "Privatesnė pagalba",
     ],
-    eyebrow: "narystė",
-    title: "Pasirink Stilloak prieigos lygį, kuris tinka tavo ritmui",
+    eyebrow: "Narystė",
+    title: "Pasirink prieigos lygį, kuris atitinka tavo ritmą ir norimą kontrolės gylį",
     intro:
-      "Narystė čia nėra techninis priedas. Ji atrakina patį produktą: Stilloak dashboardą, biudžetus, taupymo tikslus, AI suvestines ir ramesnį santykį su visa nario erdve.",
+      "Circle ir Private nėra tiesiog kainų planai. Jie atrakina pačią Stilloak vertę: biudžetus, tikslus, recurring išlaidas, AI komentarus ir ramesnį santykį su mėnesio sprendimais.",
     joinLoading: "Jungiama...",
     currentPlan: "Dabartinis planas",
     continueStripe: "Tęsti į Stripe",
     enterGuest: "Tęsti kaip svečiui",
-    sectionEyebrow: "nario kelias",
-    sectionTitle: "Aiškus kelias nuo pricing iki pirmo mėnesio aiškumo",
-    sectionIntro:
-      "Pricing puslapis turi greitai atsakyti į vieną klausimą: ką realiai gaunu nusipirkęs narystę. Dėl to visa logika veda ne į abstraktų klubą, o į konkretų Stilloak įrankį ir aiškesnį finansinį vaizdą.",
-    journey: [
-      "Sukuri paskyrą ir pasirenki Circle arba Private",
-      "Apmoki narystę per Stripe be papildomo triukšmo",
-      "Atsidarai Stilloak ir susivedi pirmą mėnesio setup",
-      "Gauni dashboardą, suvestines ir privatų nario archyvą",
+    compareEyebrow: "Kas skiriasi",
+    compareTitle: "Kiekvienas planas turi aiškų vaidmenį, o ne tik skirtingą kainą",
+    compareIntro:
+      "Guest leidžia susipažinti su produktu. Circle skirtas kasdieniam naudojimui. Private prideda aukštesnį palaikymo ir premium patirties sluoksnį.",
+    compare: [
+      {
+        label: "Guest",
+        title: "Atsargus pirmas įėjimas",
+        text: "Matai pasaulį, paskyros struktūrą ir membership kryptį prieš priimdamas sprendimą.",
+      },
+      {
+        label: "Circle",
+        title: "Pati svarbiausia Stilloak versija",
+        text: "Pilni biudžetai, tikslai, recurring, CSV importas ir AI suvestinės žmogui, kuris nori naudoti programą realiai.",
+      },
+      {
+        label: "Private",
+        title: "Daugiau tono, palaikymo ir santykio",
+        text: "Skirtas tiems, kurie nori ne tik įrankio, bet ir stipresnio premium sluoksnio bei gilesnio nario jausmo.",
+      },
     ],
-    benefitsChip: "kodėl tai verta",
-    benefitsTitle: "Geras membership puslapis turi parduoti rezultatą, ne tik planą.",
-    benefitsIntro:
-      "Circle skirtas žmogui, kuris nori pilnai naudotis Stilloak. Private skirtas tiems, kurie nori stipresnio palaikymo, daugiau premium sluoksnio ir aukštesnio lygio santykio su nario erdve.",
-    circleTitle: "Pilnas įrankis",
-    circleText: "Biudžetai, tikslai, recurring išlaidos, CSV importas ir AI suvestinės.",
-    privateTitle: "Aukštesnis tonas",
-    privateText: "Daugiau palaikymo, stipresnė nario patirtis ir daugiau vietos premium plėtrai.",
-    productEyebrow: "pagrindinis nario produktas",
-    productTitle: "Stilloak",
-    productText:
-      "Circle ir Private planai atrakina Stilloak: narys gali sekti išlaidas, nusistatyti biudžetus, valdyti recurring mokėjimus, importuoti CSV ir gauti AI suvestines su konkrečiu veiksmų planu.",
+    memberEyebrow: "Ką perki iš tikrųjų",
+    memberTitle: "Narystė perka prieigą prie aiškesnio mėnesio, ne prie uždaro klubo idėjos",
+    memberText:
+      "Stilloak turi atrodyti kaip tikras produkto branduolys: vienas premium dashboardas, privatūs archyvai, AI el. laiškai ir nuosekli nario patirtis nuo pirkimo iki kasdienio naudojimo.",
+    memberSignals: [
+      "Po apmokėjimo iškart aktyvuojama nario prieiga",
+      "Visos suvestinės ir sąskaitos lieka privačiame archyve",
+      "Programos logika iškart veda į pirmą mėnesio setup",
+      "Private sluoksnis palieka vietos gilesnei pagalbai ir premium plėtrai",
+    ],
+    circleSummaryTitle: "Pilna darbo versija",
+    circleSummaryText: "Visi pagrindiniai Stilloak sluoksniai vienoje nuoseklioje nario sistemoje.",
+    privateSummaryTitle: "Prabangesnė nario patirtis",
+    privateSummaryText: "Aukštesnis palaikymo sluoksnis, daugiau tono ir daugiau erdvės premium plėtrai.",
     previewCta: "Peržiūrėti Stilloak",
-    openProfile: "Atidaryti profilį",
-    backHome: "Grįžti į pradžią",
+    storyCta: "Skaityti Story",
     freeToast: "Free planas jau aktyvus tavo paskyrai.",
     sessionError: "Nepavyko sukurti Stripe sesijos.",
   },
   en: {
-    featurePills: [
+    pills: [
       "Full Stilloak access",
       "AI weekly and monthly summaries",
-      "Private account archive",
+      "Private member archive",
       "Members-only Journal",
-      "Priority support",
     ],
-    eyebrow: "membership",
-    title: "Choose the Stilloak access level that fits your pace",
+    eyebrow: "Membership",
+    title: "Choose the access level that matches your pace and the depth of control you want",
     intro:
-      "Membership is not a technical add-on here. It unlocks the product itself: the Stilloak dashboard, budgets, savings goals, AI summaries, and a calmer relationship with the whole member space.",
+      "Circle and Private are not just pricing plans. They unlock the value of Stilloak itself: budgets, goals, recurring spend, AI commentary, and a calmer relationship with monthly money decisions.",
     joinLoading: "Connecting...",
     currentPlan: "Current plan",
     continueStripe: "Continue to Stripe",
     enterGuest: "Continue as guest",
-    sectionEyebrow: "member path",
-    sectionTitle: "A clear path from pricing to your first month of clarity",
-    sectionIntro:
-      "The pricing page should answer one question quickly: what do I actually get when I buy membership? That is why the whole structure leads into a concrete tool, not an abstract club.",
-    journey: [
-      "Create an account and choose Circle or Private",
-      "Complete membership checkout through Stripe",
-      "Open Stilloak and set up your first month",
-      "Receive the dashboard, summaries, and private account archive",
+    compareEyebrow: "What changes",
+    compareTitle: "Each plan should feel like a clear role, not just a different price",
+    compareIntro:
+      "Guest lets people explore. Circle is for real ongoing use. Private adds a more premium layer of support and relationship.",
+    compare: [
+      {
+        label: "Guest",
+        title: "A careful first entry",
+        text: "See the world, the account structure, and the membership direction before committing.",
+      },
+      {
+        label: "Circle",
+        title: "The core Stilloak version",
+        text: "Full budgets, goals, recurring tracking, CSV import, and AI summaries for people who want to use the product for real.",
+      },
+      {
+        label: "Private",
+        title: "More tone, support, and relationship",
+        text: "For people who want not just the tool, but a deeper premium layer and stronger member feel.",
+      },
     ],
-    benefitsChip: "why it works",
-    benefitsTitle: "A strong membership page sells the result, not just the plan.",
-    benefitsIntro:
-      "Circle is for the person who wants the full Stilloak tool. Private is for those who want stronger support, a more premium layer, and a higher-touch member relationship.",
-    circleTitle: "The full tool",
-    circleText: "Budgets, goals, recurring spending, CSV import, and AI summaries.",
-    privateTitle: "A higher-touch tier",
-    privateText: "More support, a stronger member feel, and more room for premium expansion.",
-    productEyebrow: "core member product",
-    productTitle: "Stilloak",
-    productText:
-      "Circle and Private unlock Stilloak: members can track spending, set budgets, manage recurring payments, import CSV files, and receive AI summaries with a clear next-step plan.",
+    memberEyebrow: "What you are really buying",
+    memberTitle: "Membership should buy access to a clearer month, not an abstract closed-club idea",
+    memberText:
+      "Stilloak should feel like the core product: one premium dashboard, private archives, AI emails, and a coherent member experience from purchase to weekly use.",
+    memberSignals: [
+      "Member access activates immediately after payment",
+      "Summaries and invoices stay inside a private archive",
+      "The product flow leads straight into the first monthly setup",
+      "The Private layer leaves room for deeper support and premium expansion",
+    ],
+    circleSummaryTitle: "The full working version",
+    circleSummaryText: "All core Stilloak layers inside one coherent member system.",
+    privateSummaryTitle: "A more premium member experience",
+    privateSummaryText: "A higher support layer, more tone, and more room for premium expansion.",
     previewCta: "Preview Stilloak",
-    openProfile: "Open profile",
-    backHome: "Back to homepage",
+    storyCta: "Read the story",
     freeToast: "The free plan is already active on your account.",
     sessionError: "Could not create the Stripe session.",
   },
@@ -140,155 +162,155 @@ const PricingPage = () => {
   };
 
   return (
-    <div className="space-y-10">
-      <section className="public-section">
-        <div className="mx-auto max-w-3xl text-center">
-          <span className="eyebrow">{copy.eyebrow}</span>
-          <h1 className="mt-5 font-display text-5xl font-bold sm:text-6xl">{copy.title}</h1>
-          <p className="mt-4 text-base leading-7 text-muted">{copy.intro}</p>
-        </div>
+    <div className="space-y-10 pb-8">
+      <section className="marketing-dark overflow-hidden rounded-[40px] px-6 py-8 sm:px-10 sm:py-10 lg:px-12 lg:py-12">
+        <div className="grid gap-8 xl:grid-cols-[0.92fr_1.08fr] xl:gap-10">
+          <div>
+            <span className="hero-chip">{copy.eyebrow}</span>
+            <h1 className="mt-8 max-w-4xl font-display text-5xl font-bold leading-[0.9] sm:text-6xl lg:text-[4.8rem]">
+              {copy.title}
+            </h1>
+            <p className="mt-6 max-w-2xl text-base leading-7 text-white/72 sm:text-lg">{copy.intro}</p>
 
-        <div className="mt-10 grid gap-6 xl:grid-cols-3">
-          {subscriptionPlans.map((plan) => {
-            const isCurrentPlan = user?.subscription?.plan === plan.id;
-            const isFeatured = plan.id === "pro";
-            const isPaidPlan = plan.provider === "stripe";
+            <div className="mt-8 flex flex-wrap gap-3">
+              {copy.pills.map((item) => (
+                <span key={item} className="hero-chip">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
 
-            return (
-              <div
-                key={plan.id}
-                className={`overflow-hidden rounded-[30px] border p-6 transition duration-300 ${
-                  isFeatured
-                    ? "border-transparent bg-[linear-gradient(180deg,#0c0c14,#151522)] text-white shadow-[0_30px_90px_rgba(0,0,0,0.28)]"
-                    : "bg-white shadow-[0_20px_60px_rgba(20,20,35,0.05)]"
-                }`}
-                style={!isFeatured ? { borderColor: "rgb(var(--line) / 0.85)" } : undefined}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.26em] ${
-                      isFeatured ? "bg-white/10 text-white/80" : "accent-text"
+          <div className="grid gap-4 md:grid-cols-3">
+            {subscriptionPlans.map((plan) => {
+              const isCurrentPlan = user?.subscription?.plan === plan.id;
+              const isFeatured = plan.id === "pro";
+              const isPaidPlan = plan.provider === "stripe";
+
+              return (
+                <div key={plan.id} className={isFeatured ? "plan-shell-featured" : "plan-shell"}>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className={isFeatured ? "hero-chip" : "signal-pill"}>{plan.badge}</span>
+                    {isFeatured && <Sparkles size={16} style={{ color: "rgb(var(--accent-strong))" }} />}
+                  </div>
+
+                  <h2 className="mt-6 font-display text-4xl font-bold">{plan.name}</h2>
+                  <p className={`mt-3 text-sm leading-6 ${isFeatured ? "text-white/64" : "text-muted"}`}>{plan.description}</p>
+
+                  <div className="mt-8 flex items-end gap-2">
+                    <span className="font-display text-5xl font-bold">{formatCurrency(plan.price)}</span>
+                    <span className={`pb-2 text-sm ${isFeatured ? "text-white/56" : "text-muted"}`}>{plan.intervalLabel}</span>
+                  </div>
+
+                  <div className="mt-8 space-y-3">
+                    {plan.features.slice(0, 4).map((feature) => (
+                      <div
+                        key={feature}
+                        className={`flex items-start gap-3 rounded-[18px] px-3 py-3 text-sm ${isFeatured ? "bg-white/5 text-white/78" : ""}`}
+                        style={!isFeatured ? { backgroundColor: "rgb(var(--surface-soft))" } : undefined}
+                      >
+                        <CheckCircle2
+                          size={16}
+                          className="mt-0.5 shrink-0"
+                          style={isFeatured ? { color: "rgb(var(--accent-strong))" } : { color: "rgb(var(--accent-strong))" }}
+                        />
+                        <span>{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleChoosePlan(plan)}
+                    disabled={loadingPlanId === plan.id || isCurrentPlan}
+                    className={`mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3.5 text-sm font-semibold transition duration-200 disabled:cursor-not-allowed disabled:opacity-60 ${
+                      isFeatured ? "bg-white text-[rgb(24,20,18)]" : "border bg-white"
                     }`}
-                    style={!isFeatured ? { backgroundColor: "rgb(var(--accent) / 0.1)" } : undefined}
+                    style={!isFeatured ? { borderColor: "rgb(var(--line) / 0.82)", color: "rgb(var(--text))" } : undefined}
                   >
-                    {plan.badge}
-                  </span>
-                  {isFeatured && <Sparkles size={16} style={{ color: "rgb(156 131 255)" }} />}
+                    {loadingPlanId === plan.id ? (
+                      copy.joinLoading
+                    ) : isCurrentPlan ? (
+                      copy.currentPlan
+                    ) : isPaidPlan ? (
+                      <>
+                        <CreditCard size={16} />
+                        {copy.continueStripe}
+                      </>
+                    ) : (
+                      <>
+                        <ArrowRight size={16} />
+                        {copy.enterGuest}
+                      </>
+                    )}
+                  </button>
                 </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
-                <h2 className="mt-6 font-display text-3xl font-bold">{plan.name}</h2>
-                <p className={`mt-3 text-sm leading-6 ${isFeatured ? "text-white/62" : "text-muted"}`}>{plan.description}</p>
-
-                <div className="mt-8 flex items-end gap-2">
-                  <span className="font-display text-5xl font-bold">{formatCurrency(plan.price)}</span>
-                  <span className={`pb-2 text-sm ${isFeatured ? "text-white/62" : "text-muted"}`}>{plan.intervalLabel}</span>
-                </div>
-
-                <div className="mt-8 space-y-3">
-                  {plan.features.map((feature) => (
-                    <div
-                      key={feature}
-                      className={`flex items-start gap-3 rounded-[18px] px-3 py-2 text-sm ${isFeatured ? "bg-white/4 text-white/78" : ""}`}
-                      style={!isFeatured ? { backgroundColor: "rgb(var(--surface-soft))" } : undefined}
-                    >
-                      <CheckCircle2 size={16} className="mt-0.5" style={isFeatured ? { color: "rgb(156 131 255)" } : undefined} />
-                      <span>{feature}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => handleChoosePlan(plan)}
-                  disabled={loadingPlanId === plan.id || isCurrentPlan}
-                  className={`mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition duration-200 disabled:cursor-not-allowed disabled:opacity-60 ${
-                    isFeatured
-                      ? "bg-[linear-gradient(135deg,rgb(109,71,255),rgb(83,47,227))] text-white"
-                      : "border bg-white"
-                  }`}
-                  style={!isFeatured ? { borderColor: "rgb(var(--line) / 0.82)", color: "rgb(var(--text))" } : undefined}
-                >
-                  {loadingPlanId === plan.id ? (
-                    copy.joinLoading
-                  ) : isCurrentPlan ? (
-                    copy.currentPlan
-                  ) : isPaidPlan ? (
-                    <>
-                      <CreditCard size={16} />
-                      {copy.continueStripe}
-                    </>
-                  ) : (
-                    <>
-                      <ArrowRight size={16} />
-                      {copy.enterGuest}
-                    </>
-                  )}
-                </button>
-              </div>
-            );
-          })}
+      <section className="public-section">
+        <div className="max-w-3xl">
+          <span className="eyebrow">{copy.compareEyebrow}</span>
+          <h2 className="mt-5 font-display text-4xl font-bold sm:text-5xl">{copy.compareTitle}</h2>
+          <p className="mt-4 text-base leading-7 text-muted">{copy.compareIntro}</p>
         </div>
 
-        <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-          {copy.featurePills.map((item) => (
-            <div key={item} className="marketing-mini-card flex items-center gap-3">
-              <CheckCircle2 size={16} style={{ color: "rgb(var(--accent))" }} />
-              <span className="text-sm font-medium">{item}</span>
+        <div className="mt-8 grid gap-4 lg:grid-cols-3">
+          {copy.compare.map((item) => (
+            <div key={item.label} className="marketing-card p-6">
+              <span className="signal-pill">{item.label}</span>
+              <h3 className="mt-6 font-display text-3xl font-bold">{item.title}</h3>
+              <p className="mt-4 text-sm leading-7 text-muted">{item.text}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+      <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="public-section">
-          <span className="eyebrow">{copy.sectionEyebrow}</span>
-          <h2 className="mt-5 font-display text-4xl font-bold">{copy.sectionTitle}</h2>
-          <p className="mt-4 text-base leading-7 text-muted">{copy.sectionIntro}</p>
+          <span className="eyebrow">{copy.memberEyebrow}</span>
+          <h2 className="mt-5 font-display text-4xl font-bold sm:text-5xl">{copy.memberTitle}</h2>
+          <p className="mt-4 text-base leading-7 text-muted">{copy.memberText}</p>
+
           <div className="mt-8 space-y-4">
-            {copy.journey.map((item, index) => (
-              <div key={item} className="marketing-mini-card flex items-center justify-between">
-                <span className="font-medium">{item}</span>
-                <span className="text-sm text-muted">0{index + 1}</span>
+            {copy.memberSignals.map((item) => (
+              <div key={item} className="soft-card rounded-[24px] px-5 py-4">
+                <div className="flex items-start gap-3">
+                  <ShieldCheck size={18} className="mt-0.5 shrink-0" style={{ color: "rgb(var(--accent-strong))" }} />
+                  <span className="text-sm leading-6 text-muted">{item}</span>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="marketing-dark overflow-hidden rounded-[34px] px-6 py-8 sm:px-8">
-          <span className="hero-chip">{copy.benefitsChip}</span>
-          <h2 className="mt-6 max-w-xl font-display text-4xl font-bold sm:text-5xl">{copy.benefitsTitle}</h2>
-          <p className="mt-4 max-w-xl text-base leading-7 text-white/68">{copy.benefitsIntro}</p>
+        <div className="surface-dark overflow-hidden rounded-[38px] px-6 py-8 sm:px-8">
+          <span className="hero-chip">{copy.memberEyebrow}</span>
+          <h2 className="mt-6 font-display text-5xl font-bold">Stilloak</h2>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-white/68">{copy.memberText}</p>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             <div className="metric-card">
               <p className="text-xs uppercase tracking-[0.3em] text-white/45">Circle</p>
-              <p className="mt-3 font-display text-3xl font-bold">{copy.circleTitle}</p>
-              <p className="mt-2 text-sm text-white/62">{copy.circleText}</p>
+              <p className="mt-3 font-display text-3xl font-bold">{copy.circleSummaryTitle}</p>
+              <p className="mt-2 text-sm leading-6 text-white/64">{copy.circleSummaryText}</p>
             </div>
             <div className="metric-card">
               <p className="text-xs uppercase tracking-[0.3em] text-white/45">Private</p>
-              <p className="mt-3 font-display text-3xl font-bold">{copy.privateTitle}</p>
-              <p className="mt-2 text-sm text-white/62">{copy.privateText}</p>
-            </div>
-          </div>
-
-          <div className="mt-6 rounded-[24px] border border-white/8 bg-white/4 p-5">
-            <p className="text-xs uppercase tracking-[0.3em] text-white/45">{copy.productEyebrow}</p>
-            <h3 className="mt-3 font-display text-3xl font-bold">{copy.productTitle}</h3>
-            <p className="mt-3 max-w-xl text-sm leading-6 text-white/68">{copy.productText}</p>
-            <div className="mt-5">
-              <Link to="/savings-studio" className="hero-outline-button">
-                {copy.previewCta}
-              </Link>
+              <p className="mt-3 font-display text-3xl font-bold">{copy.privateSummaryTitle}</p>
+              <p className="mt-2 text-sm leading-6 text-white/64">{copy.privateSummaryText}</p>
             </div>
           </div>
 
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/profile" className="button-primary">
-              {copy.openProfile}
+            <Link to="/savings-studio" className="button-primary">
+              {copy.previewCta}
             </Link>
-            <Link to="/" className="hero-outline-button">
-              {copy.backHome}
+            <Link to="/story" className="hero-outline-button">
+              {copy.storyCta}
             </Link>
           </div>
         </div>
