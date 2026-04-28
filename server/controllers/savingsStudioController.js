@@ -350,26 +350,41 @@ const buildInsights = ({ budgets, goals, profile, recurringExpenses, summary }) 
   const recurringMonthlyTotal = roundCurrency(
     recurringExpenses.reduce((sum, recurringExpense) => sum + recurringToMonthlyEquivalent(recurringExpense), 0)
   );
+  const recurringByCategory = recurringExpenses.reduce((totals, recurringExpense) => {
+    const nextTotals = { ...totals };
+    nextTotals[recurringExpense.category] = roundCurrency(
+      Number(nextTotals[recurringExpense.category] || 0) + recurringToMonthlyEquivalent(recurringExpense)
+    );
+    return nextTotals;
+  }, {});
   const spentByCategory = new Map(
     (summary.categoryTotals || []).map((entry) => [entry.category, Number(entry.total || 0)])
   );
   const budgetProgress = budgets
     .map((budget) => {
       const spent = Number(spentByCategory.get(budget.category) || 0);
+      const recurringCommitted = Number(recurringByCategory[budget.category] || 0);
+      const projectedSpent = roundCurrency(spent + recurringCommitted);
 
       return {
         category: budget.category,
         limitAmount: Number(budget.limitAmount || 0),
         spent,
-        ratio: budget.limitAmount ? spent / Number(budget.limitAmount) : 0,
+        recurringCommitted,
+        projectedSpent,
+        ratio: budget.limitAmount ? projectedSpent / Number(budget.limitAmount) : 0,
       };
     })
     .filter((entry) => entry.limitAmount > 0)
     .sort((left, right) => right.ratio - left.ratio);
 
-  const overBudget = budgetProgress.filter((entry) => entry.spent > entry.limitAmount);
+  const projectedMonthTotal = roundCurrency(currentMonthSpent + recurringMonthlyTotal);
+  const safeToSaveAfterRecurring =
+    profile.monthlyIncome > 0 ? roundCurrency(Number(profile.monthlyIncome) - projectedMonthTotal) : null;
+
+  const overBudget = budgetProgress.filter((entry) => entry.projectedSpent > entry.limitAmount);
   const warningBudget = budgetProgress.filter(
-    (entry) => entry.spent <= entry.limitAmount && entry.spent >= entry.limitAmount * 0.85
+    (entry) => entry.projectedSpent <= entry.limitAmount && entry.projectedSpent >= entry.limitAmount * 0.85
   );
   const topCategory = summary.categoryTotals?.[0];
   const activeGoals = goals.filter((goal) => Number(goal.currentAmount || 0) < Number(goal.targetAmount || 0));
@@ -400,6 +415,21 @@ const buildInsights = ({ budgets, goals, profile, recurringExpenses, summary }) 
 
       return left.remaining - right.remaining;
     })[0];
+  const goalPace = nearestGoal?.recommendedMonthly
+    ? {
+        title: nearestGoal.title,
+        targetDate: nearestGoal.targetDate,
+        remaining: nearestGoal.remaining,
+        recommendedMonthly: nearestGoal.recommendedMonthly,
+        monthsLeft: nearestGoal.monthsLeft,
+        status:
+          profile.monthlySavingsTarget > 0 && nearestGoal.recommendedMonthly > Number(profile.monthlySavingsTarget)
+            ? "behind"
+            : safeToSaveAfterRecurring !== null && safeToSaveAfterRecurring < nearestGoal.recommendedMonthly
+            ? "tight"
+            : "on-track",
+      }
+    : null;
 
   const insights = [];
 
@@ -409,11 +439,11 @@ const buildInsights = ({ budgets, goals, profile, recurringExpenses, summary }) 
       key: "budget-over",
       tone: "danger",
       title: `Viršytas ${first.category} biudžetas`,
-      metric: formatMoney(first.spent - first.limitAmount),
+      metric: formatMoney(first.projectedSpent - first.limitAmount),
       body:
         overBudget.length > 1
-          ? `${overBudget.length} kategorijos jau viršijo ribą. Pirmiausia verta stabdyti ${first.category.toLowerCase()} sritį.`
-          : `${first.category} išlaidos jau viršijo planą. Čia dabar greičiausiai dingsta mėnesio rezervas.`,
+          ? `${overBudget.length} kategorijos jau viršijo ribą, kai įskaičiuoji pastovias išlaidas. Pirmiausia verta stabdyti ${first.category.toLowerCase()} sritį.`
+          : `${first.category} su pastoviomis išlaidomis jau viršija planą. Čia dabar greičiausiai dingsta mėnesio rezervas.`,
     });
   } else if (warningBudget.length) {
     const first = warningBudget[0];
@@ -424,8 +454,8 @@ const buildInsights = ({ budgets, goals, profile, recurringExpenses, summary }) 
       metric: `${Math.round(first.ratio * 100)}%`,
       body:
         warningBudget.length > 1
-          ? `${warningBudget.length} kategorijos pasiekė bent 85% limito. Dar keli pirkiniai gali perstumti mėnesį į minusą.`
-          : `Šioje kategorijoje jau panaudota didžioji dalis limito. Jei ją pristabdysi, bus lengviau išsaugoti mėnesio balansą.`,
+          ? `${warningBudget.length} kategorijos pasiekė bent 85% limito, kai įskaičiuoji pastovias išlaidas. Dar keli pirkiniai gali perstumti mėnesį į minusą.`
+          : `Šioje kategorijoje su pastoviomis išlaidomis jau panaudota didžioji dalis limito. Jei ją pristabdysi, bus lengviau išsaugoti mėnesio balansą.`,
     });
   }
 
@@ -530,8 +560,12 @@ const buildInsights = ({ budgets, goals, profile, recurringExpenses, summary }) 
 
   return {
     recurringMonthlyTotal,
+    recurringByCategory,
     availableToSave:
       profile.monthlyIncome > 0 ? roundCurrency(Number(profile.monthlyIncome) - currentMonthSpent) : null,
+    safeToSaveAfterRecurring,
+    projectedMonthTotal,
+    goalPace,
     insights: insights.slice(0, 4),
   };
 };

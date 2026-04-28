@@ -1,6 +1,8 @@
 import {
   AlertTriangle,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   PiggyBank,
   Pencil,
   Plus,
@@ -39,6 +41,26 @@ import {
 } from "../components/savings/savingsStudioHelpers";
 
 const ONBOARDING_BUDGET_CATEGORIES = ["Būstas", "Maistas", "Transportas"];
+const ONBOARDING_STEPS = [
+  {
+    key: "base",
+    eyebrow: "step 1",
+    title: "Susidėk finansinį pagrindą",
+    description: "Pradėk nuo dviejų skaičių: kiek uždirbi per mėnesį ir kiek realiai nori atsidėti.",
+  },
+  {
+    key: "focus",
+    eyebrow: "step 2",
+    title: "Pasirink kryptį ir pirmus limitus",
+    description: "Nusistatyk pagrindinį fokusą ir pirmas 3 kategorijas, kurias nori suvaldyti greičiausiai.",
+  },
+  {
+    key: "review",
+    eyebrow: "step 3",
+    title: "Patvirtink pirmo mėnesio planą",
+    description: "Prieš atidarant pilną studio, dar kartą peržiūrėk, kaip atrodys tavo pirmas mėnuo.",
+  },
+];
 
 const SavingsStudioPage = () => {
   const { user } = useAuth();
@@ -77,6 +99,7 @@ const SavingsStudioPage = () => {
   const [deletingId, setDeletingId] = useState("");
   const [deletingGoalId, setDeletingGoalId] = useState("");
   const [deletingRecurringId, setDeletingRecurringId] = useState("");
+  const [onboardingStep, setOnboardingStep] = useState(0);
 
   const deferredSearch = useDeferredValue(filters.search.trim().toLowerCase());
   const selectedBudgetMonth = filters.month === "all" ? currentMonthKey() : filters.month;
@@ -180,6 +203,18 @@ const SavingsStudioPage = () => {
 
   const filteredTotal = filteredEntries.reduce((sum, entry) => sum + Number(entry.amount), 0);
   const selectedMonthEntries = entries.filter((entry) => entry.date.startsWith(selectedBudgetMonth));
+  const recurringByCategory = useMemo(
+    () =>
+      summary?.recurringByCategory ||
+      recurringExpenses.reduce((totals, recurringExpense) => {
+        const nextTotals = { ...totals };
+        nextTotals[recurringExpense.category] =
+          (nextTotals[recurringExpense.category] || 0) +
+          Number(recurringExpense.monthlyEquivalent || recurringMonthlyEquivalent(recurringExpense));
+        return nextTotals;
+      }, {}),
+    [recurringExpenses, summary?.recurringByCategory]
+  );
   const spentByCategory = useMemo(
     () =>
       selectedMonthEntries.reduce((totals, entry) => {
@@ -195,22 +230,27 @@ const SavingsStudioPage = () => {
       categories
         .map((category) => {
           const budget = budgets.find((entry) => entry.category === category);
-          const spent = Number(spentByCategory[category] || 0);
+          const actualSpent = Number(spentByCategory[category] || 0);
+          const recurringCommitted = Number(recurringByCategory[category] || 0);
           const limitAmount = Number(budget?.limitAmount || 0);
-          const remaining = limitAmount ? Number((limitAmount - spent).toFixed(2)) : 0;
-          const percentUsed = limitAmount ? Math.min((spent / limitAmount) * 100, 100) : 0;
+          const projectedSpent = Number((actualSpent + recurringCommitted).toFixed(2));
+          const remaining = limitAmount ? Number((limitAmount - projectedSpent).toFixed(2)) : 0;
+          const percentUsed = limitAmount ? Math.min((projectedSpent / limitAmount) * 100, 100) : 0;
 
           return {
             category,
-            spent,
+            actualSpent,
+            recurringCommitted,
+            spent: projectedSpent,
+            projectedSpent,
             limitAmount,
             remaining,
             percentUsed,
-            status: getBudgetStatus({ spent, limitAmount }),
+            status: getBudgetStatus({ spent: projectedSpent, limitAmount }),
           };
         })
-        .filter((entry) => entry.limitAmount > 0 || entry.spent > 0),
-    [budgets, categories, spentByCategory]
+        .filter((entry) => entry.limitAmount > 0 || entry.actualSpent > 0 || entry.recurringCommitted > 0),
+    [budgets, categories, recurringByCategory, spentByCategory]
   );
 
   const budgetOverview = {
@@ -223,6 +263,9 @@ const SavingsStudioPage = () => {
     ...goal,
     ...getGoalProgress(goal),
   }));
+  const goalPace = summary?.goalPace || null;
+  const safeToSaveAfterRecurring = summary?.safeToSaveAfterRecurring;
+  const projectedMonthTotal = summary?.projectedMonthTotal || 0;
 
   const recurringMonthlyTotal = recurringExpenses.reduce(
     (sum, recurringExpense) => sum + Number(recurringExpense.monthlyEquivalent || recurringMonthlyEquivalent(recurringExpense)),
@@ -288,6 +331,46 @@ const SavingsStudioPage = () => {
       ...current,
       [category]: value,
     }));
+  };
+
+  const handleNextOnboardingStep = () => {
+    if (onboardingStep === 0) {
+      const monthlyIncome = Number(String(profileForm.monthlyIncome || "0").replace(",", "."));
+      const monthlySavingsTarget = Number(String(profileForm.monthlySavingsTarget || "0").replace(",", "."));
+
+      if (!Number.isFinite(monthlyIncome) || monthlyIncome <= 0) {
+        toast.error("Įvesk mėnesio pajamas, kad setup būtų prasmingas.");
+        return;
+      }
+
+      if (!Number.isFinite(monthlySavingsTarget) || monthlySavingsTarget < 0) {
+        toast.error("Įvesk galiojantį mėnesio taupymo tikslą.");
+        return;
+      }
+    }
+
+    if (onboardingStep === 1) {
+      const hasAnyBudget = ONBOARDING_BUDGET_CATEGORIES.some((category) => {
+        const amount = Number(String(budgetInputs[category] || "0").replace(",", "."));
+        return Number.isFinite(amount) && amount > 0;
+      });
+
+      if (!profileForm.primaryFocus) {
+        toast.error("Pasirink pagrindinį fokusą.");
+        return;
+      }
+
+      if (!hasAnyBudget) {
+        toast.error("Įrašyk bent vieną pirmą biudžeto ribą.");
+        return;
+      }
+    }
+
+    setOnboardingStep((current) => Math.min(current + 1, ONBOARDING_STEPS.length - 1));
+  };
+
+  const handlePreviousOnboardingStep = () => {
+    setOnboardingStep((current) => Math.max(current - 1, 0));
   };
 
   const handleSaveOnboarding = async (event) => {
@@ -551,75 +634,153 @@ const SavingsStudioPage = () => {
           <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
             <div>
               <span className="eyebrow">first setup</span>
-              <h2 className="mt-5 text-5xl font-bold">Susidėk pirmą taupymo pagrindą</h2>
+              <h2 className="mt-5 text-5xl font-bold">{ONBOARDING_STEPS[onboardingStep].title}</h2>
               <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
-                Šitas trumpas onboarding padeda tau iškart pradėti prasmingai: nustatai pajamas, mėnesio taupymo
-                tikslą ir kelias pirmas biudžeto ribas svarbiausioms kategorijoms.
+                {ONBOARDING_STEPS[onboardingStep].description}
               </p>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                {ONBOARDING_STEPS.map((step, index) => (
+                  <div
+                    key={step.key}
+                    className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] ${
+                      index === onboardingStep
+                        ? "bg-[rgb(var(--accent))] text-[rgb(var(--accent-contrast))]"
+                        : "bg-[rgb(var(--surface-soft))] text-muted"
+                    }`}
+                  >
+                    {step.eyebrow}
+                  </div>
+                ))}
+              </div>
             </div>
 
             <form className="space-y-4" onSubmit={handleSaveOnboarding}>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="block space-y-2">
-                  <span className="text-sm font-semibold text-muted">Mėnesio pajamos</span>
-                  <input
-                    name="monthlyIncome"
-                    value={profileForm.monthlyIncome}
-                    onChange={handleProfileChange}
-                    inputMode="decimal"
-                    placeholder="0.00"
-                    className="input-field"
-                  />
-                </label>
+              {onboardingStep === 0 ? (
+                <div className="space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <label className="block space-y-2">
+                      <span className="text-sm font-semibold text-muted">Mėnesio pajamos</span>
+                      <input
+                        name="monthlyIncome"
+                        value={profileForm.monthlyIncome}
+                        onChange={handleProfileChange}
+                        inputMode="decimal"
+                        placeholder="0.00"
+                        className="input-field"
+                      />
+                    </label>
 
-                <label className="block space-y-2">
-                  <span className="text-sm font-semibold text-muted">Mėnesio taupymo tikslas</span>
-                  <input
-                    name="monthlySavingsTarget"
-                    value={profileForm.monthlySavingsTarget}
-                    onChange={handleProfileChange}
-                    inputMode="decimal"
-                    placeholder="0.00"
-                    className="input-field"
-                  />
-                </label>
-              </div>
+                    <label className="block space-y-2">
+                      <span className="text-sm font-semibold text-muted">Mėnesio taupymo tikslas</span>
+                      <input
+                        name="monthlySavingsTarget"
+                        value={profileForm.monthlySavingsTarget}
+                        onChange={handleProfileChange}
+                        inputMode="decimal"
+                        placeholder="0.00"
+                        className="input-field"
+                      />
+                    </label>
+                  </div>
 
-              <label className="block space-y-2">
-                <span className="text-sm font-semibold text-muted">Pagrindinis fokusas</span>
-                <select
-                  name="primaryFocus"
-                  value={profileForm.primaryFocus}
-                  onChange={handleProfileChange}
-                  className="select-field"
-                >
-                  {focusOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                  <div className="soft-card rounded-[24px] p-5 text-sm text-muted">
+                    Čia susikuri bazę, nuo kurios programa galės skaičiuoti, kiek realiai dar telpa taupymui.
+                  </div>
+                </div>
+              ) : null}
 
-              <div className="grid gap-4 sm:grid-cols-3">
-                {ONBOARDING_BUDGET_CATEGORIES.map((category) => (
-                  <label key={category} className="block space-y-2">
-                    <span className="text-sm font-semibold text-muted">{category} biudžetas</span>
-                    <input
-                      value={budgetInputs[category] || ""}
-                      onChange={(event) => handleBudgetInputChange(category, event.target.value)}
-                      inputMode="decimal"
-                      placeholder="0.00"
-                      className="input-field"
-                    />
+              {onboardingStep === 1 ? (
+                <div className="space-y-4">
+                  <label className="block space-y-2">
+                    <span className="text-sm font-semibold text-muted">Pagrindinis fokusas</span>
+                    <select
+                      name="primaryFocus"
+                      value={profileForm.primaryFocus}
+                      onChange={handleProfileChange}
+                      className="select-field"
+                    >
+                      {focusOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
                   </label>
-                ))}
-              </div>
 
-              <button type="submit" className="button-primary w-full gap-2" disabled={savingOnboarding}>
-                <CheckCircle2 size={16} />
-                {savingOnboarding ? "Kuriama..." : "Užbaigti pirmą setup"}
-              </button>
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    {ONBOARDING_BUDGET_CATEGORIES.map((category) => (
+                      <label key={category} className="block space-y-2">
+                        <span className="text-sm font-semibold text-muted">{category} biudžetas</span>
+                        <input
+                          value={budgetInputs[category] || ""}
+                          onChange={(event) => handleBudgetInputChange(category, event.target.value)}
+                          inputMode="decimal"
+                          placeholder="0.00"
+                          className="input-field"
+                        />
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {onboardingStep === 2 ? (
+                <div className="space-y-4">
+                  <div className="soft-card rounded-[24px] p-5">
+                    <p className="text-xs uppercase tracking-[0.24em] text-muted">Review</p>
+                    <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                      <div>
+                        <p className="text-sm font-semibold text-muted">Mėnesio pajamos</p>
+                        <p className="mt-1 text-lg font-semibold">
+                          {money.format(Number(String(profileForm.monthlyIncome || "0").replace(",", ".")))}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-muted">Taupymo tikslas</p>
+                        <p className="mt-1 text-lg font-semibold">
+                          {money.format(Number(String(profileForm.monthlySavingsTarget || "0").replace(",", ".")))}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <p className="text-sm font-semibold text-muted">Pagrindinis fokusas</p>
+                      <p className="mt-1 text-base">{profileForm.primaryFocus || "Nepasirinkta"}</p>
+                    </div>
+                    <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                      {ONBOARDING_BUDGET_CATEGORIES.map((category) => (
+                        <div key={category} className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
+                          <p className="text-sm font-semibold text-muted">{category}</p>
+                          <p className="mt-1 text-base font-semibold">
+                            {money.format(Number(String(budgetInputs[category] || "0").replace(",", ".")))}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="flex flex-wrap gap-3">
+                {onboardingStep > 0 ? (
+                  <button type="button" className="button-secondary gap-2" onClick={handlePreviousOnboardingStep}>
+                    <ChevronLeft size={16} />
+                    Atgal
+                  </button>
+                ) : null}
+
+                {onboardingStep < ONBOARDING_STEPS.length - 1 ? (
+                  <button type="button" className="button-primary gap-2" onClick={handleNextOnboardingStep}>
+                    Toliau
+                    <ChevronRight size={16} />
+                  </button>
+                ) : (
+                  <button type="submit" className="button-primary gap-2" disabled={savingOnboarding}>
+                    <CheckCircle2 size={16} />
+                    {savingOnboarding ? "Kuriama..." : "Užbaigti pirmą setup"}
+                  </button>
+                )}
+              </div>
             </form>
           </div>
         </section>
@@ -678,6 +839,51 @@ const SavingsStudioPage = () => {
                 hint="85% ir daugiau panaudota"
               />
             </div>
+
+            {goalPace ? (
+              <div className="mt-6 rounded-[24px] border border-white/10 bg-white/5 p-5">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.24em] text-white/45">Goal pace</p>
+                    <h3 className="mt-3 font-display text-3xl font-bold">{goalPace.title}</h3>
+                  </div>
+                  <Target size={18} style={{ color: "rgb(var(--accent-strong))" }} />
+                </div>
+                <div className="mt-4 grid gap-4 sm:grid-cols-3">
+                  <div className="rounded-[18px] bg-white/5 px-4 py-3">
+                    <p className="text-xs uppercase tracking-[0.18em] text-white/45">Reikia per mėn.</p>
+                    <p className="mt-2 text-lg font-semibold">{money.format(goalPace.recommendedMonthly)}</p>
+                  </div>
+                  <div className="rounded-[18px] bg-white/5 px-4 py-3">
+                    <p className="text-xs uppercase tracking-[0.18em] text-white/45">Liko sukaupti</p>
+                    <p className="mt-2 text-lg font-semibold">{money.format(goalPace.remaining)}</p>
+                  </div>
+                  <div className="rounded-[18px] bg-white/5 px-4 py-3">
+                    <p className="text-xs uppercase tracking-[0.18em] text-white/45">Statusas</p>
+                    <p
+                      className={`mt-2 text-lg font-semibold ${
+                        goalPace.status === "behind"
+                          ? "text-red-200"
+                          : goalPace.status === "tight"
+                          ? "text-amber-100"
+                          : "text-emerald-200"
+                      }`}
+                    >
+                      {goalPace.status === "behind"
+                        ? "Per lėtas tempas"
+                        : goalPace.status === "tight"
+                        ? "Ant ribos"
+                        : "Juda gerai"}
+                    </p>
+                  </div>
+                </div>
+                <p className="mt-4 text-sm leading-6 text-white/70">
+                  {goalPace.targetDate
+                    ? `Jei nori pasiekti šį tikslą iki ${goalPace.targetDate}, verta laikyti bent tokį mėnesio atsidėjimo tempą.`
+                    : "Šis tikslas kol kas neturi datos, todėl rekomenduojamas tempas skaičiuojamas kaip geras mėnesio orientyras."}
+                </p>
+              </div>
+            ) : null}
           </div>
 
           <div className="rounded-[28px] border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
@@ -699,8 +905,12 @@ const SavingsStudioPage = () => {
               <span>Filtruota suma: {money.format(filteredTotal)}</span>
               <span>Top kategorija: {summary?.topCategory || "Dar nėra duomenų"}</span>
               <span>Biudžetų mėnuo: {selectedBudgetMonth}</span>
+              <span>Su pastoviomis: {money.format(projectedMonthTotal)}</span>
               {availableToSave !== null && availableToSave !== undefined ? (
                 <span>Laisva suma: {money.format(availableToSave)}</span>
+              ) : null}
+              {safeToSaveAfterRecurring !== null && safeToSaveAfterRecurring !== undefined ? (
+                <span>Po recurring: {money.format(safeToSaveAfterRecurring)}</span>
               ) : null}
             </div>
           </div>
@@ -995,7 +1205,7 @@ const SavingsStudioPage = () => {
                             : ""
                         }`}
                       >
-                        {money.format(entry.spent)} / {money.format(entry.limitAmount || 0)}
+                        {money.format(entry.projectedSpent)} / {money.format(entry.limitAmount || 0)}
                       </span>
                     </div>
                     <div className="mt-3 h-2 overflow-hidden rounded-full bg-[rgb(var(--surface-soft))]">
@@ -1010,6 +1220,9 @@ const SavingsStudioPage = () => {
                         style={{ width: `${entry.limitAmount ? Math.max(entry.percentUsed, 6) : 0}%` }}
                       />
                     </div>
+                    <p className="mt-3 text-xs uppercase tracking-[0.16em] text-muted">
+                      Faktinės: {money.format(entry.actualSpent)} · Pastovios: {money.format(entry.recurringCommitted)}
+                    </p>
                     <p className="mt-3 text-sm text-muted">
                       {entry.status === "over"
                         ? `Viršyta ${money.format(Math.abs(entry.remaining))}`
