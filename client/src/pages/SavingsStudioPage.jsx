@@ -65,6 +65,74 @@ const ONBOARDING_STEPS = [
     description: "Prieš atidarant pilną studio, dar kartą peržiūrėk, kaip atrodys tavo pirmas mėnuo.",
   },
 ];
+const USAGE_WIZARD_STORAGE_KEY = "savings_studio_usage_wizard_seen";
+const USAGE_WIZARD_STEPS = [
+  {
+    key: "setup",
+    eyebrow: "step 1",
+    title: "Susikurk pirmo mėnesio pagrindą",
+    description:
+      "Pirmiausia susivesk mėnesio pajamas, taupymo tikslą ir tris svarbiausias biudžeto kategorijas. Tai sukuria visą likusį Savings Studio kontekstą.",
+    bullets: [
+      "Įrašyk mėnesio pajamas ir kiek nori atsidėti.",
+      "Pasirink pagrindinį finansinį fokusą.",
+      "Nusistatyk pirmas 3 biudžeto ribas.",
+    ],
+    targetId: "savings-setup",
+  },
+  {
+    key: "ledger",
+    eyebrow: "step 2",
+    title: "Pradėk nuo realių išlaidų įrašymo",
+    description:
+      "Kai pradedi pildyti realius pirkinius, programa pradeda rodyti ne teoriją, o tavo tikrą išlaidų vaizdą.",
+    bullets: [
+      "Pridėk bent 5–10 paskutinių išlaidų.",
+      "Naudok kategorijas nuosekliai.",
+      "Jei turi daug duomenų, vietoje rankinio vedimo naudok CSV importą.",
+    ],
+    targetId: "savings-ledger",
+  },
+  {
+    key: "budgets",
+    eyebrow: "step 3",
+    title: "Sujunk biudžetus su pastoviomis išlaidomis",
+    description:
+      "Čia atsiranda tikras spaudimo vaizdas: ne tik kiek jau išleidai, bet ir kiek dar suvalgys recurring mokėjimai.",
+    bullets: [
+      "Nustatyk biudžeto ribas kiekvienai svarbiai kategorijai.",
+      "Pridėk nuomą, prenumeratas ir kitus pastovius mokėjimus.",
+      "Kai recurring nuskaičiuojamas, paversk jį tikru mėnesio įrašu vienu mygtuku.",
+    ],
+    targetId: "savings-budgets",
+  },
+  {
+    key: "insights",
+    eyebrow: "step 4",
+    title: "Naudok įžvalgas ir tikslus sprendimams",
+    description:
+      "Savings Studio turi padėti taupyti, ne tik kaupti skaičius. Todėl svarbiausia vieta yra įžvalgos, tikslų tempas ir savaitinis mėnesio ritmas.",
+    bullets: [
+      "Stebėk, kurios kategorijos labiausiai spaudžia mėnesį.",
+      "Sek, ar taupymo tempas užtenka tavo tikslams.",
+      "Žiūrėk, kuri mėnesio savaitė išleidžia daugiausia.",
+    ],
+    targetId: "savings-analytics",
+  },
+  {
+    key: "automation",
+    eyebrow: "step 5",
+    title: "Įsijunk automatizaciją ir atsarginę kopiją",
+    description:
+      "Kai bazė jau sukurta, verta įjungti automatiką, kad programa pati dirbtų tavo naudai ir turėtum atsarginę duomenų kopiją.",
+    bullets: [
+      "Įjunk savaitines arba mėnesines email suvestines.",
+      "Prieš didesnius importus naudok CSV preview.",
+      "Kartais atsisiųsk JSON backup savo duomenims.",
+    ],
+    targetId: "savings-automation",
+  },
+];
 
 const SavingsStudioPage = () => {
   const { user } = useAuth();
@@ -117,6 +185,9 @@ const SavingsStudioPage = () => {
   const [deletingGoalId, setDeletingGoalId] = useState("");
   const [deletingRecurringId, setDeletingRecurringId] = useState("");
   const [onboardingStep, setOnboardingStep] = useState(0);
+  const [usageWizardOpen, setUsageWizardOpen] = useState(false);
+  const [usageWizardStep, setUsageWizardStep] = useState(0);
+  const [usageWizardReady, setUsageWizardReady] = useState(false);
 
   const deferredSearch = useDeferredValue(filters.search.trim().toLowerCase());
   const selectedBudgetMonth = filters.month === "all" ? currentMonthKey() : filters.month;
@@ -209,6 +280,22 @@ const SavingsStudioPage = () => {
       toast.success("Narystė aktyvuota. Savings Studio laukia tavo pirmo setup.");
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    if (loading || usageWizardReady) {
+      return;
+    }
+
+    const hasSeenWizard = window.localStorage.getItem(USAGE_WIZARD_STORAGE_KEY) === "true";
+    const shouldOpenBecauseOfMembership = searchParams.get("welcome") === "membership";
+
+    if (shouldOpenBecauseOfMembership || !hasSeenWizard) {
+      setUsageWizardStep(profile?.onboardingCompleted ? 1 : 0);
+      setUsageWizardOpen(true);
+    }
+
+    setUsageWizardReady(true);
+  }, [loading, profile?.onboardingCompleted, searchParams, usageWizardReady]);
 
   const monthChoices = useMemo(() => buildMonthOptions(entries), [entries]);
 
@@ -806,6 +893,36 @@ const SavingsStudioPage = () => {
   const highestMonthlyTotal = Math.max(...monthlyTotals.map((entry) => entry.total), 1);
   const activeGoalsCount = decoratedGoals.filter((goal) => !goal.complete).length;
   const currentRecurringMonth = currentMonthKey();
+  const usageWizardCurrentStep = USAGE_WIZARD_STEPS[usageWizardStep];
+
+  const openUsageWizard = (stepIndex = 0) => {
+    setUsageWizardStep(Math.max(0, Math.min(stepIndex, USAGE_WIZARD_STEPS.length - 1)));
+    setUsageWizardOpen(true);
+  };
+
+  const closeUsageWizard = () => {
+    window.localStorage.setItem(USAGE_WIZARD_STORAGE_KEY, "true");
+    setUsageWizardOpen(false);
+  };
+
+  const completeUsageWizard = () => {
+    toast.success("Naudojimo gidas užbaigtas. Dabar gali eiti tiesiai prie aktualiausio žingsnio.");
+    closeUsageWizard();
+  };
+
+  const goToUsageWizardTarget = () => {
+    const target =
+      document.getElementById(usageWizardCurrentStep?.targetId || "") ||
+      document.getElementById("savings-ledger") ||
+      document.getElementById("savings-analytics");
+    closeUsageWizard();
+
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -814,6 +931,35 @@ const SavingsStudioPage = () => {
         title="Savings Studio"
         subtitle="Privati nario darbo zona, kur matai, kur išeina pinigai, kaip keičiasi mėnesiai ir kur gali susigrąžinti finansinį aiškumą."
       />
+
+      <section className="soft-card rounded-[28px] px-6 py-6 sm:px-7">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted">usage guide</p>
+            <h2 className="mt-3 text-3xl font-bold">Nori greito walkthrough, kaip naudotis Savings Studio?</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-muted">
+              Atidaryk step-by-step gidą ir per kelias minutes pereik visą logiką: nuo pirmo setup iki email
+              suvestinių, CSV importo ir taupymo įžvalgų.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <button type="button" className="button-primary" onClick={() => openUsageWizard(0)}>
+              Atidaryti gidą
+            </button>
+            <button
+              type="button"
+              className="button-secondary"
+              onClick={() => {
+                window.localStorage.removeItem(USAGE_WIZARD_STORAGE_KEY);
+                openUsageWizard(profile?.onboardingCompleted ? 1 : 0);
+              }}
+            >
+              Rodyti kaip pirmą kartą
+            </button>
+          </div>
+        </div>
+      </section>
 
       {searchParams.get("welcome") === "membership" ? (
         <section className="public-section">
@@ -839,7 +985,7 @@ const SavingsStudioPage = () => {
       ) : null}
 
       {!profile?.onboardingCompleted && (
-        <section className="public-section">
+        <section id="savings-setup" className="public-section">
           <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
             <div>
               <span className="eyebrow">first setup</span>
@@ -995,7 +1141,7 @@ const SavingsStudioPage = () => {
         </section>
       )}
 
-      <section className="marketing-dark overflow-hidden rounded-[34px] px-6 py-7 sm:px-8 lg:px-10">
+      <section id="savings-analytics" className="marketing-dark overflow-hidden rounded-[34px] px-6 py-7 sm:px-8 lg:px-10">
         <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
           <div>
             <span className="hero-chip">Circle feature</span>
@@ -1126,7 +1272,7 @@ const SavingsStudioPage = () => {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[0.92fr_1.1fr_0.98fr]">
+      <section id="savings-ledger" className="grid gap-6 xl:grid-cols-[0.92fr_1.1fr_0.98fr]">
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -1326,7 +1472,7 @@ const SavingsStudioPage = () => {
         </div>
 
         <div className="space-y-6">
-          <div className="panel p-6">
+          <div id="savings-budgets" className="panel p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="eyebrow">monthly budgets</p>
@@ -1604,7 +1750,7 @@ const SavingsStudioPage = () => {
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-2">
+      <section id="savings-goals" className="grid gap-6 lg:grid-cols-2">
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -1918,7 +2064,7 @@ const SavingsStudioPage = () => {
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-2">
+      <section id="savings-automation" className="grid gap-6 lg:grid-cols-2">
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -2126,6 +2272,21 @@ const SavingsStudioPage = () => {
           </button>
         </div>
       </section>
+
+      {usageWizardOpen ? (
+        <UsageWizardModal
+          currentStep={usageWizardCurrentStep}
+          isFirstStep={usageWizardStep === 0}
+          isLastStep={usageWizardStep === USAGE_WIZARD_STEPS.length - 1}
+          onBack={() => setUsageWizardStep((current) => Math.max(current - 1, 0))}
+          onClose={closeUsageWizard}
+          onComplete={completeUsageWizard}
+          onGoToSection={goToUsageWizardTarget}
+          onNext={() => setUsageWizardStep((current) => Math.min(current + 1, USAGE_WIZARD_STEPS.length - 1))}
+          stepIndex={usageWizardStep}
+          totalSteps={USAGE_WIZARD_STEPS.length}
+        />
+      ) : null}
     </div>
   );
 };
@@ -2181,5 +2342,97 @@ const InsightSignalCard = ({ insight }) => {
     </div>
   );
 };
+
+const UsageWizardModal = ({
+  currentStep,
+  isFirstStep,
+  isLastStep,
+  onBack,
+  onClose,
+  onComplete,
+  onGoToSection,
+  onNext,
+  stepIndex,
+  totalSteps,
+}) => (
+  <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/55 px-4 py-6 backdrop-blur-sm">
+    <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-[32px] bg-white p-6 shadow-[0_30px_120px_rgba(0,0,0,0.28)] sm:p-8">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-muted">{currentStep.eyebrow}</p>
+          <h2 className="mt-3 text-4xl font-bold">{currentStep.title}</h2>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-muted">{currentStep.description}</p>
+        </div>
+
+        <button type="button" className="button-secondary" onClick={onClose}>
+          Uždaryti
+        </button>
+      </div>
+
+      <div className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="soft-card rounded-[28px] p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted">Ką padaryti šiame žingsnyje</p>
+          <div className="mt-4 space-y-4">
+            {currentStep.bullets.map((bullet, index) => (
+              <div key={bullet} className="flex items-start gap-3">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--accent))] text-sm font-semibold text-[rgb(var(--accent-contrast))]">
+                  {index + 1}
+                </div>
+                <p className="pt-1 text-sm leading-6 text-muted">{bullet}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="soft-card rounded-[28px] p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted">Progresas</p>
+          <div className="mt-4 h-2 overflow-hidden rounded-full bg-[rgb(var(--surface-soft))]">
+            <div
+              className="h-full rounded-full bg-[rgb(var(--accent))]"
+              style={{ width: `${((stepIndex + 1) / totalSteps) * 100}%` }}
+            />
+          </div>
+          <p className="mt-4 text-sm text-muted">
+            Žingsnis {stepIndex + 1} iš {totalSteps}
+          </p>
+
+          <div className="mt-6 space-y-3">
+            <button type="button" className="button-primary w-full" onClick={onGoToSection}>
+              Rodyti šią vietą puslapyje
+            </button>
+            <p className="text-sm leading-6 text-muted">
+              Šis mygtukas uždarys gidą ir nuves tiesiai į tą Savings Studio vietą, kurią verta susitvarkyti dabar.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap gap-3">
+          {!isFirstStep ? (
+            <button type="button" className="button-secondary gap-2" onClick={onBack}>
+              <ChevronLeft size={16} />
+              Atgal
+            </button>
+          ) : null}
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          {!isLastStep ? (
+            <button type="button" className="button-primary gap-2" onClick={onNext}>
+              Toliau
+              <ChevronRight size={16} />
+            </button>
+          ) : (
+            <button type="button" className="button-primary gap-2" onClick={onComplete}>
+              <CheckCircle2 size={16} />
+              Užbaigti gidą
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 export default SavingsStudioPage;
