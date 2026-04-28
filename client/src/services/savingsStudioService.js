@@ -5,6 +5,16 @@ const getMeta = async () => {
   return data;
 };
 
+const getProfile = async () => {
+  const { data } = await api.get("/savings-studio/profile");
+  return data;
+};
+
+const updateProfile = async (payload) => {
+  const { data } = await api.put("/savings-studio/profile", payload);
+  return data;
+};
+
 const getEntries = async () => {
   const { data } = await api.get("/savings-studio/entries");
   return data;
@@ -20,6 +30,44 @@ const getBudgets = async (month) => {
 const updateBudgets = async (payload) => {
   const { data } = await api.put("/savings-studio/budgets", payload);
   return data;
+};
+
+const getGoals = async () => {
+  const { data } = await api.get("/savings-studio/goals");
+  return data;
+};
+
+const createGoal = async (payload) => {
+  const { data } = await api.post("/savings-studio/goals", payload);
+  return data;
+};
+
+const updateGoal = async (goalId, payload) => {
+  const { data } = await api.put(`/savings-studio/goals/${goalId}`, payload);
+  return data;
+};
+
+const deleteGoal = async (goalId) => {
+  await api.delete(`/savings-studio/goals/${goalId}`);
+};
+
+const getRecurringExpenses = async () => {
+  const { data } = await api.get("/savings-studio/recurring");
+  return data;
+};
+
+const createRecurringExpense = async (payload) => {
+  const { data } = await api.post("/savings-studio/recurring", payload);
+  return data;
+};
+
+const updateRecurringExpense = async (recurringId, payload) => {
+  const { data } = await api.put(`/savings-studio/recurring/${recurringId}`, payload);
+  return data;
+};
+
+const deleteRecurringExpense = async (recurringId) => {
+  await api.delete(`/savings-studio/recurring/${recurringId}`);
 };
 
 const getSummary = async () => {
@@ -43,8 +91,18 @@ const deleteEntry = async (entryId) => {
 
 export default {
   getMeta,
+  getProfile,
+  updateProfile,
   getEntries,
   getBudgets,
+  getGoals,
+  createGoal,
+  updateGoal,
+  deleteGoal,
+  getRecurringExpenses,
+  createRecurringExpense,
+  updateRecurringExpense,
+  deleteRecurringExpense,
   getSummary,
   createEntry,
   updateEntry,

@@ -4,6 +4,7 @@ import {
   PiggyBank,
   Pencil,
   Plus,
+  Repeat,
   ShieldCheck,
   Target,
   Trash2,
@@ -20,22 +21,46 @@ import { useAuth } from "../context/AuthContext";
 import savingsStudioService from "../services/savingsStudioService";
 import {
   buildMonthOptions,
+  currentDateInput,
   currentMonthKey,
   dateFormatter,
   DEFAULT_CATEGORIES,
+  DEFAULT_FOCUS_OPTIONS,
+  DEFAULT_RECURRING_FREQUENCIES,
   emptyEntry,
+  emptyGoal,
+  emptyRecurringExpense,
   formatChange,
+  formatRecurringFrequency,
   getBudgetStatus,
+  getGoalProgress,
   money,
+  recurringMonthlyEquivalent,
 } from "../components/savings/savingsStudioHelpers";
+
+const ONBOARDING_BUDGET_CATEGORIES = ["Būstas", "Maistas", "Transportas"];
 
 const SavingsStudioPage = () => {
   const { user } = useAuth();
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
+  const [focusOptions, setFocusOptions] = useState(DEFAULT_FOCUS_OPTIONS);
+  const [recurringFrequencies, setRecurringFrequencies] = useState(DEFAULT_RECURRING_FREQUENCIES);
+  const [profile, setProfile] = useState(null);
+  const [profileForm, setProfileForm] = useState({
+    monthlyIncome: "",
+    monthlySavingsTarget: "",
+    primaryFocus: DEFAULT_FOCUS_OPTIONS[0],
+  });
   const [entries, setEntries] = useState([]);
   const [summary, setSummary] = useState(null);
   const [budgets, setBudgets] = useState([]);
   const [budgetInputs, setBudgetInputs] = useState({});
+  const [goals, setGoals] = useState([]);
+  const [goalForm, setGoalForm] = useState(emptyGoal);
+  const [editingGoalId, setEditingGoalId] = useState("");
+  const [recurringExpenses, setRecurringExpenses] = useState([]);
+  const [recurringForm, setRecurringForm] = useState(() => emptyRecurringExpense(DEFAULT_CATEGORIES));
+  const [editingRecurringId, setEditingRecurringId] = useState("");
   const [entryForm, setEntryForm] = useState(() => emptyEntry(DEFAULT_CATEGORIES));
   const [editingId, setEditingId] = useState("");
   const [filters, setFilters] = useState({
@@ -46,7 +71,12 @@ const SavingsStudioPage = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [savingBudgets, setSavingBudgets] = useState(false);
+  const [savingOnboarding, setSavingOnboarding] = useState(false);
+  const [savingGoal, setSavingGoal] = useState(false);
+  const [savingRecurring, setSavingRecurring] = useState(false);
   const [deletingId, setDeletingId] = useState("");
+  const [deletingGoalId, setDeletingGoalId] = useState("");
+  const [deletingRecurringId, setDeletingRecurringId] = useState("");
 
   const deferredSearch = useDeferredValue(filters.search.trim().toLowerCase());
   const selectedBudgetMonth = filters.month === "all" ? currentMonthKey() : filters.month;
@@ -56,27 +86,50 @@ const SavingsStudioPage = () => {
       try {
         setLoading(true);
 
-        const [metaResult, entriesResult, summaryResult, budgetsResult] = await Promise.all([
-          savingsStudioService.getMeta(),
-          savingsStudioService.getEntries(),
-          savingsStudioService.getSummary(),
-          savingsStudioService.getBudgets(currentMonthKey()),
-        ]);
+        const [metaResult, profileResult, entriesResult, summaryResult, budgetsResult, goalsResult, recurringResult] =
+          await Promise.all([
+            savingsStudioService.getMeta(),
+            savingsStudioService.getProfile(),
+            savingsStudioService.getEntries(),
+            savingsStudioService.getSummary(),
+            savingsStudioService.getBudgets(currentMonthKey()),
+            savingsStudioService.getGoals(),
+            savingsStudioService.getRecurringExpenses(),
+          ]);
 
         startTransition(() => {
           const apiCategories = metaResult.categories?.length ? metaResult.categories : DEFAULT_CATEGORIES;
+          const apiFocusOptions = metaResult.focusOptions?.length
+            ? metaResult.focusOptions
+            : DEFAULT_FOCUS_OPTIONS;
+          const apiRecurringFrequencies = metaResult.recurringFrequencies?.length
+            ? metaResult.recurringFrequencies
+            : DEFAULT_RECURRING_FREQUENCIES;
+
           setCategories(apiCategories);
+          setFocusOptions(apiFocusOptions);
+          setRecurringFrequencies(apiRecurringFrequencies);
+          setProfile(profileResult.profile || null);
+          setProfileForm({
+            monthlyIncome: profileResult.profile?.monthlyIncome ? String(profileResult.profile.monthlyIncome) : "",
+            monthlySavingsTarget: profileResult.profile?.monthlySavingsTarget
+              ? String(profileResult.profile.monthlySavingsTarget)
+              : "",
+            primaryFocus: profileResult.profile?.primaryFocus || apiFocusOptions[0] || "",
+          });
           setEntries(entriesResult.entries || []);
           setSummary(summaryResult.summary || null);
           setBudgets(budgetsResult.budgets || []);
           setBudgetInputs(
-            Object.fromEntries(
-              (budgetsResult.budgets || []).map((budget) => [budget.category, String(budget.limitAmount)])
-            )
+            Object.fromEntries((budgetsResult.budgets || []).map((budget) => [budget.category, String(budget.limitAmount)]))
           );
+          setGoals(goalsResult.goals || []);
+          setRecurringExpenses(recurringResult.recurringExpenses || []);
+          setRecurringForm(emptyRecurringExpense(apiCategories));
           setEntryForm((current) => ({
             ...current,
             category: current.category || apiCategories[1] || apiCategories[0] || "Maistas",
+            date: current.date || currentDateInput(),
           }));
         });
       } catch (error) {
@@ -95,9 +148,7 @@ const SavingsStudioPage = () => {
         const budgetResult = await savingsStudioService.getBudgets(selectedBudgetMonth);
         setBudgets(budgetResult.budgets || []);
         setBudgetInputs(
-          Object.fromEntries(
-            (budgetResult.budgets || []).map((budget) => [budget.category, String(budget.limitAmount)])
-          )
+          Object.fromEntries((budgetResult.budgets || []).map((budget) => [budget.category, String(budget.limitAmount)]))
         );
       } catch (error) {
         toast.error(error.response?.data?.message || "Nepavyko užkrauti biudžetų.");
@@ -138,24 +189,29 @@ const SavingsStudioPage = () => {
       }, {}),
     [selectedMonthEntries]
   );
-  const budgetProgress = categories
-    .map((category) => {
-      const budget = budgets.find((entry) => entry.category === category);
-      const spent = Number(spentByCategory[category] || 0);
-      const limitAmount = Number(budget?.limitAmount || 0);
-      const remaining = limitAmount ? Number((limitAmount - spent).toFixed(2)) : 0;
-      const percentUsed = limitAmount ? Math.min((spent / limitAmount) * 100, 100) : 0;
 
-      return {
-        category,
-        spent,
-        limitAmount,
-        remaining,
-        percentUsed,
-        status: getBudgetStatus({ spent, limitAmount }),
-      };
-    })
-    .filter((entry) => entry.limitAmount > 0 || entry.spent > 0);
+  const budgetProgress = useMemo(
+    () =>
+      categories
+        .map((category) => {
+          const budget = budgets.find((entry) => entry.category === category);
+          const spent = Number(spentByCategory[category] || 0);
+          const limitAmount = Number(budget?.limitAmount || 0);
+          const remaining = limitAmount ? Number((limitAmount - spent).toFixed(2)) : 0;
+          const percentUsed = limitAmount ? Math.min((spent / limitAmount) * 100, 100) : 0;
+
+          return {
+            category,
+            spent,
+            limitAmount,
+            remaining,
+            percentUsed,
+            status: getBudgetStatus({ spent, limitAmount }),
+          };
+        })
+        .filter((entry) => entry.limitAmount > 0 || entry.spent > 0),
+    [budgets, categories, spentByCategory]
+  );
 
   const budgetOverview = {
     setCount: budgetProgress.filter((entry) => entry.limitAmount > 0).length,
@@ -163,7 +219,17 @@ const SavingsStudioPage = () => {
     warningCount: budgetProgress.filter((entry) => entry.status === "warning").length,
   };
 
-  const refreshStudio = async () => {
+  const decoratedGoals = goals.map((goal) => ({
+    ...goal,
+    ...getGoalProgress(goal),
+  }));
+
+  const recurringMonthlyTotal = recurringExpenses.reduce(
+    (sum, recurringExpense) => sum + Number(recurringExpense.monthlyEquivalent || recurringMonthlyEquivalent(recurringExpense)),
+    0
+  );
+
+  const refreshSummaryAndEntries = async () => {
     const [entriesResult, summaryResult] = await Promise.all([
       savingsStudioService.getEntries(),
       savingsStudioService.getSummary(),
@@ -175,9 +241,43 @@ const SavingsStudioPage = () => {
     });
   };
 
-  const handleFormChange = (event) => {
+  const refreshGoals = async () => {
+    const goalResult = await savingsStudioService.getGoals();
+    setGoals(goalResult.goals || []);
+  };
+
+  const refreshRecurring = async () => {
+    const recurringResult = await savingsStudioService.getRecurringExpenses();
+    setRecurringExpenses(recurringResult.recurringExpenses || []);
+  };
+
+  const handleEntryFormChange = (event) => {
     const { name, value } = event.target;
     setEntryForm((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  };
+
+  const handleProfileChange = (event) => {
+    const { name, value } = event.target;
+    setProfileForm((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  };
+
+  const handleGoalFormChange = (event) => {
+    const { name, value } = event.target;
+    setGoalForm((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  };
+
+  const handleRecurringFormChange = (event) => {
+    const { name, value } = event.target;
+    setRecurringForm((current) => ({
       ...current,
       [name]: value,
     }));
@@ -190,64 +290,34 @@ const SavingsStudioPage = () => {
     }));
   };
 
-  const handleSubmit = async (event) => {
+  const handleSaveOnboarding = async (event) => {
     event.preventDefault();
-    setSubmitting(true);
+    setSavingOnboarding(true);
 
     try {
-      if (editingId) {
-        await savingsStudioService.updateEntry(editingId, entryForm);
-      } else {
-        await savingsStudioService.createEntry(entryForm);
-      }
+      const [profileResult] = await Promise.all([
+        savingsStudioService.updateProfile({
+          monthlyIncome: Number(String(profileForm.monthlyIncome || "0").replace(",", ".")),
+          monthlySavingsTarget: Number(String(profileForm.monthlySavingsTarget || "0").replace(",", ".")),
+          primaryFocus: profileForm.primaryFocus,
+          onboardingCompleted: true,
+        }),
+        savingsStudioService.updateBudgets({
+          month: currentMonthKey(),
+          budgets: ONBOARDING_BUDGET_CATEGORIES.map((category) => ({
+            category,
+            limitAmount: Number(String(budgetInputs[category] || "0").replace(",", ".")),
+          })).filter((budget) => Number.isFinite(budget.limitAmount) && budget.limitAmount > 0),
+        }),
+      ]);
 
-      await refreshStudio();
-      setEntryForm(emptyEntry(categories));
-      setEditingId("");
-      toast.success(editingId ? "Išlaida atnaujinta." : "Išlaida išsaugota.");
+      setProfile(profileResult.profile);
+      toast.success("Pirmasis Savings Studio setup baigtas.");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Nepavyko išsaugoti išlaidos.");
+      toast.error(error.response?.data?.message || "Nepavyko užbaigti pirmojo setup.");
     } finally {
-      setSubmitting(false);
+      setSavingOnboarding(false);
     }
-  };
-
-  const handleDelete = async (entryId) => {
-    const confirmed = window.confirm("Ar tikrai nori ištrinti šią išlaidą?");
-
-    if (!confirmed) {
-      return;
-    }
-
-    setDeletingId(entryId);
-
-    try {
-      await savingsStudioService.deleteEntry(entryId);
-      await refreshStudio();
-      toast.success("Išlaida ištrinta.");
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Nepavyko ištrinti išlaidos.");
-    } finally {
-      setDeletingId("");
-    }
-  };
-
-  const handleEdit = (entry) => {
-    setEditingId(entry._id);
-    setEntryForm({
-      title: entry.title,
-      amount: String(entry.amount),
-      category: entry.category,
-      date: entry.date,
-      notes: entry.notes,
-    });
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleCancelEdit = () => {
-    setEditingId("");
-    setEntryForm(emptyEntry(categories));
   };
 
   const handleSaveBudgets = async (event) => {
@@ -269,9 +339,7 @@ const SavingsStudioPage = () => {
 
       setBudgets(budgetResult.budgets || []);
       setBudgetInputs(
-        Object.fromEntries(
-          (budgetResult.budgets || []).map((budget) => [budget.category, String(budget.limitAmount)])
-        )
+        Object.fromEntries((budgetResult.budgets || []).map((budget) => [budget.category, String(budget.limitAmount)]))
       );
       toast.success("Biudžetai atnaujinti.");
     } catch (error) {
@@ -281,6 +349,184 @@ const SavingsStudioPage = () => {
     }
   };
 
+  const handleEntrySubmit = async (event) => {
+    event.preventDefault();
+    setSubmitting(true);
+
+    try {
+      if (editingId) {
+        await savingsStudioService.updateEntry(editingId, entryForm);
+      } else {
+        await savingsStudioService.createEntry(entryForm);
+      }
+
+      await refreshSummaryAndEntries();
+      setEntryForm(emptyEntry(categories));
+      setEditingId("");
+      toast.success(editingId ? "Išlaida atnaujinta." : "Išlaida išsaugota.");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Nepavyko išsaugoti išlaidos.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleGoalSubmit = async (event) => {
+    event.preventDefault();
+    setSavingGoal(true);
+
+    try {
+      if (editingGoalId) {
+        await savingsStudioService.updateGoal(editingGoalId, goalForm);
+      } else {
+        await savingsStudioService.createGoal(goalForm);
+      }
+
+      await refreshGoals();
+      setGoalForm(emptyGoal());
+      setEditingGoalId("");
+      toast.success(editingGoalId ? "Tikslas atnaujintas." : "Tikslas pridėtas.");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Nepavyko išsaugoti tikslo.");
+    } finally {
+      setSavingGoal(false);
+    }
+  };
+
+  const handleRecurringSubmit = async (event) => {
+    event.preventDefault();
+    setSavingRecurring(true);
+
+    try {
+      if (editingRecurringId) {
+        await savingsStudioService.updateRecurringExpense(editingRecurringId, recurringForm);
+      } else {
+        await savingsStudioService.createRecurringExpense(recurringForm);
+      }
+
+      await refreshRecurring();
+      setRecurringForm(emptyRecurringExpense(categories));
+      setEditingRecurringId("");
+      toast.success(editingRecurringId ? "Pasikartojanti išlaida atnaujinta." : "Pasikartojanti išlaida pridėta.");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Nepavyko išsaugoti pasikartojančios išlaidos.");
+    } finally {
+      setSavingRecurring(false);
+    }
+  };
+
+  const handleDelete = async (entryId) => {
+    const confirmed = window.confirm("Ar tikrai nori ištrinti šią išlaidą?");
+
+    if (!confirmed) {
+      return;
+    }
+
+    setDeletingId(entryId);
+
+    try {
+      await savingsStudioService.deleteEntry(entryId);
+      await refreshSummaryAndEntries();
+      toast.success("Išlaida ištrinta.");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Nepavyko ištrinti išlaidos.");
+    } finally {
+      setDeletingId("");
+    }
+  };
+
+  const handleDeleteGoal = async (goalId) => {
+    const confirmed = window.confirm("Ar tikrai nori ištrinti šį taupymo tikslą?");
+
+    if (!confirmed) {
+      return;
+    }
+
+    setDeletingGoalId(goalId);
+
+    try {
+      await savingsStudioService.deleteGoal(goalId);
+      await refreshGoals();
+      toast.success("Taupymo tikslas ištrintas.");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Nepavyko ištrinti tikslo.");
+    } finally {
+      setDeletingGoalId("");
+    }
+  };
+
+  const handleDeleteRecurring = async (recurringId) => {
+    const confirmed = window.confirm("Ar tikrai nori ištrinti šią pasikartojančią išlaidą?");
+
+    if (!confirmed) {
+      return;
+    }
+
+    setDeletingRecurringId(recurringId);
+
+    try {
+      await savingsStudioService.deleteRecurringExpense(recurringId);
+      await refreshRecurring();
+      toast.success("Pasikartojanti išlaida ištrinta.");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Nepavyko ištrinti pasikartojančios išlaidos.");
+    } finally {
+      setDeletingRecurringId("");
+    }
+  };
+
+  const handleEdit = (entry) => {
+    setEditingId(entry._id);
+    setEntryForm({
+      title: entry.title,
+      amount: String(entry.amount),
+      category: entry.category,
+      date: entry.date,
+      notes: entry.notes,
+    });
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleEditGoal = (goal) => {
+    setEditingGoalId(goal._id);
+    setGoalForm({
+      title: goal.title,
+      targetAmount: String(goal.targetAmount),
+      currentAmount: String(goal.currentAmount),
+      targetDate: goal.targetDate || "",
+      notes: goal.notes || "",
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleEditRecurring = (recurringExpense) => {
+    setEditingRecurringId(recurringExpense._id);
+    setRecurringForm({
+      title: recurringExpense.title,
+      amount: String(recurringExpense.amount),
+      category: recurringExpense.category,
+      frequency: recurringExpense.frequency,
+      notes: recurringExpense.notes || "",
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId("");
+    setEntryForm(emptyEntry(categories));
+  };
+
+  const handleCancelGoalEdit = () => {
+    setEditingGoalId("");
+    setGoalForm(emptyGoal());
+  };
+
+  const handleCancelRecurringEdit = () => {
+    setEditingRecurringId("");
+    setRecurringForm(emptyRecurringExpense(categories));
+  };
+
   if (loading) {
     return <LoadingSpinner fullScreen />;
   }
@@ -288,6 +534,7 @@ const SavingsStudioPage = () => {
   const monthlyTotals = summary?.monthlyTotals || [];
   const categoryTotals = summary?.categoryTotals || [];
   const highestMonthlyTotal = Math.max(...monthlyTotals.map((entry) => entry.total), 1);
+  const activeGoalsCount = decoratedGoals.filter((goal) => !goal.complete).length;
 
   return (
     <div className="space-y-8">
@@ -297,6 +544,85 @@ const SavingsStudioPage = () => {
         subtitle="Privati nario darbo zona, kur matai, kur išeina pinigai, kaip keičiasi mėnesiai ir kur gali susigrąžinti finansinį aiškumą."
       />
 
+      {!profile?.onboardingCompleted && (
+        <section className="public-section">
+          <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+            <div>
+              <span className="eyebrow">first setup</span>
+              <h2 className="mt-5 text-5xl font-bold">Susidėk pirmą taupymo pagrindą</h2>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
+                Šitas trumpas onboarding padeda tau iškart pradėti prasmingai: nustatai pajamas, mėnesio taupymo
+                tikslą ir kelias pirmas biudžeto ribas svarbiausioms kategorijoms.
+              </p>
+            </div>
+
+            <form className="space-y-4" onSubmit={handleSaveOnboarding}>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <label className="block space-y-2">
+                  <span className="text-sm font-semibold text-muted">Mėnesio pajamos</span>
+                  <input
+                    name="monthlyIncome"
+                    value={profileForm.monthlyIncome}
+                    onChange={handleProfileChange}
+                    inputMode="decimal"
+                    placeholder="0.00"
+                    className="input-field"
+                  />
+                </label>
+
+                <label className="block space-y-2">
+                  <span className="text-sm font-semibold text-muted">Mėnesio taupymo tikslas</span>
+                  <input
+                    name="monthlySavingsTarget"
+                    value={profileForm.monthlySavingsTarget}
+                    onChange={handleProfileChange}
+                    inputMode="decimal"
+                    placeholder="0.00"
+                    className="input-field"
+                  />
+                </label>
+              </div>
+
+              <label className="block space-y-2">
+                <span className="text-sm font-semibold text-muted">Pagrindinis fokusas</span>
+                <select
+                  name="primaryFocus"
+                  value={profileForm.primaryFocus}
+                  onChange={handleProfileChange}
+                  className="select-field"
+                >
+                  {focusOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <div className="grid gap-4 sm:grid-cols-3">
+                {ONBOARDING_BUDGET_CATEGORIES.map((category) => (
+                  <label key={category} className="block space-y-2">
+                    <span className="text-sm font-semibold text-muted">{category} biudžetas</span>
+                    <input
+                      value={budgetInputs[category] || ""}
+                      onChange={(event) => handleBudgetInputChange(category, event.target.value)}
+                      inputMode="decimal"
+                      placeholder="0.00"
+                      className="input-field"
+                    />
+                  </label>
+                ))}
+              </div>
+
+              <button type="submit" className="button-primary w-full gap-2" disabled={savingOnboarding}>
+                <CheckCircle2 size={16} />
+                {savingOnboarding ? "Kuriama..." : "Užbaigti pirmą setup"}
+              </button>
+            </form>
+          </div>
+        </section>
+      )}
+
       <section className="marketing-dark overflow-hidden rounded-[34px] px-6 py-7 sm:px-8 lg:px-10">
         <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
           <div>
@@ -305,8 +631,8 @@ const SavingsStudioPage = () => {
               {user?.name?.split(" ")[0]}, čia tavo pinigų aiškumo kambarys.
             </h2>
             <p className="mt-4 max-w-2xl text-base leading-7 text-white/72">
-              Šis modulis leidžia suvesti kasdienes išlaidas, pamatyti bendrą mėnesio vaizdą ir rasti
-              kategorijas, kuriose lengviausia sutaupyti be chaoso.
+              Šis modulis leidžia suvesti kasdienes išlaidas, nustatyti biudžetus, sekti taupymo tikslus ir
+              pamatyti, kurios pasikartojančios išlaidos sunkiausiai leidžia judėti į priekį.
             </p>
 
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -317,25 +643,25 @@ const SavingsStudioPage = () => {
                 hint={formatChange(summary?.change)}
               />
               <InsightTile
-                icon={TrendingDown}
-                label="Vidutinė išlaida"
-                value={money.format(summary?.averageSpend || 0)}
-                hint={`${summary?.recentCount || 0} įrašų`}
+                icon={Target}
+                label="Mėnesio tikslas"
+                value={money.format(profile?.monthlySavingsTarget || 0)}
+                hint={profile?.primaryFocus || "Dar nesuvestas fokusas"}
               />
               <InsightTile
-                icon={PiggyBank}
-                label="Didžiausia sritis"
-                value={summary?.topCategory || "Dar nėra"}
-                hint={money.format(categoryTotals[0]?.total || 0)}
+                icon={Repeat}
+                label="Pastovios išlaidos"
+                value={money.format(recurringMonthlyTotal)}
+                hint={`${recurringExpenses.length} aktyvūs įrašai`}
               />
             </div>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
               <InsightTile
-                icon={Target}
-                label="Biudžetai"
-                value={String(budgetOverview.setCount)}
-                hint={`${selectedBudgetMonth} mėnuo`}
+                icon={PiggyBank}
+                label="Tikslai"
+                value={String(activeGoalsCount)}
+                hint="Aktyvūs taupymo tikslai"
               />
               <InsightTile
                 icon={AlertTriangle}
@@ -344,7 +670,7 @@ const SavingsStudioPage = () => {
                 hint="Kategorijos virš limito"
               />
               <InsightTile
-                icon={CheckCircle2}
+                icon={TrendingDown}
                 label="Prie ribos"
                 value={String(budgetOverview.warningCount)}
                 hint="85% ir daugiau panaudota"
@@ -355,7 +681,7 @@ const SavingsStudioPage = () => {
           <div className="rounded-[28px] border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.28em] text-white/45">Taupymo signalai</p>
+                <p className="text-xs uppercase tracking-[0.28em] text-white/45">Aiškumo signalai</p>
                 <h3 className="mt-3 font-display text-3xl font-bold">Kur verta žiūrėti pirmiausia</h3>
               </div>
               <ShieldCheck size={20} style={{ color: "rgb(var(--accent-strong))" }} />
@@ -365,8 +691,8 @@ const SavingsStudioPage = () => {
               {[
                 `Filtruota suma: ${money.format(filteredTotal)}`,
                 `Top kategorija: ${summary?.topCategory || "Dar nėra duomenų"}`,
-                `Mėnesio pokytis: ${formatChange(summary?.change)}`,
-                `Aktyvus biudžeto mėnuo: ${selectedBudgetMonth}`,
+                `Mėnesio pajamos: ${money.format(profile?.monthlyIncome || 0)}`,
+                `Biudžetų mėnuo: ${selectedBudgetMonth}`,
               ].map((item) => (
                 <div key={item} className="rounded-[18px] bg-white/5 px-4 py-3 text-sm text-white/76">
                   {item}
@@ -391,13 +717,13 @@ const SavingsStudioPage = () => {
             ) : null}
           </div>
 
-          <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+          <form className="mt-6 space-y-4" onSubmit={handleEntrySubmit}>
             <label className="block space-y-2">
               <span className="text-sm font-semibold text-muted">Pavadinimas</span>
               <input
                 name="title"
                 value={entryForm.title}
-                onChange={handleFormChange}
+                onChange={handleEntryFormChange}
                 placeholder="Nuoma, maistas, taksi"
                 className="input-field"
               />
@@ -409,7 +735,7 @@ const SavingsStudioPage = () => {
                 <input
                   name="amount"
                   value={entryForm.amount}
-                  onChange={handleFormChange}
+                  onChange={handleEntryFormChange}
                   inputMode="decimal"
                   placeholder="0.00"
                   className="input-field"
@@ -422,7 +748,7 @@ const SavingsStudioPage = () => {
                   type="date"
                   name="date"
                   value={entryForm.date}
-                  onChange={handleFormChange}
+                  onChange={handleEntryFormChange}
                   className="input-field"
                 />
               </label>
@@ -433,7 +759,7 @@ const SavingsStudioPage = () => {
               <select
                 name="category"
                 value={entryForm.category}
-                onChange={handleFormChange}
+                onChange={handleEntryFormChange}
                 className="select-field"
               >
                 {categories.map((category) => (
@@ -449,7 +775,7 @@ const SavingsStudioPage = () => {
               <textarea
                 name="notes"
                 value={entryForm.notes}
-                onChange={handleFormChange}
+                onChange={handleEntryFormChange}
                 placeholder="Kas privertė pirkti, ar galima mažinti tokių išlaidų dažnį?"
                 className="textarea-field"
               />
@@ -583,7 +909,7 @@ const SavingsStudioPage = () => {
                 <p className="eyebrow">monthly budgets</p>
                 <h2 className="mt-4 text-4xl font-bold">Biudžetų ribos</h2>
                 <p className="mt-3 text-sm leading-6 text-muted">
-                  Nustatyk, kiek nori skirti kiekvienai kategorijai pasirinktam mėnesiui, ir stebėk kiek lieka.
+                  Nustatyk, kiek nori skirti kiekvienai kategorijai pasirinktam mėnesiui.
                 </p>
               </div>
               <Target size={20} style={{ color: "rgb(var(--accent))" }} />
@@ -704,6 +1030,290 @@ const SavingsStudioPage = () => {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-2">
+        <div className="panel p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow">savings goals</p>
+              <h2 className="mt-4 text-4xl font-bold">{editingGoalId ? "Redaguoti tikslą" : "Taupymo tikslai"}</h2>
+            </div>
+            {editingGoalId ? (
+              <button type="button" className="button-secondary" onClick={handleCancelGoalEdit}>
+                Atšaukti
+              </button>
+            ) : null}
+          </div>
+
+          <form className="mt-6 space-y-4" onSubmit={handleGoalSubmit}>
+            <label className="block space-y-2">
+              <span className="text-sm font-semibold text-muted">Tikslo pavadinimas</span>
+              <input
+                name="title"
+                value={goalForm.title}
+                onChange={handleGoalFormChange}
+                placeholder="Kelionės fondas, rezervas, naujas kompiuteris"
+                className="input-field"
+              />
+            </label>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="block space-y-2">
+                <span className="text-sm font-semibold text-muted">Tikslinė suma</span>
+                <input
+                  name="targetAmount"
+                  value={goalForm.targetAmount}
+                  onChange={handleGoalFormChange}
+                  inputMode="decimal"
+                  placeholder="0.00"
+                  className="input-field"
+                />
+              </label>
+              <label className="block space-y-2">
+                <span className="text-sm font-semibold text-muted">Jau sukaupta</span>
+                <input
+                  name="currentAmount"
+                  value={goalForm.currentAmount}
+                  onChange={handleGoalFormChange}
+                  inputMode="decimal"
+                  placeholder="0.00"
+                  className="input-field"
+                />
+              </label>
+            </div>
+
+            <label className="block space-y-2">
+              <span className="text-sm font-semibold text-muted">Norima data</span>
+              <input
+                type="date"
+                name="targetDate"
+                value={goalForm.targetDate}
+                onChange={handleGoalFormChange}
+                className="input-field"
+              />
+            </label>
+
+            <label className="block space-y-2">
+              <span className="text-sm font-semibold text-muted">Pastabos</span>
+              <textarea
+                name="notes"
+                value={goalForm.notes}
+                onChange={handleGoalFormChange}
+                placeholder="Kam šis tikslas svarbus ir per kiek laiko nori pasiekti?"
+                className="textarea-field"
+              />
+            </label>
+
+            <button type="submit" className="button-primary w-full gap-2" disabled={savingGoal}>
+              <Target size={16} />
+              {savingGoal ? "Saugoma..." : editingGoalId ? "Atnaujinti tikslą" : "Pridėti tikslą"}
+            </button>
+          </form>
+
+          <div className="mt-6 space-y-4">
+            {decoratedGoals.length ? (
+              decoratedGoals.map((goal) => (
+                <div key={goal._id} className="soft-card rounded-[24px] p-5">
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div>
+                      <h3 className="font-display text-2xl font-bold">{goal.title}</h3>
+                      <p className="mt-2 text-sm text-muted">
+                        {goal.targetDate ? `Tikslinė data: ${goal.targetDate}` : "Be konkrečios datos"}
+                      </p>
+                    </div>
+                    <div className="text-left md:text-right">
+                      <p className="text-xl font-semibold">
+                        {money.format(goal.currentAmount)} / {money.format(goal.targetAmount)}
+                      </p>
+                      <p className="mt-1 text-sm text-muted">
+                        {goal.complete ? "Tikslas pasiektas" : `Liko ${money.format(Math.max(goal.remaining, 0))}`}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 h-2 overflow-hidden rounded-full bg-[rgb(var(--surface-soft))]">
+                    <div
+                      className={`h-full rounded-full ${goal.complete ? "bg-emerald-500" : "bg-[rgb(var(--accent))]"}`}
+                      style={{ width: `${Math.max(goal.progress, 6)}%` }}
+                    />
+                  </div>
+
+                  {goal.notes ? <p className="mt-3 text-sm leading-6 text-muted">{goal.notes}</p> : null}
+
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <button type="button" className="button-secondary gap-2" onClick={() => handleEditGoal(goal)}>
+                      <Pencil size={16} />
+                      Redaguoti
+                    </button>
+                    <button
+                      type="button"
+                      className="button-secondary gap-2 text-red-600"
+                      onClick={() => handleDeleteGoal(goal._id)}
+                      disabled={deletingGoalId === goal._id}
+                    >
+                      <Trash2 size={16} />
+                      {deletingGoalId === goal._id ? "Šalinama..." : "Trinti"}
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="soft-card rounded-[24px] p-8 text-center text-muted">
+                Kai susikursi pirmą tikslą, čia matysi progresą, likutį ir ar artėji prie savo sumos.
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="panel p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow">recurring expenses</p>
+              <h2 className="mt-4 text-4xl font-bold">
+                {editingRecurringId ? "Redaguoti pasikartojančią išlaidą" : "Pastovios išlaidos"}
+              </h2>
+            </div>
+            {editingRecurringId ? (
+              <button type="button" className="button-secondary" onClick={handleCancelRecurringEdit}>
+                Atšaukti
+              </button>
+            ) : null}
+          </div>
+
+          <form className="mt-6 space-y-4" onSubmit={handleRecurringSubmit}>
+            <label className="block space-y-2">
+              <span className="text-sm font-semibold text-muted">Pavadinimas</span>
+              <input
+                name="title"
+                value={recurringForm.title}
+                onChange={handleRecurringFormChange}
+                placeholder="Nuoma, Netflix, sporto klubas"
+                className="input-field"
+              />
+            </label>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="block space-y-2">
+                <span className="text-sm font-semibold text-muted">Suma</span>
+                <input
+                  name="amount"
+                  value={recurringForm.amount}
+                  onChange={handleRecurringFormChange}
+                  inputMode="decimal"
+                  placeholder="0.00"
+                  className="input-field"
+                />
+              </label>
+
+              <label className="block space-y-2">
+                <span className="text-sm font-semibold text-muted">Kategorija</span>
+                <select
+                  name="category"
+                  value={recurringForm.category}
+                  onChange={handleRecurringFormChange}
+                  className="select-field"
+                >
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <label className="block space-y-2">
+              <span className="text-sm font-semibold text-muted">Periodiškumas</span>
+              <select
+                name="frequency"
+                value={recurringForm.frequency}
+                onChange={handleRecurringFormChange}
+                className="select-field"
+              >
+                {recurringFrequencies.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block space-y-2">
+              <span className="text-sm font-semibold text-muted">Pastabos</span>
+              <textarea
+                name="notes"
+                value={recurringForm.notes}
+                onChange={handleRecurringFormChange}
+                placeholder="Kas kartojasi automatiškai arba vis sugrįžta kiekvieną laikotarpį?"
+                className="textarea-field"
+              />
+            </label>
+
+            <button type="submit" className="button-primary w-full gap-2" disabled={savingRecurring}>
+              <Repeat size={16} />
+              {savingRecurring
+                ? "Saugoma..."
+                : editingRecurringId
+                ? "Atnaujinti pasikartojančią išlaidą"
+                : "Pridėti pasikartojančią išlaidą"}
+            </button>
+          </form>
+
+          <div className="mt-6 space-y-4">
+            {recurringExpenses.length ? (
+              recurringExpenses.map((recurringExpense) => (
+                <div key={recurringExpense._id} className="soft-card rounded-[24px] p-5">
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <h3 className="font-display text-2xl font-bold">{recurringExpense.title}</h3>
+                        <span className="premium-tag">{recurringExpense.category}</span>
+                      </div>
+                      <p className="mt-2 text-sm text-muted">
+                        {formatRecurringFrequency(recurringExpense.frequency, recurringFrequencies)}
+                      </p>
+                    </div>
+                    <div className="text-left md:text-right">
+                      <p className="text-xl font-semibold">{money.format(recurringExpense.amount)}</p>
+                      <p className="mt-1 text-sm text-muted">
+                        ~ {money.format(recurringExpense.monthlyEquivalent || recurringMonthlyEquivalent(recurringExpense))} / mėn.
+                      </p>
+                    </div>
+                  </div>
+
+                  {recurringExpense.notes ? (
+                    <p className="mt-3 text-sm leading-6 text-muted">{recurringExpense.notes}</p>
+                  ) : null}
+
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      className="button-secondary gap-2"
+                      onClick={() => handleEditRecurring(recurringExpense)}
+                    >
+                      <Pencil size={16} />
+                      Redaguoti
+                    </button>
+                    <button
+                      type="button"
+                      className="button-secondary gap-2 text-red-600"
+                      onClick={() => handleDeleteRecurring(recurringExpense._id)}
+                      disabled={deletingRecurringId === recurringExpense._id}
+                    >
+                      <Trash2 size={16} />
+                      {deletingRecurringId === recurringExpense._id ? "Šalinama..." : "Trinti"}
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="soft-card rounded-[24px] p-8 text-center text-muted">
+                Įtrauk pasikartojančias išlaidas ir pamatysi, kiek tavo mėnesį jau “suvalgo” vien pastovūs mokėjimai.
+              </div>
+            )}
           </div>
         </div>
       </section>

@@ -1,5 +1,8 @@
-const SavingsEntry = require("../models/SavingsEntry");
+const RecurringExpense = require("../models/RecurringExpense");
 const SavingsBudget = require("../models/SavingsBudget");
+const SavingsEntry = require("../models/SavingsEntry");
+const SavingsGoal = require("../models/SavingsGoal");
+const SavingsStudioProfile = require("../models/SavingsStudioProfile");
 
 const CATEGORIES = [
   "Būstas",
@@ -13,6 +16,21 @@ const CATEGORIES = [
   "Kita",
 ];
 
+const FOCUS_OPTIONS = [
+  "Sumažinti kasdienes išlaidas",
+  "Susikurti finansinį aiškumą",
+  "Sutaupyti kelionei",
+  "Sukaupti rezervą",
+  "Suvaldyti laisvalaikio išlaidas",
+];
+
+const RECURRING_FREQUENCIES = [
+  { value: "weekly", label: "Kas savaitę" },
+  { value: "monthly", label: "Kas mėnesį" },
+  { value: "quarterly", label: "Kas ketvirtį" },
+  { value: "yearly", label: "Kartą per metus" },
+];
+
 const currentMonthKey = () => new Date().toISOString().slice(0, 7);
 
 const previousMonthKey = () => {
@@ -20,16 +38,6 @@ const previousMonthKey = () => {
   date.setUTCDate(1);
   date.setUTCMonth(date.getUTCMonth() - 1);
   return date.toISOString().slice(0, 7);
-};
-
-const parseMonthKey = (value, fallback = currentMonthKey()) => {
-  const month = String(value || fallback).trim();
-
-  if (!/^\d{4}-\d{2}$/.test(month)) {
-    throw createHttpError("Naudok galiojantį mėnesio formatą YYYY-MM.");
-  }
-
-  return month;
 };
 
 const roundCurrency = (value) => Number(value.toFixed(2));
@@ -69,6 +77,16 @@ const createHttpError = (message, status = 400) => {
   return error;
 };
 
+const parseMonthKey = (value, fallback = currentMonthKey()) => {
+  const month = String(value || fallback).trim();
+
+  if (!/^\d{4}-\d{2}$/.test(month)) {
+    throw createHttpError("Naudok galiojantį mėnesio formatą YYYY-MM.");
+  }
+
+  return month;
+};
+
 const parseEntryInput = (input) => {
   const title = String(input.title || "").trim();
   const notes = String(input.notes || "").trim();
@@ -100,6 +118,143 @@ const parseEntryInput = (input) => {
     notes: notes.slice(0, 240),
   };
 };
+
+const parseBudgetPayload = (input) => {
+  const month = parseMonthKey(input.month);
+  const budgets = Array.isArray(input.budgets) ? input.budgets : [];
+
+  const normalizedBudgets = budgets
+    .map((budget) => ({
+      category: String(budget.category || "").trim(),
+      limitAmount: Number(budget.limitAmount),
+    }))
+    .filter((budget) => budget.category && Number.isFinite(budget.limitAmount) && budget.limitAmount > 0);
+
+  for (const budget of normalizedBudgets) {
+    if (!CATEGORIES.includes(budget.category)) {
+      throw createHttpError(`Biudžeto kategorija negalioja: ${budget.category}`);
+    }
+  }
+
+  return {
+    month,
+    budgets: normalizedBudgets.map((budget) => ({
+      ...budget,
+      limitAmount: roundCurrency(budget.limitAmount),
+    })),
+  };
+};
+
+const parseGoalInput = (input) => {
+  const title = String(input.title || "").trim();
+  const notes = String(input.notes || "").trim();
+  const targetDate = String(input.targetDate || "").trim();
+  const targetAmount = Number(input.targetAmount);
+  const currentAmount = Number(input.currentAmount || 0);
+
+  if (title.length < 2) {
+    throw createHttpError("Tikslo pavadinimui reikia bent 2 simbolių.");
+  }
+
+  if (!Number.isFinite(targetAmount) || targetAmount <= 0) {
+    throw createHttpError("Tikslo suma turi būti didesnė už 0.");
+  }
+
+  if (!Number.isFinite(currentAmount) || currentAmount < 0) {
+    throw createHttpError("Dabartinė sukaupta suma negali būti neigiama.");
+  }
+
+  if (targetDate && (!/^\d{4}-\d{2}-\d{2}$/.test(targetDate) || Number.isNaN(new Date(`${targetDate}T00:00:00`).getTime()))) {
+    throw createHttpError("Naudok galiojančią tikslo datą YYYY-MM-DD formatu.");
+  }
+
+  return {
+    title,
+    targetAmount: roundCurrency(targetAmount),
+    currentAmount: roundCurrency(currentAmount),
+    targetDate,
+    notes: notes.slice(0, 240),
+  };
+};
+
+const parseRecurringInput = (input) => {
+  const title = String(input.title || "").trim();
+  const notes = String(input.notes || "").trim();
+  const category = String(input.category || "").trim();
+  const frequency = String(input.frequency || "monthly").trim();
+  const amount = Number(input.amount);
+
+  if (title.length < 2) {
+    throw createHttpError("Pasikartojančios išlaidos pavadinimui reikia bent 2 simbolių.");
+  }
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    throw createHttpError("Suma turi būti didesnė už 0.");
+  }
+
+  if (!CATEGORIES.includes(category)) {
+    throw createHttpError("Pasirink galiojančią kategoriją.");
+  }
+
+  if (!RECURRING_FREQUENCIES.some((entry) => entry.value === frequency)) {
+    throw createHttpError("Pasirink galiojantį periodiškumą.");
+  }
+
+  return {
+    title,
+    amount: roundCurrency(amount),
+    category,
+    frequency,
+    notes: notes.slice(0, 240),
+  };
+};
+
+const parseProfileInput = (input) => {
+  const monthlyIncome = Number(input.monthlyIncome || 0);
+  const monthlySavingsTarget = Number(input.monthlySavingsTarget || 0);
+  const primaryFocus = String(input.primaryFocus || "").trim();
+  const onboardingCompleted = Boolean(input.onboardingCompleted);
+
+  if (!Number.isFinite(monthlyIncome) || monthlyIncome < 0) {
+    throw createHttpError("Mėnesio pajamos negali būti neigiamos.");
+  }
+
+  if (!Number.isFinite(monthlySavingsTarget) || monthlySavingsTarget < 0) {
+    throw createHttpError("Mėnesio taupymo tikslas negali būti neigiamas.");
+  }
+
+  if (primaryFocus && !FOCUS_OPTIONS.includes(primaryFocus)) {
+    throw createHttpError("Pasirink vieną iš siūlomų pagrindinių fokusų.");
+  }
+
+  return {
+    monthlyIncome: roundCurrency(monthlyIncome),
+    monthlySavingsTarget: roundCurrency(monthlySavingsTarget),
+    primaryFocus,
+    onboardingCompleted,
+  };
+};
+
+const recurringToMonthlyEquivalent = (expense) => {
+  const amount = Number(expense.amount || 0);
+
+  switch (expense.frequency) {
+    case "weekly":
+      return roundCurrency((amount * 52) / 12);
+    case "quarterly":
+      return roundCurrency(amount / 3);
+    case "yearly":
+      return roundCurrency(amount / 12);
+    case "monthly":
+    default:
+      return roundCurrency(amount);
+  }
+};
+
+const decorateRecurringExpense = (expense) => ({
+  ...expense.toObject(),
+  monthlyEquivalent: recurringToMonthlyEquivalent(expense),
+});
 
 const buildSummary = (entries) => {
   const monthKey = currentMonthKey();
@@ -164,36 +319,39 @@ const buildSummary = (entries) => {
   };
 };
 
-const parseBudgetPayload = (input) => {
-  const month = parseMonthKey(input.month);
-  const budgets = Array.isArray(input.budgets) ? input.budgets : [];
-
-  const normalizedBudgets = budgets
-    .map((budget) => ({
-      category: String(budget.category || "").trim(),
-      limitAmount: Number(budget.limitAmount),
-    }))
-    .filter((budget) => budget.category && Number.isFinite(budget.limitAmount) && budget.limitAmount > 0);
-
-  for (const budget of normalizedBudgets) {
-    if (!CATEGORIES.includes(budget.category)) {
-      throw createHttpError(`Biudžeto kategorija negalioja: ${budget.category}`);
-    }
-  }
-
-  return {
-    month,
-    budgets: normalizedBudgets.map((budget) => ({
-      ...budget,
-      limitAmount: roundCurrency(budget.limitAmount),
-    })),
-  };
-};
+const getProfileDocument = async (userId) =>
+  SavingsStudioProfile.findOneAndUpdate(
+    { user: userId },
+    { $setOnInsert: { user: userId } },
+    { new: true, upsert: true }
+  );
 
 const getSavingsMeta = async (_req, res) => {
   res.json({
     categories: CATEGORIES,
+    focusOptions: FOCUS_OPTIONS,
+    recurringFrequencies: RECURRING_FREQUENCIES,
   });
+};
+
+const getSavingsProfile = async (req, res) => {
+  const profile = await getProfileDocument(req.user._id);
+  res.json({ profile });
+};
+
+const updateSavingsProfile = async (req, res) => {
+  const input = parseProfileInput(req.body);
+
+  const profile = await SavingsStudioProfile.findOneAndUpdate(
+    { user: req.user._id },
+    {
+      $set: input,
+      $setOnInsert: { user: req.user._id },
+    },
+    { new: true, upsert: true }
+  );
+
+  res.json({ profile });
 };
 
 const getSavingsBudgets = async (req, res) => {
@@ -285,6 +443,100 @@ const deleteSavingsEntry = async (req, res) => {
   res.status(204).send();
 };
 
+const getSavingsGoals = async (req, res) => {
+  const goals = await SavingsGoal.find({ user: req.user._id }).sort({ createdAt: -1 });
+  res.json({ goals });
+};
+
+const createSavingsGoal = async (req, res) => {
+  const input = parseGoalInput(req.body);
+  const goal = await SavingsGoal.create({
+    user: req.user._id,
+    ...input,
+  });
+
+  res.status(201).json({ goal });
+};
+
+const updateSavingsGoal = async (req, res) => {
+  const input = parseGoalInput(req.body);
+  const goal = await SavingsGoal.findOne({
+    _id: req.params.goalId,
+    user: req.user._id,
+  });
+
+  if (!goal) {
+    throw createHttpError("Taupymo tikslas nerastas.", 404);
+  }
+
+  Object.assign(goal, input);
+  await goal.save();
+
+  res.json({ goal });
+};
+
+const deleteSavingsGoal = async (req, res) => {
+  const goal = await SavingsGoal.findOne({
+    _id: req.params.goalId,
+    user: req.user._id,
+  });
+
+  if (!goal) {
+    throw createHttpError("Taupymo tikslas nerastas.", 404);
+  }
+
+  await goal.deleteOne();
+  res.status(204).send();
+};
+
+const getRecurringExpenses = async (req, res) => {
+  const recurringExpenses = await RecurringExpense.find({ user: req.user._id }).sort({ createdAt: -1 });
+  res.json({
+    recurringExpenses: recurringExpenses.map(decorateRecurringExpense),
+  });
+};
+
+const createRecurringExpense = async (req, res) => {
+  const input = parseRecurringInput(req.body);
+  const recurringExpense = await RecurringExpense.create({
+    user: req.user._id,
+    ...input,
+  });
+
+  res.status(201).json({ recurringExpense: decorateRecurringExpense(recurringExpense) });
+};
+
+const updateRecurringExpense = async (req, res) => {
+  const input = parseRecurringInput(req.body);
+  const recurringExpense = await RecurringExpense.findOne({
+    _id: req.params.recurringId,
+    user: req.user._id,
+  });
+
+  if (!recurringExpense) {
+    throw createHttpError("Pasikartojanti išlaida nerasta.", 404);
+  }
+
+  Object.assign(recurringExpense, input);
+  await recurringExpense.save();
+
+  res.json({ recurringExpense: decorateRecurringExpense(recurringExpense) });
+};
+
+const deleteRecurringExpense = async (req, res) => {
+  const recurringExpense = await RecurringExpense.findOne({
+    _id: req.params.recurringId,
+    user: req.user._id,
+  });
+
+  if (!recurringExpense) {
+    throw createHttpError("Pasikartojanti išlaida nerasta.", 404);
+  }
+
+  await recurringExpense.deleteOne();
+  res.status(204).send();
+};
+
 const getSavingsSummary = async (req, res) => {
   const entries = await SavingsEntry.find({ user: req.user._id });
   res.json({
@@ -294,11 +546,21 @@ const getSavingsSummary = async (req, res) => {
 
 module.exports = {
   getSavingsMeta,
+  getSavingsProfile,
+  updateSavingsProfile,
   getSavingsBudgets,
   getSavingsEntries,
   createSavingsEntry,
   updateSavingsEntry,
   deleteSavingsEntry,
+  getSavingsGoals,
+  createSavingsGoal,
+  updateSavingsGoal,
+  deleteSavingsGoal,
+  getRecurringExpenses,
+  createRecurringExpense,
+  updateRecurringExpense,
+  deleteRecurringExpense,
   getSavingsSummary,
   upsertSavingsBudgets,
   CATEGORIES,
