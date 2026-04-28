@@ -76,13 +76,20 @@ const Footer = () => (
       ))}
 
       <div>
-        <p className="font-semibold text-white">Contact</p>
+        <Link to="/contact" className="font-semibold text-white transition hover:text-white/80">
+          Contact
+        </Link>
         <div className="mt-4 space-y-3 text-sm text-white/58">
-          <p>hello@stilloakstudio.com</p>
+          <a href="mailto:hello@stilloakstudio.com" className="block transition hover:text-white">
+            hello@stilloakstudio.com
+          </a>
           <p>+370 600 12345</p>
           <p>Vilnius, Lithuania</p>
           <p>Mon - Fri 9:00 - 18:00</p>
         </div>
+        <Link to="/contact" className="mt-5 inline-flex text-sm font-medium accent-text transition hover:opacity-80">
+          Visit contact page
+        </Link>
       </div>
     </div>
 

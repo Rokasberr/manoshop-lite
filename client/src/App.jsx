@@ -45,6 +45,7 @@ const App = () => (
       <Route path="/receipt-archive" element={<InfoPage page={infoPages.receiptArchive} />} />
       <Route path="/member-pricing" element={<InfoPage page={infoPages.memberPricing} />} />
       <Route path="/private-support" element={<InfoPage page={infoPages.privateSupport} />} />
+      <Route path="/contact" element={<InfoPage page={infoPages.contact} />} />
       <Route path="/shipping" element={<InfoPage page={infoPages.shipping} />} />
       <Route path="/returns" element={<InfoPage page={infoPages.returns} />} />
       <Route path="/privacy" element={<InfoPage page={infoPages.privacy} />} />

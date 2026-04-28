@@ -164,7 +164,53 @@ export const infoPages = {
         ],
       },
     ],
-    cta: { label: "Contact us", to: "/shop" },
+    cta: { label: "Contact us", to: "/contact" },
+  },
+  contact: {
+    title: "Contact",
+    eyebrow: "Client care",
+    summary:
+      "Jei turi klausimą dėl užsakymo, skaitmeninio atsisiuntimo, narystės ar bendro bendradarbiavimo, Stilloak Studio komanda pasiruošusi padėti aiškiai ir be bereikalingo triukšmo.",
+    lastUpdated: "April 28, 2026",
+    highlights: [
+      "Atsakymas per 1–2 darbo dienas",
+      "Pagalba dėl fizinių ir skaitmeninių produktų",
+      "Kontaktas el. paštu ir aiškus support kelias",
+    ],
+    sections: [
+      {
+        heading: "Pagrindinis kontaktas",
+        paragraphs: [
+          "Rašyk mums el. paštu hello@stilloakstudio.com. Jei klausimas susijęs su konkrečiu pirkimu, pridėk užsakymo numerį ir trumpą situacijos aprašymą.",
+          "Jei kreipiesi dėl skaitmeninio produkto, mums ypač padeda nurodyti, kuris failas neatsidaro arba kurio atsisiuntimo nerandi.",
+        ],
+      },
+      {
+        heading: "Kada dirbame",
+        bullets: [
+          "Pirmadienis–penktadienis: 9:00–18:00",
+          "Savaitgaliais atsakome rečiau, bet skubius klausimus peržiūrime kaip įmanoma greičiau",
+          "Bendras atsakymo laikas: 1–2 darbo dienos",
+        ],
+      },
+      {
+        heading: "Klausimų tipai",
+        bullets: [
+          "mokėjimai ir checkout",
+          "fizinių prekių pristatymas",
+          "skaitmeninių failų prieiga",
+          "narystės planai ir sąskaitos",
+          "bendradarbiavimas ar brand partnerystės",
+        ],
+      },
+      {
+        heading: "Studijos lokacija",
+        paragraphs: [
+          "Stilloak Studio dirba internetu, o administracinis kontaktas šiuo metu valdomas iš Vilniaus, Lietuvoje.",
+        ],
+      },
+    ],
+    cta: { label: "Write to support", to: "/private-support" },
   },
   shipping: {
     title: "Shipping",
