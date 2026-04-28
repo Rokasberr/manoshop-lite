@@ -1,4 +1,4 @@
-const getCompanyName = () => process.env.COMPANY_NAME || "ManoShop Lite";
+const getCompanyName = () => process.env.COMPANY_NAME || "Stilloak Studio";
 
 const sanitizeText = (value) =>
   String(value ?? "")

@@ -71,6 +71,29 @@ const shippingAddressSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const digitalDeliveryEmailSchema = new mongoose.Schema(
+  {
+    status: {
+      type: String,
+      enum: ["not_required", "pending", "sent", "failed"],
+      default: "not_required",
+    },
+    sentAt: {
+      type: Date,
+      default: null,
+    },
+    lastAttemptAt: {
+      type: Date,
+      default: null,
+    },
+    error: {
+      type: String,
+      default: "",
+    },
+  },
+  { _id: false }
+);
+
 const orderSchema = new mongoose.Schema(
   {
     user: {
@@ -103,6 +126,10 @@ const orderSchema = new mongoose.Schema(
     containsDigitalProducts: {
       type: Boolean,
       default: false,
+    },
+    digitalDeliveryEmail: {
+      type: digitalDeliveryEmailSchema,
+      default: () => ({}),
     },
     paymentStatus: {
       type: String,

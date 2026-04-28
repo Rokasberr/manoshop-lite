@@ -1,5 +1,6 @@
 const Order = require("../models/Order");
 const Product = require("../models/Product");
+const { ensureDigitalDeliveryEmail } = require("./digitalDeliveryEmailService");
 
 const buildInvoiceNumber = () => {
   const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, "");
@@ -130,7 +131,13 @@ const buildOrderDraft = async ({ items, shippingAddress }) => {
   const itemsPrice = Number(
     orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)
   );
-  const shippingPrice = requiresShipping ? (itemsPrice >= 100 ? 0 : 6.99) : 0;
+  const physicalItemsPrice = Number(
+    orderItems
+      .filter((item) => !isDigitalProduct(item))
+      .reduce((sum, item) => sum + item.price * item.quantity, 0)
+      .toFixed(2)
+  );
+  const shippingPrice = requiresShipping ? (physicalItemsPrice >= 100 ? 0 : 6.99) : 0;
   const taxPrice = Number((itemsPrice * 0.21).toFixed(2));
   const totalPrice = Number((itemsPrice + shippingPrice + taxPrice).toFixed(2));
 
@@ -217,6 +224,12 @@ const createReservedOrder = async ({
       paymentStatus,
       requiresShipping: draft.requiresShipping,
       containsDigitalProducts: draft.containsDigitalProducts,
+      digitalDeliveryEmail: {
+        status: draft.containsDigitalProducts ? "pending" : "not_required",
+        sentAt: null,
+        lastAttemptAt: null,
+        error: "",
+      },
       stockReserved,
       itemsPrice: draft.itemsPrice,
       shippingPrice: draft.shippingPrice,
@@ -236,7 +249,14 @@ const createReservedOrder = async ({
 };
 
 const finalizeStripeOrderPayment = async (order, session) => {
-  if (!order || order.paymentStatus === "paid") {
+  if (!order) {
+    return order;
+  }
+
+  if (order.paymentStatus === "paid") {
+    if (order.containsDigitalProducts) {
+      return ensureDigitalDeliveryEmail(order);
+    }
     return order;
   }
 
@@ -252,6 +272,9 @@ const finalizeStripeOrderPayment = async (order, session) => {
   }
 
   await order.save();
+  if (order.containsDigitalProducts) {
+    await ensureDigitalDeliveryEmail(order);
+  }
   return order;
 };
 

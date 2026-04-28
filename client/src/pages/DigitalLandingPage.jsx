@@ -126,7 +126,7 @@ const DigitalLandingPage = () => {
         <div className="grid gap-10 lg:grid-cols-[1.02fr_0.98fr]">
           <div className="flex flex-col justify-between">
             <div>
-              <span className="hero-chip">Digital atelier</span>
+            <span className="hero-chip">Digital collection</span>
               <h1 className="mt-8 max-w-3xl font-display text-5xl font-bold leading-[0.92] sm:text-6xl lg:text-7xl">
                 Instant digital products for calmer rooms and clearer routines.
               </h1>

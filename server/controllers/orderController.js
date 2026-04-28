@@ -11,6 +11,7 @@ const {
   cancelStripeOrder,
   syncStripeOrderFromSession,
 } = require("../services/orderCheckoutService");
+const { ensureDigitalDeliveryEmail } = require("../services/digitalDeliveryEmailService");
 const fs = require("fs/promises");
 
 const createOrder = async (req, res) => {
@@ -249,10 +250,20 @@ const refundStripeOrderPayment = async (req, res) => {
 };
 
 const getUserOrders = async (req, res) => {
-  const orders = await Order.find({
+  let orders = await Order.find({
     user: req.user._id,
     paymentStatus: { $ne: "canceled" },
   }).sort({ createdAt: -1 });
+
+  orders = await Promise.all(
+    orders.map(async (order) => {
+      if (order.containsDigitalProducts && order.paymentStatus === "paid") {
+        return ensureDigitalDeliveryEmail(order);
+      }
+
+      return order;
+    })
+  );
 
   res.json(orders);
 };

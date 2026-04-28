@@ -23,7 +23,7 @@ services:
       - key: PORT
         value: "10000"
       - key: COMPANY_NAME
-        value: Mano Atelier
+        value: Stilloak Studio
       - key: JWT_SECRET
         generateValue: true
       - key: CLIENT_URL

@@ -43,10 +43,10 @@ const Footer = () => (
               background: "linear-gradient(135deg, rgb(var(--accent)), rgb(var(--accent-strong)))",
             }}
           >
-            MA
+            SS
           </div>
           <div>
-            <p className="font-display text-xl font-bold">Mano Atelier</p>
+            <p className="font-display text-xl font-bold">Stilloak Studio</p>
             <p className="text-xs uppercase tracking-[0.3em] text-white/36">curated living</p>
           </div>
         </div>
@@ -69,7 +69,7 @@ const Footer = () => (
       <div>
         <p className="font-semibold text-white">Contact</p>
         <div className="mt-4 space-y-3 text-sm text-white/58">
-          <p>hello@manoatelier.lt</p>
+          <p>hello@stilloakstudio.com</p>
           <p>+370 600 12345</p>
           <p>Vilnius, Lithuania</p>
           <p>Mon - Fri 9:00 - 18:00</p>
@@ -78,7 +78,7 @@ const Footer = () => (
     </div>
 
     <div className="mt-10 border-t border-white/8 pt-5 text-sm text-white/44">
-      © 2026 Mano Atelier. All rights reserved.
+      © 2026 Stilloak Studio. All rights reserved.
     </div>
   </footer>
 );

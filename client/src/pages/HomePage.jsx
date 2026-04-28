@@ -128,7 +128,7 @@ const HomePage = () => {
                 A calmer, more elevated way to shop beautifully useful objects.
               </h1>
               <p className="mt-6 max-w-2xl text-base leading-7 text-white/72 sm:text-lg">
-                Mano Atelier sujungia curated commerce, member-only perks ir švarų checkout kelią į vieną
+                Stilloak Studio sujungia curated commerce, member-only perks ir švarų checkout kelią į vieną
                 vientisą, prabangesnę patirtį. Čia mažiau triukšmo, daugiau pasitikėjimo ir daugiau noro
                 sugrįžti.
               </p>
@@ -167,7 +167,7 @@ const HomePage = () => {
             <div className="hero-screen relative w-full max-w-[620px]">
               <div className="flex items-center justify-between rounded-[22px] border border-white/8 bg-white/5 px-4 py-3">
                 <div>
-                  <p className="text-sm font-semibold text-white">Mano Atelier</p>
+                  <p className="text-sm font-semibold text-white">Stilloak Studio</p>
                   <p className="text-xs text-white/50">Private collection preview</p>
                 </div>
                 <span className="hero-chip">Circle access</span>

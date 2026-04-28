@@ -33,6 +33,9 @@ const CheckoutPage = () => {
 
   const hasDigitalProducts = cartItems.some((item) => item.productType === "digital");
   const requiresShipping = cartItems.some((item) => item.productType !== "digital");
+  const physicalSubtotal = cartItems
+    .filter((item) => item.productType !== "digital")
+    .reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   useEffect(() => {
     if (hasDigitalProducts) {
@@ -50,7 +53,7 @@ const CheckoutPage = () => {
     );
   }
 
-  const shipping = requiresShipping ? (subtotal >= 100 ? 0 : 6.99) : 0;
+  const shipping = requiresShipping ? (physicalSubtotal >= 100 ? 0 : 6.99) : 0;
   const tax = subtotal * 0.21;
   const total = subtotal + shipping + tax;
 
@@ -277,7 +280,9 @@ const CheckoutPage = () => {
             </div>
             <div className="flex items-center justify-between">
               <span className="text-muted">Pristatymas</span>
-              <span>{shipping === 0 ? "Nemokamas" : formatCurrency(shipping)}</span>
+              <span>
+                {!requiresShipping ? "Netaikoma" : shipping === 0 ? "Nemokamas" : formatCurrency(shipping)}
+              </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-muted">PVM</span>

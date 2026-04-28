@@ -36,10 +36,10 @@ const Navbar = () => {
               background: "linear-gradient(135deg, rgb(var(--accent)), rgb(var(--accent-strong)))",
             }}
           >
-            MA
+            SS
           </div>
           <div className="min-w-0">
-            <p className="font-display text-[1.45rem] font-bold leading-none">Mano Atelier</p>
+            <p className="font-display text-[1.45rem] font-bold leading-none">Stilloak Studio</p>
             <p className="text-[10px] uppercase tracking-[0.32em] text-muted">curated living</p>
           </div>
         </Link>
