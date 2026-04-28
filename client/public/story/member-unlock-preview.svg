@@ -1,0 +1,49 @@
+<svg width="1200" height="980" viewBox="0 0 1200 980" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="980" rx="34" fill="#F6EEE3"/>
+  <rect x="46" y="46" width="1108" height="888" rx="28" fill="#FFFDF9" stroke="#E7DCCB"/>
+  <rect x="92" y="92" width="1016" height="116" rx="26" fill="#1D1813"/>
+  <text x="132" y="136" fill="#C7A676" font-family="Arial, sans-serif" font-size="12" font-weight="700" letter-spacing="2.4">PURCHASE SUCCESS</text>
+  <text x="132" y="186" fill="#FFF9F2" font-family="Georgia, serif" font-size="42" font-weight="700">Circle membership unlocked</text>
+
+  <rect x="92" y="240" width="640" height="612" rx="28" fill="#FFF9F2" stroke="#E7DCCB"/>
+  <text x="128" y="286" fill="#8B6B43" font-family="Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="2.4">WHAT YOU GET IMMEDIATELY</text>
+
+  <rect x="128" y="324" width="568" height="96" rx="22" fill="#F3E8D7"/>
+  <rect x="152" y="350" width="44" height="44" rx="22" fill="#1D1813"/>
+  <text x="214" y="370" fill="#1D1813" font-family="Georgia, serif" font-size="28" font-weight="700">Savings Studio</text>
+  <text x="214" y="394" fill="#7A6248" font-family="Arial, sans-serif" font-size="14">Private dashboard with budgets, goals, recurring spend, and imports.</text>
+
+  <rect x="128" y="438" width="568" height="96" rx="22" fill="#FBF5EC" stroke="#E7DCCB"/>
+  <rect x="152" y="464" width="44" height="44" rx="22" fill="#C59E67"/>
+  <text x="214" y="484" fill="#1D1813" font-family="Georgia, serif" font-size="28" font-weight="700">Members Journal</text>
+  <text x="214" y="508" fill="#7A6248" font-family="Arial, sans-serif" font-size="14">Locked editorial notes, strategy entries, and brand-only content.</text>
+
+  <rect x="128" y="552" width="568" height="96" rx="22" fill="#FBF5EC" stroke="#E7DCCB"/>
+  <rect x="152" y="578" width="44" height="44" rx="22" fill="#A88455"/>
+  <text x="214" y="598" fill="#1D1813" font-family="Georgia, serif" font-size="28" font-weight="700">Receipt archive</text>
+  <text x="214" y="622" fill="#7A6248" font-family="Arial, sans-serif" font-size="14">Orders, invoices, delivery history, and account documentation in one place.</text>
+
+  <rect x="128" y="666" width="568" height="96" rx="22" fill="#FBF5EC" stroke="#E7DCCB"/>
+  <rect x="152" y="692" width="44" height="44" rx="22" fill="#D3B188"/>
+  <text x="214" y="712" fill="#1D1813" font-family="Georgia, serif" font-size="28" font-weight="700">Digital delivery</text>
+  <text x="214" y="736" fill="#7A6248" font-family="Arial, sans-serif" font-size="14">Purchased files, delivery emails, and member support tied to your account.</text>
+
+  <rect x="764" y="240" width="344" height="612" rx="28" fill="#FBF5EC" stroke="#E7DCCB"/>
+  <text x="798" y="286" fill="#8B6B43" font-family="Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="2.4">AFTER CHECKOUT</text>
+  <text x="798" y="330" fill="#1D1813" font-family="Georgia, serif" font-size="34" font-weight="700">Private account status</text>
+  <rect x="798" y="364" width="114" height="30" rx="15" fill="#1D1813"/>
+  <text x="825" y="384" fill="#FFF9F2" font-family="Arial, sans-serif" font-size="12" font-weight="700">ACTIVE</text>
+
+  <rect x="798" y="422" width="276" height="118" rx="22" fill="#FFF9F2" stroke="#E7DCCB"/>
+  <text x="826" y="458" fill="#8B6B43" font-family="Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="2.2">CURRENT PLAN</text>
+  <text x="826" y="502" fill="#1D1813" font-family="Georgia, serif" font-size="34" font-weight="700">Circle</text>
+  <text x="826" y="530" fill="#7A6248" font-family="Arial, sans-serif" font-size="14">Member pricing, locked Journal, and Savings Studio.</text>
+
+  <rect x="798" y="566" width="276" height="124" rx="22" fill="#FFF9F2" stroke="#E7DCCB"/>
+  <text x="826" y="602" fill="#8B6B43" font-family="Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="2.2">NEXT STEP</text>
+  <text x="826" y="644" fill="#1D1813" font-family="Arial, sans-serif" font-size="16" font-weight="700">Open Savings Studio</text>
+  <text x="826" y="674" fill="#7A6248" font-family="Arial, sans-serif" font-size="14">Start with budgets, import past entries, and turn the membership into a real working tool.</text>
+
+  <rect x="798" y="720" width="276" height="86" rx="18" fill="#1D1813"/>
+  <text x="862" y="772" fill="#FFF9F2" font-family="Arial, sans-serif" font-size="15" font-weight="700">Go to members area</text>
+</svg>
