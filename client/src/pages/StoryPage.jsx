@@ -1,4 +1,11 @@
-import { ArrowRight, BarChart3, CheckCircle2, LockKeyhole, MailCheck, Sparkles, WalletCards } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  LockKeyhole,
+  MailCheck,
+  Sparkles,
+  WalletCards,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 
 const storyPillars = [
@@ -37,6 +44,36 @@ const memberUnlocks = [
     icon: LockKeyhole,
     title: "Locked editorial layer",
     text: "Members-only Journal access, account archive, receipts, and a more private experience across the brand.",
+  },
+];
+
+const memberStoryFrames = [
+  {
+    eyebrow: "Frame 01",
+    title: "Your private member dashboard",
+    subtitle:
+      "See budgets, recurring costs, and where the month is losing control before it spills into next week.",
+    metricLabel: "Money view",
+    metricValue: "3 active budgets",
+    bullets: ["Monthly budget pressure", "Recurring vs flexible spend", "Goal pace and savings capacity"],
+  },
+  {
+    eyebrow: "Frame 02",
+    title: "Reports that read like a coach note",
+    subtitle:
+      "Members receive weekly and monthly summaries with a premium evaluation, what works, where risk grows, and what to do next.",
+    metricLabel: "Inbox layer",
+    metricValue: "Weekly + monthly",
+    bullets: ["AI commentary", "7-day action plan", "Top category and recurring load"],
+  },
+  {
+    eyebrow: "Frame 03",
+    title: "The locked layer after purchase",
+    subtitle:
+      "Membership unlocks Journal access, receipts, digital delivery, and a more editorial, private account experience.",
+    metricLabel: "What unlocks",
+    metricValue: "Journal + archive",
+    bullets: ["Members-only Journal", "Receipt archive", "Digital delivery and support"],
   },
 ];
 
@@ -109,8 +146,8 @@ const StoryPage = () => (
             Unlock membership
             <ArrowRight size={16} />
           </Link>
-          <Link to="/savings-studio" className="button-secondary">
-            View public demo
+          <Link to="/membership-preview" className="button-secondary">
+            Membership preview
           </Link>
         </div>
       </div>
@@ -176,71 +213,57 @@ const MemberExperienceShowcase = () => (
           <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-[rgb(128,90,42)]">Members view</p>
           <p className="mt-2 font-display text-3xl font-bold text-[rgb(29,24,19)]">What opens after purchase</p>
         </div>
-        <span className="premium-tag">Realistic preview</span>
+        <span className="premium-tag">Member experience</span>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[1.08fr_0.92fr]">
-        <article className="rounded-[26px] border border-[rgb(226,216,203)] bg-white p-4 shadow-[0_18px_50px_rgba(33,26,18,0.06)]">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-[rgb(128,90,42)]">Frame 01</p>
-          <h3 className="mt-3 font-display text-4xl font-bold text-[rgb(29,24,19)]">The private dashboard itself</h3>
-          <p className="mt-3 text-sm leading-7 text-[rgb(98,87,74)]">
-            This is the members area where budgets, recurring spend, goals, and savings pressure come together in one
-            calmer money view.
-          </p>
-          <div className="mt-4 overflow-hidden rounded-[22px] border border-[rgb(232,224,214)] bg-[rgb(248,243,235)]">
-            <img
-              src="/story/members-dashboard-preview.svg"
-              alt="Savings Studio member dashboard preview showing budgets, summaries, and spending insights."
-              className="h-auto w-full"
-            />
-          </div>
-        </article>
+      <div className="grid gap-4">
+        {memberStoryFrames.map((frame) => (
+          <article
+            key={frame.title}
+            className="rounded-[24px] border border-[rgb(226,216,203)] bg-white px-5 py-5 shadow-[0_18px_50px_rgba(33,26,18,0.04)]"
+          >
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div className="max-w-xl">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-[rgb(128,90,42)]">
+                  {frame.eyebrow}
+                </p>
+                <h3 className="mt-3 font-display text-3xl font-bold text-[rgb(29,24,19)]">{frame.title}</h3>
+                <p className="mt-3 text-sm leading-7 text-[rgb(98,87,74)]">{frame.subtitle}</p>
+              </div>
 
-        <div className="grid gap-4">
-          <article className="rounded-[26px] border border-[rgb(226,216,203)] bg-white p-4 shadow-[0_18px_50px_rgba(33,26,18,0.06)]">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-[rgb(128,90,42)]">Frame 02</p>
-            <h3 className="mt-3 font-display text-3xl font-bold text-[rgb(29,24,19)]">The premium email summary</h3>
-            <p className="mt-3 text-sm leading-7 text-[rgb(98,87,74)]">
-              Members receive a weekly or monthly report with an AI-style evaluation, key risks, and an action plan.
-            </p>
-            <div className="mt-4 overflow-hidden rounded-[22px] border border-[rgb(232,224,214)] bg-[rgb(248,243,235)]">
-              <img
-                src="/story/member-summary-email-preview.svg"
-                alt="Preview of the Savings Studio summary email with score, commentary, and action plan."
-                className="h-auto w-full"
-              />
+              <div className="min-w-[170px] rounded-[20px] border border-[rgb(232,224,214)] bg-[rgb(248,243,235)] px-4 py-4">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[rgb(128,90,42)]">
+                  {frame.metricLabel}
+                </p>
+                <p className="mt-2 font-display text-3xl font-bold text-[rgb(29,24,19)]">{frame.metricValue}</p>
+              </div>
+            </div>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              {frame.bullets.map((bullet) => (
+                <div
+                  key={bullet}
+                  className="rounded-[18px] border border-[rgb(238,231,223)] bg-[rgb(252,249,244)] px-4 py-3 text-sm text-[rgb(98,87,74)]"
+                >
+                  {bullet}
+                </div>
+              ))}
             </div>
           </article>
-
-          <article className="rounded-[26px] border border-[rgb(226,216,203)] bg-white p-4 shadow-[0_18px_50px_rgba(33,26,18,0.06)]">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-[rgb(128,90,42)]">Frame 03</p>
-            <h3 className="mt-3 font-display text-3xl font-bold text-[rgb(29,24,19)]">What the purchase unlocks</h3>
-            <p className="mt-3 text-sm leading-7 text-[rgb(98,87,74)]">
-              After buying membership, the customer unlocks Savings Studio, the locked Journal, receipt archive, and
-              digital delivery support in one place.
-            </p>
-            <div className="mt-4 overflow-hidden rounded-[22px] border border-[rgb(232,224,214)] bg-[rgb(248,243,235)]">
-              <img
-                src="/story/member-unlock-preview.svg"
-                alt="Membership success preview showing unlocked features like Savings Studio, Journal, and receipt archive."
-                className="h-auto w-full"
-              />
-            </div>
-          </article>
-        </div>
+        ))}
       </div>
 
       <div className="mt-5 rounded-[24px] border border-[rgb(232,224,214)] bg-[rgb(248,243,235)] px-5 py-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.22em] text-[rgb(128,90,42)]">What this shows</p>
+            <p className="text-xs uppercase tracking-[0.22em] text-[rgb(128,90,42)]">Preview page</p>
             <p className="mt-2 text-sm leading-7 text-[rgb(98,87,74)]">
-              The story section now shows realistic visual previews of the members dashboard, the premium email
-              experience, and the private unlock layer instead of generic text-only placeholders.
+              If you want to see the real screens, summary email example, and unlock flow visually, open the dedicated
+              Membership Preview page.
             </p>
           </div>
-          <Link to="/pricing" className="button-primary">
-            See membership plans
+          <Link to="/membership-preview" className="button-primary">
+            Open preview
           </Link>
         </div>
       </div>
