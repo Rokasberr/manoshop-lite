@@ -106,66 +106,113 @@ const buildSummaryEmail = ({ frequency, summary, userName }) => {
 
   const subject = `${COMPANY_NAME}: ${periodLabel.toLowerCase()} iš Savings Studio`;
   const html = `
-    <div style="margin:0;padding:24px;background:#f8f4ee;font-family:Arial,sans-serif;color:#2b241d;">
-      <div style="max-width:680px;margin:0 auto;background:#ffffff;border-radius:18px;padding:32px;border:1px solid #ece3d7;">
-        <p style="margin:0 0 12px 0;font-size:12px;letter-spacing:0.24em;text-transform:uppercase;color:#8a6c46;">
-          ${periodLabel}
-        </p>
-        <h1 style="margin:0 0 18px 0;font-size:32px;line-height:1.1;">${greetingName}, štai tavo Savings Studio vaizdas.</h1>
-        <p style="margin:0 0 20px 0;font-size:15px;line-height:1.7;color:#6d5c4c;">
-          Žemiau matai pagrindinius signalus: kiek šį mėnesį išleidai, kas labiausiai spaudžia biudžetą ir kur verta pradėti taupyti pirmiausia.
-        </p>
-        <div style="margin:0 0 22px 0;padding:20px;border-radius:16px;background:#f3ede3;border:1px solid #e5d8c4;">
-          <p style="margin:0 0 10px 0;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:#8a6c46;">
-            ${aiCommentary.title}
-          </p>
-          <p style="margin:0;font-size:15px;line-height:1.75;color:#2b241d;">
-            ${aiCommentary.body}
-          </p>
-          <p style="margin:12px 0 0 0;font-size:14px;line-height:1.7;color:#6d5c4c;">
-            <strong>Ką daryti toliau:</strong> ${aiCommentary.nextStep}
-          </p>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 22px 0;">
-          <div style="padding:16px;border-radius:14px;background:#faf7f2;">
-            <p style="margin:0 0 8px 0;font-size:12px;color:#8a6c46;text-transform:uppercase;letter-spacing:0.18em;">Šis mėnuo</p>
-            <p style="margin:0;font-size:24px;font-weight:700;">${money.format(summary.monthTotal || 0)}</p>
-          </div>
-          <div style="padding:16px;border-radius:14px;background:#faf7f2;">
-            <p style="margin:0 0 8px 0;font-size:12px;color:#8a6c46;text-transform:uppercase;letter-spacing:0.18em;">Po recurring</p>
-            <p style="margin:0;font-size:24px;font-weight:700;">${money.format(summary.safeToSaveAfterRecurring || 0)}</p>
-          </div>
-          <div style="padding:16px;border-radius:14px;background:#faf7f2;">
-            <p style="margin:0 0 8px 0;font-size:12px;color:#8a6c46;text-transform:uppercase;letter-spacing:0.18em;">Top kategorija</p>
-            <p style="margin:0;font-size:20px;font-weight:700;">${summary.topCategory || "Dar nėra duomenų"}</p>
-          </div>
-        </div>
-        <h2 style="margin:0 0 12px 0;font-size:20px;">Svarbiausios įžvalgos</h2>
-        <ul style="padding-left:20px;margin:0 0 22px 0;font-size:15px;line-height:1.7;color:#2b241d;">
-          ${insightItems || "<li>Kol kas dar trūksta duomenų, kad sistema galėtų parodyti aiškias rekomendacijas.</li>"}
-        </ul>
-        <h2 style="margin:0 0 12px 0;font-size:20px;">Didžiausios kategorijos</h2>
-        <table style="width:100%;border-collapse:collapse;margin:0 0 22px 0;font-size:15px;">
-          <tbody>
-            ${categoryItems || "<tr><td style='padding:8px 0;color:#6d5c4c;'>Dar nėra pakankamai įrašų.</td><td></td></tr>"}
-          </tbody>
+    <!doctype html>
+    <html lang="lt">
+      <body style="margin:0;padding:24px;background:#f8f4ee;font-family:Arial,sans-serif;color:#2b241d;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;">
+          <tr>
+            <td align="center">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="680" style="width:680px;max-width:100%;border-collapse:separate;background:#ffffff;border:1px solid #ece3d7;border-radius:18px;">
+                <tr>
+                  <td style="padding:32px;">
+                    <p style="margin:0 0 12px 0;font-size:12px;letter-spacing:0.24em;text-transform:uppercase;color:#8a6c46;">
+                      ${periodLabel}
+                    </p>
+                    <h1 style="margin:0 0 18px 0;font-size:32px;line-height:1.1;color:#2b241d;">${greetingName}, štai tavo Savings Studio vaizdas.</h1>
+                    <p style="margin:0 0 20px 0;font-size:15px;line-height:1.7;color:#6d5c4c;">
+                      Žemiau matai pagrindinius signalus: kiek šį mėnesį išleidai, kas labiausiai spaudžia biudžetą ir kur verta pradėti taupyti pirmiausia.
+                    </p>
+
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 22px 0;border-collapse:separate;background:#f3ede3;border:1px solid #e5d8c4;border-radius:16px;">
+                      <tr>
+                        <td style="padding:20px;">
+                          <p style="margin:0 0 10px 0;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:#8a6c46;">
+                            ${aiCommentary.title}
+                          </p>
+                          <p style="margin:0;font-size:15px;line-height:1.75;color:#2b241d;">
+                            ${aiCommentary.body}
+                          </p>
+                          <p style="margin:12px 0 0 0;font-size:14px;line-height:1.7;color:#6d5c4c;">
+                            <strong>Ką daryti toliau:</strong> ${aiCommentary.nextStep}
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 22px 0;border-collapse:collapse;">
+                      <tr>
+                        <td width="33.33%" style="padding:0 6px 0 0;vertical-align:top;">
+                          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#faf7f2;border-radius:14px;">
+                            <tr>
+                              <td style="padding:16px;">
+                                <p style="margin:0 0 8px 0;font-size:12px;color:#8a6c46;text-transform:uppercase;letter-spacing:0.18em;">Šis mėnuo</p>
+                                <p style="margin:0;font-size:24px;font-weight:700;color:#2b241d;">${money.format(summary.monthTotal || 0)}</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td width="33.33%" style="padding:0 3px;vertical-align:top;">
+                          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#faf7f2;border-radius:14px;">
+                            <tr>
+                              <td style="padding:16px;">
+                                <p style="margin:0 0 8px 0;font-size:12px;color:#8a6c46;text-transform:uppercase;letter-spacing:0.18em;">Po recurring</p>
+                                <p style="margin:0;font-size:24px;font-weight:700;color:#2b241d;">${money.format(summary.safeToSaveAfterRecurring || 0)}</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                        <td width="33.33%" style="padding:0 0 0 6px;vertical-align:top;">
+                          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#faf7f2;border-radius:14px;">
+                            <tr>
+                              <td style="padding:16px;">
+                                <p style="margin:0 0 8px 0;font-size:12px;color:#8a6c46;text-transform:uppercase;letter-spacing:0.18em;">Top kategorija</p>
+                                <p style="margin:0;font-size:20px;font-weight:700;color:#2b241d;">${summary.topCategory || "Dar nėra duomenų"}</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <h2 style="margin:0 0 12px 0;font-size:20px;color:#2b241d;">Svarbiausios įžvalgos</h2>
+                    <ul style="padding-left:20px;margin:0 0 22px 0;font-size:15px;line-height:1.7;color:#2b241d;">
+                      ${insightItems || "<li>Kol kas dar trūksta duomenų, kad sistema galėtų parodyti aiškias rekomendacijas.</li>"}
+                    </ul>
+
+                    <h2 style="margin:0 0 12px 0;font-size:20px;color:#2b241d;">Didžiausios kategorijos</h2>
+                    <table style="width:100%;border-collapse:collapse;margin:0 0 22px 0;font-size:15px;">
+                      <tbody>
+                        ${categoryItems || "<tr><td style='padding:8px 0;color:#6d5c4c;'>Dar nėra pakankamai įrašų.</td><td></td></tr>"}
+                      </tbody>
+                    </table>
+
+                    ${
+                      summary.goalPace
+                        ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 22px 0;border-collapse:separate;background:#faf7f2;border-radius:14px;">
+                            <tr>
+                              <td style="padding:18px;">
+                                <p style="margin:0 0 10px 0;font-size:13px;color:#8a6c46;text-transform:uppercase;letter-spacing:0.18em;">Taupymo tikslas</p>
+                                <p style="margin:0 0 8px 0;font-size:24px;font-weight:700;color:#2b241d;">${summary.goalPace.title}</p>
+                                <p style="margin:0;font-size:15px;line-height:1.7;color:#6d5c4c;">
+                                  Rekomenduojamas tempas: ${money.format(summary.goalPace.recommendedMonthly || 0)} / mėn.
+                                </p>
+                              </td>
+                            </tr>
+                          </table>`
+                        : ""
+                    }
+
+                    <p style="margin:18px 0 0 0;font-size:14px;line-height:1.7;color:#6d5c4c;">
+                      ${COMPANY_NAME}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
         </table>
-        ${
-          summary.goalPace
-            ? `<div style="margin:0 0 22px 0;padding:18px;border-radius:14px;background:#faf7f2;">
-                <p style="margin:0 0 10px 0;font-size:13px;color:#8a6c46;text-transform:uppercase;letter-spacing:0.18em;">Taupymo tikslas</p>
-                <p style="margin:0 0 8px 0;font-size:24px;font-weight:700;">${summary.goalPace.title}</p>
-                <p style="margin:0;font-size:15px;line-height:1.7;color:#6d5c4c;">
-                  Rekomenduojamas tempas: ${money.format(summary.goalPace.recommendedMonthly || 0)} / mėn.
-                </p>
-              </div>`
-            : ""
-        }
-        <p style="margin:18px 0 0 0;font-size:14px;line-height:1.7;color:#6d5c4c;">
-          ${COMPANY_NAME}
-        </p>
-      </div>
-    </div>
+      </body>
+    </html>
   `;
 
   const text = [
