@@ -37,6 +37,11 @@ const recurringExpenseSchema = new mongoose.Schema(
       maxlength: 240,
       default: "",
     },
+    lastLoggedMonth: {
+      type: String,
+      default: "",
+      match: [/^$|^\d{4}-\d{2}$/, "Use YYYY-MM month format"],
+    },
   },
   {
     timestamps: true,

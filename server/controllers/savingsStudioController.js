@@ -3,6 +3,7 @@ const SavingsBudget = require("../models/SavingsBudget");
 const SavingsEntry = require("../models/SavingsEntry");
 const SavingsGoal = require("../models/SavingsGoal");
 const SavingsStudioProfile = require("../models/SavingsStudioProfile");
+const { sendSavingsSummaryEmail } = require("../services/savingsStudioSummaryEmailService");
 
 const CATEGORIES = [
   "Būstas",
@@ -238,6 +239,20 @@ const parseProfileInput = (input) => {
     monthlySavingsTarget: roundCurrency(monthlySavingsTarget),
     primaryFocus,
     onboardingCompleted,
+  };
+};
+
+const parseEmailSettingsInput = (input) => {
+  const summaryEmailsEnabled = Boolean(input.summaryEmailsEnabled);
+  const summaryEmailFrequency = String(input.summaryEmailFrequency || "weekly").trim();
+
+  if (!["weekly", "monthly"].includes(summaryEmailFrequency)) {
+    throw createHttpError("Pasirink galiojantį suvestinių dažnį.");
+  }
+
+  return {
+    summaryEmailsEnabled,
+    summaryEmailFrequency,
   };
 };
 
@@ -570,6 +585,37 @@ const buildInsights = ({ budgets, goals, profile, recurringExpenses, summary }) 
   };
 };
 
+const buildSavingsSummaryPayload = async (userId) => {
+  const month = currentMonthKey();
+  const [entries, profile, recurringExpenses, budgets, goals] = await Promise.all([
+    SavingsEntry.find({ user: userId }),
+    getProfileDocument(userId),
+    RecurringExpense.find({ user: userId }),
+    SavingsBudget.find({ user: userId, month }),
+    SavingsGoal.find({ user: userId }),
+  ]);
+  const summary = buildSummary(entries);
+  const insightPayload = buildInsights({
+    budgets,
+    goals,
+    profile,
+    recurringExpenses,
+    summary,
+  });
+
+  return {
+    profile,
+    recurringExpenses,
+    budgets,
+    goals,
+    entries,
+    summary: {
+      ...summary,
+      ...insightPayload,
+    },
+  };
+};
+
 const getProfileDocument = async (userId) =>
   SavingsStudioProfile.findOneAndUpdate(
     { user: userId },
@@ -592,6 +638,21 @@ const getSavingsProfile = async (req, res) => {
 
 const updateSavingsProfile = async (req, res) => {
   const input = parseProfileInput(req.body);
+
+  const profile = await SavingsStudioProfile.findOneAndUpdate(
+    { user: req.user._id },
+    {
+      $set: input,
+      $setOnInsert: { user: req.user._id },
+    },
+    { new: true, upsert: true }
+  );
+
+  res.json({ profile });
+};
+
+const updateSavingsEmailSettings = async (req, res) => {
+  const input = parseEmailSettingsInput(req.body);
 
   const profile = await SavingsStudioProfile.findOneAndUpdate(
     { user: req.user._id },
@@ -661,6 +722,28 @@ const createSavingsEntry = async (req, res) => {
   });
 
   res.status(201).json({ entry });
+};
+
+const importSavingsEntries = async (req, res) => {
+  const rows = Array.isArray(req.body.rows) ? req.body.rows : [];
+
+  if (!rows.length) {
+    throw createHttpError("CSV importui reikia bent vienos eilutės.");
+  }
+
+  const parsedRows = rows.map((row) => parseEntryInput(row));
+  const importedEntries = await SavingsEntry.insertMany(
+    parsedRows.map((entry) => ({
+      user: req.user._id,
+      ...entry,
+      importSource: "csv-upload",
+    }))
+  );
+
+  res.status(201).json({
+    importedCount: importedEntries.length,
+    entries: importedEntries,
+  });
 };
 
 const updateSavingsEntry = async (req, res) => {
@@ -774,6 +857,48 @@ const updateRecurringExpense = async (req, res) => {
   res.json({ recurringExpense: decorateRecurringExpense(recurringExpense) });
 };
 
+const logRecurringExpenseAsEntry = async (req, res) => {
+  const recurringExpense = await RecurringExpense.findOne({
+    _id: req.params.recurringId,
+    user: req.user._id,
+  });
+
+  if (!recurringExpense) {
+    throw createHttpError("Pasikartojanti išlaida nerasta.", 404);
+  }
+
+  const month = parseMonthKey(req.body.month, currentMonthKey());
+
+  if (recurringExpense.lastLoggedMonth === month) {
+    throw createHttpError("Ši pasikartojanti išlaida jau įtraukta šiam mėnesiui.", 409);
+  }
+
+  const date =
+    month === currentMonthKey()
+      ? new Date().toISOString().slice(0, 10)
+      : `${month}-01`;
+
+  const entry = await SavingsEntry.create({
+    user: req.user._id,
+    title: recurringExpense.title,
+    amount: recurringToMonthlyEquivalent(recurringExpense),
+    category: recurringExpense.category,
+    date,
+    notes: recurringExpense.notes
+      ? `${recurringExpense.notes} | Sugeneruota iš pasikartojančios išlaidos.`
+      : "Sugeneruota iš pasikartojančios išlaidos.",
+    importSource: "recurring-expense",
+  });
+
+  recurringExpense.lastLoggedMonth = month;
+  await recurringExpense.save();
+
+  res.status(201).json({
+    entry,
+    recurringExpense: decorateRecurringExpense(recurringExpense),
+  });
+};
+
 const deleteRecurringExpense = async (req, res) => {
   const recurringExpense = await RecurringExpense.findOne({
     _id: req.params.recurringId,
@@ -789,28 +914,31 @@ const deleteRecurringExpense = async (req, res) => {
 };
 
 const getSavingsSummary = async (req, res) => {
-  const month = currentMonthKey();
-  const [entries, profile, recurringExpenses, budgets, goals] = await Promise.all([
-    SavingsEntry.find({ user: req.user._id }),
-    getProfileDocument(req.user._id),
-    RecurringExpense.find({ user: req.user._id }),
-    SavingsBudget.find({ user: req.user._id, month }),
-    SavingsGoal.find({ user: req.user._id }),
-  ]);
-  const summary = buildSummary(entries);
-  const insightPayload = buildInsights({
-    budgets,
-    goals,
-    profile,
-    recurringExpenses,
+  const { summary } = await buildSavingsSummaryPayload(req.user._id);
+  res.json({
     summary,
+  });
+};
+
+const sendSavingsSummaryEmailNow = async (req, res) => {
+  const profile = await getProfileDocument(req.user._id);
+  const frequency = String(req.body.frequency || profile.summaryEmailFrequency || "weekly").trim();
+
+  if (!["weekly", "monthly"].includes(frequency)) {
+    throw createHttpError("Pasirink galiojantį suvestinės dažnį.");
+  }
+
+  const { summary } = await buildSavingsSummaryPayload(req.user._id);
+  const result = await sendSavingsSummaryEmail({
+    frequency,
+    profile,
+    summary,
+    user: req.user,
   });
 
   res.json({
-    summary: {
-      ...summary,
-      ...insightPayload,
-    },
+    ...result,
+    frequency,
   });
 };
 
@@ -818,9 +946,11 @@ module.exports = {
   getSavingsMeta,
   getSavingsProfile,
   updateSavingsProfile,
+  updateSavingsEmailSettings,
   getSavingsBudgets,
   getSavingsEntries,
   createSavingsEntry,
+  importSavingsEntries,
   updateSavingsEntry,
   deleteSavingsEntry,
   getSavingsGoals,
@@ -830,8 +960,10 @@ module.exports = {
   getRecurringExpenses,
   createRecurringExpense,
   updateRecurringExpense,
+  logRecurringExpenseAsEntry,
   deleteRecurringExpense,
   getSavingsSummary,
+  sendSavingsSummaryEmailNow,
   upsertSavingsBudgets,
   CATEGORIES,
 };

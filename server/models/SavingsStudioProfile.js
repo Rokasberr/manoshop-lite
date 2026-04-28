@@ -29,6 +29,19 @@ const savingsStudioProfileSchema = new mongoose.Schema(
       maxlength: 80,
       default: "",
     },
+    summaryEmailsEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    summaryEmailFrequency: {
+      type: String,
+      enum: ["weekly", "monthly"],
+      default: "weekly",
+    },
+    summaryEmailLastSentAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,

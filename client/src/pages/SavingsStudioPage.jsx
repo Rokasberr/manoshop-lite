@@ -3,6 +3,8 @@ import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  Download,
+  Mail,
   PiggyBank,
   Pencil,
   Plus,
@@ -37,6 +39,7 @@ import {
   getBudgetStatus,
   getGoalProgress,
   money,
+  parseSavingsCsvText,
   recurringMonthlyEquivalent,
 } from "../components/savings/savingsStudioHelpers";
 
@@ -73,6 +76,10 @@ const SavingsStudioPage = () => {
     monthlySavingsTarget: "",
     primaryFocus: DEFAULT_FOCUS_OPTIONS[0],
   });
+  const [emailSettingsForm, setEmailSettingsForm] = useState({
+    summaryEmailsEnabled: false,
+    summaryEmailFrequency: "weekly",
+  });
   const [entries, setEntries] = useState([]);
   const [summary, setSummary] = useState(null);
   const [budgets, setBudgets] = useState([]);
@@ -96,6 +103,10 @@ const SavingsStudioPage = () => {
   const [savingOnboarding, setSavingOnboarding] = useState(false);
   const [savingGoal, setSavingGoal] = useState(false);
   const [savingRecurring, setSavingRecurring] = useState(false);
+  const [savingEmailSettings, setSavingEmailSettings] = useState(false);
+  const [sendingSummaryEmail, setSendingSummaryEmail] = useState(false);
+  const [importingCsv, setImportingCsv] = useState(false);
+  const [loggingRecurringId, setLoggingRecurringId] = useState("");
   const [deletingId, setDeletingId] = useState("");
   const [deletingGoalId, setDeletingGoalId] = useState("");
   const [deletingRecurringId, setDeletingRecurringId] = useState("");
@@ -139,6 +150,10 @@ const SavingsStudioPage = () => {
               ? String(profileResult.profile.monthlySavingsTarget)
               : "",
             primaryFocus: profileResult.profile?.primaryFocus || apiFocusOptions[0] || "",
+          });
+          setEmailSettingsForm({
+            summaryEmailsEnabled: Boolean(profileResult.profile?.summaryEmailsEnabled),
+            summaryEmailFrequency: profileResult.profile?.summaryEmailFrequency || "weekly",
           });
           setEntries(entriesResult.entries || []);
           setSummary(summaryResult.summary || null);
@@ -310,6 +325,14 @@ const SavingsStudioPage = () => {
     }));
   };
 
+  const handleEmailSettingsChange = (event) => {
+    const { name, type, checked, value } = event.target;
+    setEmailSettingsForm((current) => ({
+      ...current,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
   const handleGoalFormChange = (event) => {
     const { name, value } = event.target;
     setGoalForm((current) => ({
@@ -432,6 +455,46 @@ const SavingsStudioPage = () => {
     }
   };
 
+  const handleSaveEmailSettings = async (event) => {
+    event.preventDefault();
+    setSavingEmailSettings(true);
+
+    try {
+      const result = await savingsStudioService.updateEmailSettings(emailSettingsForm);
+      setProfile(result.profile || profile);
+      setEmailSettingsForm({
+        summaryEmailsEnabled: Boolean(result.profile?.summaryEmailsEnabled),
+        summaryEmailFrequency: result.profile?.summaryEmailFrequency || "weekly",
+      });
+      toast.success("Email suvestinių nustatymai atnaujinti.");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Nepavyko išsaugoti email suvestinių nustatymų.");
+    } finally {
+      setSavingEmailSettings(false);
+    }
+  };
+
+  const handleSendSummaryEmail = async (frequency) => {
+    setSendingSummaryEmail(true);
+
+    try {
+      const result = await savingsStudioService.sendSummaryEmail({ frequency });
+
+      if (result.skipped) {
+        toast.error("SMTP dar nesukonfigūruotas, todėl laiško išsiųsti nepavyko.");
+      } else {
+        toast.success(`${frequency === "monthly" ? "Mėnesio" : "Savaitės"} suvestinė išsiųsta į tavo el. paštą.`);
+      }
+
+      const profileResult = await savingsStudioService.getProfile();
+      setProfile(profileResult.profile || null);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Nepavyko išsiųsti suvestinės.");
+    } finally {
+      setSendingSummaryEmail(false);
+    }
+  };
+
   const handleEntrySubmit = async (event) => {
     event.preventDefault();
     setSubmitting(true);
@@ -495,6 +558,51 @@ const SavingsStudioPage = () => {
       toast.error(error.response?.data?.message || "Nepavyko išsaugoti pasikartojančios išlaidos.");
     } finally {
       setSavingRecurring(false);
+    }
+  };
+
+  const handleLogRecurringExpense = async (recurringExpense) => {
+    setLoggingRecurringId(recurringExpense._id);
+
+    try {
+      await savingsStudioService.logRecurringExpense(recurringExpense._id, {
+        month: currentMonthKey(),
+      });
+      await Promise.all([refreshRecurring(), refreshSummaryAndEntries()]);
+      toast.success("Pasikartojanti išlaida įtraukta į šio mėnesio įrašus.");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Nepavyko įtraukti pasikartojančios išlaidos.");
+    } finally {
+      setLoggingRecurringId("");
+    }
+  };
+
+  const handleCsvImport = async (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    setImportingCsv(true);
+
+    try {
+      const text = await file.text();
+      const rows = parseSavingsCsvText({ categories, text });
+
+      if (!rows.length) {
+        toast.error("Nepavyko rasti tinkamų CSV eilučių importui.");
+        return;
+      }
+
+      const result = await savingsStudioService.importEntries({ rows });
+      await refreshSummaryAndEntries();
+      toast.success(`Importuota ${result.importedCount} įrašų.`);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Nepavyko importuoti CSV failo.");
+    } finally {
+      event.target.value = "";
+      setImportingCsv(false);
     }
   };
 
@@ -620,6 +728,7 @@ const SavingsStudioPage = () => {
   const availableToSave = summary?.availableToSave;
   const highestMonthlyTotal = Math.max(...monthlyTotals.map((entry) => entry.total), 1);
   const activeGoalsCount = decoratedGoals.filter((goal) => !goal.complete).length;
+  const currentRecurringMonth = currentMonthKey();
 
   return (
     <div className="space-y-8">
@@ -1505,6 +1614,36 @@ const SavingsStudioPage = () => {
                     <p className="mt-3 text-sm leading-6 text-muted">{recurringExpense.notes}</p>
                   ) : null}
 
+                  <div className="mt-4 rounded-[18px] border border-[rgb(var(--border))] bg-[rgb(var(--surface-soft))] px-4 py-3">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.18em] text-muted">One-click log</p>
+                        <p className="mt-2 text-sm leading-6 text-muted">
+                          {recurringExpense.lastLoggedMonth === currentRecurringMonth
+                            ? "Ši pasikartojanti išlaida jau įtraukta į šio mėnesio faktines išlaidas."
+                            : "Jei mokėjimas jau nuskaičiuotas, vienu paspaudimu paversk jį tikru mėnesio įrašu."}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="button-secondary gap-2 sm:self-start"
+                        onClick={() => handleLogRecurringExpense(recurringExpense)}
+                        disabled={
+                          loggingRecurringId === recurringExpense._id ||
+                          recurringExpense.lastLoggedMonth === currentRecurringMonth
+                        }
+                      >
+                        <CheckCircle2 size={16} />
+                        {loggingRecurringId === recurringExpense._id
+                          ? "Įtraukiama..."
+                          : recurringExpense.lastLoggedMonth === currentRecurringMonth
+                          ? "Jau įtraukta"
+                          : "Įtraukti į šį mėnesį"}
+                      </button>
+                    </div>
+                  </div>
+
                   <div className="mt-4 flex flex-wrap gap-3">
                     <button
                       type="button"
@@ -1531,6 +1670,143 @@ const SavingsStudioPage = () => {
                 Įtrauk pasikartojančias išlaidas ir pamatysi, kiek tavo mėnesį jau “suvalgo” vien pastovūs mokėjimai.
               </div>
             )}
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-2">
+        <div className="panel p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow">summary emails</p>
+              <h2 className="mt-4 text-4xl font-bold">Savaitinės ir mėnesinės suvestinės</h2>
+              <p className="mt-3 text-sm leading-6 text-muted">
+                Įsijunk el. pašto suvestines, kad programa pati primintų, kur išteka pinigai ir kiek dar telpa
+                taupymui.
+              </p>
+            </div>
+            <Mail size={20} style={{ color: "rgb(var(--accent))" }} />
+          </div>
+
+          <form className="mt-6 space-y-5" onSubmit={handleSaveEmailSettings}>
+            <label className="flex items-start gap-3 rounded-[18px] border border-[rgb(var(--border))] bg-[rgb(var(--surface-soft))] px-4 py-4">
+              <input
+                type="checkbox"
+                name="summaryEmailsEnabled"
+                checked={emailSettingsForm.summaryEmailsEnabled}
+                onChange={handleEmailSettingsChange}
+                className="mt-1 h-4 w-4 rounded border-[rgb(var(--border))]"
+              />
+              <span>
+                <span className="block text-sm font-semibold">Įjungti automatinę suvestinę</span>
+                <span className="mt-1 block text-sm leading-6 text-muted">
+                  Kai aktyvuota, šis profilis yra paruoštas gauti trumpas Savings Studio įžvalgas el. paštu.
+                </span>
+              </span>
+            </label>
+
+            <label className="block space-y-2">
+              <span className="text-sm font-semibold text-muted">Numatytas ritmas</span>
+              <select
+                name="summaryEmailFrequency"
+                value={emailSettingsForm.summaryEmailFrequency}
+                onChange={handleEmailSettingsChange}
+                className="select-field"
+                disabled={!emailSettingsForm.summaryEmailsEnabled}
+              >
+                <option value="weekly">Savaitinė suvestinė</option>
+                <option value="monthly">Mėnesinė suvestinė</option>
+              </select>
+            </label>
+
+            <button type="submit" className="button-primary w-full gap-2" disabled={savingEmailSettings}>
+              <Mail size={16} />
+              {savingEmailSettings ? "Saugoma..." : "Išsaugoti suvestinių nustatymus"}
+            </button>
+          </form>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <button
+              type="button"
+              className="button-secondary w-full justify-center gap-2"
+              onClick={() => handleSendSummaryEmail("weekly")}
+              disabled={sendingSummaryEmail}
+            >
+              <Mail size={16} />
+              {sendingSummaryEmail ? "Siunčiama..." : "Išsiųsti savaitės suvestinę"}
+            </button>
+            <button
+              type="button"
+              className="button-secondary w-full justify-center gap-2"
+              onClick={() => handleSendSummaryEmail("monthly")}
+              disabled={sendingSummaryEmail}
+            >
+              <Mail size={16} />
+              {sendingSummaryEmail ? "Siunčiama..." : "Išsiųsti mėnesio suvestinę"}
+            </button>
+          </div>
+
+          <div className="mt-6 soft-card rounded-[24px] p-5">
+            <p className="text-xs uppercase tracking-[0.18em] text-muted">Statusas</p>
+            <p className="mt-3 text-sm leading-6 text-muted">
+              {profile?.summaryEmailLastSentAt
+                ? `Paskutinė suvestinė išsiųsta ${dateFormatter.format(new Date(profile.summaryEmailLastSentAt))}.`
+                : "Suvestinių dar nesiuntėme. Gali pasibandyti rankinį siuntimą ir pamatyti, kaip atrodys laiškas."}
+            </p>
+          </div>
+        </div>
+
+        <div className="panel p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow">csv import</p>
+              <h2 className="mt-4 text-4xl font-bold">Banko išrašo importas</h2>
+              <p className="mt-3 text-sm leading-6 text-muted">
+                Jei turi CSV iš banko ar kitos programos, gali greitai sukelti išlaidas ir pamatyti visą mėnesio
+                vaizdą be rankinio suvedimo.
+              </p>
+            </div>
+            <Download size={20} style={{ color: "rgb(var(--accent))" }} />
+          </div>
+
+          <div className="mt-6 rounded-[24px] border border-dashed border-[rgb(var(--border))] bg-[rgb(var(--surface-soft))] p-5">
+            <label className="block">
+              <span className="text-sm font-semibold text-muted">Pasirink CSV failą</span>
+              <input
+                type="file"
+                accept=".csv,text/csv"
+                onChange={handleCsvImport}
+                disabled={importingCsv}
+                className="input-field mt-3 file:mr-4 file:rounded-full file:border-0 file:bg-[rgb(var(--accent))] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-[rgb(var(--accent-contrast))]"
+              />
+            </label>
+
+            <p className="mt-4 text-sm leading-6 text-muted">
+              {importingCsv
+                ? "CSV eilutės importuojamos, palauk kelias sekundes."
+                : "Sistema atpažįsta dažniausius stulpelius ir automatiškai pabando susieti kategorijas."}
+            </p>
+          </div>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div className="soft-card rounded-[24px] p-5">
+              <p className="text-xs uppercase tracking-[0.18em] text-muted">Priimami stulpeliai</p>
+              <ul className="mt-3 space-y-2 text-sm leading-6 text-muted">
+                <li>`title`, `name`, `description`, `merchant`</li>
+                <li>`amount`, `sum`, `value`, `price`</li>
+                <li>`date`, `transactionDate`, `bookingDate`, `data`</li>
+                <li>`category`, `kategorija`, `notes`, `memo`</li>
+              </ul>
+            </div>
+
+            <div className="soft-card rounded-[24px] p-5">
+              <p className="text-xs uppercase tracking-[0.18em] text-muted">Kaip veikia</p>
+              <ol className="mt-3 space-y-2 text-sm leading-6 text-muted">
+                <li>1. Iš banko eksportuoji CSV.</li>
+                <li>2. Įkeli jį čia vienu veiksmu.</li>
+                <li>3. Savings Studio sukuria įrašus ir atnaujina suvestines.</li>
+              </ol>
+            </div>
           </div>
         </div>
       </section>

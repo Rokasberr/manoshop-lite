@@ -15,6 +15,11 @@ const updateProfile = async (payload) => {
   return data;
 };
 
+const updateEmailSettings = async (payload) => {
+  const { data } = await api.put("/savings-studio/email-settings", payload);
+  return data;
+};
+
 const getEntries = async () => {
   const { data } = await api.get("/savings-studio/entries");
   return data;
@@ -61,6 +66,11 @@ const createRecurringExpense = async (payload) => {
   return data;
 };
 
+const logRecurringExpense = async (recurringId, payload = {}) => {
+  const { data } = await api.post(`/savings-studio/recurring/${recurringId}/log`, payload);
+  return data;
+};
+
 const updateRecurringExpense = async (recurringId, payload) => {
   const { data } = await api.put(`/savings-studio/recurring/${recurringId}`, payload);
   return data;
@@ -80,6 +90,11 @@ const createEntry = async (payload) => {
   return data;
 };
 
+const importEntries = async (payload) => {
+  const { data } = await api.post("/savings-studio/entries/import", payload);
+  return data;
+};
+
 const updateEntry = async (entryId, payload) => {
   const { data } = await api.put(`/savings-studio/entries/${entryId}`, payload);
   return data;
@@ -89,10 +104,16 @@ const deleteEntry = async (entryId) => {
   await api.delete(`/savings-studio/entries/${entryId}`);
 };
 
+const sendSummaryEmail = async (payload) => {
+  const { data } = await api.post("/savings-studio/summary-email", payload);
+  return data;
+};
+
 export default {
   getMeta,
   getProfile,
   updateProfile,
+  updateEmailSettings,
   getEntries,
   getBudgets,
   getGoals,
@@ -101,11 +122,14 @@ export default {
   deleteGoal,
   getRecurringExpenses,
   createRecurringExpense,
+  logRecurringExpense,
   updateRecurringExpense,
   deleteRecurringExpense,
   getSummary,
   createEntry,
+  importEntries,
   updateEntry,
   updateBudgets,
   deleteEntry,
+  sendSummaryEmail,
 };

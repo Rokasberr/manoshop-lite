@@ -148,3 +148,140 @@ export const recurringMonthlyEquivalent = (expense) => {
 
 export const formatRecurringFrequency = (value, options = DEFAULT_RECURRING_FREQUENCIES) =>
   options.find((option) => option.value === value)?.label || value;
+
+const splitCsvLine = (line, delimiter) => {
+  const values = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index];
+    const next = line[index + 1];
+
+    if (char === '"' && inQuotes && next === '"') {
+      current += '"';
+      index += 1;
+      continue;
+    }
+
+    if (char === '"') {
+      inQuotes = !inQuotes;
+      continue;
+    }
+
+    if (char === delimiter && !inQuotes) {
+      values.push(current.trim());
+      current = "";
+      continue;
+    }
+
+    current += char;
+  }
+
+  values.push(current.trim());
+  return values;
+};
+
+const detectCsvDelimiter = (headerLine) => {
+  const commaCount = (headerLine.match(/,/g) || []).length;
+  const semicolonCount = (headerLine.match(/;/g) || []).length;
+  return semicolonCount > commaCount ? ";" : ",";
+};
+
+const normalizeHeader = (value) =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[ą]/g, "a")
+    .replace(/[č]/g, "c")
+    .replace(/[ęė]/g, "e")
+    .replace(/[į]/g, "i")
+    .replace(/[š]/g, "s")
+    .replace(/[ųū]/g, "u")
+    .replace(/[ž]/g, "z");
+
+const findHeaderValue = (row, aliases) => {
+  for (const alias of aliases) {
+    if (row[alias] !== undefined && row[alias] !== null && String(row[alias]).trim()) {
+      return String(row[alias]).trim();
+    }
+  }
+
+  return "";
+};
+
+const normalizeAmount = (rawValue) => {
+  const cleaned = String(rawValue || "")
+    .replace(/\s/g, "")
+    .replace(/€/g, "")
+    .replace(/,/g, ".");
+  const match = cleaned.match(/-?\d+(\.\d+)?/);
+  return match ? Number(match[0]) : NaN;
+};
+
+const normalizeDateValue = (rawValue) => {
+  const value = String(rawValue || "").trim();
+
+  if (!value) {
+    return "";
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return value;
+  }
+
+  if (/^\d{2}[./-]\d{2}[./-]\d{4}$/.test(value)) {
+    const [day, month, year] = value.split(/[./-]/);
+    return `${year}-${month}-${day}`;
+  }
+
+  const parsed = new Date(value);
+
+  if (Number.isNaN(parsed.getTime())) {
+    return "";
+  }
+
+  return parsed.toISOString().slice(0, 10);
+};
+
+export const parseSavingsCsvText = ({ categories = DEFAULT_CATEGORIES, text }) => {
+  const trimmed = String(text || "").trim();
+
+  if (!trimmed) {
+    return [];
+  }
+
+  const lines = trimmed
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  if (lines.length < 2) {
+    return [];
+  }
+
+  const delimiter = detectCsvDelimiter(lines[0]);
+  const headers = splitCsvLine(lines[0], delimiter).map(normalizeHeader);
+  const rows = lines.slice(1).map((line) => {
+    const values = splitCsvLine(line, delimiter);
+    return Object.fromEntries(headers.map((header, index) => [header, values[index] || ""]));
+  });
+
+  return rows
+    .map((row) => {
+      const title = findHeaderValue(row, ["title", "name", "description", "merchant", "payee", "details"]);
+      const amount = normalizeAmount(findHeaderValue(row, ["amount", "sum", "value", "debit", "price"]));
+      const date = normalizeDateValue(findHeaderValue(row, ["date", "transactiondate", "bookingdate", "data"]));
+      const categoryCandidate = findHeaderValue(row, ["category", "kategorija"]);
+      const notes = findHeaderValue(row, ["notes", "note", "memo", "comment", "pastabos"]);
+
+      return {
+        title,
+        amount,
+        date,
+        category: categories.includes(categoryCandidate) ? categoryCandidate : "Kita",
+        notes,
+      };
+    })
+    .filter((row) => row.title && Number.isFinite(row.amount) && row.amount > 0 && row.date);
+};
