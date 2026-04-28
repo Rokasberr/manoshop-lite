@@ -1,8 +1,11 @@
 import {
+  AlertTriangle,
+  CheckCircle2,
   PiggyBank,
   Pencil,
   Plus,
   ShieldCheck,
+  Target,
   Trash2,
   TrendingDown,
   TrendingUp,
@@ -17,10 +20,12 @@ import { useAuth } from "../context/AuthContext";
 import savingsStudioService from "../services/savingsStudioService";
 import {
   buildMonthOptions,
+  currentMonthKey,
   dateFormatter,
   DEFAULT_CATEGORIES,
   emptyEntry,
   formatChange,
+  getBudgetStatus,
   money,
 } from "../components/savings/savingsStudioHelpers";
 
@@ -29,6 +34,8 @@ const SavingsStudioPage = () => {
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
   const [entries, setEntries] = useState([]);
   const [summary, setSummary] = useState(null);
+  const [budgets, setBudgets] = useState([]);
+  const [budgetInputs, setBudgetInputs] = useState({});
   const [entryForm, setEntryForm] = useState(() => emptyEntry(DEFAULT_CATEGORIES));
   const [editingId, setEditingId] = useState("");
   const [filters, setFilters] = useState({
@@ -38,19 +45,22 @@ const SavingsStudioPage = () => {
   });
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [savingBudgets, setSavingBudgets] = useState(false);
   const [deletingId, setDeletingId] = useState("");
 
   const deferredSearch = useDeferredValue(filters.search.trim().toLowerCase());
+  const selectedBudgetMonth = filters.month === "all" ? currentMonthKey() : filters.month;
 
   useEffect(() => {
     const loadStudio = async () => {
       try {
         setLoading(true);
 
-        const [metaResult, entriesResult, summaryResult] = await Promise.all([
+        const [metaResult, entriesResult, summaryResult, budgetsResult] = await Promise.all([
           savingsStudioService.getMeta(),
           savingsStudioService.getEntries(),
           savingsStudioService.getSummary(),
+          savingsStudioService.getBudgets(currentMonthKey()),
         ]);
 
         startTransition(() => {
@@ -58,6 +68,12 @@ const SavingsStudioPage = () => {
           setCategories(apiCategories);
           setEntries(entriesResult.entries || []);
           setSummary(summaryResult.summary || null);
+          setBudgets(budgetsResult.budgets || []);
+          setBudgetInputs(
+            Object.fromEntries(
+              (budgetsResult.budgets || []).map((budget) => [budget.category, String(budget.limitAmount)])
+            )
+          );
           setEntryForm((current) => ({
             ...current,
             category: current.category || apiCategories[1] || apiCategories[0] || "Maistas",
@@ -72,6 +88,26 @@ const SavingsStudioPage = () => {
 
     loadStudio();
   }, []);
+
+  useEffect(() => {
+    const loadBudgets = async () => {
+      try {
+        const budgetResult = await savingsStudioService.getBudgets(selectedBudgetMonth);
+        setBudgets(budgetResult.budgets || []);
+        setBudgetInputs(
+          Object.fromEntries(
+            (budgetResult.budgets || []).map((budget) => [budget.category, String(budget.limitAmount)])
+          )
+        );
+      } catch (error) {
+        toast.error(error.response?.data?.message || "Nepavyko užkrauti biudžetų.");
+      }
+    };
+
+    if (!loading) {
+      loadBudgets();
+    }
+  }, [loading, selectedBudgetMonth]);
 
   const monthChoices = useMemo(() => buildMonthOptions(entries), [entries]);
 
@@ -92,6 +128,40 @@ const SavingsStudioPage = () => {
   );
 
   const filteredTotal = filteredEntries.reduce((sum, entry) => sum + Number(entry.amount), 0);
+  const selectedMonthEntries = entries.filter((entry) => entry.date.startsWith(selectedBudgetMonth));
+  const spentByCategory = useMemo(
+    () =>
+      selectedMonthEntries.reduce((totals, entry) => {
+        const nextTotals = { ...totals };
+        nextTotals[entry.category] = (nextTotals[entry.category] || 0) + Number(entry.amount);
+        return nextTotals;
+      }, {}),
+    [selectedMonthEntries]
+  );
+  const budgetProgress = categories
+    .map((category) => {
+      const budget = budgets.find((entry) => entry.category === category);
+      const spent = Number(spentByCategory[category] || 0);
+      const limitAmount = Number(budget?.limitAmount || 0);
+      const remaining = limitAmount ? Number((limitAmount - spent).toFixed(2)) : 0;
+      const percentUsed = limitAmount ? Math.min((spent / limitAmount) * 100, 100) : 0;
+
+      return {
+        category,
+        spent,
+        limitAmount,
+        remaining,
+        percentUsed,
+        status: getBudgetStatus({ spent, limitAmount }),
+      };
+    })
+    .filter((entry) => entry.limitAmount > 0 || entry.spent > 0);
+
+  const budgetOverview = {
+    setCount: budgetProgress.filter((entry) => entry.limitAmount > 0).length,
+    overCount: budgetProgress.filter((entry) => entry.status === "over").length,
+    warningCount: budgetProgress.filter((entry) => entry.status === "warning").length,
+  };
 
   const refreshStudio = async () => {
     const [entriesResult, summaryResult] = await Promise.all([
@@ -110,6 +180,13 @@ const SavingsStudioPage = () => {
     setEntryForm((current) => ({
       ...current,
       [name]: value,
+    }));
+  };
+
+  const handleBudgetInputChange = (category, value) => {
+    setBudgetInputs((current) => ({
+      ...current,
+      [category]: value,
     }));
   };
 
@@ -173,6 +250,37 @@ const SavingsStudioPage = () => {
     setEntryForm(emptyEntry(categories));
   };
 
+  const handleSaveBudgets = async (event) => {
+    event.preventDefault();
+    setSavingBudgets(true);
+
+    try {
+      const budgetsPayload = categories
+        .map((category) => ({
+          category,
+          limitAmount: Number(String(budgetInputs[category] || "").replace(",", ".")),
+        }))
+        .filter((budget) => Number.isFinite(budget.limitAmount) && budget.limitAmount > 0);
+
+      const budgetResult = await savingsStudioService.updateBudgets({
+        month: selectedBudgetMonth,
+        budgets: budgetsPayload,
+      });
+
+      setBudgets(budgetResult.budgets || []);
+      setBudgetInputs(
+        Object.fromEntries(
+          (budgetResult.budgets || []).map((budget) => [budget.category, String(budget.limitAmount)])
+        )
+      );
+      toast.success("Biudžetai atnaujinti.");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Nepavyko išsaugoti biudžetų.");
+    } finally {
+      setSavingBudgets(false);
+    }
+  };
+
   if (loading) {
     return <LoadingSpinner fullScreen />;
   }
@@ -221,6 +329,27 @@ const SavingsStudioPage = () => {
                 hint={money.format(categoryTotals[0]?.total || 0)}
               />
             </div>
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+              <InsightTile
+                icon={Target}
+                label="Biudžetai"
+                value={String(budgetOverview.setCount)}
+                hint={`${selectedBudgetMonth} mėnuo`}
+              />
+              <InsightTile
+                icon={AlertTriangle}
+                label="Viršyti"
+                value={String(budgetOverview.overCount)}
+                hint="Kategorijos virš limito"
+              />
+              <InsightTile
+                icon={CheckCircle2}
+                label="Prie ribos"
+                value={String(budgetOverview.warningCount)}
+                hint="85% ir daugiau panaudota"
+              />
+            </div>
           </div>
 
           <div className="rounded-[28px] border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
@@ -237,6 +366,7 @@ const SavingsStudioPage = () => {
                 `Filtruota suma: ${money.format(filteredTotal)}`,
                 `Top kategorija: ${summary?.topCategory || "Dar nėra duomenų"}`,
                 `Mėnesio pokytis: ${formatChange(summary?.change)}`,
+                `Aktyvus biudžeto mėnuo: ${selectedBudgetMonth}`,
               ].map((item) => (
                 <div key={item} className="rounded-[18px] bg-white/5 px-4 py-3 text-sm text-white/76">
                   {item}
@@ -448,6 +578,39 @@ const SavingsStudioPage = () => {
 
         <div className="space-y-6">
           <div className="panel p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="eyebrow">monthly budgets</p>
+                <h2 className="mt-4 text-4xl font-bold">Biudžetų ribos</h2>
+                <p className="mt-3 text-sm leading-6 text-muted">
+                  Nustatyk, kiek nori skirti kiekvienai kategorijai pasirinktam mėnesiui, ir stebėk kiek lieka.
+                </p>
+              </div>
+              <Target size={20} style={{ color: "rgb(var(--accent))" }} />
+            </div>
+
+            <form className="mt-6 space-y-4" onSubmit={handleSaveBudgets}>
+              {categories.map((category) => (
+                <label key={category} className="block space-y-2">
+                  <span className="text-sm font-semibold text-muted">{category}</span>
+                  <input
+                    value={budgetInputs[category] || ""}
+                    onChange={(event) => handleBudgetInputChange(category, event.target.value)}
+                    inputMode="decimal"
+                    placeholder="0.00"
+                    className="input-field"
+                  />
+                </label>
+              ))}
+
+              <button type="submit" className="button-primary w-full gap-2" disabled={savingBudgets}>
+                <Target size={16} />
+                {savingBudgets ? "Saugoma..." : `Išsaugoti ${selectedBudgetMonth} biudžetus`}
+              </button>
+            </form>
+          </div>
+
+          <div className="panel p-6">
             <p className="eyebrow">month pulse</p>
             <h2 className="mt-4 text-4xl font-bold">6 mėnesių vaizdas</h2>
             <div className="mt-6 grid h-[260px] grid-cols-6 items-end gap-3">
@@ -481,14 +644,52 @@ const SavingsStudioPage = () => {
           <div className="panel p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="eyebrow">categories</p>
-                <h2 className="mt-4 text-4xl font-bold">Kur pinigai išeina labiausiai</h2>
+                <p className="eyebrow">budget progress</p>
+                <h2 className="mt-4 text-4xl font-bold">Kiek liko iki limito</h2>
               </div>
               <TrendingUp size={20} style={{ color: "rgb(var(--accent))" }} />
             </div>
 
             <div className="mt-6 space-y-3">
-              {categoryTotals.length ? (
+              {budgetProgress.length ? (
+                budgetProgress.map((entry) => (
+                  <div key={entry.category} className="soft-card rounded-[20px] px-4 py-4">
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="font-medium">{entry.category}</span>
+                      <span
+                        className={`font-semibold ${
+                          entry.status === "over"
+                            ? "text-red-600"
+                            : entry.status === "warning"
+                            ? "text-amber-600"
+                            : ""
+                        }`}
+                      >
+                        {money.format(entry.spent)} / {money.format(entry.limitAmount || 0)}
+                      </span>
+                    </div>
+                    <div className="mt-3 h-2 overflow-hidden rounded-full bg-[rgb(var(--surface-soft))]">
+                      <div
+                        className={`h-full rounded-full ${
+                          entry.status === "over"
+                            ? "bg-red-500"
+                            : entry.status === "warning"
+                            ? "bg-amber-500"
+                            : "bg-[rgb(var(--accent))]"
+                        }`}
+                        style={{ width: `${entry.limitAmount ? Math.max(entry.percentUsed, 6) : 0}%` }}
+                      />
+                    </div>
+                    <p className="mt-3 text-sm text-muted">
+                      {entry.status === "over"
+                        ? `Viršyta ${money.format(Math.abs(entry.remaining))}`
+                        : entry.limitAmount
+                        ? `Liko ${money.format(entry.remaining)}`
+                        : `Šioje kategorijoje kol kas išleista ${money.format(entry.spent)}`}
+                    </p>
+                  </div>
+                ))
+              ) : categoryTotals.length ? (
                 categoryTotals.map((entry) => (
                   <div key={entry.category} className="soft-card rounded-[20px] px-4 py-4">
                     <div className="flex items-center justify-between gap-4">
@@ -499,7 +700,7 @@ const SavingsStudioPage = () => {
                 ))
               ) : (
                 <div className="soft-card rounded-[20px] p-5 text-sm text-muted">
-                  Kai suvesi pirmas išlaidas, čia atsiras tavo stipriausios taupymo kryptys.
+                  Nustatyk pirmus biudžetus arba suvesk pirmas išlaidas, ir čia matysi kiek dar liko iki limito.
                 </div>
               )}
             </div>

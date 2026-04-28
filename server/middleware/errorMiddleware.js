@@ -4,7 +4,8 @@ const notFound = (req, res, next) => {
 };
 
 const errorHandler = (err, _req, res, _next) => {
-  const statusCode = res.statusCode && res.statusCode !== 200 ? res.statusCode : 500;
+  const statusCode =
+    res.statusCode && res.statusCode !== 200 ? res.statusCode : err.statusCode || err.status || 500;
 
   res.status(statusCode).json({
     message: err.message || "Serverio klaida",
@@ -16,4 +17,3 @@ module.exports = {
   notFound,
   errorHandler,
 };
-

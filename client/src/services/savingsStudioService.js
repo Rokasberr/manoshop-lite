@@ -10,6 +10,18 @@ const getEntries = async () => {
   return data;
 };
 
+const getBudgets = async (month) => {
+  const { data } = await api.get("/savings-studio/budgets", {
+    params: { month },
+  });
+  return data;
+};
+
+const updateBudgets = async (payload) => {
+  const { data } = await api.put("/savings-studio/budgets", payload);
+  return data;
+};
+
 const getSummary = async () => {
   const { data } = await api.get("/savings-studio/summary");
   return data;
@@ -32,8 +44,10 @@ const deleteEntry = async (entryId) => {
 export default {
   getMeta,
   getEntries,
+  getBudgets,
   getSummary,
   createEntry,
   updateEntry,
+  updateBudgets,
   deleteEntry,
 };

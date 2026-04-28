@@ -1,11 +1,12 @@
 import {
+  CheckCircle2,
   ArrowRight,
   BadgeEuro,
   ChartNoAxesColumn,
   LockKeyhole,
   PiggyBank,
   ShieldCheck,
-  Sparkles,
+  Target,
   WalletCards,
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -83,6 +84,18 @@ const reasons = [
     title: "Lengviau priimi sprendimus",
     description: "Kai skaičiai aiškūs, lengviau nuspręsti, ką mažinti, o ko nereikia liesti.",
   },
+  {
+    icon: Target,
+    title: "Nustatai ribas pagal kategoriją",
+    description: "Biudžetai parodo ne tik kiek išleidai, bet ir kiek planavai skirti konkrečiai sričiai.",
+  },
+];
+
+const transformations = [
+  "Matai kuri kategorija brangsta greičiausiai",
+  "Gali nustatyti mėnesio limitus maistui, transportui ar laisvalaikiui",
+  "Matai ar likai biudžete, ar viršijai",
+  "Gali grįžti prie aiškaus mėnesio vaizdo bet kada",
 ];
 
 const SavingsStudioDemoPage = () => {
@@ -98,11 +111,11 @@ const SavingsStudioDemoPage = () => {
             <div>
               <span className="hero-chip">subscription tool</span>
               <h1 className="mt-8 max-w-3xl font-display text-5xl font-bold leading-[0.92] sm:text-6xl lg:text-7xl">
-                Savings Studio padeda pamatyti, kur galima pradėti taupyti.
+                Programa, kuri parodo kur realiai pradėti taupyti pinigus.
               </h1>
               <p className="mt-6 max-w-2xl text-base leading-7 text-white/72 sm:text-lg">
-                Tai members-only modulis tavo paskyroje: paprastas išlaidų sekimas, mėnesių palyginimai ir
-                aiškus vaizdas, kur pinigai išeina greičiausiai.
+                `Savings Studio` yra members-only modulis tavo paskyroje: išlaidų sekimas, mėnesių palyginimai,
+                biudžetų ribos ir aiškus vaizdas, kur pinigai išeina greičiausiai.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
@@ -111,7 +124,7 @@ const SavingsStudioDemoPage = () => {
                   <ArrowRight size={16} />
                 </Link>
                 <Link to="/pricing" className="hero-outline-button">
-                  View membership plans
+                  View Circle access
                 </Link>
               </div>
             </div>
@@ -167,17 +180,17 @@ const SavingsStudioDemoPage = () => {
                 <div className="rounded-[24px] border border-white/8 bg-white/4 p-5">
                   <p className="text-xs uppercase tracking-[0.3em] text-white/42">Savings signal</p>
                   <p className="mt-3 text-sm leading-6 text-white/72">
-                    Maistas šį mėnesį sudaro didžiausią dalį, todėl būtent čia verta pradėti nuo mažų pakeitimų.
+                    Maistas šį mėnesį sudaro didžiausią dalį, todėl būtent čia verta pradėti nuo mažų pokyčių.
                   </p>
                 </div>
 
                 <div className="rounded-[24px] border border-white/8 bg-white/4 p-5">
-                  <p className="text-xs uppercase tracking-[0.3em] text-white/42">Top categories</p>
+                  <p className="text-xs uppercase tracking-[0.3em] text-white/42">What changes with membership</p>
                   <div className="mt-4 space-y-3">
-                    {demoSummary.categoryTotals.map((entry) => (
-                      <div key={entry.category} className="flex items-center justify-between gap-4 rounded-[18px] bg-white/4 px-4 py-3 text-sm">
-                        <span>{entry.category}</span>
-                        <span className="text-white/72">{money.format(entry.total)}</span>
+                    {transformations.slice(0, 3).map((entry) => (
+                      <div key={entry} className="flex items-start gap-3 rounded-[18px] bg-white/4 px-4 py-3 text-sm">
+                        <CheckCircle2 size={16} className="mt-0.5" style={{ color: "rgb(var(--accent-strong))" }} />
+                        <span className="text-white/72">{entry}</span>
                       </div>
                     ))}
                   </div>
@@ -201,10 +214,10 @@ const SavingsStudioDemoPage = () => {
       <section className="grid gap-6 lg:grid-cols-[1.02fr_0.98fr]">
         <div className="public-section">
           <span className="eyebrow">what the member sees</span>
-          <h2 className="mt-5 font-display text-4xl font-bold sm:text-5xl">Programa ne tik seka išlaidas, bet parodo kryptį.</h2>
+          <h2 className="mt-5 font-display text-4xl font-bold sm:text-5xl">Programa ne tik seka išlaidas, bet parodo aiškią kryptį.</h2>
           <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
             Tikras narys savo paskyroje mato gyvą dashboardą: gali pridėti išlaidas, jas redaguoti, filtruoti
-            pagal kategoriją ir matyti, kaip mėnuo lyginasi su ankstesniu.
+            pagal kategoriją, stebėti mėnesio pokytį ir iškart matyti, ar telpa į nusistatytus biudžetus.
           </p>
 
           <div className="mt-8 space-y-4">
@@ -242,13 +255,25 @@ const SavingsStudioDemoPage = () => {
             {[
               { icon: LockKeyhole, text: "Pilnas dashboardas atsidaro tik aktyviems nariams." },
               { icon: ShieldCheck, text: "Serveris irgi tikrina membership, ne tik frontend." },
-              { icon: BadgeEuro, text: "Paskirtis aiški: padėti tau pamatyti realias taupymo vietas." },
+              { icon: BadgeEuro, text: "Paskirtis aiški: padėti tau pamatyti realias taupymo vietas ir biudžeto ribas." },
             ].map((item) => (
               <div key={item.text} className="metric-card flex items-start gap-3">
                 <item.icon size={18} className="mt-0.5" style={{ color: "rgb(var(--accent-strong))" }} />
                 <p className="text-sm leading-6 text-white/72">{item.text}</p>
               </div>
             ))}
+          </div>
+
+          <div className="mt-8 rounded-[24px] bg-white/5 p-5">
+            <p className="text-xs uppercase tracking-[0.3em] text-white/45">Included in Circle</p>
+            <div className="mt-4 space-y-3">
+              {transformations.map((item) => (
+                <div key={item} className="flex items-start gap-3 text-sm text-white/74">
+                  <CheckCircle2 size={16} className="mt-0.5" style={{ color: "rgb(var(--accent-strong))" }} />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="mt-8 flex flex-wrap gap-3">

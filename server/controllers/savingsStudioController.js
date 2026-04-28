@@ -1,4 +1,5 @@
 const SavingsEntry = require("../models/SavingsEntry");
+const SavingsBudget = require("../models/SavingsBudget");
 
 const CATEGORIES = [
   "Būstas",
@@ -19,6 +20,16 @@ const previousMonthKey = () => {
   date.setUTCDate(1);
   date.setUTCMonth(date.getUTCMonth() - 1);
   return date.toISOString().slice(0, 7);
+};
+
+const parseMonthKey = (value, fallback = currentMonthKey()) => {
+  const month = String(value || fallback).trim();
+
+  if (!/^\d{4}-\d{2}$/.test(month)) {
+    throw createHttpError("Naudok galiojantį mėnesio formatą YYYY-MM.");
+  }
+
+  return month;
 };
 
 const roundCurrency = (value) => Number(value.toFixed(2));
@@ -153,9 +164,75 @@ const buildSummary = (entries) => {
   };
 };
 
+const parseBudgetPayload = (input) => {
+  const month = parseMonthKey(input.month);
+  const budgets = Array.isArray(input.budgets) ? input.budgets : [];
+
+  const normalizedBudgets = budgets
+    .map((budget) => ({
+      category: String(budget.category || "").trim(),
+      limitAmount: Number(budget.limitAmount),
+    }))
+    .filter((budget) => budget.category && Number.isFinite(budget.limitAmount) && budget.limitAmount > 0);
+
+  for (const budget of normalizedBudgets) {
+    if (!CATEGORIES.includes(budget.category)) {
+      throw createHttpError(`Biudžeto kategorija negalioja: ${budget.category}`);
+    }
+  }
+
+  return {
+    month,
+    budgets: normalizedBudgets.map((budget) => ({
+      ...budget,
+      limitAmount: roundCurrency(budget.limitAmount),
+    })),
+  };
+};
+
 const getSavingsMeta = async (_req, res) => {
   res.json({
     categories: CATEGORIES,
+  });
+};
+
+const getSavingsBudgets = async (req, res) => {
+  const month = parseMonthKey(req.query.month);
+  const budgets = await SavingsBudget.find({
+    user: req.user._id,
+    month,
+  }).sort({ category: 1 });
+
+  res.json({
+    month,
+    budgets,
+  });
+};
+
+const upsertSavingsBudgets = async (req, res) => {
+  const { month, budgets } = parseBudgetPayload(req.body);
+
+  await SavingsBudget.deleteMany({
+    user: req.user._id,
+    month,
+  });
+
+  let savedBudgets = [];
+
+  if (budgets.length) {
+    savedBudgets = await SavingsBudget.insertMany(
+      budgets.map((budget) => ({
+        user: req.user._id,
+        month,
+        category: budget.category,
+        limitAmount: budget.limitAmount,
+      }))
+    );
+  }
+
+  res.json({
+    month,
+    budgets: savedBudgets,
   });
 };
 
@@ -217,10 +294,12 @@ const getSavingsSummary = async (req, res) => {
 
 module.exports = {
   getSavingsMeta,
+  getSavingsBudgets,
   getSavingsEntries,
   createSavingsEntry,
   updateSavingsEntry,
   deleteSavingsEntry,
   getSavingsSummary,
+  upsertSavingsBudgets,
   CATEGORIES,
 };

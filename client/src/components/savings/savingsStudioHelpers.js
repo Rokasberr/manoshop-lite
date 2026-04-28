@@ -23,6 +23,7 @@ export const dateFormatter = new Intl.DateTimeFormat("lt-LT", {
 });
 
 export const currentDateInput = () => new Date().toISOString().slice(0, 10);
+export const currentMonthKey = () => new Date().toISOString().slice(0, 7);
 
 export const emptyEntry = (categories = DEFAULT_CATEGORIES) => ({
   title: "",
@@ -61,4 +62,20 @@ export const formatChange = (change) => {
 
   const prefix = change > 0 ? "+" : "";
   return `${prefix}${change}% prieš praeitą mėnesį`;
+};
+
+export const getBudgetStatus = ({ spent, limitAmount }) => {
+  if (!limitAmount) {
+    return "unset";
+  }
+
+  if (spent > limitAmount) {
+    return "over";
+  }
+
+  if (spent >= limitAmount * 0.85) {
+    return "warning";
+  }
+
+  return "healthy";
 };
