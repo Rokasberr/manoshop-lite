@@ -14,6 +14,7 @@
     "start": "npm --workspace server run start",
     "seed": "npm --workspace server run seed",
     "seed:digital": "node .\\database\\seed-digital-products.js",
+    "import:savings": "node .\\scripts\\import-ledger-lane-data.js",
     "test:admin-flow": "powershell -ExecutionPolicy Bypass -File .\\scripts\\test-admin-flow.ps1"
   }
 }

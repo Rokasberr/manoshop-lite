@@ -36,6 +36,18 @@ const savingsEntrySchema = new mongoose.Schema(
       maxlength: 240,
       default: "",
     },
+    importSource: {
+      system: {
+        type: String,
+        default: "",
+        trim: true,
+      },
+      entryId: {
+        type: String,
+        default: "",
+        trim: true,
+      },
+    },
   },
   {
     timestamps: true,
