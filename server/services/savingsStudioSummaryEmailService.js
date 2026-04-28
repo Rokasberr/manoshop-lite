@@ -15,9 +15,71 @@ const toneLabelMap = {
   info: "Signalas",
 };
 
+const buildAiCommentary = ({ frequency, summary }) => {
+  const strongestInsight =
+    (summary.insights || []).find((insight) => insight.tone === "danger") ||
+    (summary.insights || []).find((insight) => insight.tone === "warning") ||
+    summary.insights?.[0] ||
+    null;
+
+  const biggestWeek = (summary.weeklyTotalsCurrentMonth || [])
+    .filter((entry) => Number(entry.total) > 0)
+    .sort((left, right) => Number(right.total) - Number(left.total))[0];
+
+  const lines = [];
+
+  if (frequency === "weekly") {
+    lines.push("Pagal šios savaitės vaizdą svarbiausia žiūrėti ne į visų išlaidų kiekį, o į vietą, kur mėnesis greičiausiai praranda kontrolę.");
+  } else {
+    lines.push("Pagal šio mėnesio vaizdą verta vertinti ne tik kiek išleidai, bet ir ar dabartinis tempas leidžia pasiekti taupymo tikslus be papildomo spaudimo kitą mėnesį.");
+  }
+
+  if (strongestInsight) {
+    lines.push(`Ryškiausias signalas dabar yra „${strongestInsight.title.toLowerCase()}${strongestInsight.metric ? `“ (${strongestInsight.metric})` : "“"}.`);
+  } else if (summary.topCategory) {
+    lines.push(`Šiuo metu ryškiausiai išsiskiria kategorija „${summary.topCategory.toLowerCase()}“, todėl būtent ji turi didžiausią įtaką bendram mėnesio balansui.`);
+  }
+
+  if (biggestWeek) {
+    lines.push(`${biggestWeek.label} šiame mėnesyje kol kas yra brangiausia (${money.format(biggestWeek.total)}), todėl verta peržiūrėti, kokie pirkiniai susikoncentravo būtent tame ruože.`);
+  }
+
+  if (summary.recurringMonthlyTotal > 0) {
+    lines.push(`Vien pastovios išlaidos sudaro apie ${money.format(summary.recurringMonthlyTotal)}, todėl net ir geras einamasis ritmas atrodys silpniau, jei recurring dalis nebus aiškiai kontroliuojama.`);
+  }
+
+  if (summary.goalPace?.recommendedMonthly) {
+    if (summary.goalPace.status === "behind") {
+      lines.push(`Pagal dabartinį tikslų tempą reikėtų atsidėti bent ${money.format(summary.goalPace.recommendedMonthly)} per mėnesį, todėl dabartinę išlaidų struktūrą verta koreguoti agresyviau.`);
+    } else if (summary.goalPace.status === "tight") {
+      lines.push(`Tikslas dar pasiekiamas, bet tempas jau įtemptas: orientyras yra apie ${money.format(summary.goalPace.recommendedMonthly)} per mėnesį.`);
+    } else {
+      lines.push(`Gera žinia ta, kad dabartinis tikslų tempas atrodo tvarus: orientyras išlieka apie ${money.format(summary.goalPace.recommendedMonthly)} per mėnesį.`);
+    }
+  } else if (summary.safeToSaveAfterRecurring !== null && summary.safeToSaveAfterRecurring !== undefined) {
+    lines.push(`Po pastovių išlaidų taupymui šiuo metu dar lieka apie ${money.format(summary.safeToSaveAfterRecurring)}, todėl svarbiausia neišbarstyti šios laisvos sumos smulkiais spontaniškais pirkimais.`);
+  }
+
+  const nextStep =
+    strongestInsight?.tone === "danger"
+      ? "Pirmas veiksmas: peržiūrėk viršytą kategoriją ir sustabdyk nebūtinus pirkinius dar šią savaitę."
+      : strongestInsight?.tone === "warning"
+      ? "Pirmas veiksmas: pristabdyk ribą pasiekiančią kategoriją ir dar kartą palygink ją su pastoviomis išlaidomis."
+      : summary.goalPace?.status === "behind"
+      ? "Pirmas veiksmas: padidink mėnesio atsidėjimą arba nukelk tikslą į realesnį terminą."
+      : "Pirmas veiksmas: tęsk įrašų pildymą nuosekliai ir kartą per savaitę peržiūrėk didžiausią kategoriją.";
+
+  return {
+    title: frequency === "monthly" ? "AI mėnesio komentaras" : "AI savaitės komentaras",
+    body: lines.join(" "),
+    nextStep,
+  };
+};
+
 const buildSummaryEmail = ({ frequency, summary, userName }) => {
   const periodLabel = frequency === "monthly" ? "Mėnesio suvestinė" : "Savaitės suvestinė";
   const greetingName = userName?.trim() || "nary";
+  const aiCommentary = buildAiCommentary({ frequency, summary });
   const insightItems = (summary.insights || [])
     .map(
       (insight) => `
@@ -53,6 +115,17 @@ const buildSummaryEmail = ({ frequency, summary, userName }) => {
         <p style="margin:0 0 20px 0;font-size:15px;line-height:1.7;color:#6d5c4c;">
           Žemiau matai pagrindinius signalus: kiek šį mėnesį išleidai, kas labiausiai spaudžia biudžetą ir kur verta pradėti taupyti pirmiausia.
         </p>
+        <div style="margin:0 0 22px 0;padding:20px;border-radius:16px;background:#f3ede3;border:1px solid #e5d8c4;">
+          <p style="margin:0 0 10px 0;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:#8a6c46;">
+            ${aiCommentary.title}
+          </p>
+          <p style="margin:0;font-size:15px;line-height:1.75;color:#2b241d;">
+            ${aiCommentary.body}
+          </p>
+          <p style="margin:12px 0 0 0;font-size:14px;line-height:1.7;color:#6d5c4c;">
+            <strong>Ką daryti toliau:</strong> ${aiCommentary.nextStep}
+          </p>
+        </div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 22px 0;">
           <div style="padding:16px;border-radius:14px;background:#faf7f2;">
             <p style="margin:0 0 8px 0;font-size:12px;color:#8a6c46;text-transform:uppercase;letter-spacing:0.18em;">Šis mėnuo</p>
@@ -102,6 +175,10 @@ const buildSummaryEmail = ({ frequency, summary, userName }) => {
     `Šis mėnuo: ${money.format(summary.monthTotal || 0)}`,
     `Po recurring: ${money.format(summary.safeToSaveAfterRecurring || 0)}`,
     `Top kategorija: ${summary.topCategory || "Dar nėra duomenų"}`,
+    "",
+    `${aiCommentary.title}:`,
+    aiCommentary.body,
+    `Ką daryti toliau: ${aiCommentary.nextStep}`,
     "",
     "Svarbiausios įžvalgos:",
     ...(summary.insights || []).map((insight) => `- ${insight.title}${insight.metric ? ` (${insight.metric})` : ""}: ${insight.body}`),
