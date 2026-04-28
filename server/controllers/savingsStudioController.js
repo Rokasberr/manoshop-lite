@@ -41,6 +41,12 @@ const previousMonthKey = () => {
 };
 
 const roundCurrency = (value) => Number(value.toFixed(2));
+const moneyFormatter = new Intl.NumberFormat("lt-LT", {
+  style: "currency",
+  currency: "EUR",
+  maximumFractionDigits: 2,
+});
+const formatMoney = (value) => moneyFormatter.format(Number(value || 0));
 
 const monthOptions = (count = 6) => {
   const formatter = new Intl.DateTimeFormat("lt-LT", {
@@ -256,6 +262,26 @@ const decorateRecurringExpense = (expense) => ({
   monthlyEquivalent: recurringToMonthlyEquivalent(expense),
 });
 
+const monthsUntilTargetDate = (targetDate) => {
+  if (!targetDate) {
+    return null;
+  }
+
+  const today = new Date();
+  const target = new Date(`${targetDate}T00:00:00`);
+
+  if (Number.isNaN(target.getTime())) {
+    return null;
+  }
+
+  const rawMonths =
+    (target.getUTCFullYear() - today.getUTCFullYear()) * 12 +
+    (target.getUTCMonth() - today.getUTCMonth()) +
+    1;
+
+  return Math.max(rawMonths, 1);
+};
+
 const buildSummary = (entries) => {
   const monthKey = currentMonthKey();
   const lastMonthKey = previousMonthKey();
@@ -316,6 +342,197 @@ const buildSummary = (entries) => {
       ...entry,
       total: roundCurrency(entry.total),
     })),
+  };
+};
+
+const buildInsights = ({ budgets, goals, profile, recurringExpenses, summary }) => {
+  const currentMonthSpent = Number(summary.monthTotal || 0);
+  const recurringMonthlyTotal = roundCurrency(
+    recurringExpenses.reduce((sum, recurringExpense) => sum + recurringToMonthlyEquivalent(recurringExpense), 0)
+  );
+  const spentByCategory = new Map(
+    (summary.categoryTotals || []).map((entry) => [entry.category, Number(entry.total || 0)])
+  );
+  const budgetProgress = budgets
+    .map((budget) => {
+      const spent = Number(spentByCategory.get(budget.category) || 0);
+
+      return {
+        category: budget.category,
+        limitAmount: Number(budget.limitAmount || 0),
+        spent,
+        ratio: budget.limitAmount ? spent / Number(budget.limitAmount) : 0,
+      };
+    })
+    .filter((entry) => entry.limitAmount > 0)
+    .sort((left, right) => right.ratio - left.ratio);
+
+  const overBudget = budgetProgress.filter((entry) => entry.spent > entry.limitAmount);
+  const warningBudget = budgetProgress.filter(
+    (entry) => entry.spent <= entry.limitAmount && entry.spent >= entry.limitAmount * 0.85
+  );
+  const topCategory = summary.categoryTotals?.[0];
+  const activeGoals = goals.filter((goal) => Number(goal.currentAmount || 0) < Number(goal.targetAmount || 0));
+  const nearestGoal = activeGoals
+    .map((goal) => {
+      const remaining = roundCurrency(Number(goal.targetAmount || 0) - Number(goal.currentAmount || 0));
+      const monthsLeft = monthsUntilTargetDate(goal.targetDate);
+
+      return {
+        ...goal.toObject(),
+        remaining,
+        monthsLeft,
+        recommendedMonthly: monthsLeft ? roundCurrency(remaining / monthsLeft) : null,
+      };
+    })
+    .sort((left, right) => {
+      if (left.monthsLeft && right.monthsLeft) {
+        return left.monthsLeft - right.monthsLeft;
+      }
+
+      if (left.monthsLeft) {
+        return -1;
+      }
+
+      if (right.monthsLeft) {
+        return 1;
+      }
+
+      return left.remaining - right.remaining;
+    })[0];
+
+  const insights = [];
+
+  if (overBudget.length) {
+    const first = overBudget[0];
+    insights.push({
+      key: "budget-over",
+      tone: "danger",
+      title: `Viršytas ${first.category} biudžetas`,
+      metric: formatMoney(first.spent - first.limitAmount),
+      body:
+        overBudget.length > 1
+          ? `${overBudget.length} kategorijos jau viršijo ribą. Pirmiausia verta stabdyti ${first.category.toLowerCase()} sritį.`
+          : `${first.category} išlaidos jau viršijo planą. Čia dabar greičiausiai dingsta mėnesio rezervas.`,
+    });
+  } else if (warningBudget.length) {
+    const first = warningBudget[0];
+    insights.push({
+      key: "budget-warning",
+      tone: "warning",
+      title: `${first.category} artėja prie ribos`,
+      metric: `${Math.round(first.ratio * 100)}%`,
+      body:
+        warningBudget.length > 1
+          ? `${warningBudget.length} kategorijos pasiekė bent 85% limito. Dar keli pirkiniai gali perstumti mėnesį į minusą.`
+          : `Šioje kategorijoje jau panaudota didžioji dalis limito. Jei ją pristabdysi, bus lengviau išsaugoti mėnesio balansą.`,
+    });
+  }
+
+  if (profile.monthlyIncome > 0 && profile.monthlySavingsTarget > 0) {
+    const availableToSave = roundCurrency(Number(profile.monthlyIncome) - currentMonthSpent);
+
+    if (availableToSave >= Number(profile.monthlySavingsTarget)) {
+      insights.push({
+        key: "target-on-track",
+        tone: "success",
+        title: "Mėnesio taupymo tikslas telpa",
+        metric: formatMoney(availableToSave),
+        body: `Pagal dabartinį mėnesį dar telpa apie ${formatMoney(availableToSave)}. Tai užtenka pasiekti tavo nusistatytą taupymo tikslą.`,
+      });
+    } else {
+      const shortfall = roundCurrency(Number(profile.monthlySavingsTarget) - availableToSave);
+      insights.push({
+        key: "target-shortfall",
+        tone: "warning",
+        title: "Taupymo tikslui dar trūksta vietos",
+        metric: formatMoney(shortfall),
+        body: `Jei nieko nekeisi, iki mėnesio taupymo tikslo trūks apie ${formatMoney(shortfall)}. Geriausia pradėti nuo labiausiai augančios kategorijos.`,
+      });
+    }
+  }
+
+  if (summary.change !== null) {
+    if (summary.change <= -8) {
+      insights.push({
+        key: "month-improving",
+        tone: "success",
+        title: "Mėnuo juda gera kryptimi",
+        metric: `${summary.change}%`,
+        body: "Palyginti su praėjusiu mėnesiu, išlaidos sumažėjo. Verta išlaikyti dabartinį ritmą ir negrįžti prie spontaniškų pirkinių.",
+      });
+    } else if (summary.change >= 10) {
+      insights.push({
+        key: "month-rising",
+        tone: "warning",
+        title: "Išlaidos auga greičiau nei įprasta",
+        metric: `+${summary.change}%`,
+        body: "Šis mėnuo jau brangesnis nei praėjęs. Dabar svarbiausia patikrinti, ar augimas ateina iš vienos kategorijos, ar iš kelių smulkių įpročių.",
+      });
+    }
+  }
+
+  if (topCategory && currentMonthSpent > 0) {
+    const topShare = roundCurrency((Number(topCategory.total) / currentMonthSpent) * 100);
+
+    if (topShare >= 30) {
+      insights.push({
+        key: "top-category",
+        tone: "info",
+        title: `${topCategory.category} valgo didžiausią dalį mėnesio`,
+        metric: `${topShare}%`,
+        body: `Vien ši kategorija sudaro apie ${topShare}% viso mėnesio. Jei nori greito pokyčio, pradėk būtent nuo jos.`,
+      });
+    }
+  }
+
+  if (recurringMonthlyTotal > 0) {
+    const recurringShare = currentMonthSpent > 0 ? roundCurrency((recurringMonthlyTotal / currentMonthSpent) * 100) : 0;
+    const largestRecurring = recurringExpenses
+      .map((recurringExpense) => ({
+        title: recurringExpense.title,
+        monthlyEquivalent: recurringToMonthlyEquivalent(recurringExpense),
+      }))
+      .sort((left, right) => right.monthlyEquivalent - left.monthlyEquivalent)[0];
+
+    insights.push({
+      key: "recurring-load",
+      tone: recurringShare >= 35 ? "warning" : "info",
+      title: "Pastovios išlaidos jau užima mėnesio dalį",
+      metric: formatMoney(recurringMonthlyTotal),
+      body: largestRecurring
+        ? `Pasikartojantys mokėjimai sudaro apie ${recurringShare}% šio mėnesio vaizdo. Didžiausia pastovi eilutė dabar yra ${largestRecurring.title.toLowerCase()}.`
+        : "Pasikartojančios išlaidos jau užima reikšmingą mėnesio dalį, todėl jos turi būti matomos atskirai.",
+    });
+  }
+
+  if (nearestGoal?.recommendedMonthly) {
+    insights.push({
+      key: "goal-pace",
+      tone: "info",
+      title: `Tikslas „${nearestGoal.title}“ turi aiškų tempą`,
+      metric: `${formatMoney(nearestGoal.recommendedMonthly)}/mėn.`,
+      body: nearestGoal.monthsLeft
+        ? `Jei nori pasiekti šį tikslą iki ${nearestGoal.targetDate}, reikėtų atsidėti maždaug po ${formatMoney(nearestGoal.recommendedMonthly)} per mėnesį.`
+        : `Kad tikslas judėtų užtikrintai, verta atsidėti bent po ${formatMoney(nearestGoal.recommendedMonthly)} per mėnesį.`,
+    });
+  }
+
+  if (!insights.length) {
+    insights.push({
+      key: "starting-point",
+      tone: "info",
+      title: "Pradžiai reikia daugiau duomenų",
+      metric: "Start",
+      body: "Sukurk kelias išlaidas, vieną biudžetą ir vieną tikslą. Tuomet Savings Studio galės parodyti, kur realiai pradėti taupyti.",
+    });
+  }
+
+  return {
+    recurringMonthlyTotal,
+    availableToSave:
+      profile.monthlyIncome > 0 ? roundCurrency(Number(profile.monthlyIncome) - currentMonthSpent) : null,
+    insights: insights.slice(0, 4),
   };
 };
 
@@ -538,9 +755,28 @@ const deleteRecurringExpense = async (req, res) => {
 };
 
 const getSavingsSummary = async (req, res) => {
-  const entries = await SavingsEntry.find({ user: req.user._id });
+  const month = currentMonthKey();
+  const [entries, profile, recurringExpenses, budgets, goals] = await Promise.all([
+    SavingsEntry.find({ user: req.user._id }),
+    getProfileDocument(req.user._id),
+    RecurringExpense.find({ user: req.user._id }),
+    SavingsBudget.find({ user: req.user._id, month }),
+    SavingsGoal.find({ user: req.user._id }),
+  ]);
+  const summary = buildSummary(entries);
+  const insightPayload = buildInsights({
+    budgets,
+    goals,
+    profile,
+    recurringExpenses,
+    summary,
+  });
+
   res.json({
-    summary: buildSummary(entries),
+    summary: {
+      ...summary,
+      ...insightPayload,
+    },
   });
 };
 

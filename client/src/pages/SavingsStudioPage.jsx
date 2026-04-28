@@ -533,6 +533,8 @@ const SavingsStudioPage = () => {
 
   const monthlyTotals = summary?.monthlyTotals || [];
   const categoryTotals = summary?.categoryTotals || [];
+  const summaryInsights = summary?.insights || [];
+  const availableToSave = summary?.availableToSave;
   const highestMonthlyTotal = Math.max(...monthlyTotals.map((entry) => entry.total), 1);
   const activeGoalsCount = decoratedGoals.filter((goal) => !goal.complete).length;
 
@@ -681,23 +683,25 @@ const SavingsStudioPage = () => {
           <div className="rounded-[28px] border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.28em] text-white/45">Aiškumo signalai</p>
-                <h3 className="mt-3 font-display text-3xl font-bold">Kur verta žiūrėti pirmiausia</h3>
+                <p className="text-xs uppercase tracking-[0.28em] text-white/45">Automatinės įžvalgos</p>
+                <h3 className="mt-3 font-display text-3xl font-bold">Kur verta veikti pirmiausia</h3>
               </div>
               <ShieldCheck size={20} style={{ color: "rgb(var(--accent-strong))" }} />
             </div>
 
             <div className="mt-6 space-y-3">
-              {[
-                `Filtruota suma: ${money.format(filteredTotal)}`,
-                `Top kategorija: ${summary?.topCategory || "Dar nėra duomenų"}`,
-                `Mėnesio pajamos: ${money.format(profile?.monthlyIncome || 0)}`,
-                `Biudžetų mėnuo: ${selectedBudgetMonth}`,
-              ].map((item) => (
-                <div key={item} className="rounded-[18px] bg-white/5 px-4 py-3 text-sm text-white/76">
-                  {item}
-                </div>
+              {summaryInsights.map((insight) => (
+                <InsightSignalCard key={insight.key} insight={insight} />
               ))}
+            </div>
+
+            <div className="mt-5 flex flex-wrap gap-3 text-xs uppercase tracking-[0.18em] text-white/48">
+              <span>Filtruota suma: {money.format(filteredTotal)}</span>
+              <span>Top kategorija: {summary?.topCategory || "Dar nėra duomenų"}</span>
+              <span>Biudžetų mėnuo: {selectedBudgetMonth}</span>
+              {availableToSave !== null && availableToSave !== undefined ? (
+                <span>Laisva suma: {money.format(availableToSave)}</span>
+              ) : null}
             </div>
           </div>
         </div>
@@ -1331,5 +1335,46 @@ const InsightTile = ({ hint, icon: Icon, label, value }) => (
     <p className="mt-2 text-sm text-white/62">{hint}</p>
   </div>
 );
+
+const InsightSignalCard = ({ insight }) => {
+  const toneMap = {
+    success: {
+      icon: CheckCircle2,
+      borderClass: "border-emerald-400/20 bg-emerald-400/10",
+      metricClass: "text-emerald-200",
+    },
+    warning: {
+      icon: AlertTriangle,
+      borderClass: "border-amber-300/20 bg-amber-300/10",
+      metricClass: "text-amber-100",
+    },
+    danger: {
+      icon: TrendingDown,
+      borderClass: "border-red-400/20 bg-red-400/10",
+      metricClass: "text-red-100",
+    },
+    info: {
+      icon: ShieldCheck,
+      borderClass: "border-white/10 bg-white/5",
+      metricClass: "text-white",
+    },
+  };
+
+  const config = toneMap[insight.tone] || toneMap.info;
+  const Icon = config.icon;
+
+  return (
+    <div className={`rounded-[18px] border px-4 py-4 ${config.borderClass}`}>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-sm font-semibold text-white">{insight.title}</p>
+          <p className="mt-2 text-sm leading-6 text-white/72">{insight.body}</p>
+        </div>
+        <Icon size={18} className={config.metricClass} />
+      </div>
+      {insight.metric ? <p className={`mt-3 text-sm font-semibold ${config.metricClass}`}>{insight.metric}</p> : null}
+    </div>
+  );
+};
 
 export default SavingsStudioPage;

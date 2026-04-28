@@ -1,47 +1,66 @@
 # Savings Studio Roadmap
 
-Trumpas realaus produkto vystymo planas, kad `Savings Studio` taptų ne tik narių priedu, o aiškia mokama funkcija.
+Trumpas, realus 6 savaičių planas, kad `Savings Studio` taptų ne tik narių priedu, o aiškia mokama priežastimi pirkti membership.
 
-## 1 etapas: Aiškus pinigų vaizdas
+## Kas jau padaryta
 - Išlaidų įrašai pagal kategoriją
-- Mėnesio suvestinė
-- 6 mėnesių tendencijos
-- Kategorijų pjūvis
-- Mėnesio biudžetai pagal kategoriją
-
-Tikslas:
-vartotojas greitai pamato, kur išeina pinigai ir kur prasideda pirmos taupymo galimybės.
-
-## 2 etapas: Kontrolė, ne tik stebėjimas
-- Pasikartojančios išlaidos
+- 6 mėnesių suvestinė
+- Mėnesio biudžetai
 - Taupymo tikslai
-- Įspėjimai apie viršytus biudžetus
-- Paprastas pirmo naudojimo onboarding
+- Pasikartojančios išlaidos
+- Pirmo naudojimo onboarding
+
+## 1 savaitė: Produktas pradeda „kalbėti“
+- Automatinės įžvalgos iš realių duomenų
+- Aiškesni signalai, kur viršijamas biudžetas
+- Demo puslapis su stipresniu membership pitch
 
 Tikslas:
-programa pradeda ne tik rodyti istoriją, bet ir aktyviai padeda valdyti pinigus.
+vartotojas ne tik suveda skaičius, bet iškart gauna kryptį, kur verta mažinti išlaidas pirmiausia.
 
-## 3 etapas: Grįžimo priežastis
+## 2 savaitė: Recurring logika tampa naudinga
+- Pastovios išlaidos įtraukiamos į mėnesio finansinį vaizdą
+- Rodoma, kiek mėnesio jau „užimta“ dar prieš naujus pirkinius
+- Atskiras signalas, kiek pasikartojantys mokėjimai sudaro viso mėnesio
+
+Tikslas:
+žmogus pamato ne tik spontaniškas išlaidas, bet ir tą dalį, kuri tyliai suvalgo biudžetą kiekvieną mėnesį.
+
+## 3 savaitė: Tikslai tampa realiai pasiekiami
+- Tikslams rodoma, kiek reikia atsidėti per mėnesį
+- Signalas, ar dabartinis tempas pakankamas
+- Prioritetinis tikslas rodomas viršuje kaip pagrindinis fokusas
+
+Tikslas:
+taupymo tikslai tampa ne dekoracija, o praktine planavimo priemone.
+
+## 4 savaitė: Onboarding tampa vedliu
+- Step-by-step wizard vietoje vieno bloko
+- Pirmo setup pabaigoje sugeneruojamas aiškus „first month plan“
+- Tuščios būsenos pakeičiamos į veiksmų pasiūlymus
+
+Tikslas:
+naujas vartotojas supranta, ką daryti per pirmas 5 minutes, ir greičiau pajunta vertę.
+
+## 5 savaitė: Grįžimo priežastis
 - Savaitinė el. pašto suvestinė
-- Mėnesio review ekranas
-- „Kur galima sumažinti“ įžvalgos
-- Membership naudos sluoksnis: Journal + Savings Studio kartu
+- Mėnesio review santrauka
+- Priminimas grįžti, kai nėra naujų įrašų
 
 Tikslas:
-vartotojas grįžta reguliariai, nes gauna vertę ne vien įvedimo momentu.
+`Savings Studio` tampa įrankiu, prie kurio grįžtama reguliariai, ne tik vieną kartą.
 
-## 4 etapas: Tikras mokamas produktas
-- Demo puslapis su aiškiu promise
-- Po pirkimo nukreipimas tiesiai į Savings Studio
-- Review/testimonial blokai
-- Aiškus palyginimas: free vs membership
+## 6 savaitė: Tikras membership argumentas
+- Aiškus free vs member palyginimas
+- Po sėkmingo pirkimo nukreipimas tiesiai į Savings Studio
+- Testimonials / results blokai demo puslapyje
 
 Tikslas:
-`Savings Studio` tampa aiškia membership priežastimi, ne paslėptu priedu.
+membership parduodamas ne per pažadą „gausi daugiau“, o per konkretų rezultatą: daugiau aiškumo ir daugiau santaupų.
 
-## Rekomenduojama seka dabar
-1. Biudžetai
-2. Taupymo tikslai
-3. Pasikartojančios išlaidos
-4. Onboarding
-5. Savaitiniai email priminimai
+## Prioritetų seka po šios savaitės
+1. Recurring išlaidų integracija į mėnesio biudžeto logiką
+2. Tikslų tempo ir rekomenduojamo mėnesio atsidėjimo skaičiavimai
+3. Wizard tipo onboarding
+4. Savaitinės email suvestinės
+5. Pirkimo → Savings Studio nukreipimas

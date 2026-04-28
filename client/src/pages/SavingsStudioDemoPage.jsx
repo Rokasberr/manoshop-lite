@@ -98,6 +98,47 @@ const transformations = [
   "Gali grįžti prie aiškaus mėnesio vaizdo bet kada",
 ];
 
+const memberJourney = [
+  {
+    step: "01",
+    title: "Susivedi pajamas ir pirmus limitus",
+    text: "Per kelias minutes nusistatai mėnesio tikslą, tris svarbiausias kategorijas ir pradedi nuo aiškaus plano.",
+  },
+  {
+    step: "02",
+    title: "Matai kur pinigai dingsta greičiausiai",
+    text: "Programa pati išryškina, kuri kategorija brangsta, kur limitas jau arti ir kokia suma dar telpa taupymui.",
+  },
+  {
+    step: "03",
+    title: "Gauni kryptį ką koreguoti kitą savaitę",
+    text: "Vietoje bendro jausmo gauni konkretų veiksmą: ką pristabdyti, kur neviršyti limito ir kiek atsidėti tikslui.",
+  },
+];
+
+const comparisonRows = [
+  {
+    label: "Demo puslapis",
+    publicValue: "Matai kaip veikia ir kokias problemas sprendžia",
+    memberValue: "Naudoji pilną dashboardą su savo skaičiais",
+  },
+  {
+    label: "Biudžetai",
+    publicValue: "Matai tik pavyzdį",
+    memberValue: "Nustatai realius limitus ir matai likutį kiekvienai kategorijai",
+  },
+  {
+    label: "Automatinės įžvalgos",
+    publicValue: "Supranti, kad jos egzistuoja",
+    memberValue: "Gauni konkrečius signalus iš savo mėnesio duomenų",
+  },
+  {
+    label: "Taupymo tikslai",
+    publicValue: "Matai funkcijos kryptį",
+    memberValue: "Sekti progresą, likutį ir rekomenduojamą mėnesio tempą",
+  },
+];
+
 const SavingsStudioDemoPage = () => {
   const { user } = useAuth();
   const canOpenStudio = hasActiveMembership(user);
@@ -115,16 +156,16 @@ const SavingsStudioDemoPage = () => {
               </h1>
               <p className="mt-6 max-w-2xl text-base leading-7 text-white/72 sm:text-lg">
                 `Savings Studio` yra members-only modulis tavo paskyroje: išlaidų sekimas, mėnesių palyginimai,
-                biudžetų ribos ir aiškus vaizdas, kur pinigai išeina greičiausiai.
+                biudžetų ribos ir automatiniai signalai, kurie parodo kur pirmiausia atsiranda vietos sutaupyti.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link to={canOpenStudio ? "/members/savings-studio" : "/pricing"} className="button-primary gap-2">
-                  {canOpenStudio ? "Open Savings Studio" : "Unlock with membership"}
+                  {canOpenStudio ? "Open Savings Studio" : "Start with Circle"}
                   <ArrowRight size={16} />
                 </Link>
                 <Link to="/pricing" className="hero-outline-button">
-                  View Circle access
+                  Compare membership
                 </Link>
               </div>
             </div>
@@ -209,6 +250,68 @@ const SavingsStudioDemoPage = () => {
             <p className="mt-3 text-sm leading-6 text-muted">{reason.description}</p>
           </div>
         ))}
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-[0.92fr_1.08fr]">
+        <div className="public-section">
+          <span className="eyebrow">first 10 minutes</span>
+          <h2 className="mt-5 font-display text-4xl font-bold sm:text-5xl">Taip narys pradeda naudotis programa realiai.</h2>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
+            Membership čia parduodamas ne dėl papildomų ekranų, o dėl greitesnio rezultato: aiškesnio mėnesio vaizdo
+            ir mažiau chaoso sprendžiant, ką mažinti.
+          </p>
+
+          <div className="mt-8 space-y-4">
+            {memberJourney.map((item) => (
+              <div key={item.step} className="soft-card rounded-[24px] p-5">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--accent))]/12 text-sm font-semibold text-[rgb(var(--accent))]">
+                    {item.step}
+                  </div>
+                  <div>
+                    <h3 className="font-display text-2xl font-bold">{item.title}</h3>
+                    <p className="mt-3 text-sm leading-6 text-muted">{item.text}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="surface-dark overflow-hidden rounded-[34px] px-6 py-8 sm:px-8">
+          <span className="hero-chip">free vs member</span>
+          <h2 className="mt-6 font-display text-4xl font-bold sm:text-5xl">Viešai matai pažadą, narys gauna sistemą.</h2>
+          <div className="mt-8 space-y-4">
+            {comparisonRows.map((row) => (
+              <div key={row.label} className="rounded-[22px] border border-white/8 bg-white/4 p-5">
+                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                  <div className="md:w-[30%]">
+                    <p className="text-sm font-semibold text-white">{row.label}</p>
+                  </div>
+                  <div className="grid gap-3 md:w-[70%] md:grid-cols-2">
+                    <div className="rounded-[18px] bg-white/5 px-4 py-3">
+                      <p className="text-xs uppercase tracking-[0.24em] text-white/42">Public</p>
+                      <p className="mt-2 text-sm leading-6 text-white/68">{row.publicValue}</p>
+                    </div>
+                    <div className="rounded-[18px] bg-white/10 px-4 py-3">
+                      <p className="text-xs uppercase tracking-[0.24em] text-white/42">Member</p>
+                      <p className="mt-2 text-sm leading-6 text-white/82">{row.memberValue}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link to={canOpenStudio ? "/members/savings-studio" : "/pricing"} className="button-primary">
+              {canOpenStudio ? "Open member version" : "Unlock member access"}
+            </Link>
+            <Link to="/pricing" className="hero-outline-button">
+              View pricing
+            </Link>
+          </div>
+        </div>
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[1.02fr_0.98fr]">
