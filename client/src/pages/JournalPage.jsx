@@ -1,26 +1,6 @@
 import { ArrowRight, Quote } from "lucide-react";
 import { Link } from "react-router-dom";
-
-const journalEntries = [
-  {
-    category: "Brand notes",
-    title: "Why calm design converts better than louder design",
-    excerpt:
-      "A more premium storefront often earns trust faster because it removes visual friction before a customer even reaches checkout.",
-  },
-  {
-    category: "Digital collection",
-    title: "How we think about useful digital products",
-    excerpt:
-      "Printable art, interior guides, and planners work best when they solve a specific need and still feel beautiful to return to.",
-  },
-  {
-    category: "Commerce rhythm",
-    title: "What makes a boutique store feel memorable",
-    excerpt:
-      "It is usually the combination of tone, restraint, product framing, and a checkout flow that does not create anxiety.",
-  },
-];
+import { journalArticles } from "../content/journalArticles";
 
 const editorialPoints = [
   "notes on building a calmer storefront",
@@ -66,16 +46,16 @@ const JournalPage = () => (
     </section>
 
     <section className="public-section">
-      <div className="grid gap-5 lg:grid-cols-3">
-        {journalEntries.map((entry) => (
-          <article key={entry.title} className="marketing-card p-6">
+        <div className="grid gap-5 lg:grid-cols-3">
+        {journalArticles.map((entry) => (
+          <Link key={entry.slug} to={`/journal/${entry.slug}`} className="marketing-card p-6 transition hover:-translate-y-1">
             <p className="text-xs uppercase tracking-[0.3em] text-muted">{entry.category}</p>
             <h2 className="mt-4 font-display text-3xl font-bold tracking-[-0.03em] text-[rgb(28,24,20)]">
               {entry.title}
             </h2>
             <p className="mt-4 text-base leading-7 text-muted">{entry.excerpt}</p>
-            <p className="mt-6 text-sm font-medium accent-text">Full editorial entries can grow here next.</p>
-          </article>
+            <p className="mt-6 text-sm font-medium accent-text">Read full article</p>
+          </Link>
         ))}
       </div>
     </section>

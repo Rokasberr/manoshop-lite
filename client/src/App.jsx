@@ -7,6 +7,7 @@ import HomePage from "./pages/HomePage";
 import DigitalLandingPage from "./pages/DigitalLandingPage";
 import StoryPage from "./pages/StoryPage";
 import JournalPage from "./pages/JournalPage";
+import JournalArticlePage from "./pages/JournalArticlePage";
 import ShopPage from "./pages/ShopPage";
 import ProductPage from "./pages/ProductPage";
 import CartPage from "./pages/CartPage";
@@ -37,6 +38,7 @@ const App = () => (
       <Route path="/" element={<HomePage />} />
       <Route path="/story" element={<StoryPage />} />
       <Route path="/journal" element={<JournalPage />} />
+      <Route path="/journal/:slug" element={<JournalArticlePage />} />
       <Route path="/shop" element={<ShopPage />} />
       <Route path="/digital" element={<DigitalLandingPage />} />
       <Route path="/digital/collection" element={<ShopPage defaultProductType="digital" />} />
