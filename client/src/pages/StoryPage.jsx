@@ -142,7 +142,7 @@ const StoryPage = () => (
         </div>
       </div>
 
-      <MemberStoryReel />
+      <MemberExperienceShowcase />
     </section>
 
     <section className="public-section grid gap-8 lg:grid-cols-[0.84fr_1.16fr]">
@@ -195,86 +195,56 @@ const StoryPage = () => (
   </div>
 );
 
-const MemberStoryReel = () => (
-  <div className="story-reel-shell relative overflow-hidden rounded-[34px] p-4 sm:p-5">
-    <div className="story-reel-device relative overflow-hidden rounded-[30px] p-4 sm:p-5">
-      <div className="mb-4 flex items-center justify-between">
+const MemberExperienceShowcase = () => (
+  <div className="member-showcase-shell rounded-[34px] p-4 sm:p-5">
+    <div className="member-showcase-device rounded-[30px] p-4 sm:p-5">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-white/48">Members view</p>
-          <p className="mt-2 font-display text-3xl font-bold text-white">What opens after purchase</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-[rgb(128,90,42)]">Members view</p>
+          <p className="mt-2 font-display text-3xl font-bold text-[rgb(29,24,19)]">What opens after purchase</p>
         </div>
-        <span className="hero-chip">Live preview</span>
+        <span className="premium-tag">Member experience</span>
       </div>
 
-      <div className="relative min-h-[440px]">
-        {memberStoryFrames.map((frame, index) => (
-          <article
-            key={frame.title}
-            className="story-reel-frame absolute inset-0 flex flex-col justify-between rounded-[26px] border border-white/8 bg-white/5 p-5"
-            style={{ animationDelay: `${index * 4}s` }}
-          >
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-white/45">{frame.eyebrow}</p>
-              <h3 className="mt-3 font-display text-4xl font-bold text-white">{frame.title}</h3>
-              <p className="mt-4 max-w-xl text-sm leading-7 text-white/70">{frame.subtitle}</p>
+      <div className="grid gap-4">
+        {memberStoryFrames.map((frame) => (
+          <article key={frame.title} className="rounded-[26px] border border-[rgb(226,216,203)] bg-white p-5 shadow-[0_18px_50px_rgba(33,26,18,0.06)]">
+            <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
+              <div className="max-w-2xl">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-[rgb(128,90,42)]">{frame.eyebrow}</p>
+                <h3 className="mt-3 font-display text-4xl font-bold text-[rgb(29,24,19)]">{frame.title}</h3>
+                <p className="mt-4 text-sm leading-7 text-[rgb(98,87,74)]">{frame.subtitle}</p>
+              </div>
+
+              <div className="min-w-[180px] rounded-[22px] border border-[rgb(232,224,214)] bg-[rgb(248,243,235)] px-4 py-4">
+                <p className="text-xs uppercase tracking-[0.22em] text-[rgb(128,90,42)]">{frame.metricLabel}</p>
+                <p className="mt-3 text-2xl font-semibold text-[rgb(29,24,19)]">{frame.metricValue}</p>
+              </div>
             </div>
 
-            <div className="mt-6 grid gap-4">
-              <div className="rounded-[24px] border border-white/10 bg-white/6 p-4">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-xs uppercase tracking-[0.22em] text-white/48">{frame.metricLabel}</span>
-                  <span className="premium-tag">{frame.metricValue}</span>
+            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              {frame.bullets.map((bullet) => (
+                <div key={bullet} className="rounded-[18px] border border-[rgb(232,224,214)] bg-[linear-gradient(180deg,rgba(255,252,247,0.96),rgba(247,241,233,0.94))] px-4 py-4">
+                  <p className="text-sm leading-6 text-[rgb(70,61,52)]">{bullet}</p>
                 </div>
-                <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                  {frame.bullets.map((bullet) => (
-                    <div key={bullet} className="rounded-[18px] border border-white/8 bg-black/20 px-4 py-4">
-                      <p className="text-sm leading-6 text-white/82">{bullet}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-[0.66fr_0.34fr]">
-                <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))] p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-sm font-semibold text-white">Member stack</span>
-                    <span className="text-xs uppercase tracking-[0.22em] text-white/42">Locked layer</span>
-                  </div>
-                  <div className="mt-4 space-y-3">
-                    <div className="h-2 rounded-full bg-white/10">
-                      <div className="story-reel-bar h-full rounded-full bg-[rgb(var(--accent-strong))]" />
-                    </div>
-                    <div className="h-2 rounded-full bg-white/10">
-                      <div className="story-reel-bar h-full rounded-full bg-white/65" style={{ width: "72%" }} />
-                    </div>
-                    <div className="h-2 rounded-full bg-white/10">
-                      <div className="story-reel-bar h-full rounded-full bg-white/35" style={{ width: "46%" }} />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-[22px] border border-white/10 bg-black/20 p-4">
-                  <p className="text-xs uppercase tracking-[0.22em] text-white/42">You get</p>
-                  <ul className="mt-3 space-y-2">
-                    <li className="text-sm text-white/82">Dashboard</li>
-                    <li className="text-sm text-white/82">Reports</li>
-                    <li className="text-sm text-white/82">Journal</li>
-                  </ul>
-                </div>
-              </div>
+              ))}
             </div>
           </article>
         ))}
       </div>
 
-      <div className="mt-5 grid grid-cols-3 gap-2">
-        {memberStoryFrames.map((frame, index) => (
-          <span
-            key={frame.title}
-            className="story-reel-progress h-1.5 overflow-hidden rounded-full bg-white/10"
-            style={{ animationDelay: `${index * 4}s` }}
-          />
-        ))}
+      <div className="mt-5 rounded-[24px] border border-[rgb(232,224,214)] bg-[rgb(248,243,235)] px-5 py-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.22em] text-[rgb(128,90,42)]">Next media step</p>
+            <p className="mt-2 text-sm leading-7 text-[rgb(98,87,74)]">
+              This section is now brighter and easier to read. The next upgrade is replacing it with a real GIF or MP4 capture from the live member page.
+            </p>
+          </div>
+          <Link to="/pricing" className="button-primary">
+            See membership plans
+          </Link>
+        </div>
       </div>
     </div>
   </div>
