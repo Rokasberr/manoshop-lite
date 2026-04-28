@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
+import { ArrowRight, BarChart3, CheckCircle2, LockKeyhole, MailCheck, Sparkles, WalletCards } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const storyPillars = [
@@ -20,6 +20,51 @@ const storyMoments = [
   "The brand began as a move away from demo-shop energy and toward a quieter editorial commerce feeling.",
   "Every layer of the store is meant to feel more collected: product pages, member access, receipts, and digital delivery.",
   "The goal is not more noise. It is a better rhythm, stronger trust, and a calmer first impression.",
+];
+
+const memberUnlocks = [
+  {
+    icon: WalletCards,
+    title: "Savings Studio",
+    text: "A private dashboard with budgets, goals, recurring spend, CSV import, and a calmer monthly money view.",
+  },
+  {
+    icon: MailCheck,
+    title: "AI summaries",
+    text: "Weekly and monthly reports arrive in your inbox with premium commentary, risk signals, and a next-step plan.",
+  },
+  {
+    icon: LockKeyhole,
+    title: "Locked editorial layer",
+    text: "Members-only Journal access, account archive, receipts, and a more private experience across the brand.",
+  },
+];
+
+const memberStoryFrames = [
+  {
+    eyebrow: "Frame 01",
+    title: "Your private member dashboard",
+    subtitle: "See budgets, recurring costs, and where the month is losing control before it spills into next week.",
+    metricLabel: "Money view",
+    metricValue: "3 active budgets",
+    bullets: ["Monthly budget pressure", "Recurring vs flexible spend", "Goal pace and savings capacity"],
+  },
+  {
+    eyebrow: "Frame 02",
+    title: "Reports that read like a coach note",
+    subtitle: "Members receive weekly and monthly summaries with a premium evaluation, what works, where risk grows, and what to do next.",
+    metricLabel: "Inbox layer",
+    metricValue: "Weekly + monthly",
+    bullets: ["AI commentary", "7-day action plan", "Top category and recurring load"],
+  },
+  {
+    eyebrow: "Frame 03",
+    title: "The locked layer after purchase",
+    subtitle: "Membership unlocks Journal access, receipts, digital delivery, and a more editorial, private account experience.",
+    metricLabel: "What unlocks",
+    metricValue: "Journal + archive",
+    bullets: ["Members-only Journal", "Receipt archive", "Digital delivery and support"],
+  },
 ];
 
 const StoryPage = () => (
@@ -57,6 +102,47 @@ const StoryPage = () => (
           ))}
         </div>
       </div>
+    </section>
+
+    <section className="public-section grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+      <div>
+        <span className="eyebrow">Member preview</span>
+        <h2 className="mt-5 max-w-xl font-display text-4xl font-bold sm:text-5xl">
+          A short story of what the membership actually unlocks.
+        </h2>
+        <p className="mt-4 max-w-xl text-base leading-7 text-muted">
+          Instead of asking people to imagine the value, we show the private side of the experience: the dashboard,
+          the inbox reports, and the locked editorial layer that opens after purchase.
+        </p>
+
+        <div className="mt-6 grid gap-4">
+          {memberUnlocks.map(({ icon: Icon, text, title }) => (
+            <div key={title} className="marketing-card p-5">
+              <div className="flex items-start gap-4">
+                <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--accent))]/12">
+                  <Icon size={18} style={{ color: "rgb(var(--accent-strong))" }} />
+                </div>
+                <div>
+                  <p className="text-xl font-semibold text-[rgb(29,24,19)]">{title}</p>
+                  <p className="mt-2 text-sm leading-6 text-muted">{text}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link to="/pricing" className="button-primary gap-2">
+            Unlock membership
+            <ArrowRight size={16} />
+          </Link>
+          <Link to="/savings-studio" className="button-secondary">
+            View public demo
+          </Link>
+        </div>
+      </div>
+
+      <MemberStoryReel />
     </section>
 
     <section className="public-section grid gap-8 lg:grid-cols-[0.84fr_1.16fr]">
@@ -106,6 +192,91 @@ const StoryPage = () => (
         </div>
       </div>
     </section>
+  </div>
+);
+
+const MemberStoryReel = () => (
+  <div className="story-reel-shell relative overflow-hidden rounded-[34px] p-4 sm:p-5">
+    <div className="story-reel-device relative overflow-hidden rounded-[30px] p-4 sm:p-5">
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-white/48">Members view</p>
+          <p className="mt-2 font-display text-3xl font-bold text-white">What opens after purchase</p>
+        </div>
+        <span className="hero-chip">Live preview</span>
+      </div>
+
+      <div className="relative min-h-[440px]">
+        {memberStoryFrames.map((frame, index) => (
+          <article
+            key={frame.title}
+            className="story-reel-frame absolute inset-0 flex flex-col justify-between rounded-[26px] border border-white/8 bg-white/5 p-5"
+            style={{ animationDelay: `${index * 4}s` }}
+          >
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-white/45">{frame.eyebrow}</p>
+              <h3 className="mt-3 font-display text-4xl font-bold text-white">{frame.title}</h3>
+              <p className="mt-4 max-w-xl text-sm leading-7 text-white/70">{frame.subtitle}</p>
+            </div>
+
+            <div className="mt-6 grid gap-4">
+              <div className="rounded-[24px] border border-white/10 bg-white/6 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-xs uppercase tracking-[0.22em] text-white/48">{frame.metricLabel}</span>
+                  <span className="premium-tag">{frame.metricValue}</span>
+                </div>
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  {frame.bullets.map((bullet) => (
+                    <div key={bullet} className="rounded-[18px] border border-white/8 bg-black/20 px-4 py-4">
+                      <p className="text-sm leading-6 text-white/82">{bullet}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-[0.66fr_0.34fr]">
+                <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02))] p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm font-semibold text-white">Member stack</span>
+                    <span className="text-xs uppercase tracking-[0.22em] text-white/42">Locked layer</span>
+                  </div>
+                  <div className="mt-4 space-y-3">
+                    <div className="h-2 rounded-full bg-white/10">
+                      <div className="story-reel-bar h-full rounded-full bg-[rgb(var(--accent-strong))]" />
+                    </div>
+                    <div className="h-2 rounded-full bg-white/10">
+                      <div className="story-reel-bar h-full rounded-full bg-white/65" style={{ width: "72%" }} />
+                    </div>
+                    <div className="h-2 rounded-full bg-white/10">
+                      <div className="story-reel-bar h-full rounded-full bg-white/35" style={{ width: "46%" }} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-[22px] border border-white/10 bg-black/20 p-4">
+                  <p className="text-xs uppercase tracking-[0.22em] text-white/42">You get</p>
+                  <ul className="mt-3 space-y-2">
+                    <li className="text-sm text-white/82">Dashboard</li>
+                    <li className="text-sm text-white/82">Reports</li>
+                    <li className="text-sm text-white/82">Journal</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div className="mt-5 grid grid-cols-3 gap-2">
+        {memberStoryFrames.map((frame, index) => (
+          <span
+            key={frame.title}
+            className="story-reel-progress h-1.5 overflow-hidden rounded-full bg-white/10"
+            style={{ animationDelay: `${index * 4}s` }}
+          />
+        ))}
+      </div>
+    </div>
   </div>
 );
 
