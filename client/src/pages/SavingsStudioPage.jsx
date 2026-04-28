@@ -72,7 +72,7 @@ const USAGE_WIZARD_STEPS = [
     eyebrow: "step 1",
     title: "Susikurk pirmo mėnesio pagrindą",
     description:
-      "Pirmiausia susivesk mėnesio pajamas, taupymo tikslą ir tris svarbiausias biudžeto kategorijas. Tai sukuria visą likusį Savings Studio kontekstą.",
+      "Pirmiausia susivesk mėnesio pajamas, taupymo tikslą ir tris svarbiausias biudžeto kategorijas. Tai sukuria visą likusį Stilloak kontekstą.",
     bullets: [
       "Įrašyk mėnesio pajamas ir kiek nori atsidėti.",
       "Pasirink pagrindinį finansinį fokusą.",
@@ -111,7 +111,7 @@ const USAGE_WIZARD_STEPS = [
     eyebrow: "step 4",
     title: "Naudok įžvalgas ir tikslus sprendimams",
     description:
-      "Savings Studio turi padėti taupyti, ne tik kaupti skaičius. Todėl svarbiausia vieta yra įžvalgos, tikslų tempas ir savaitinis mėnesio ritmas.",
+      "Stilloak turi padėti taupyti, ne tik kaupti skaičius. Todėl svarbiausia vieta yra įžvalgos, tikslų tempas ir savaitinis mėnesio ritmas.",
     bullets: [
       "Stebėk, kurios kategorijos labiausiai spaudžia mėnesį.",
       "Sek, ar taupymo tempas užtenka tavo tikslams.",
@@ -248,7 +248,7 @@ const SavingsStudioPage = () => {
           }));
         });
       } catch (error) {
-        toast.error(error.response?.data?.message || "Nepavyko užkrauti Savings Studio.");
+        toast.error(error.response?.data?.message || "Nepavyko užkrauti Stilloak.");
       } finally {
         setLoading(false);
       }
@@ -277,7 +277,7 @@ const SavingsStudioPage = () => {
 
   useEffect(() => {
     if (searchParams.get("welcome") === "membership") {
-      toast.success("Narystė aktyvuota. Savings Studio laukia tavo pirmo setup.");
+      toast.success("Narystė aktyvuota. Stilloak laukia tavo pirmo setup.");
     }
   }, [searchParams]);
 
@@ -529,7 +529,7 @@ const SavingsStudioPage = () => {
       ]);
 
       setProfile(profileResult.profile);
-      toast.success("Pirmasis Savings Studio setup baigtas.");
+      toast.success("Pirmasis Stilloak setup baigtas.");
     } catch (error) {
       toast.error(error.response?.data?.message || "Nepavyko užbaigti pirmojo setup.");
     } finally {
@@ -928,7 +928,7 @@ const SavingsStudioPage = () => {
     <div className="space-y-8">
       <SectionTitle
         eyebrow="members tool"
-        title="Savings Studio"
+            title="Stilloak"
         subtitle="Privati nario darbo zona, kur matai, kur išeina pinigai, kaip keičiasi mėnesiai ir kur gali susigrąžinti finansinį aiškumą."
       />
 
@@ -936,7 +936,7 @@ const SavingsStudioPage = () => {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted">usage guide</p>
-            <h2 className="mt-3 text-3xl font-bold">Nori greito walkthrough, kaip naudotis Savings Studio?</h2>
+            <h2 className="mt-3 text-3xl font-bold">Nori greito walkthrough, kaip naudotis Stilloak?</h2>
             <p className="mt-3 max-w-3xl text-sm leading-6 text-muted">
               Atidaryk step-by-step gidą ir per kelias minutes pereik visą logiką: nuo pirmo setup iki email
               suvestinių, CSV importo ir taupymo įžvalgų.
@@ -968,7 +968,7 @@ const SavingsStudioPage = () => {
               <span className="eyebrow">membership unlocked</span>
               <h2 className="mt-5 text-5xl font-bold">Narystė aktyvi. Dabar pradėk nuo pirmo taupymo setup.</h2>
               <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
-                Savings Studio jau atrakinta tavo paskyrai. Jei dar nebaigei pirmo setup, pradėk nuo pajamų,
+            Stilloak jau atrakinta tavo paskyrai. Jei dar nebaigei pirmo setup, pradėk nuo pajamų,
                 mėnesio taupymo tikslo ir trijų svarbiausių biudžetų.
               </p>
             </div>
@@ -2090,7 +2090,7 @@ const SavingsStudioPage = () => {
               <span>
                 <span className="block text-sm font-semibold">Įjungti automatinę suvestinę</span>
                 <span className="mt-1 block text-sm leading-6 text-muted">
-                  Kai aktyvuota, šis profilis yra paruoštas gauti trumpas Savings Studio įžvalgas el. paštu.
+                  Kai aktyvuota, šis profilis yra paruoštas gauti trumpas Stilloak įžvalgas el. paštu.
                 </span>
               </span>
             </label>
@@ -2401,7 +2401,7 @@ const UsageWizardModal = ({
               Rodyti šią vietą puslapyje
             </button>
             <p className="text-sm leading-6 text-muted">
-              Šis mygtukas uždarys gidą ir nuves tiesiai į tą Savings Studio vietą, kurią verta susitvarkyti dabar.
+              Šis mygtukas uždarys gidą ir nuves tiesiai į tą Stilloak vietą, kurią verta susitvarkyti dabar.
             </p>
           </div>
         </div>

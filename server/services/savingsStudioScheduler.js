@@ -112,7 +112,7 @@ const runPendingSavingsStudioSummaries = async () => {
 
 const startSavingsStudioSummaryScheduler = () => {
   if (!isSchedulerEnabled()) {
-    console.log("Savings Studio scheduler išjungtas per env.");
+    console.log("Stilloak scheduler išjungtas per env.");
     return;
   }
 
@@ -121,16 +121,16 @@ const startSavingsStudioSummaryScheduler = () => {
   }
 
   const intervalMs = getSchedulerIntervalMs();
-  console.log(`Savings Studio scheduler paleistas. Intervalas: ${Math.round(intervalMs / 60000)} min.`);
+  console.log(`Stilloak scheduler paleistas. Intervalas: ${Math.round(intervalMs / 60000)} min.`);
 
   const runSafely = async () => {
     try {
       const result = await runPendingSavingsStudioSummaries();
       if (result.sent > 0) {
-        console.log(`Savings Studio scheduler išsiuntė ${result.sent} suvestinių.`);
+        console.log(`Stilloak scheduler išsiuntė ${result.sent} suvestinių.`);
       }
     } catch (error) {
-      console.error("Savings Studio scheduler klaida:", error.message);
+        console.error("Stilloak scheduler klaida:", error.message);
     }
   };
 

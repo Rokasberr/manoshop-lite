@@ -32,7 +32,7 @@ const storyMoments = [
 const memberUnlocks = [
   {
     icon: WalletCards,
-    title: "Savings Studio",
+    title: "Stilloak",
     text: "A private dashboard with budgets, goals, recurring spend, CSV import, and a calmer monthly money view.",
   },
   {

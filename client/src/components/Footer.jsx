@@ -52,7 +52,7 @@ const Footer = () => (
           </div>
         </div>
         <p className="mt-5 max-w-xs text-sm leading-7 text-white/62">
-          Savings Studio padeda aiškiau valdyti išlaidas, sekti biudžetus ir ramiau judėti link taupymo tikslų vienoje apgalvotoje nario erdvėje.
+          Stilloak padeda aiškiau valdyti išlaidas, sekti biudžetus ir ramiau judėti link taupymo tikslų vienoje apgalvotoje nario erdvėje.
         </p>
       </div>
 

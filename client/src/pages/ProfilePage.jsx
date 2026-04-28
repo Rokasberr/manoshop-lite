@@ -118,7 +118,7 @@ const ProfilePage = () => {
             </Link>
             {hasActiveMembership(user) && (
               <Link to="/members/savings-studio" className="button-primary mt-4 inline-flex">
-                Open Savings Studio
+                Open Stilloak
               </Link>
             )}
           </div>

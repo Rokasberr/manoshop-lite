@@ -13,7 +13,7 @@ const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const publicLinks = [
     { label: "Story", to: "/story" },
-    { label: "Savings Studio", to: "/savings-studio" },
+    { label: "Stilloak", to: "/savings-studio" },
     { label: "Membership", to: "/pricing" },
     { label: "Launch soon", to: "/launch-soon" },
   ];

@@ -150,22 +150,22 @@ const SavingsStudioDemoPage = () => {
         <div className="grid gap-10 lg:grid-cols-[1.02fr_0.98fr]">
           <div className="flex flex-col justify-between">
             <div>
-              <span className="hero-chip">subscription tool</span>
+              <span className="hero-chip">membership program</span>
               <h1 className="mt-8 max-w-3xl font-display text-5xl font-bold leading-[0.92] sm:text-6xl lg:text-7xl">
                 Programa, kuri parodo kur realiai pradėti taupyti pinigus.
               </h1>
               <p className="mt-6 max-w-2xl text-base leading-7 text-white/72 sm:text-lg">
-                `Savings Studio` yra members-only modulis tavo paskyroje: išlaidų sekimas, mėnesių palyginimai,
+                `Stilloak` yra members-only modulis tavo paskyroje: išlaidų sekimas, mėnesių palyginimai,
                 biudžetų ribos ir automatiniai signalai, kurie parodo kur pirmiausia atsiranda vietos sutaupyti.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link to={canOpenStudio ? "/members/savings-studio" : "/pricing"} className="button-primary gap-2">
-                  {canOpenStudio ? "Open Savings Studio" : "Start with Circle"}
+                  {canOpenStudio ? "Open Stilloak" : "Start with Circle"}
                   <ArrowRight size={16} />
                 </Link>
                 <Link to="/pricing" className="hero-outline-button">
-                  Compare membership
+                  View membership
                 </Link>
               </div>
             </div>
@@ -180,7 +180,7 @@ const SavingsStudioDemoPage = () => {
           <div className="hero-screen relative">
             <div className="flex items-center justify-between rounded-[22px] border border-white/8 bg-white/5 px-4 py-3">
               <div>
-                <p className="text-sm font-semibold text-white">Savings Studio preview</p>
+                  <p className="text-sm font-semibold text-white">Stilloak preview</p>
                 <p className="text-xs text-white/50">How the program helps you save money</p>
               </div>
               <span className="hero-chip">Demo</span>

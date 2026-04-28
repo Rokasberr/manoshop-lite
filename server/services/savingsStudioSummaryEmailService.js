@@ -238,7 +238,7 @@ const buildSummaryEmail = ({ frequency, summary, userName }) => {
     )
     .join("");
 
-  const subject = `${COMPANY_NAME}: ${periodLabel.toLowerCase()} iš Savings Studio`;
+  const subject = `${COMPANY_NAME}: ${periodLabel.toLowerCase()} iš Stilloak`;
   const html = `
     <!doctype html>
     <html lang="lt">
@@ -252,7 +252,7 @@ const buildSummaryEmail = ({ frequency, summary, userName }) => {
                     <p style="margin:0 0 12px 0;font-size:12px;letter-spacing:0.24em;text-transform:uppercase;color:#8a6c46;">
                       ${periodLabel}
                     </p>
-                    <h1 style="margin:0 0 18px 0;font-size:32px;line-height:1.1;color:#2b241d;">${greetingName}, štai tavo Savings Studio vaizdas.</h1>
+                  <h1 style="margin:0 0 18px 0;font-size:32px;line-height:1.1;color:#2b241d;">${greetingName}, štai tavo Stilloak vaizdas.</h1>
                     <p style="margin:0 0 20px 0;font-size:15px;line-height:1.7;color:#6d5c4c;">
                       Žemiau matai pagrindinius signalus: kiek šį mėnesį išleidai, kas labiausiai spaudžia biudžetą ir kur verta pradėti taupyti pirmiausia.
                     </p>

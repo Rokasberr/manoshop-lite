@@ -260,7 +260,7 @@ const LaunchSoonPage = ({ focus = "default" }) => {
                 The current live layer is still open.
               </h2>
               <p className="mt-2 max-w-3xl text-base leading-7 text-[rgb(98,87,74)]">
-                You can still browse the main collection, view membership, and explore Savings Studio while Digital
+                You can still browse the main collection, view membership, and explore Stilloak while Digital
                 Collection and Journal are being prepared for a stronger release.
               </p>
             </div>

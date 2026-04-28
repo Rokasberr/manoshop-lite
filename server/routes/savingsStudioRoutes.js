@@ -35,7 +35,7 @@ const mutationLimiter = createWindowRateLimiter({
   keyPrefix: "savings-mutation",
   max: 30,
   windowMs: 60 * 1000,
-  message: "Per daug Savings Studio pakeitimų per trumpą laiką.",
+      message: "Per daug Stilloak pakeitimų per trumpą laiką.",
 });
 const importLimiter = createWindowRateLimiter({
   keyPrefix: "savings-import",

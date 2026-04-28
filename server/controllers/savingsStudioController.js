@@ -653,7 +653,7 @@ const buildInsights = ({ budgets, entries, goals, profile, recurringExpenses, su
       tone: "info",
       title: "Pradžiai reikia daugiau duomenų",
       metric: "Start",
-      body: "Sukurk kelias išlaidas, vieną biudžetą ir vieną tikslą. Tuomet Savings Studio galės parodyti, kur realiai pradėti taupyti.",
+      body: "Sukurk kelias išlaidas, vieną biudžetą ir vieną tikslą. Tuomet Stilloak galės parodyti, kur realiai pradėti taupyti.",
     });
   }
 

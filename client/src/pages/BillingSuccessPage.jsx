@@ -35,7 +35,7 @@ const BillingSuccessPage = () => {
             profile?.subscription?.provider === "stripe" &&
             ["active", "trialing"].includes(profile?.subscription?.status || "")
           ) {
-            setStatusMessage("Prenumerata aktyvuota. Tuoj atidarysime Savings Studio.");
+            setStatusMessage("Prenumerata aktyvuota. Tuoj atidarysime Stilloak.");
             setLoading(false);
             setTimeout(() => {
               if (!cancelled) {
@@ -88,7 +88,7 @@ const BillingSuccessPage = () => {
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link to="/members/savings-studio?welcome=membership" className="button-primary">
-                Atidaryti Savings Studio
+                Atidaryti Stilloak
               </Link>
               <Link to="/pricing" className="button-secondary">
                 Peržiūrėti planus

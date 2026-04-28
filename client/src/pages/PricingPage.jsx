@@ -9,11 +9,11 @@ import billingService from "../services/billingService";
 import { formatCurrency } from "../utils/currency";
 
 const featurePills = [
-  "Early access drops",
-  "Member-only pricing",
+  "Full Stilloak access",
+  "AI weekly and monthly summaries",
   "Private account archive",
+  "Members-only Journal",
   "Priority client care",
-  "Savings Studio access",
 ];
 
 const PricingPage = () => {
@@ -54,10 +54,10 @@ const PricingPage = () => {
       <section className="public-section">
         <div className="mx-auto max-w-3xl text-center">
           <span className="eyebrow">membership</span>
-          <h1 className="mt-5 font-display text-5xl font-bold sm:text-6xl">Choose the level of access that fits your pace</h1>
+          <h1 className="mt-5 font-display text-5xl font-bold sm:text-6xl">Unlock the level of Stilloak access that fits your pace</h1>
           <p className="mt-4 text-base leading-7 text-muted">
-            Narystė čia atrodo kaip brand dalis, ne kaip techninis papildinys. Kiekvienas planas atveria kitą
-            santykio su kolekcija lygį, o Stripe pasirūpina švariu apmokėjimo keliu.
+            Narystė čia nėra techninis priedas. Ji atrakina patį produktą: Stilloak dashboardą, biudžetus,
+            taupymo tikslus, AI suvestines ir ramesnį santykį su visa nario erdve.
           </p>
         </div>
 
@@ -166,18 +166,18 @@ const PricingPage = () => {
 
       <section className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
         <div className="public-section">
-          <span className="eyebrow">member journey</span>
-          <h2 className="mt-5 font-display text-4xl font-bold">Designed to feel intimate, not overbuilt</h2>
+          <span className="eyebrow">member path</span>
+          <h2 className="mt-5 font-display text-4xl font-bold">Aiškus kelias nuo pricing iki pirmo mėnesio aiškumo</h2>
           <p className="mt-4 text-base leading-7 text-muted">
-            Už gražaus paviršiaus vis dar yra tikras produktinis pagrindas: saugi registracija, apmokėjimas,
-            aktyvi narystė ir aiški paskyros istorija. Tačiau klientui visa tai jaučiasi lengva.
+            Pricing puslapis turi greitai atsakyti į vieną klausimą: ką realiai gaunu nusipirkęs narystę.
+            Dėl to visa logika veda ne į abstraktų klubą, o į konkretų Stilloak įrankį ir aiškesnį finansinį vaizdą.
           </p>
           <div className="mt-8 space-y-4">
             {[
-              "Create an account and step into the house",
-              "Choose Circle or Private membership",
-              "Complete payment with Stripe",
-              "Manage access from your personal profile",
+              "Sukuri paskyrą ir pasirenki Circle arba Private",
+              "Apmoki narystę per Stripe be papildomo triukšmo",
+              "Atsidarai Stilloak ir susivedi pirmą mėnesio setup",
+              "Gauni dashboardą, suvestines ir privatų nario archyvą",
             ].map((item, index) => (
               <div key={item} className="marketing-mini-card flex items-center justify-between">
                 <span className="font-medium">{item}</span>
@@ -188,45 +188,45 @@ const PricingPage = () => {
         </div>
 
         <div className="marketing-dark overflow-hidden rounded-[34px] px-6 py-8 sm:px-8">
-          <span className="hero-chip">House benefits</span>
+          <span className="hero-chip">Why membership works</span>
           <h2 className="mt-6 max-w-xl font-display text-4xl font-bold sm:text-5xl">
-            Membership should feel desirable before it feels transactional.
+            Geras membership puslapis turi parduoti rezultatą, ne tik planą.
           </h2>
           <p className="mt-4 max-w-xl text-base leading-7 text-white/68">
-            Perkėlėme pricing puslapį iš techninio plano sąrašo į brand’o sluoksnį: ramesnis tonas, stipresnė
-            tipografija, išgrynintos kortelės ir aiškesnė nario vertė.
+            Circle yra skirtas žmogui, kuris nori pilnai naudotis Stilloak. Private skirtas tiems, kurie nori
+            stipresnio palaikymo, daugiau premium sluoksnio ir aukštesnio lygio santykio su nario erdve.
           </p>
 
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
               <div className="metric-card">
                 <p className="text-xs uppercase tracking-[0.3em] text-white/45">Circle</p>
-                <p className="mt-3 font-display text-3xl font-bold">Early drops</p>
-                <p className="mt-2 text-sm text-white/62">Priority access to limited pieces and softer perks.</p>
+                <p className="mt-3 font-display text-3xl font-bold">Pilnas įrankis</p>
+                <p className="mt-2 text-sm text-white/62">Biudžetai, tikslai, recurring išlaidos, CSV importas ir AI suvestinės.</p>
               </div>
               <div className="metric-card">
                 <p className="text-xs uppercase tracking-[0.3em] text-white/45">Private</p>
-                <p className="mt-3 font-display text-3xl font-bold">Concierge tone</p>
-                <p className="mt-2 text-sm text-white/62">Better fit for frequent orders, gifts and client projects.</p>
+                <p className="mt-3 font-display text-3xl font-bold">Aukštesnis tonas</p>
+                <p className="mt-2 text-sm text-white/62">Daugiau palaikymo, stipresnė nario patirtis ir daugiau vietos premium plėtrai.</p>
               </div>
             </div>
 
           <div className="mt-6 rounded-[24px] border border-white/8 bg-white/4 p-5">
-            <p className="text-xs uppercase tracking-[0.3em] text-white/45">New members tool</p>
-            <h3 className="mt-3 font-display text-3xl font-bold">Savings Studio</h3>
+            <p className="text-xs uppercase tracking-[0.3em] text-white/45">Core member product</p>
+            <h3 className="mt-3 font-display text-3xl font-bold">Stilloak</h3>
             <p className="mt-3 max-w-xl text-sm leading-6 text-white/68">
-              Circle ir Private planai dabar atrakina ir taupymo modulį: narys gali sekti išlaidas, matyti
-              mėnesių pokytį ir naudoti programą kaip aiškesnį pinigų kontrolės sluoksnį.
+              Circle ir Private planai atrakina Stilloak: narys gali sekti išlaidas, nusistatyti biudžetus,
+              valdyti recurring mokėjimus, importuoti CSV ir gauti AI suvestines su konkrečiu veiksmų planu.
             </p>
             <div className="mt-5">
               <Link to="/savings-studio" className="hero-outline-button">
-                Preview the program
+                Preview Stilloak
               </Link>
             </div>
           </div>
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Link to="/profile" className="button-primary">
-              Open account
+              Open profile
             </Link>
             <Link to="/" className="hero-outline-button">
               Back to homepage
