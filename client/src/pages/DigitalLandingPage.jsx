@@ -33,6 +33,23 @@ const fallbackProducts = [
   },
 ];
 
+const fallbackBundles = [
+  {
+    _id: "digital-bundle-fallback-1",
+    name: "Home Edit Bundle",
+    description: "Poster bundle + living room guide for a quiet but practical room refresh.",
+    price: 39,
+  },
+  {
+    _id: "digital-bundle-fallback-2",
+    name: "Calm Living Bundle",
+    description: "Poster bundle + guide + planner for a fuller digital collection.",
+    price: 49,
+  },
+];
+
+const bundleNames = ["Home Edit Bundle", "Calm Living Bundle"];
+
 const ritualCards = [
   {
     icon: LayoutPanelTop,
@@ -97,8 +114,11 @@ const DigitalLandingPage = () => {
     loadDigitalProducts();
   }, []);
 
-  const featuredProducts = products.length ? products.slice(0, 3) : fallbackProducts;
+  const nonBundleProducts = products.filter((product) => !bundleNames.includes(product.name));
+  const featuredProducts = nonBundleProducts.length ? nonBundleProducts.slice(0, 3) : fallbackProducts;
   const leadProduct = featuredProducts[0];
+  const actualBundles = products.filter((product) => bundleNames.includes(product.name));
+  const bundleProducts = actualBundles.length ? actualBundles : fallbackBundles;
 
   return (
     <div className="space-y-10 pb-6">
@@ -325,24 +345,20 @@ const DigitalLandingPage = () => {
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            {[
-              {
-                title: "Home Edit Bundle",
-                price: "€39–49",
-                text: "Poster bundle + living room guide for a quiet but practical room refresh.",
-              },
-              {
-                title: "Calm Living Bundle",
-                price: "€49–59",
-                text: "Poster bundle + guide + planner for a fuller digital product stack.",
-              },
-            ].map((bundle) => (
-              <div key={bundle.title} className="rounded-[24px] bg-white/6 p-5">
+            {bundleProducts.map((bundle) => (
+              <Link
+                key={bundle._id}
+                to={bundle._id.startsWith("digital-bundle-fallback-") ? "/digital/collection" : `/products/${bundle._id}`}
+                className="rounded-[24px] bg-white/6 p-5 transition duration-300 hover:-translate-y-1 hover:bg-white/8"
+              >
                 <p className="text-xs uppercase tracking-[0.3em] text-white/42">Bundle idea</p>
-                <h3 className="mt-4 font-display text-3xl font-bold">{bundle.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-white/74">{bundle.text}</p>
-                <p className="mt-6 font-semibold text-[rgb(227,196,149)]">{bundle.price}</p>
-              </div>
+                <h3 className="mt-4 font-display text-3xl font-bold">{bundle.name}</h3>
+                <p className="mt-3 text-sm leading-6 text-white/74">{bundle.description}</p>
+                <div className="mt-6 flex items-center justify-between gap-3">
+                  <p className="font-semibold text-[rgb(227,196,149)]">{formatCurrency(bundle.price)}</p>
+                  <span className="text-sm font-medium text-white/72">View bundle</span>
+                </div>
+              </Link>
             ))}
           </div>
         </div>

@@ -24,6 +24,22 @@ $targets = @(
       "Demo digital download placeholder",
       "Replace with the final planner PDF export."
     )
+  },
+  @{
+    Path = "bundles\home-edit-bundle.pdf"
+    Lines = @(
+      "Home Edit Bundle",
+      "Demo digital download placeholder",
+      "Replace with the final bundle PDF or ZIP export."
+    )
+  },
+  @{
+    Path = "bundles\calm-living-bundle.pdf"
+    Lines = @(
+      "Calm Living Bundle",
+      "Demo digital download placeholder",
+      "Replace with the final bundle PDF or ZIP export."
+    )
   }
 )
 

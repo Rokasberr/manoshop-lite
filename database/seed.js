@@ -153,6 +153,44 @@ const products = [
       mimeType: "application/pdf",
     },
   },
+  {
+    name: "Home Edit Bundle",
+    description:
+      "A premium two-part digital set that combines the Calm Home Poster Bundle with The Atelier Living Room Guide for a quiet but practical room refresh.",
+    price: 39,
+    category: "Digital Products",
+    productType: "digital",
+    images: [
+      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+    ],
+    stock: 0,
+    featured: true,
+    digitalAsset: {
+      storagePath: "bundles/home-edit-bundle.pdf",
+      fileName: "home-edit-bundle.pdf",
+      downloadLabel: "Atsisiųsti Home Edit Bundle",
+      mimeType: "application/pdf",
+    },
+  },
+  {
+    name: "Calm Living Bundle",
+    description:
+      "The full three-part digital collection with printable wall art, an interior styling guide, and the Sunday Reset planner in one higher-value bundle.",
+    price: 49,
+    category: "Digital Products",
+    productType: "digital",
+    images: [
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1200&q=80",
+    ],
+    stock: 0,
+    featured: true,
+    digitalAsset: {
+      storagePath: "bundles/calm-living-bundle.pdf",
+      fileName: "calm-living-bundle.pdf",
+      downloadLabel: "Atsisiųsti Calm Living Bundle",
+      mimeType: "application/pdf",
+    },
+  },
 ];
 
 const seedDatabase = async () => {
