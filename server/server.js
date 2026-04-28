@@ -10,6 +10,7 @@ const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const userRoutes = require("./routes/userRoutes");
 const savingsStudioRoutes = require("./routes/savingsStudioRoutes");
+const launchSoonRoutes = require("./routes/launchSoonRoutes");
 const { startSavingsStudioSummaryScheduler } = require("./services/savingsStudioScheduler");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const { handleStripeWebhook } = require("./controllers/billingController");
@@ -56,6 +57,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/savings-studio", savingsStudioRoutes);
+app.use("/api/launch-soon", launchSoonRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

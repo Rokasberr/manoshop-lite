@@ -1,54 +1,5 @@
 import { ArrowRight, Download, LayoutPanelTop, Palette, Sparkles } from "lucide-react";
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-
-import LoadingSpinner from "../components/LoadingSpinner";
-import productService from "../services/productService";
-import { formatCurrency } from "../utils/currency";
-
-const fallbackProducts = [
-  {
-    _id: "digital-fallback-1",
-    name: "Calm Home Poster Bundle",
-    description: "Printable wall art set for bedrooms, living rooms, and slower interiors.",
-    price: 24,
-    category: "Digital Products",
-    images: [],
-  },
-  {
-    _id: "digital-fallback-2",
-    name: "The Atelier Living Room Guide",
-    description: "A premium PDF guide to palette, layout, texture, and visual calm.",
-    price: 29,
-    category: "Digital Products",
-    images: [],
-  },
-  {
-    _id: "digital-fallback-3",
-    name: "Sunday Reset Ritual Planner",
-    description: "A gentle weekly planning and reflection tool for calmer routines.",
-    price: 16,
-    category: "Digital Products",
-    images: [],
-  },
-];
-
-const fallbackBundles = [
-  {
-    _id: "digital-bundle-fallback-1",
-    name: "Home Edit Bundle",
-    description: "Poster bundle + living room guide for a quiet but practical room refresh.",
-    price: 39,
-  },
-  {
-    _id: "digital-bundle-fallback-2",
-    name: "Calm Living Bundle",
-    description: "Poster bundle + guide + planner for a fuller digital collection.",
-    price: 49,
-  },
-];
-
-const bundleNames = ["Home Edit Bundle", "Calm Living Bundle"];
 
 const ritualCards = [
   {
@@ -86,47 +37,44 @@ const steps = [
   },
 ];
 
+const teaserPanels = [
+  {
+    eyebrow: "Planned release",
+    title: "Printable bundles and premium PDF guides",
+    text: "The first release is being curated to open as one cleaner shelf instead of scattered individual product drops.",
+  },
+  {
+    eyebrow: "What will be inside",
+    title: "Poster sets, room guides, planners",
+    text: "The collection is meant to feel editorial and intentional, with fewer but stronger digital products from day one.",
+  },
+  {
+    eyebrow: "Current status",
+    title: "Temporarily staged under Launch Soon",
+    text: "For now, the digital layer stays in preview mode while the files, bundles, and launch flow are tightened.",
+  },
+];
+
+const teaserProducts = [
+  "Calm Home Poster Bundle",
+  "The Atelier Living Room Guide",
+  "Sunday Reset Ritual Planner",
+];
+
+const launchSignals = [
+  "Protected account download flow",
+  "Bundle logic for higher-margin offers",
+  "Cleaner release sequence before opening the shelf",
+];
+
 const DigitalLandingPage = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    const loadDigitalProducts = async () => {
-      try {
-        setLoading(true);
-        setError("");
-
-        const data = await productService.listProducts({
-          productType: "digital",
-          limit: 6,
-          sort: "latest",
-        });
-
-        setProducts(data.products || []);
-      } catch (loadError) {
-        setError(loadError.response?.data?.message || "Nepavyko užkrauti digital kolekcijos.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadDigitalProducts();
-  }, []);
-
-  const nonBundleProducts = products.filter((product) => !bundleNames.includes(product.name));
-  const featuredProducts = nonBundleProducts.length ? nonBundleProducts.slice(0, 3) : fallbackProducts;
-  const leadProduct = featuredProducts[0];
-  const actualBundles = products.filter((product) => bundleNames.includes(product.name));
-  const bundleProducts = actualBundles.length ? actualBundles : fallbackBundles;
-
   return (
     <div className="space-y-10 pb-6">
       <section className="marketing-dark overflow-hidden rounded-[38px] px-6 py-8 sm:px-10 sm:py-10 lg:px-12 lg:py-12">
         <div className="grid gap-10 lg:grid-cols-[1.02fr_0.98fr]">
           <div className="flex flex-col justify-between">
             <div>
-            <span className="hero-chip">Digital collection</span>
+              <span className="hero-chip">Digital collection</span>
               <h1 className="mt-8 max-w-3xl font-display text-5xl font-bold leading-[0.92] sm:text-6xl lg:text-7xl">
                 Instant digital products for calmer rooms and clearer routines.
               </h1>
@@ -134,10 +82,14 @@ const DigitalLandingPage = () => {
                 Ši kolekcija skirta PDF gidams, printable rinkiniams ir planavimo įrankiams, kurie jaučiasi
                 kaip natūrali tavo brand&apos;o tąsa, o ne atsitiktinis priedas prie fizinio shop&apos;o.
               </p>
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-white/58">
+                Pilna Digital Collection šiuo metu perkelta į atskirą <span className="font-semibold text-white/80">Launch soon</span> sluoksnį,
+                kad atsidarytų tik tada, kai visa patirtis bus iki galo paruošta.
+              </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link to="/digital/collection" className="button-primary gap-2">
-                  Browse digital products
+                <Link to="/launch-soon" className="button-primary gap-2">
+                  View launch status
                   <ArrowRight size={16} />
                 </Link>
                 <Link to="/pricing" className="hero-outline-button">
@@ -177,30 +129,29 @@ const DigitalLandingPage = () => {
 
               <div className="mt-6 grid gap-4 lg:grid-cols-[1.08fr_0.92fr]">
                 <div className="rounded-[24px] border border-white/8 bg-white/4 p-5">
-                  <p className="text-xs uppercase tracking-[0.3em] text-white/42">Lead product</p>
-                  <h3 className="mt-4 font-display text-3xl font-bold">{leadProduct.name}</h3>
-                  <p className="mt-3 text-sm leading-6 text-white/62">{leadProduct.description}</p>
+                  <p className="text-xs uppercase tracking-[0.3em] text-white/42">Launch mode</p>
+                  <h3 className="mt-4 font-display text-3xl font-bold">The shelf is visible as a teaser for now</h3>
+                  <p className="mt-3 text-sm leading-6 text-white/62">
+                    Instead of exposing half-ready product pages, the digital layer is temporarily shown as a curated
+                    preview until launch day.
+                  </p>
                   <div className="mt-6 grid gap-3 sm:grid-cols-2">
                     <div className="rounded-[20px] bg-white/5 p-4">
-                      <p className="text-xs text-white/45">Delivery</p>
-                      <p className="mt-2 font-display text-2xl font-bold">Account download</p>
+                      <p className="text-xs text-white/45">Status</p>
+                      <p className="mt-2 font-display text-2xl font-bold">Launch soon</p>
                     </div>
                     <div className="rounded-[20px] bg-white/5 p-4">
-                      <p className="text-xs text-white/45">From</p>
-                      <p className="mt-2 font-display text-2xl font-bold">{formatCurrency(leadProduct.price)}</p>
+                      <p className="text-xs text-white/45">Focus</p>
+                      <p className="mt-2 font-display text-2xl font-bold">Better first release</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <div className="rounded-[24px] border border-white/8 bg-white/4 p-5">
-                    <p className="text-xs uppercase tracking-[0.3em] text-white/42">What buyers get</p>
+                    <p className="text-xs uppercase tracking-[0.3em] text-white/42">What is being prepared</p>
                     <div className="mt-4 space-y-3">
-                      {[
-                        "Protected download access",
-                        "Receipt and order archive",
-                        "No physical shipping needed",
-                      ].map((item) => (
+                      {launchSignals.map((item) => (
                         <div key={item} className="flex items-start gap-3 text-sm text-white/74">
                           <Download size={16} className="mt-0.5" style={{ color: "rgb(var(--accent-strong))" }} />
                           <span>{item}</span>
@@ -210,15 +161,15 @@ const DigitalLandingPage = () => {
                   </div>
 
                   <div className="rounded-[24px] border border-white/8 bg-white/4 p-5">
-                    <p className="text-xs uppercase tracking-[0.3em] text-white/42">Collection mood</p>
+                    <p className="text-xs uppercase tracking-[0.3em] text-white/42">Preview titles</p>
                     <div className="mt-4 grid gap-3">
-                      {featuredProducts.slice(1, 3).map((product, index) => (
+                      {teaserProducts.map((product, index) => (
                         <div
-                          key={product._id}
+                          key={product}
                           className="flex items-center justify-between rounded-[18px] bg-white/4 px-4 py-3 text-sm"
                         >
-                          <span>{product.name}</span>
-                          <span className="text-white/45">0{index + 2}</span>
+                          <span>{product}</span>
+                          <span className="text-white/45">0{index + 1}</span>
                         </div>
                       ))}
                     </div>
@@ -248,66 +199,52 @@ const DigitalLandingPage = () => {
       <section className="public-section">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <span className="eyebrow">Featured downloads</span>
-            <h2 className="mt-5 font-display text-4xl font-bold sm:text-5xl">Start with a small digital collection.</h2>
+            <span className="eyebrow">Teaser only</span>
+            <h2 className="mt-5 font-display text-4xl font-bold sm:text-5xl">The digital shelf is visible as a promise, not a live catalog.</h2>
             <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
-              Čia yra pirmi skaitmeniniai produktai, kuriuos gali paversti aukštos maržos sluoksniu virš fizinio
-              shop&apos;o: printable plakatai, PDF gidai ir ritual planneriai.
+              Instead of showing clickable product cards right now, this section stays in teaser mode and points people
+              into the launch-soon layer until the collection is fully ready.
             </p>
           </div>
-          <Link to="/digital/collection" className="button-secondary">
-            View full digital collection
+          <Link to="/launch-soon" className="button-secondary">
+            Open launch soon
           </Link>
         </div>
 
-        {loading ? (
-          <div className="mt-8">
-            <LoadingSpinner />
-          </div>
-        ) : error ? (
-          <div className="mt-8 rounded-[24px] border border-red-200 bg-red-50 p-5 text-red-600">{error}</div>
-        ) : (
-          <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {featuredProducts.map((product) => (
-              <Link
-                key={product._id}
-                to={product._id.startsWith("digital-fallback-") ? "/digital/collection" : `/products/${product._id}`}
-                className="marketing-card overflow-hidden transition duration-300 hover:-translate-y-1 hover:shadow-[0_28px_85px_rgba(31,26,20,0.08)]"
-              >
-                <div className="relative aspect-[4/3] overflow-hidden bg-[linear-gradient(135deg,rgba(245,239,231,0.95),rgba(233,223,210,0.75))]">
-                  {product.images?.[0] ? (
-                    <img
-                      src={product.images[0]}
-                      alt={product.name}
-                      className="h-full w-full object-cover transition duration-500 hover:scale-105"
-                    />
-                  ) : (
-                    <div className="flex h-full items-end justify-between p-6">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-muted">Digital product</p>
-                        <p className="mt-3 font-display text-4xl font-bold text-[rgb(34,28,22)]">{product.name}</p>
-                      </div>
-                      <span className="rounded-full bg-white/70 px-3 py-1 text-xs font-semibold text-[rgb(34,28,22)]">
-                        PDF
-                      </span>
-                    </div>
-                  )}
+        <div className="mt-8 grid gap-5 md:grid-cols-3">
+          {teaserPanels.map((panel) => (
+            <div key={panel.title} className="marketing-card p-6">
+              <p className="text-xs uppercase tracking-[0.3em] text-muted">{panel.eyebrow}</p>
+              <h3 className="mt-4 font-display text-3xl font-bold text-[rgb(28,24,20)]">{panel.title}</h3>
+              <p className="mt-4 text-base leading-7 text-muted">{panel.text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="public-section">
+        <div className="rounded-[32px] border border-[rgb(232,224,214)] bg-[linear-gradient(135deg,rgba(255,252,247,0.96),rgba(247,241,233,0.94))] px-6 py-7 sm:px-8">
+          <div className="grid gap-5 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+            <div>
+              <span className="eyebrow">What will open later</span>
+              <h2 className="mt-5 font-display text-4xl font-bold sm:text-5xl">The first release is planned to open as one tighter edit.</h2>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
+                The goal is to launch with stronger bundles, cleaner product framing, and a better instant-download
+                experience instead of opening the shelf too early.
+              </p>
+            </div>
+            <div className="grid gap-3">
+              {teaserProducts.map((product) => (
+                <div
+                  key={product}
+                  className="rounded-[18px] border border-[rgb(238,231,223)] bg-[rgb(252,249,244)] px-4 py-4 text-sm text-[rgb(98,87,74)]"
+                >
+                  {product}
                 </div>
-                <div className="p-5">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="font-display text-2xl font-bold">{product.name}</p>
-                    <span className="premium-tag">Digital</span>
-                  </div>
-                  <p className="mt-4 text-sm leading-6 text-muted">{product.description}</p>
-                  <div className="mt-5 flex items-center justify-between">
-                    <span className="font-semibold">{formatCurrency(product.price)}</span>
-                    <span className="text-sm font-medium accent-text">View product</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
+              ))}
+            </div>
           </div>
-        )}
+        </div>
       </section>
 
       <section className="public-section">
@@ -345,21 +282,29 @@ const DigitalLandingPage = () => {
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            {bundleProducts.map((bundle) => (
-              <Link
-                key={bundle._id}
-                to={bundle._id.startsWith("digital-bundle-fallback-") ? "/digital/collection" : `/products/${bundle._id}`}
-                className="rounded-[24px] bg-white/6 p-5 transition duration-300 hover:-translate-y-1 hover:bg-white/8"
-              >
-                <p className="text-xs uppercase tracking-[0.3em] text-white/42">Bundle idea</p>
-                <h3 className="mt-4 font-display text-3xl font-bold">{bundle.name}</h3>
-                <p className="mt-3 text-sm leading-6 text-white/74">{bundle.description}</p>
-                <div className="mt-6 flex items-center justify-between gap-3">
-                  <p className="font-semibold text-[rgb(227,196,149)]">{formatCurrency(bundle.price)}</p>
-                  <span className="text-sm font-medium text-white/72">View bundle</span>
-                </div>
-              </Link>
-            ))}
+            <div className="rounded-[24px] bg-white/6 p-5">
+              <p className="text-xs uppercase tracking-[0.3em] text-white/42">Bundle idea</p>
+              <h3 className="mt-4 font-display text-3xl font-bold">Home Edit Bundle</h3>
+              <p className="mt-3 text-sm leading-6 text-white/74">
+                Poster bundle + living room guide framed as one cleaner room reset offer.
+              </p>
+              <div className="mt-6 flex items-center justify-between gap-3">
+                <p className="font-semibold text-[rgb(227,196,149)]">Launch soon</p>
+                <span className="text-sm font-medium text-white/72">Teaser</span>
+              </div>
+            </div>
+
+            <div className="rounded-[24px] bg-white/6 p-5">
+              <p className="text-xs uppercase tracking-[0.3em] text-white/42">Bundle idea</p>
+              <h3 className="mt-4 font-display text-3xl font-bold">Calm Living Bundle</h3>
+              <p className="mt-3 text-sm leading-6 text-white/74">
+                Poster bundle + guide + planner shaped as a fuller digital lifestyle layer.
+              </p>
+              <div className="mt-6 flex items-center justify-between gap-3">
+                <p className="font-semibold text-[rgb(227,196,149)]">Launch soon</p>
+                <span className="text-sm font-medium text-white/72">Teaser</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -375,9 +320,9 @@ const DigitalLandingPage = () => {
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Link to="/digital/collection" className="button-primary">
-                Browse digital products
-              </Link>
+                <Link to="/launch-soon" className="button-primary">
+                  Open launch soon
+                </Link>
               <Link to="/admin/products" className="button-secondary">
                 Add products in admin
               </Link>

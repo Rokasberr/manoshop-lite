@@ -6,6 +6,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import HomePage from "./pages/HomePage";
 import DigitalLandingPage from "./pages/DigitalLandingPage";
 import StoryPage from "./pages/StoryPage";
+import LaunchSoonPage from "./pages/LaunchSoonPage";
 import MembershipPreviewPage from "./pages/MembershipPreviewPage";
 import JournalPage from "./pages/JournalPage";
 import JournalArticlePage from "./pages/JournalArticlePage";
@@ -40,13 +41,14 @@ const App = () => (
     <Route element={<Layout />}>
       <Route path="/" element={<HomePage />} />
       <Route path="/story" element={<StoryPage />} />
+      <Route path="/launch-soon" element={<LaunchSoonPage />} />
       <Route path="/membership-preview" element={<MembershipPreviewPage />} />
-      <Route path="/journal" element={<JournalPage />} />
-      <Route path="/journal/:slug" element={<JournalArticlePage />} />
+      <Route path="/journal" element={<LaunchSoonPage focus="journal" />} />
+      <Route path="/journal/:slug" element={<LaunchSoonPage focus="journal" />} />
       <Route path="/savings-studio" element={<SavingsStudioDemoPage />} />
       <Route path="/shop" element={<ShopPage />} />
       <Route path="/digital" element={<DigitalLandingPage />} />
-      <Route path="/digital/collection" element={<ShopPage defaultProductType="digital" />} />
+      <Route path="/digital/collection" element={<LaunchSoonPage focus="digital" />} />
       <Route path="/products/:id" element={<ProductPage />} />
       <Route path="/cart" element={<CartPage />} />
       <Route path="/login" element={<LoginPage />} />

@@ -16,7 +16,7 @@ export const houseLinks = [
   { label: "Our story", to: "/story" },
   { label: "Collection", to: "/shop" },
   { label: "Membership", to: "/pricing" },
-  { label: "Journal", to: "/journal" },
+  { label: "Launch soon", to: "/launch-soon" },
 ];
 
 export const infoPages = {

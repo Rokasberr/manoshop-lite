@@ -17,7 +17,7 @@ const Navbar = () => {
     { label: "Digital", to: "/digital" },
     { label: "Savings Studio", to: "/savings-studio" },
     { label: "Membership", to: "/pricing" },
-    { label: "Journal", to: "/journal" },
+    { label: "Launch soon", to: "/launch-soon" },
   ];
 
   const handleLogout = () => {
