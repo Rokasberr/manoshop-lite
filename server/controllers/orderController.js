@@ -2,11 +2,16 @@ const Order = require("../models/Order");
 const { createInvoicePdfBuffer } = require("../utils/invoicePdf");
 const { getStripeClient, resolveClientUrl } = require("../utils/stripeClient");
 const {
+  resolveDigitalAssetPath,
+  resolveDigitalAssetMimeType,
+} = require("../utils/digitalAsset");
+const {
   canAccessOrder,
   createReservedOrder,
   cancelStripeOrder,
   syncStripeOrderFromSession,
 } = require("../services/orderCheckoutService");
+const fs = require("fs/promises");
 
 const createOrder = async (req, res) => {
   const { items, shippingAddress, paymentMethod } = req.body;
@@ -307,6 +312,55 @@ const getOrderInvoicePdf = async (req, res) => {
   res.send(pdfBuffer);
 };
 
+const getOrderDigitalAsset = async (req, res) => {
+  const order = await Order.findById(req.params.id).populate("user", "name email");
+
+  if (!order) {
+    res.status(404);
+    throw new Error("Užsakymas nerastas.");
+  }
+
+  if (!canAccessOrder(order, req.user)) {
+    res.status(403);
+    throw new Error("Neturi teisės atsisiųsti šio failo.");
+  }
+
+  if (order.paymentStatus !== "paid") {
+    res.status(409);
+    throw new Error("Skaitmeniniai failai prieinami tik po apmokėjimo.");
+  }
+
+  const item = order.items.find(
+    (orderItem) =>
+      orderItem.product?.toString() === req.params.productId && orderItem.productType === "digital"
+  );
+
+  if (!item) {
+    res.status(404);
+    throw new Error("Skaitmeninis produktas šiame užsakyme nerastas.");
+  }
+
+  if (!item.digitalAsset?.storagePath) {
+    res.status(404);
+    throw new Error("Šiam produktui nepriskirtas atsisiuntimo failas.");
+  }
+
+  const filePath = resolveDigitalAssetPath(item.digitalAsset.storagePath);
+
+  try {
+    await fs.access(filePath);
+  } catch (_error) {
+    res.status(404);
+    throw new Error("Skaitmeninis failas serveryje nerastas.");
+  }
+
+  const safeFileName = (item.digitalAsset.fileName || `${item.name}.pdf`).replace(/[^\w.\- ]/g, "_");
+
+  res.setHeader("Content-Type", resolveDigitalAssetMimeType(item.digitalAsset));
+  res.setHeader("Content-Disposition", `attachment; filename="${safeFileName}"`);
+  res.sendFile(filePath);
+};
+
 module.exports = {
   createOrder,
   createStripeCheckoutSession,
@@ -318,4 +372,5 @@ module.exports = {
   getAdminOrders,
   updateOrderStatus,
   getOrderInvoicePdf,
+  getOrderDigitalAsset,
 };

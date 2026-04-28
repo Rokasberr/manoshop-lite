@@ -123,14 +123,22 @@ const ProductManagerPage = () => {
                       <div>
                         <p className="text-2xl font-semibold tracking-[-0.03em] text-slate-950">{product.name}</p>
                         <p className="mt-1 text-sm text-slate-500">
-                          {product.category} • stock {product.stock}
+                          {product.category} •{" "}
+                          {product.productType === "digital"
+                            ? `digital • ${product.digitalAsset?.storagePath || "no file linked"}`
+                            : `stock ${product.stock}`}
                         </p>
                       </div>
                       <div className="text-right">
                         <p className="text-2xl font-semibold tracking-[-0.03em] text-slate-950">{formatCurrency(product.price)}</p>
+                        {product.productType === "digital" && (
+                          <span className="mt-2 inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
+                            Digital
+                          </span>
+                        )}
                         {product.featured && (
                           <span
-                            className="mt-2 inline-flex rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700"
+                            className="mt-2 ml-2 inline-flex rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700"
                           >
                             Featured
                           </span>

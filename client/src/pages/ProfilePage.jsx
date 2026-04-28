@@ -17,6 +17,7 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [downloadingInvoiceId, setDownloadingInvoiceId] = useState("");
+  const [downloadingDigitalKey, setDownloadingDigitalKey] = useState("");
 
   useEffect(() => {
     const loadOrders = async () => {
@@ -45,6 +46,24 @@ const ProfilePage = () => {
       toast.error(downloadError.response?.data?.message || "Nepavyko atsisiųsti sąskaitos.");
     } finally {
       setDownloadingInvoiceId("");
+    }
+  };
+
+  const handleDownloadDigitalProduct = async (order, item) => {
+    const downloadKey = `${order._id}:${item.product}`;
+
+    try {
+      setDownloadingDigitalKey(downloadKey);
+      await orderService.downloadDigitalProduct(
+        order._id,
+        item.product,
+        item.digitalAsset?.fileName || `${item.name}.pdf`
+      );
+      toast.success("Skaitmeninis failas atsisiųstas.");
+    } catch (downloadError) {
+      toast.error(downloadError.response?.data?.message || "Nepavyko atsisiųsti skaitmeninio failo.");
+    } finally {
+      setDownloadingDigitalKey("");
     }
   };
 
@@ -123,10 +142,14 @@ const ProfilePage = () => {
           ) : (
             <div className="mt-6 space-y-4">
               {orders.map((order) => (
-                <div
-                  key={order._id}
-                  className="soft-card rounded-[24px] p-5"
-                >
+                <div key={order._id} className="soft-card rounded-[24px] p-5">
+                  {(() => {
+                    const digitalItems = order.items.filter(
+                      (item) => item.productType === "digital" && item.digitalAsset?.storagePath
+                    );
+
+                    return (
+                      <>
                   <div className="flex flex-wrap items-center justify-between gap-4">
                     <div>
                       <p className="font-display text-xl font-bold">
@@ -170,7 +193,33 @@ const ProfilePage = () => {
                       <Download size={16} />
                       {downloadingInvoiceId === order._id ? "Generuojama..." : "Atsisiųsti PDF"}
                     </button>
+                    {digitalItems.map((item) => {
+                      const downloadKey = `${order._id}:${item.product}`;
+
+                      return (
+                        <button
+                          key={downloadKey}
+                          type="button"
+                          onClick={() => handleDownloadDigitalProduct(order, item)}
+                          disabled={order.paymentStatus !== "paid" || downloadingDigitalKey === downloadKey}
+                          className="button-secondary gap-2 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          <Download size={16} />
+                          {downloadingDigitalKey === downloadKey
+                            ? "Atsiunčiama..."
+                            : item.digitalAsset?.downloadLabel || `Atsisiųsti ${item.name}`}
+                        </button>
+                      );
+                    })}
+                    {!!digitalItems.length && order.paymentStatus !== "paid" && (
+                      <p className="text-sm text-muted">
+                        Atsisiuntimai atrakinsis po sėkmingo apmokėjimo.
+                      </p>
+                    )}
                   </div>
+                      </>
+                    );
+                  })()}
                 </div>
               ))}
             </div>

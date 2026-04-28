@@ -6,6 +6,8 @@ import { formatCurrency } from "../utils/currency";
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
+  const isDigital = product.productType === "digital";
+  const isUnavailable = !isDigital && product.stock === 0;
 
   return (
     <div className="panel overflow-hidden">
@@ -28,6 +30,11 @@ const ProductCard = ({ product }) => {
                 Editor's pick
               </span>
             )}
+            {isDigital && (
+              <span className="rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-slate-900">
+                Digital
+              </span>
+            )}
           </div>
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 via-black/5 to-transparent px-5 pb-5 pt-12 text-white">
             <p className="text-[11px] uppercase tracking-[0.28em] text-white/62">Curated piece</p>
@@ -45,15 +52,18 @@ const ProductCard = ({ product }) => {
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-muted">from</p>
             <p className="mt-1 font-display text-2xl font-bold">{formatCurrency(product.price)}</p>
+            <p className="mt-1 text-xs text-muted">
+              {isDigital ? "Instant download after payment" : `Stock ${product.stock}`}
+            </p>
           </div>
           <button
             type="button"
             onClick={() => addToCart(product)}
-            disabled={product.stock === 0}
+            disabled={isUnavailable}
             className="button-primary gap-2 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <ShoppingCart size={16} />
-            {product.stock === 0 ? "Sold out" : "Reserve piece"}
+            {isUnavailable ? "Sold out" : isDigital ? "Add download" : "Reserve piece"}
           </button>
         </div>
       </div>

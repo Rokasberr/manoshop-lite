@@ -96,6 +96,63 @@ const products = [
     stock: 21,
     featured: true,
   },
+  {
+    name: "Calm Home Poster Bundle",
+    description:
+      "10 minimalist printable pieces for a calmer, warmer home. Instant digital download in multiple frame-ready sizes.",
+    price: 24,
+    category: "Digital Products",
+    productType: "digital",
+    images: [
+      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+    ],
+    stock: 0,
+    featured: true,
+    digitalAsset: {
+      storagePath: "posters/calm-home-poster-bundle-guide.pdf",
+      fileName: "calm-home-poster-bundle-guide.pdf",
+      downloadLabel: "Atsisiųsti poster bundle",
+      mimeType: "application/pdf",
+    },
+  },
+  {
+    name: "The Atelier Living Room Guide",
+    description:
+      "A premium digital guide to layout, palette, texture, and styling choices that make your living room feel calmer and more elevated.",
+    price: 29,
+    category: "Digital Products",
+    productType: "digital",
+    images: [
+      "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1200&q=80",
+    ],
+    stock: 0,
+    featured: true,
+    digitalAsset: {
+      storagePath: "guides/the-atelier-living-room-guide.pdf",
+      fileName: "the-atelier-living-room-guide.pdf",
+      downloadLabel: "Atsisiųsti gidą",
+      mimeType: "application/pdf",
+    },
+  },
+  {
+    name: "Sunday Reset Ritual Planner",
+    description:
+      "A calm digital planner for weekly resets, self-care rituals, reflection, and more intentional routines.",
+    price: 16,
+    category: "Digital Products",
+    productType: "digital",
+    images: [
+      "https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=1200&q=80",
+    ],
+    stock: 0,
+    featured: false,
+    digitalAsset: {
+      storagePath: "planners/sunday-reset-ritual-planner.pdf",
+      fileName: "sunday-reset-ritual-planner.pdf",
+      downloadLabel: "Atsisiųsti plannerį",
+      mimeType: "application/pdf",
+    },
+  },
 ];
 
 const seedDatabase = async () => {
@@ -118,4 +175,3 @@ const seedDatabase = async () => {
 };
 
 seedDatabase();
-

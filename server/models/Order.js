@@ -1,5 +1,27 @@
 const mongoose = require("mongoose");
 
+const digitalAssetSchema = new mongoose.Schema(
+  {
+    storagePath: {
+      type: String,
+      default: "",
+    },
+    fileName: {
+      type: String,
+      default: "",
+    },
+    downloadLabel: {
+      type: String,
+      default: "",
+    },
+    mimeType: {
+      type: String,
+      default: "application/pdf",
+    },
+  },
+  { _id: false }
+);
+
 const orderItemSchema = new mongoose.Schema(
   {
     product: {
@@ -24,6 +46,15 @@ const orderItemSchema = new mongoose.Schema(
       required: true,
       min: 1,
     },
+    productType: {
+      type: String,
+      enum: ["physical", "digital"],
+      default: "physical",
+    },
+    digitalAsset: {
+      type: digitalAssetSchema,
+      default: undefined,
+    },
   },
   { _id: false }
 );
@@ -31,10 +62,10 @@ const orderItemSchema = new mongoose.Schema(
 const shippingAddressSchema = new mongoose.Schema(
   {
     fullName: { type: String, required: true },
-    address: { type: String, required: true },
-    city: { type: String, required: true },
-    postalCode: { type: String, required: true },
-    country: { type: String, required: true },
+    address: { type: String, default: "" },
+    city: { type: String, default: "" },
+    postalCode: { type: String, default: "" },
+    country: { type: String, default: "" },
     phone: { type: String, default: "" },
   },
   { _id: false }
@@ -64,6 +95,14 @@ const orderSchema = new mongoose.Schema(
     paymentMethod: {
       type: String,
       default: "card",
+    },
+    requiresShipping: {
+      type: Boolean,
+      default: true,
+    },
+    containsDigitalProducts: {
+      type: Boolean,
+      default: false,
     },
     paymentStatus: {
       type: String,

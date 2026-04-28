@@ -13,6 +13,7 @@ const {
   getAdminOrders,
   updateOrderStatus,
   getOrderInvoicePdf,
+  getOrderDigitalAsset,
 } = require("../controllers/orderController");
 
 const router = express.Router();
@@ -25,6 +26,7 @@ router.post("/:id/admin-cancel-payment", protect, adminOnly, asyncHandler(adminC
 router.post("/:id/refund", protect, adminOnly, asyncHandler(refundStripeOrderPayment));
 router.get("/user", protect, asyncHandler(getUserOrders));
 router.get("/admin", protect, adminOnly, asyncHandler(getAdminOrders));
+router.get("/:id/items/:productId/download", protect, asyncHandler(getOrderDigitalAsset));
 router.get("/:id/invoice", protect, asyncHandler(getOrderInvoicePdf));
 router.put("/:id/status", protect, adminOnly, asyncHandler(updateOrderStatus));
 

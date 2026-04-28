@@ -3,11 +3,25 @@ import toast from "react-hot-toast";
 
 const CartContext = createContext(null);
 const cartStorageKey = "manoshop_cart";
+const maxDigitalQuantity = 10;
+
+const normalizeStoredItems = (items) =>
+  Array.isArray(items)
+    ? items.map((item) => ({
+        ...item,
+        productType: item.productType || "physical",
+      }))
+    : [];
+
+const getQuantityLimit = (item) =>
+  item.productType === "digital"
+    ? maxDigitalQuantity
+    : Math.max(Number(item.stock) || 0, 0);
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState(() => {
     const storedItems = localStorage.getItem(cartStorageKey);
-    return storedItems ? JSON.parse(storedItems) : [];
+    return storedItems ? normalizeStoredItems(JSON.parse(storedItems)) : [];
   });
 
   useEffect(() => {
@@ -23,7 +37,7 @@ export const CartProvider = ({ children }) => {
           item.product === product._id
             ? {
                 ...item,
-                quantity: Math.min(item.quantity + quantity, item.stock),
+                quantity: Math.min(item.quantity + quantity, getQuantityLimit(item)),
               }
             : item
         );
@@ -41,7 +55,14 @@ export const CartProvider = ({ children }) => {
           image: product.images?.[0] || "",
           stock: product.stock,
           category: product.category,
-          quantity: Math.min(quantity, product.stock || quantity),
+          productType: product.productType || "physical",
+          quantity: Math.min(
+            quantity,
+            getQuantityLimit({
+              productType: product.productType || "physical",
+              stock: product.stock,
+            }) || quantity
+          ),
         },
       ];
     });
@@ -58,7 +79,7 @@ export const CartProvider = ({ children }) => {
         item.product === productId
           ? {
               ...item,
-              quantity: Math.min(quantity, item.stock || quantity),
+              quantity: Math.min(quantity, getQuantityLimit(item) || quantity),
             }
           : item
       )

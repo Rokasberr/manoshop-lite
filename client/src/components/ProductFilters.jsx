@@ -1,5 +1,5 @@
 const ProductFilters = ({ filters, categories, onChange, onSubmit, onReset }) => (
-  <form className="panel grid gap-4 p-5 lg:grid-cols-[2fr_1fr_1fr_auto_auto]" onSubmit={onSubmit}>
+  <form className="panel grid gap-4 p-5 lg:grid-cols-[2fr_1fr_1fr_1fr_auto_auto]" onSubmit={onSubmit}>
     <div>
       <label className="mb-2 block text-sm font-semibold">Search the collection</label>
       <input
@@ -37,6 +37,19 @@ const ProductFilters = ({ filters, categories, onChange, onSubmit, onReset }) =>
         <option value="price-asc">Price: low to high</option>
         <option value="price-desc">Price: high to low</option>
         <option value="name">Name</option>
+      </select>
+    </div>
+
+    <div>
+      <label className="mb-2 block text-sm font-semibold">Product type</label>
+      <select
+        className="select-field"
+        value={filters.productType}
+        onChange={(event) => onChange("productType", event.target.value)}
+      >
+        <option value="all">All products</option>
+        <option value="physical">Physical</option>
+        <option value="digital">Digital products</option>
       </select>
     </div>
 

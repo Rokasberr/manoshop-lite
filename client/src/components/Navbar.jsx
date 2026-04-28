@@ -16,6 +16,7 @@ const Navbar = () => {
   const publicLinks = [
     { label: "Story", href: "/#story" },
     { label: "Collection", href: "/shop" },
+    { label: "Digital", href: "/digital" },
     { label: "Membership", href: "/pricing" },
     { label: "Journal", href: "/#journal" },
   ];
@@ -60,7 +61,9 @@ const Navbar = () => {
                 key={link.label}
                 to={link.href}
                 className={`nav-link-public ${
-                  location.pathname === link.href ? "nav-link-public-active" : ""
+                  location.pathname === link.href || location.pathname.startsWith(`${link.href}/`)
+                    ? "nav-link-public-active"
+                    : ""
                 }`}
               >
                 {link.label}

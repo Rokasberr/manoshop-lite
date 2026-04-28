@@ -47,6 +47,25 @@ const downloadInvoice = async (id, invoiceNumber = "invoice") => {
   window.URL.revokeObjectURL(url);
 };
 
+const downloadDigitalProduct = async (orderId, productId, fileName = "download") => {
+  const response = await api.get(`/orders/${orderId}/items/${productId}/download`, {
+    responseType: "blob",
+  });
+
+  const blob = new Blob([response.data], {
+    type: response.headers["content-type"] || "application/octet-stream",
+  });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+};
+
 const getUserOrders = async () => {
   const { data } = await api.get("/orders/user");
   return data;
@@ -70,6 +89,7 @@ export default {
   adminCancelOrderPayment,
   refundOrderPayment,
   downloadInvoice,
+  downloadDigitalProduct,
   getUserOrders,
   getAdminOrders,
   updateOrderStatus,

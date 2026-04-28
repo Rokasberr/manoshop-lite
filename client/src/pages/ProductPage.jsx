@@ -48,6 +48,10 @@ const ProductPage = () => {
     );
   }
 
+  const isDigital = product.productType === "digital";
+  const maxQuantity = isDigital ? 10 : product.stock;
+  const isUnavailable = !isDigital && product.stock === 0;
+
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_0.9fr]">
       <div className="space-y-4">
@@ -88,6 +92,11 @@ const ProductPage = () => {
               Editor's pick
             </span>
           )}
+          {isDigital && (
+            <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">
+              Instant download
+            </span>
+          )}
         </div>
 
         <h1 className="mt-5 font-display text-4xl font-bold">{product.name}</h1>
@@ -102,7 +111,11 @@ const ProductPage = () => {
               <p className="mt-2 font-display text-4xl font-bold">{formatCurrency(product.price)}</p>
             </div>
             <p className="text-sm text-muted">
-              {product.stock > 0 ? `${product.stock} pieces currently available` : "Currently unavailable"}
+              {isDigital
+                ? "Delivered to your account after payment"
+                : product.stock > 0
+                  ? `${product.stock} pieces currently available`
+                  : "Currently unavailable"}
             </p>
           </div>
 
@@ -119,10 +132,10 @@ const ProductPage = () => {
               <button
                 type="button"
                 onClick={() =>
-                  setQuantity((currentQuantity) => Math.min(product.stock, currentQuantity + 1))
+                  setQuantity((currentQuantity) => Math.min(maxQuantity, currentQuantity + 1))
                 }
                 className="h-10 w-10 rounded-full"
-                disabled={product.stock === 0}
+                disabled={isUnavailable}
               >
                 <Plus size={16} className="mx-auto" />
               </button>
@@ -131,11 +144,11 @@ const ProductPage = () => {
             <button
               type="button"
               onClick={() => addToCart(product, quantity)}
-              disabled={product.stock === 0}
+              disabled={isUnavailable}
               className="button-primary gap-2 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <ShoppingCart size={16} />
-              {product.stock === 0 ? "Sold out" : "Reserve this piece"}
+              {isUnavailable ? "Sold out" : isDigital ? "Add digital product" : "Reserve this piece"}
             </button>
           </div>
         </div>
@@ -145,7 +158,7 @@ const ProductPage = () => {
             {[
               "Secure Stripe checkout available",
               "PDF receipt saved to your account",
-              "Thoughtful delivery updates after purchase",
+              isDigital ? "Download access appears in your profile after payment" : "Thoughtful delivery updates after purchase",
             ].map((item) => (
               <div key={item} className="flex items-start gap-3">
                 <CheckCircle2 size={16} className="mt-1" style={{ color: "rgb(var(--accent))" }} />

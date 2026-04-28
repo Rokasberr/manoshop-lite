@@ -15,11 +15,33 @@ const parseImages = (images) => {
   return [];
 };
 
+const normalizeProductType = (productType) =>
+  productType === "digital" ? "digital" : "physical";
+
+const parseDigitalAsset = (digitalAsset) => {
+  if (!digitalAsset || typeof digitalAsset !== "object") {
+    return {
+      storagePath: "",
+      fileName: "",
+      downloadLabel: "",
+      mimeType: "application/pdf",
+    };
+  }
+
+  return {
+    storagePath: digitalAsset.storagePath?.trim() || "",
+    fileName: digitalAsset.fileName?.trim() || "",
+    downloadLabel: digitalAsset.downloadLabel?.trim() || "",
+    mimeType: digitalAsset.mimeType?.trim() || "application/pdf",
+  };
+};
+
 const getProducts = async (req, res) => {
   const page = Math.max(Number(req.query.page) || 1, 1);
   const limit = Math.min(Number(req.query.limit) || 9, 48);
   const search = req.query.search?.trim();
   const category = req.query.category?.trim();
+  const productType = req.query.productType?.trim();
   const featured = req.query.featured;
   const sort = req.query.sort || "latest";
 
@@ -34,6 +56,10 @@ const getProducts = async (req, res) => {
 
   if (category && category.toLowerCase() !== "all") {
     filters.category = category;
+  }
+
+  if (productType === "physical" || productType === "digital") {
+    filters.productType = productType;
   }
 
   if (featured === "true") {
@@ -81,11 +107,20 @@ const getProductCategories = async (_req, res) => {
 };
 
 const createProduct = async (req, res) => {
-  const { name, description, price, category, stock, featured, images } = req.body;
+  const { name, description, price, category, stock, featured, images, productType, digitalAsset } =
+    req.body;
 
   if (!name || !description || !price || !category) {
     res.status(400);
     throw new Error("Pavadinimas, aprašymas, kaina ir kategorija yra privalomi.");
+  }
+
+  const normalizedProductType = normalizeProductType(productType);
+  const normalizedDigitalAsset = parseDigitalAsset(digitalAsset);
+
+  if (normalizedProductType === "digital" && !normalizedDigitalAsset.storagePath) {
+    res.status(400);
+    throw new Error("Skaitmeniniam produktui būtina nurodyti failo kelią.");
   }
 
   const product = await Product.create({
@@ -93,9 +128,11 @@ const createProduct = async (req, res) => {
     description,
     price: Number(price),
     category,
+    productType: normalizedProductType,
     stock: Number(stock) || 0,
     featured: Boolean(featured),
     images: parseImages(images),
+    digitalAsset: normalizedProductType === "digital" ? normalizedDigitalAsset : undefined,
   });
 
   res.status(201).json(product);
@@ -109,15 +146,35 @@ const updateProduct = async (req, res) => {
     throw new Error("Produktas nerastas.");
   }
 
-  const { name, description, price, category, stock, featured, images } = req.body;
+  const { name, description, price, category, stock, featured, images, productType, digitalAsset } =
+    req.body;
+  const normalizedProductType = normalizeProductType(productType ?? product.productType);
+  const normalizedDigitalAsset = parseDigitalAsset(
+    digitalAsset !== undefined ? digitalAsset : product.digitalAsset
+  );
+
+  if (normalizedProductType === "digital" && !normalizedDigitalAsset.storagePath) {
+    res.status(400);
+    throw new Error("Skaitmeniniam produktui būtina nurodyti failo kelią.");
+  }
 
   product.name = name ?? product.name;
   product.description = description ?? product.description;
   product.price = price !== undefined ? Number(price) : product.price;
   product.category = category ?? product.category;
+  product.productType = normalizedProductType;
   product.stock = stock !== undefined ? Number(stock) : product.stock;
   product.featured = featured !== undefined ? Boolean(featured) : product.featured;
   product.images = images !== undefined ? parseImages(images) : product.images;
+  product.digitalAsset =
+    normalizedProductType === "digital"
+      ? normalizedDigitalAsset
+      : {
+          storagePath: "",
+          fileName: "",
+          downloadLabel: "",
+          mimeType: "application/pdf",
+        };
 
   const updatedProduct = await product.save();
   res.json(updatedProduct);
@@ -143,4 +200,3 @@ module.exports = {
   updateProduct,
   deleteProduct,
 };
-

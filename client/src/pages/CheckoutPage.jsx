@@ -31,6 +31,15 @@ const CheckoutPage = () => {
     }
   }, [user]);
 
+  const hasDigitalProducts = cartItems.some((item) => item.productType === "digital");
+  const requiresShipping = cartItems.some((item) => item.productType !== "digital");
+
+  useEffect(() => {
+    if (hasDigitalProducts) {
+      setFormData((currentData) => ({ ...currentData, paymentMethod: "card" }));
+    }
+  }, [hasDigitalProducts]);
+
   if (!cartItems.length) {
     return (
       <EmptyState
@@ -41,7 +50,7 @@ const CheckoutPage = () => {
     );
   }
 
-  const shipping = subtotal >= 100 ? 0 : 6.99;
+  const shipping = requiresShipping ? (subtotal >= 100 ? 0 : 6.99) : 0;
   const tax = subtotal * 0.21;
   const total = subtotal + shipping + tax;
 
@@ -54,12 +63,22 @@ const CheckoutPage = () => {
 
     if (
       !formData.fullName.trim() ||
-      !formData.address.trim() ||
-      !formData.city.trim() ||
-      !formData.postalCode.trim() ||
-      !formData.country.trim()
+      (requiresShipping &&
+        (!formData.address.trim() ||
+          !formData.city.trim() ||
+          !formData.postalCode.trim() ||
+          !formData.country.trim()))
     ) {
-      setError("Užpildyk visus privalomus pristatymo laukus.");
+      setError(
+        requiresShipping
+          ? "Užpildyk visus privalomus pristatymo laukus."
+          : "Užpildyk pirkėjo vardą ir pavardę."
+      );
+      return;
+    }
+
+    if (hasDigitalProducts && formData.paymentMethod !== "card") {
+      setError("Skaitmeniniams produktams šiuo metu galimas tik atsiskaitymas kortele.");
       return;
     }
 
@@ -74,10 +93,10 @@ const CheckoutPage = () => {
         })),
         shippingAddress: {
           fullName: formData.fullName.trim(),
-          address: formData.address.trim(),
-          city: formData.city.trim(),
-          postalCode: formData.postalCode.trim(),
-          country: formData.country.trim(),
+          address: requiresShipping ? formData.address.trim() : "",
+          city: requiresShipping ? formData.city.trim() : "",
+          postalCode: requiresShipping ? formData.postalCode.trim() : "",
+          country: requiresShipping ? formData.country.trim() : "",
           phone: formData.phone.trim(),
         },
         paymentMethod: formData.paymentMethod,
@@ -122,11 +141,20 @@ const CheckoutPage = () => {
 
       <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
         <form className="panel space-y-5 p-6" onSubmit={handleSubmit}>
-          <h2 className="font-display text-3xl font-bold">Pristatymo informacija</h2>
+          <h2 className="font-display text-3xl font-bold">
+            {requiresShipping ? "Pristatymo informacija" : "Pirkėjo informacija"}
+          </h2>
 
           {error && (
             <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-300">
               {error}
+            </div>
+          )}
+
+          {!requiresShipping && (
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+              Šiame užsakyme yra tik skaitmeniniai produktai, todėl pristatymo adreso nereikia. Po apmokėjimo
+              atsisiuntimai atsiras tavo profilyje.
             </div>
           )}
 
@@ -140,62 +168,72 @@ const CheckoutPage = () => {
               />
             </div>
 
-            <div className="sm:col-span-2">
-              <label className="mb-2 block text-sm font-semibold">Adresas</label>
-              <input
-                className="input-field"
-                value={formData.address}
-                onChange={(event) => handleChange("address", event.target.value)}
-              />
-            </div>
+            {requiresShipping && (
+              <>
+                <div className="sm:col-span-2">
+                  <label className="mb-2 block text-sm font-semibold">Adresas</label>
+                  <input
+                    className="input-field"
+                    value={formData.address}
+                    onChange={(event) => handleChange("address", event.target.value)}
+                  />
+                </div>
 
-            <div>
-              <label className="mb-2 block text-sm font-semibold">Miestas</label>
-              <input
-                className="input-field"
-                value={formData.city}
-                onChange={(event) => handleChange("city", event.target.value)}
-              />
-            </div>
+                <div>
+                  <label className="mb-2 block text-sm font-semibold">Miestas</label>
+                  <input
+                    className="input-field"
+                    value={formData.city}
+                    onChange={(event) => handleChange("city", event.target.value)}
+                  />
+                </div>
 
-            <div>
-              <label className="mb-2 block text-sm font-semibold">Pašto kodas</label>
-              <input
-                className="input-field"
-                value={formData.postalCode}
-                onChange={(event) => handleChange("postalCode", event.target.value)}
-              />
-            </div>
+                <div>
+                  <label className="mb-2 block text-sm font-semibold">Pašto kodas</label>
+                  <input
+                    className="input-field"
+                    value={formData.postalCode}
+                    onChange={(event) => handleChange("postalCode", event.target.value)}
+                  />
+                </div>
 
-            <div>
-              <label className="mb-2 block text-sm font-semibold">Šalis</label>
-              <input
-                className="input-field"
-                value={formData.country}
-                onChange={(event) => handleChange("country", event.target.value)}
-              />
-            </div>
+                <div>
+                  <label className="mb-2 block text-sm font-semibold">Šalis</label>
+                  <input
+                    className="input-field"
+                    value={formData.country}
+                    onChange={(event) => handleChange("country", event.target.value)}
+                  />
+                </div>
 
-            <div>
-              <label className="mb-2 block text-sm font-semibold">Telefonas</label>
-              <input
-                className="input-field"
-                value={formData.phone}
-                onChange={(event) => handleChange("phone", event.target.value)}
-              />
-            </div>
+                <div>
+                  <label className="mb-2 block text-sm font-semibold">Telefonas</label>
+                  <input
+                    className="input-field"
+                    value={formData.phone}
+                    onChange={(event) => handleChange("phone", event.target.value)}
+                  />
+                </div>
+              </>
+            )}
 
             <div className="sm:col-span-2">
               <label className="mb-2 block text-sm font-semibold">Mokėjimo būdas</label>
-              <select
-                className="select-field"
-                value={formData.paymentMethod}
-                onChange={(event) => handleChange("paymentMethod", event.target.value)}
-              >
-                <option value="card">Kortelė (Stripe)</option>
-                <option value="bank-transfer">Bankinis pavedimas</option>
-                <option value="cash-on-delivery">Apmokėti pristatymo metu</option>
-              </select>
+              {hasDigitalProducts ? (
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                  Skaitmeniniams produktams naudojamas tik atsiskaitymas kortele per Stripe.
+                </div>
+              ) : (
+                <select
+                  className="select-field"
+                  value={formData.paymentMethod}
+                  onChange={(event) => handleChange("paymentMethod", event.target.value)}
+                >
+                  <option value="card">Kortelė (Stripe)</option>
+                  <option value="bank-transfer">Bankinis pavedimas</option>
+                  <option value="cash-on-delivery">Apmokėti pristatymo metu</option>
+                </select>
+              )}
             </div>
           </div>
 
@@ -222,6 +260,9 @@ const CheckoutPage = () => {
                     <p className="text-sm text-muted">
                       {item.quantity} x {formatCurrency(item.price)}
                     </p>
+                    {item.productType === "digital" && (
+                      <p className="text-xs uppercase tracking-[0.2em] text-muted">Digital</p>
+                    )}
                   </div>
                 </div>
                 <p className="font-semibold">{formatCurrency(item.quantity * item.price)}</p>

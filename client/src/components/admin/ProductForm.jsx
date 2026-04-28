@@ -5,9 +5,14 @@ const emptyForm = {
   description: "",
   price: "",
   category: "",
+  productType: "physical",
   stock: "",
   featured: false,
   imagesText: "",
+  digitalStoragePath: "",
+  digitalFileName: "",
+  digitalDownloadLabel: "",
+  digitalMimeType: "application/pdf",
 };
 
 const mapProductToForm = (product) =>
@@ -17,9 +22,14 @@ const mapProductToForm = (product) =>
         description: product.description || "",
         price: product.price ?? "",
         category: product.category || "",
+        productType: product.productType || "physical",
         stock: product.stock ?? "",
         featured: Boolean(product.featured),
         imagesText: Array.isArray(product.images) ? product.images.join("\n") : "",
+        digitalStoragePath: product.digitalAsset?.storagePath || "",
+        digitalFileName: product.digitalAsset?.fileName || "",
+        digitalDownloadLabel: product.digitalAsset?.downloadLabel || "",
+        digitalMimeType: product.digitalAsset?.mimeType || "application/pdf",
       }
     : emptyForm;
 
@@ -54,6 +64,11 @@ const ProductForm = ({
       return;
     }
 
+    if (formData.productType === "digital" && !formData.digitalStoragePath.trim()) {
+      setError("Skaitmeniniam produktui nurodyk failo kelią serveryje.");
+      return;
+    }
+
     setError("");
 
     await onSubmit({
@@ -61,9 +76,19 @@ const ProductForm = ({
       description: formData.description.trim(),
       price: Number(formData.price),
       category: formData.category.trim(),
-      stock: Number(formData.stock) || 0,
+      productType: formData.productType,
+      stock: formData.productType === "digital" ? 0 : Number(formData.stock) || 0,
       featured: formData.featured,
       images: formData.imagesText,
+      digitalAsset:
+        formData.productType === "digital"
+          ? {
+              storagePath: formData.digitalStoragePath.trim(),
+              fileName: formData.digitalFileName.trim(),
+              downloadLabel: formData.digitalDownloadLabel.trim(),
+              mimeType: formData.digitalMimeType.trim() || "application/pdf",
+            }
+          : undefined,
     });
   };
 
@@ -122,16 +147,36 @@ const ProductForm = ({
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-semibold">Stock</label>
-          <input
-            className="input-field"
-            type="number"
-            min="0"
-            step="1"
-            value={formData.stock}
-            onChange={(event) => handleChange("stock", event.target.value)}
-          />
+          <label className="mb-2 block text-sm font-semibold">Product type</label>
+          <select
+            className="select-field"
+            value={formData.productType}
+            onChange={(event) => handleChange("productType", event.target.value)}
+          >
+            <option value="physical">Physical</option>
+            <option value="digital">Digital</option>
+          </select>
         </div>
+
+        {formData.productType === "physical" ? (
+          <div>
+            <label className="mb-2 block text-sm font-semibold">Stock</label>
+            <input
+              className="input-field"
+              type="number"
+              min="0"
+              step="1"
+              value={formData.stock}
+              onChange={(event) => handleChange("stock", event.target.value)}
+            />
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+            Place the actual file in
+            <span className="mx-1 font-semibold">server/digital-downloads/</span>
+            and enter the relative path below.
+          </div>
+        )}
 
         <label className="mt-8 flex items-center gap-3 text-sm font-semibold">
           <input
@@ -151,6 +196,50 @@ const ProductForm = ({
             onChange={(event) => handleChange("imagesText", event.target.value)}
           />
         </div>
+
+        {formData.productType === "digital" && (
+          <>
+            <div className="sm:col-span-2">
+              <label className="mb-2 block text-sm font-semibold">Storage path</label>
+              <input
+                className="input-field"
+                placeholder="guides/the-atelier-living-room-guide.pdf"
+                value={formData.digitalStoragePath}
+                onChange={(event) => handleChange("digitalStoragePath", event.target.value)}
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-semibold">Download file name</label>
+              <input
+                className="input-field"
+                placeholder="the-atelier-living-room-guide.pdf"
+                value={formData.digitalFileName}
+                onChange={(event) => handleChange("digitalFileName", event.target.value)}
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-semibold">Download button label</label>
+              <input
+                className="input-field"
+                placeholder="Atsisiųsti gidą"
+                value={formData.digitalDownloadLabel}
+                onChange={(event) => handleChange("digitalDownloadLabel", event.target.value)}
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="mb-2 block text-sm font-semibold">MIME type</label>
+              <input
+                className="input-field"
+                placeholder="application/pdf"
+                value={formData.digitalMimeType}
+                onChange={(event) => handleChange("digitalMimeType", event.target.value)}
+              />
+            </div>
+          </>
+        )}
 
         <div className="sm:col-span-2">
           <label className="mb-2 block text-sm font-semibold">Description</label>

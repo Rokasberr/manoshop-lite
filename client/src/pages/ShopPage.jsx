@@ -11,18 +11,33 @@ const defaultFilters = {
   search: "",
   category: "all",
   sort: "latest",
+  productType: "all",
   page: 1,
   limit: 9,
 };
 
-const ShopPage = () => {
+const ShopPage = ({ defaultProductType = "all" }) => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [filters, setFilters] = useState(defaultFilters);
-  const [draftFilters, setDraftFilters] = useState(defaultFilters);
+  const initialFilters = {
+    ...defaultFilters,
+    productType: defaultProductType,
+  };
+  const [filters, setFilters] = useState(initialFilters);
+  const [draftFilters, setDraftFilters] = useState(initialFilters);
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const nextFilters = {
+      ...defaultFilters,
+      productType: defaultProductType,
+    };
+
+    setDraftFilters(nextFilters);
+    setFilters(nextFilters);
+  }, [defaultProductType]);
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -70,8 +85,13 @@ const ShopPage = () => {
   };
 
   const handleReset = () => {
-    setDraftFilters(defaultFilters);
-    setFilters(defaultFilters);
+    const resetFilters = {
+      ...defaultFilters,
+      productType: defaultProductType,
+    };
+
+    setDraftFilters(resetFilters);
+    setFilters(resetFilters);
   };
 
   const handlePageChange = (page) => {
@@ -81,30 +101,52 @@ const ShopPage = () => {
   return (
     <div className="space-y-8">
       <SectionTitle
-        eyebrow="collection"
-        title="A considered edit, presented with more room to breathe"
-        subtitle="Naršyk atrinktą kolekciją, filtruok pagal nuotaiką ar kategoriją ir išsirink objektus, kurie jaučiasi verti vietos tavo namuose."
+        eyebrow={defaultProductType === "digital" ? "digital collection" : "collection"}
+        title={
+          defaultProductType === "digital"
+            ? "Digital products for calmer routines and more elevated spaces"
+            : "A considered edit, presented with more room to breathe"
+        }
+        subtitle={
+          defaultProductType === "digital"
+            ? "Naršyk PDF gidus, printable rinkinius ir kitus instant download produktus, kuriuos gali gauti iškart po apmokėjimo."
+            : "Naršyk atrinktą kolekciją, filtruok pagal nuotaiką ar kategoriją ir išsirink objektus, kurie jaučiasi verti vietos tavo namuose."
+        }
       />
 
       <div className="public-section grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
-          <span className="premium-tag">Seasonal selection</span>
+          <span className="premium-tag">
+            {defaultProductType === "digital" ? "Instant download" : "Seasonal selection"}
+          </span>
           <h3 className="mt-5 font-display text-4xl font-bold sm:text-5xl">
-            The collection now feels more editorial than template-like.
+            {defaultProductType === "digital"
+              ? "Build a digital ritual shelf instead of waiting for a parcel."
+              : "The collection now feels more editorial than template-like."}
           </h3>
           <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
-            Vietoje bendro demo katalogo akcentuojame ramesnę naršymo patirtį: švarius kortelių santykius,
-            mažiau triukšmo ir aiškesnį dėmesį pačiam objektui.
+            {defaultProductType === "digital"
+              ? "Šioje dalyje rasi printable plakatus, PDF gidus ir plannerius, kuriuos gali atsisiųsti iškart po apmokėjimo. Tai ramus, aukštos maržos sluoksnis tavo brand'ui be fizinės logistikos."
+              : "Vietoje bendro demo katalogo akcentuojame ramesnę naršymo patirtį: švarius kortelių santykius, mažiau triukšmo ir aiškesnį dėmesį pačiam objektui."}
           </p>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          {[
-            "Curated categories",
-            "Secure checkout",
-            "Receipt archive",
-            "Member-only pricing",
-          ].map((item) => (
+          {(
+            defaultProductType === "digital"
+              ? [
+                  "Instant download access",
+                  "Protected file delivery",
+                  "Receipt archive",
+                  "Bundle-friendly pricing",
+                ]
+              : [
+                  "Curated categories",
+                  "Secure checkout",
+                  "Receipt archive",
+                  "Member-only pricing",
+                ]
+          ).map((item) => (
             <div key={item} className="marketing-mini-card flex items-center justify-between">
               <span className="font-medium">{item}</span>
               <span className="accent-text text-sm">•</span>
@@ -143,6 +185,13 @@ const ShopPage = () => {
         />
       ) : (
         <>
+          {filters.productType === "digital" && (
+            <div className="rounded-[28px] border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800">
+              Rodomi tik skaitmeniniai produktai: PDF gidai, printable rinkiniai ir instant download
+              kolekcijos.
+            </div>
+          )}
+
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {products.map((product) => (
               <ProductCard key={product._id} product={product} />
