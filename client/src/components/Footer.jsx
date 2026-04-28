@@ -1,17 +1,18 @@
 import { Link } from "react-router-dom";
+import { clientCareLinks, houseLinks, serviceLinks } from "../content/infoPages";
 
 const footerColumns = [
   {
     title: "House",
-    items: ["Our story", "Collection", "Membership", "Journal"],
+    items: houseLinks,
   },
   {
     title: "Services",
-    items: ["Secure checkout", "Receipt archive", "Member pricing", "Private support"],
+    items: serviceLinks,
   },
   {
     title: "Client care",
-    items: ["Shipping", "Returns", "Privacy", "Terms"],
+    items: clientCareLinks,
   },
 ];
 
@@ -59,9 +60,17 @@ const Footer = () => (
         <div key={column.title}>
           <p className="font-semibold text-white">{column.title}</p>
           <div className="mt-4 space-y-3 text-sm text-white/58">
-            {column.items.map((item) => (
-              <p key={item}>{item}</p>
-            ))}
+            {column.items.map((item) =>
+              item.to ? (
+                <Link key={item.label} to={item.to} className="block transition hover:text-white">
+                  {item.label}
+                </Link>
+              ) : (
+                <a key={item.label} href={item.href} className="block transition hover:text-white">
+                  {item.label}
+                </a>
+              )
+            )}
           </div>
         </div>
       ))}

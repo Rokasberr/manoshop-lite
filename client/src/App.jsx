@@ -15,6 +15,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ProfilePage from "./pages/ProfilePage";
 import PricingPage from "./pages/PricingPage";
+import InfoPage from "./pages/InfoPage";
 import BillingSuccessPage from "./pages/BillingSuccessPage";
 import BillingCancelPage from "./pages/BillingCancelPage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
@@ -22,6 +23,7 @@ import AdminDashboardPreviewPage from "./pages/admin/AdminDashboardPreviewPage";
 import ProductManagerPage from "./pages/admin/ProductManagerPage";
 import OrdersManagerPage from "./pages/admin/OrdersManagerPage";
 import AdminShell from "./components/admin-dashboard/AdminShell";
+import { infoPages } from "./content/infoPages";
 
 const App = () => (
   <Routes>
@@ -39,6 +41,14 @@ const App = () => (
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/pricing" element={<PricingPage />} />
+      <Route path="/secure-checkout" element={<InfoPage page={infoPages.secureCheckout} />} />
+      <Route path="/receipt-archive" element={<InfoPage page={infoPages.receiptArchive} />} />
+      <Route path="/member-pricing" element={<InfoPage page={infoPages.memberPricing} />} />
+      <Route path="/private-support" element={<InfoPage page={infoPages.privateSupport} />} />
+      <Route path="/shipping" element={<InfoPage page={infoPages.shipping} />} />
+      <Route path="/returns" element={<InfoPage page={infoPages.returns} />} />
+      <Route path="/privacy" element={<InfoPage page={infoPages.privacy} />} />
+      <Route path="/terms" element={<InfoPage page={infoPages.terms} />} />
 
       <Route element={<ProtectedRoute />}>
         <Route path="/checkout" element={<CheckoutPage />} />
