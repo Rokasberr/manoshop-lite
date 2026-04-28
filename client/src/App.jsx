@@ -8,6 +8,8 @@ import DigitalLandingPage from "./pages/DigitalLandingPage";
 import StoryPage from "./pages/StoryPage";
 import JournalPage from "./pages/JournalPage";
 import JournalArticlePage from "./pages/JournalArticlePage";
+import SavingsStudioDemoPage from "./pages/SavingsStudioDemoPage";
+import SavingsStudioPage from "./pages/SavingsStudioPage";
 import ShopPage from "./pages/ShopPage";
 import ProductPage from "./pages/ProductPage";
 import CartPage from "./pages/CartPage";
@@ -39,6 +41,7 @@ const App = () => (
       <Route path="/story" element={<StoryPage />} />
       <Route path="/journal" element={<JournalPage />} />
       <Route path="/journal/:slug" element={<JournalArticlePage />} />
+      <Route path="/savings-studio" element={<SavingsStudioDemoPage />} />
       <Route path="/shop" element={<ShopPage />} />
       <Route path="/digital" element={<DigitalLandingPage />} />
       <Route path="/digital/collection" element={<ShopPage defaultProductType="digital" />} />
@@ -64,6 +67,10 @@ const App = () => (
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/billing/success" element={<BillingSuccessPage />} />
         <Route path="/billing/cancel" element={<BillingCancelPage />} />
+      </Route>
+
+      <Route element={<ProtectedRoute requireMembership membershipRedirect="/savings-studio" />}>
+        <Route path="/members/savings-studio" element={<SavingsStudioPage />} />
       </Route>
 
       <Route element={<ProtectedRoute requireAdmin />}>

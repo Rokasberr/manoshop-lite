@@ -9,6 +9,7 @@ const billingRoutes = require("./routes/billingRoutes");
 const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const userRoutes = require("./routes/userRoutes");
+const savingsStudioRoutes = require("./routes/savingsStudioRoutes");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const { handleStripeWebhook } = require("./controllers/billingController");
 const { getConfiguredOrigins, isAllowedOrigin } = require("./utils/originMatcher");
@@ -53,6 +54,7 @@ app.use("/api/billing", billingRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/savings-studio", savingsStudioRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

@@ -38,8 +38,33 @@ const adminOnly = (req, res, next) => {
   next();
 };
 
+const hasActiveMembership = (user) => {
+  if (!user) {
+    return false;
+  }
+
+  if (user.role === "admin") {
+    return true;
+  }
+
+  const plan = user.subscription?.plan || "free";
+  const status = user.subscription?.status || "inactive";
+
+  return plan !== "free" && ["active", "trialing"].includes(status);
+};
+
+const memberOnly = (req, res, next) => {
+  if (!hasActiveMembership(req.user)) {
+    res.status(403);
+    return next(new Error("Ši sritis prieinama tik aktyviems nariams."));
+  }
+
+  next();
+};
+
 module.exports = {
   protect,
   adminOnly,
+  memberOnly,
+  hasActiveMembership,
 };
-

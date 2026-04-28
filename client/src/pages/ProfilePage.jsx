@@ -9,6 +9,7 @@ import SectionTitle from "../components/SectionTitle";
 import StatusBadge from "../components/admin/StatusBadge";
 import { useAuth } from "../context/AuthContext";
 import orderService from "../services/orderService";
+import { hasActiveMembership } from "../utils/membership";
 import { formatCurrency } from "../utils/currency";
 
 const ProfilePage = () => {
@@ -111,10 +112,15 @@ const ProfilePage = () => {
                   {new Date(user.subscription.currentPeriodEnd).toLocaleDateString("lt-LT")}
                 </span>
               </p>
-            )}
+            )} 
             <Link to="/pricing" className="button-secondary mt-6 inline-flex">
               Manage plan
             </Link>
+            {hasActiveMembership(user) && (
+              <Link to="/members/savings-studio" className="button-primary mt-4 inline-flex">
+                Open Savings Studio
+              </Link>
+            )}
           </div>
         </div>
 

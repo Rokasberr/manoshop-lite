@@ -21,6 +21,7 @@ export const subscriptionPlans = [
       "Early access to new drops",
       "Member pricing on selected pieces",
       "Members-only Journal access",
+      "Savings Studio access",
       "Priority support and billing",
     ],
   },
@@ -35,6 +36,7 @@ export const subscriptionPlans = [
     features: [
       "Everything in Circle",
       "Members-only Journal access",
+      "Savings Studio access",
       "Private sourcing assistance",
       "Priority fulfillment across orders",
     ],

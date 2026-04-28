@@ -13,6 +13,7 @@ const featurePills = [
   "Member-only pricing",
   "Private account archive",
   "Priority client care",
+  "Savings Studio access",
 ];
 
 const PricingPage = () => {
@@ -196,16 +197,30 @@ const PricingPage = () => {
             tipografija, išgrynintos kortelės ir aiškesnė nario vertė.
           </p>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            <div className="metric-card">
-              <p className="text-xs uppercase tracking-[0.3em] text-white/45">Circle</p>
-              <p className="mt-3 font-display text-3xl font-bold">Early drops</p>
-              <p className="mt-2 text-sm text-white/62">Priority access to limited pieces and softer perks.</p>
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              <div className="metric-card">
+                <p className="text-xs uppercase tracking-[0.3em] text-white/45">Circle</p>
+                <p className="mt-3 font-display text-3xl font-bold">Early drops</p>
+                <p className="mt-2 text-sm text-white/62">Priority access to limited pieces and softer perks.</p>
+              </div>
+              <div className="metric-card">
+                <p className="text-xs uppercase tracking-[0.3em] text-white/45">Private</p>
+                <p className="mt-3 font-display text-3xl font-bold">Concierge tone</p>
+                <p className="mt-2 text-sm text-white/62">Better fit for frequent orders, gifts and client projects.</p>
+              </div>
             </div>
-            <div className="metric-card">
-              <p className="text-xs uppercase tracking-[0.3em] text-white/45">Private</p>
-              <p className="mt-3 font-display text-3xl font-bold">Concierge tone</p>
-              <p className="mt-2 text-sm text-white/62">Better fit for frequent orders, gifts and client projects.</p>
+
+          <div className="mt-6 rounded-[24px] border border-white/8 bg-white/4 p-5">
+            <p className="text-xs uppercase tracking-[0.3em] text-white/45">New members tool</p>
+            <h3 className="mt-3 font-display text-3xl font-bold">Savings Studio</h3>
+            <p className="mt-3 max-w-xl text-sm leading-6 text-white/68">
+              Circle ir Private planai dabar atrakina ir taupymo modulį: narys gali sekti išlaidas, matyti
+              mėnesių pokytį ir naudoti programą kaip aiškesnį pinigų kontrolės sluoksnį.
+            </p>
+            <div className="mt-5">
+              <Link to="/savings-studio" className="hero-outline-button">
+                Preview the program
+              </Link>
             </div>
           </div>
 
