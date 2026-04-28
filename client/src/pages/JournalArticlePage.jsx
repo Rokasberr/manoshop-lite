@@ -1,14 +1,34 @@
 import { ArrowLeft, ArrowRight, Quote } from "lucide-react";
 import { Link, Navigate, useParams } from "react-router-dom";
 
+import JournalAccessGate from "../components/JournalAccessGate";
+import JournalCoverArt from "../components/JournalCoverArt";
 import { getJournalArticleBySlug, journalArticles } from "../content/journalArticles";
+import LoadingSpinner from "../components/LoadingSpinner";
+import { useAuth } from "../context/AuthContext";
+import { hasActiveMembership } from "../utils/membership";
 
 const JournalArticlePage = () => {
+  const { user, isCheckingAuth } = useAuth();
   const { slug } = useParams();
   const article = getJournalArticleBySlug(slug);
 
   if (!article) {
     return <Navigate to="/journal" replace />;
+  }
+
+  if (isCheckingAuth) {
+    return <LoadingSpinner label="Tikriname narystės prieigą..." />;
+  }
+
+  if (!hasActiveMembership(user)) {
+    return (
+      <JournalAccessGate
+        user={user}
+        title={`“${article.title}” is reserved for active members.`}
+        description="This article becomes fully visible after your Circle or Private membership is active. The lock is tied to your paid membership status, not just account creation."
+      />
+    );
   }
 
   const relatedArticles = journalArticles.filter((entry) => entry.slug !== article.slug).slice(0, 2);
@@ -21,14 +41,18 @@ const JournalArticlePage = () => {
           Back to journal
         </Link>
 
-        <div className="mt-8 max-w-4xl">
-          <p className="text-xs uppercase tracking-[0.34em] text-white/42">{article.category}</p>
-          <h1 className="mt-5 font-display text-5xl font-bold leading-[0.94] sm:text-6xl">{article.title}</h1>
-          <div className="mt-5 flex flex-wrap gap-4 text-sm text-white/58">
-            <span>{article.date}</span>
-            <span>{article.readTime}</span>
+        <div className="mt-8 grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+          <div className="max-w-4xl">
+            <p className="text-xs uppercase tracking-[0.34em] text-white/42">{article.category}</p>
+            <h1 className="mt-5 font-display text-5xl font-bold leading-[0.94] sm:text-6xl">{article.title}</h1>
+            <div className="mt-5 flex flex-wrap gap-4 text-sm text-white/58">
+              <span>{article.date}</span>
+              <span>{article.readTime}</span>
+            </div>
+            <p className="mt-6 max-w-3xl text-base leading-7 text-white/74 sm:text-lg">{article.intro}</p>
           </div>
-          <p className="mt-6 max-w-3xl text-base leading-7 text-white/74 sm:text-lg">{article.intro}</p>
+
+          <JournalCoverArt cover={article.cover} />
         </div>
       </section>
 
@@ -64,16 +88,19 @@ const JournalArticlePage = () => {
       <section className="public-section">
         <div className="grid gap-5 lg:grid-cols-2">
           {relatedArticles.map((entry) => (
-            <Link key={entry.slug} to={`/journal/${entry.slug}`} className="marketing-card p-6 transition hover:-translate-y-1">
-              <p className="text-xs uppercase tracking-[0.3em] text-muted">{entry.category}</p>
-              <h2 className="mt-4 font-display text-3xl font-bold tracking-[-0.03em] text-[rgb(28,24,20)]">
-                {entry.title}
-              </h2>
-              <p className="mt-4 text-base leading-7 text-muted">{entry.excerpt}</p>
-              <span className="mt-6 inline-flex items-center gap-2 text-sm font-medium accent-text">
-                Read article
-                <ArrowRight size={16} />
-              </span>
+            <Link key={entry.slug} to={`/journal/${entry.slug}`} className="marketing-card overflow-hidden p-0 transition hover:-translate-y-1">
+              <JournalCoverArt cover={entry.cover} compact />
+              <div className="p-6">
+                <p className="text-xs uppercase tracking-[0.3em] text-muted">{entry.category}</p>
+                <h2 className="mt-4 font-display text-3xl font-bold tracking-[-0.03em] text-[rgb(28,24,20)]">
+                  {entry.title}
+                </h2>
+                <p className="mt-4 text-base leading-7 text-muted">{entry.excerpt}</p>
+                <span className="mt-6 inline-flex items-center gap-2 text-sm font-medium accent-text">
+                  Read article
+                  <ArrowRight size={16} />
+                </span>
+              </div>
             </Link>
           ))}
         </div>

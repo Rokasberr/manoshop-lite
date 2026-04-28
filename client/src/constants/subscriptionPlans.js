@@ -17,7 +17,12 @@ export const subscriptionPlans = [
     description: "Mėnesinė narystė pirkėjams, kurie nori ankstyvos prieigos ir išskirtinių pasiūlymų.",
     provider: "stripe",
     badge: "Most loved",
-    features: ["Early access to new drops", "Member pricing on selected pieces", "Priority support and billing"],
+    features: [
+      "Early access to new drops",
+      "Member pricing on selected pieces",
+      "Members-only Journal access",
+      "Priority support and billing",
+    ],
   },
   {
     id: "business",
@@ -27,6 +32,11 @@ export const subscriptionPlans = [
     description: "Privatesnė narystė interjero projektams, dovanoms ir dažnesniems užsakymams.",
     provider: "stripe",
     badge: "Signature",
-    features: ["Everything in Circle", "Private sourcing assistance", "Priority fulfillment across orders"],
+    features: [
+      "Everything in Circle",
+      "Members-only Journal access",
+      "Private sourcing assistance",
+      "Priority fulfillment across orders",
+    ],
   },
 ];
