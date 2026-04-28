@@ -1,0 +1,28 @@
+<svg width="1200" height="1350" viewBox="0 0 1200 1350" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="1350" rx="48" fill="#F3ECE2"/>
+  <circle cx="1000" cy="180" r="180" fill="#E8DACA"/>
+  <rect x="88" y="86" width="1024" height="1178" rx="36" fill="#FFFBF6" stroke="#E4D7C7" stroke-width="2"/>
+  <text x="150" y="180" fill="#7F6138" font-family="Arial, sans-serif" font-size="28" letter-spacing="6">STILLOAK</text>
+  <text x="150" y="258" fill="#231C16" font-family="Georgia, serif" font-size="72" font-weight="700">AI summaries</text>
+  <text x="150" y="314" fill="#796B5C" font-family="Arial, sans-serif" font-size="28">Weekly and monthly commentary that explains the numbers clearly.</text>
+
+  <rect x="150" y="390" width="902" height="820" rx="34" fill="#1C1714"/>
+  <rect x="194" y="438" width="814" height="724" rx="28" fill="#FDF8F2"/>
+  <text x="244" y="508" fill="#8D6736" font-family="Arial, sans-serif" font-size="22" letter-spacing="4">WEEKLY NOTE</text>
+  <text x="244" y="592" fill="#231C16" font-family="Georgia, serif" font-size="62" font-weight="700">You stayed under pressure in the right places.</text>
+  <text x="244" y="654" fill="#796B5C" font-family="Arial, sans-serif" font-size="28">Food and transport remain stable. Small spontaneous buys are still the cleanest space to protect this week.</text>
+
+  <rect x="244" y="716" width="724" height="132" rx="24" fill="#F5EEE4"/>
+  <text x="282" y="776" fill="#8D6736" font-family="Arial, sans-serif" font-size="20" letter-spacing="4">ULTRA PRO EVALUATION</text>
+  <text x="282" y="834" fill="#231C16" font-family="Georgia, serif" font-size="48" font-weight="700">Strong control • 84 / 100</text>
+
+  <rect x="244" y="886" width="340" height="196" rx="24" fill="#FFFDF9" stroke="#E4D7C7" stroke-width="2"/>
+  <text x="280" y="946" fill="#8D6736" font-family="Arial, sans-serif" font-size="20" letter-spacing="4">TOP RISK</text>
+  <text x="280" y="1016" fill="#231C16" font-family="Georgia, serif" font-size="50" font-weight="700">Impulse spend</text>
+  <text x="280" y="1060" fill="#796B5C" font-family="Arial, sans-serif" font-size="24">watch late-week lifestyle purchases</text>
+
+  <rect x="628" y="886" width="340" height="196" rx="24" fill="#FFFDF9" stroke="#E4D7C7" stroke-width="2"/>
+  <text x="664" y="946" fill="#8D6736" font-family="Arial, sans-serif" font-size="20" letter-spacing="4">NEXT MOVE</text>
+  <text x="664" y="1016" fill="#231C16" font-family="Georgia, serif" font-size="50" font-weight="700">Keep 120 €</text>
+  <text x="664" y="1060" fill="#796B5C" font-family="Arial, sans-serif" font-size="24">free for your active savings goal</text>
+</svg>

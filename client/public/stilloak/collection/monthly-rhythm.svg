@@ -1,0 +1,31 @@
+<svg width="1200" height="1350" viewBox="0 0 1200 1350" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="1350" rx="48" fill="#F4EDE4"/>
+  <circle cx="220" cy="210" r="150" fill="#E5D8C6"/>
+  <rect x="88" y="86" width="1024" height="1178" rx="36" fill="#FFFBF6" stroke="#E4D7C7" stroke-width="2"/>
+  <text x="150" y="180" fill="#7F6138" font-family="Arial, sans-serif" font-size="28" letter-spacing="6">STILLOAK</text>
+  <text x="150" y="258" fill="#231C16" font-family="Georgia, serif" font-size="72" font-weight="700">Monthly rhythm</text>
+  <text x="150" y="314" fill="#796B5C" font-family="Arial, sans-serif" font-size="28">A calmer weekly flow instead of a month that feels random.</text>
+
+  <rect x="150" y="392" width="902" height="760" rx="34" fill="#FFFDF8" stroke="#E4D7C7" stroke-width="2"/>
+  <text x="196" y="456" fill="#8D6736" font-family="Arial, sans-serif" font-size="22" letter-spacing="4">WEEKLY SHAPE</text>
+  <path d="M210 930 C300 840 360 790 450 820 C540 850 620 970 730 900 C810 850 900 700 990 730" stroke="#8D6736" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="210" cy="930" r="16" fill="#1B1614"/>
+  <circle cx="450" cy="820" r="16" fill="#1B1614"/>
+  <circle cx="730" cy="900" r="16" fill="#1B1614"/>
+  <circle cx="990" cy="730" r="16" fill="#1B1614"/>
+
+  <rect x="210" y="544" width="240" height="166" rx="24" fill="#1B1614"/>
+  <text x="242" y="602" fill="#D9C7AF" font-family="Arial, sans-serif" font-size="20" letter-spacing="4">WEEK 1</text>
+  <text x="242" y="668" fill="#FFFFFF" font-family="Georgia, serif" font-size="54" font-weight="700">Stable</text>
+
+  <rect x="478" y="544" width="240" height="166" rx="24" fill="#F7F0E7"/>
+  <text x="510" y="602" fill="#8D6736" font-family="Arial, sans-serif" font-size="20" letter-spacing="4">WEEK 2</text>
+  <text x="510" y="668" fill="#231C16" font-family="Georgia, serif" font-size="54" font-weight="700">Busy</text>
+
+  <rect x="746" y="544" width="240" height="166" rx="24" fill="#F7F0E7"/>
+  <text x="778" y="602" fill="#8D6736" font-family="Arial, sans-serif" font-size="20" letter-spacing="4">WEEK 3</text>
+  <text x="778" y="668" fill="#231C16" font-family="Georgia, serif" font-size="54" font-weight="700">Recover</text>
+
+  <text x="196" y="1032" fill="#231C16" font-family="Georgia, serif" font-size="44" font-weight="700">The goal is not perfect discipline.</text>
+  <text x="196" y="1084" fill="#796B5C" font-family="Arial, sans-serif" font-size="28">It is a month you can understand early enough to adjust calmly.</text>
+</svg>

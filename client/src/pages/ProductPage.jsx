@@ -8,6 +8,7 @@ import { useCart } from "../context/CartContext";
 import { STORE_PURCHASES_PAUSED, STORE_PURCHASES_PAUSED_MESSAGE } from "../constants/storefront";
 import productService from "../services/productService";
 import { formatCurrency } from "../utils/currency";
+import { getProductDisplayImages } from "../utils/productVisuals";
 
 const ProductPage = () => {
   const { id } = useParams();
@@ -17,6 +18,7 @@ const ProductPage = () => {
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const displayImages = getProductDisplayImages(product);
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -24,7 +26,7 @@ const ProductPage = () => {
         setLoading(true);
         const data = await productService.getProductById(id);
         setProduct(data);
-        setSelectedImage(data.images?.[0] || "");
+        setSelectedImage(getProductDisplayImages(data)[0] || "");
       } catch (loadError) {
         setError(loadError.response?.data?.message || "Produktas nerastas.");
       } finally {
@@ -60,9 +62,9 @@ const ProductPage = () => {
           <img src={selectedImage} alt={product.name} className="aspect-[4/4.4] w-full object-cover" />
         </div>
 
-        {product.images?.length > 1 && (
+        {displayImages.length > 1 && (
           <div className="grid grid-cols-4 gap-3">
-            {product.images.map((image) => (
+            {displayImages.map((image) => (
               <button
                 type="button"
                 key={image}

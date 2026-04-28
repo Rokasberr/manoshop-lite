@@ -5,6 +5,7 @@ import SectionTitle from "../components/SectionTitle";
 import { useCart } from "../context/CartContext";
 import { STORE_PURCHASES_PAUSED, STORE_PURCHASES_PAUSED_MESSAGE } from "../constants/storefront";
 import { formatCurrency } from "../utils/currency";
+import { getPrimaryProductImage } from "../utils/productVisuals";
 
 const CartPage = () => {
   const { cartItems, subtotal, updateQuantity, removeFromCart } = useCart();
@@ -42,7 +43,7 @@ const CartPage = () => {
           {cartItems.map((item) => (
             <div key={item.product} className="panel flex flex-col gap-4 p-5 sm:flex-row">
               <img
-                src={item.image}
+                src={getPrimaryProductImage(item) || item.image}
                 alt={item.name}
                 className="h-28 w-full rounded-[24px] object-cover sm:w-32"
               />

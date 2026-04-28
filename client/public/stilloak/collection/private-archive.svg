@@ -1,0 +1,28 @@
+<svg width="1200" height="1350" viewBox="0 0 1200 1350" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="1350" rx="48" fill="#F4EEE4"/>
+  <circle cx="1030" cy="220" r="200" fill="#E8DACA"/>
+  <rect x="88" y="86" width="1024" height="1178" rx="36" fill="#FFFBF6" stroke="#E4D7C7" stroke-width="2"/>
+  <text x="150" y="180" fill="#7F6138" font-family="Arial, sans-serif" font-size="28" letter-spacing="6">STILLOAK</text>
+  <text x="150" y="258" fill="#231C16" font-family="Georgia, serif" font-size="72" font-weight="700">Private archive</text>
+  <text x="150" y="314" fill="#796B5C" font-family="Arial, sans-serif" font-size="28">Membership, receipts, summaries and downloads in one calm layer.</text>
+
+  <rect x="150" y="388" width="902" height="252" rx="30" fill="#1B1614"/>
+  <text x="196" y="450" fill="#D9C7AF" font-family="Arial, sans-serif" font-size="22" letter-spacing="4">PRIVATE ACCESS</text>
+  <text x="196" y="542" fill="#FFFFFF" font-family="Georgia, serif" font-size="88" font-weight="700">Private tier</text>
+  <text x="196" y="596" fill="#D0C1AF" font-family="Arial, sans-serif" font-size="28">A more elevated member relationship around support and clarity.</text>
+
+  <rect x="150" y="692" width="286" height="408" rx="28" fill="#FFFDF8" stroke="#E4D7C7" stroke-width="2"/>
+  <text x="186" y="754" fill="#8D6736" font-family="Arial, sans-serif" font-size="20" letter-spacing="4">RECEIPTS</text>
+  <text x="186" y="822" fill="#231C16" font-family="Georgia, serif" font-size="50" font-weight="700">PDF archive</text>
+  <text x="186" y="866" fill="#796B5C" font-family="Arial, sans-serif" font-size="24">every invoice saved inside the account</text>
+
+  <rect x="458" y="692" width="286" height="408" rx="28" fill="#F7F0E7"/>
+  <text x="494" y="754" fill="#8D6736" font-family="Arial, sans-serif" font-size="20" letter-spacing="4">SUMMARIES</text>
+  <text x="494" y="822" fill="#231C16" font-family="Georgia, serif" font-size="50" font-weight="700">Weekly + monthly</text>
+  <text x="494" y="866" fill="#796B5C" font-family="Arial, sans-serif" font-size="24">a private timeline of commentary and signal</text>
+
+  <rect x="766" y="692" width="286" height="408" rx="28" fill="#F7F0E7"/>
+  <text x="802" y="754" fill="#8D6736" font-family="Arial, sans-serif" font-size="20" letter-spacing="4">DOWNLOADS</text>
+  <text x="802" y="822" fill="#231C16" font-family="Georgia, serif" font-size="50" font-weight="700">Member files</text>
+  <text x="802" y="866" fill="#796B5C" font-family="Arial, sans-serif" font-size="24">protected access in one tidy member space</text>
+</svg>

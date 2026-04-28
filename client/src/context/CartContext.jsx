@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { STORE_PURCHASES_PAUSED, STORE_PURCHASES_PAUSED_MESSAGE } from "../constants/storefront";
+import { getPrimaryProductImage } from "../utils/productVisuals";
 
 const CartContext = createContext(null);
 const cartStorageKey = "manoshop_cart";
@@ -11,6 +12,7 @@ const normalizeStoredItems = (items) =>
     ? items.map((item) => ({
         ...item,
         productType: item.productType || "physical",
+        image: getPrimaryProductImage(item) || item.image || "",
       }))
     : [];
 
@@ -58,7 +60,7 @@ export const CartProvider = ({ children }) => {
           product: product._id,
           name: product.name,
           price: product.price,
-          image: product.images?.[0] || "",
+          image: getPrimaryProductImage(product) || "",
           stock: product.stock,
           category: product.category,
           productType: product.productType || "physical",

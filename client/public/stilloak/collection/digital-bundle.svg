@@ -1,0 +1,32 @@
+<svg width="1200" height="1350" viewBox="0 0 1200 1350" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="1350" rx="48" fill="#F5EFE6"/>
+  <circle cx="1010" cy="180" r="180" fill="#E8DACA"/>
+  <rect x="88" y="86" width="1024" height="1178" rx="36" fill="#FFFBF6" stroke="#E4D7C7" stroke-width="2"/>
+  <text x="150" y="180" fill="#7F6138" font-family="Arial, sans-serif" font-size="28" letter-spacing="6">STILLOAK</text>
+  <text x="150" y="258" fill="#231C16" font-family="Georgia, serif" font-size="72" font-weight="700">Digital bundle</text>
+  <text x="150" y="314" fill="#796B5C" font-family="Arial, sans-serif" font-size="28">A premium member-style product frame for Stilloak digital layers.</text>
+
+  <rect x="150" y="388" width="902" height="830" rx="34" fill="#1B1614"/>
+  <rect x="200" y="446" width="296" height="680" rx="28" fill="#FDF8F2"/>
+  <text x="234" y="504" fill="#8D6736" font-family="Arial, sans-serif" font-size="18" letter-spacing="4">GUIDE</text>
+  <text x="234" y="574" fill="#231C16" font-family="Georgia, serif" font-size="48" font-weight="700">Clarity kit</text>
+  <rect x="234" y="628" width="228" height="14" rx="7" fill="#E4D7C7"/>
+  <rect x="234" y="658" width="192" height="14" rx="7" fill="#E4D7C7"/>
+  <rect x="234" y="688" width="210" height="14" rx="7" fill="#E4D7C7"/>
+  <rect x="234" y="770" width="228" height="228" rx="24" fill="#F2E6D6"/>
+
+  <rect x="532" y="512" width="202" height="438" rx="24" fill="#F7F0E7"/>
+  <text x="560" y="560" fill="#8D6736" font-family="Arial, sans-serif" font-size="16" letter-spacing="4">PLANNER</text>
+  <text x="560" y="628" fill="#231C16" font-family="Georgia, serif" font-size="40" font-weight="700">Reset</text>
+  <rect x="560" y="682" width="140" height="12" rx="6" fill="#DCCCB7"/>
+  <rect x="560" y="710" width="120" height="12" rx="6" fill="#DCCCB7"/>
+
+  <rect x="770" y="562" width="202" height="388" rx="24" fill="#F7F0E7"/>
+  <text x="798" y="610" fill="#8D6736" font-family="Arial, sans-serif" font-size="16" letter-spacing="4">SUMMARY</text>
+  <text x="798" y="678" fill="#231C16" font-family="Georgia, serif" font-size="40" font-weight="700">Focus</text>
+  <rect x="798" y="732" width="130" height="12" rx="6" fill="#DCCCB7"/>
+  <rect x="798" y="760" width="110" height="12" rx="6" fill="#DCCCB7"/>
+
+  <text x="532" y="1044" fill="#FFFFFF" font-family="Georgia, serif" font-size="54" font-weight="700">Structured like the product itself.</text>
+  <text x="532" y="1092" fill="#D0C1AF" font-family="Arial, sans-serif" font-size="24">Quiet, protected, and tied to real member value.</text>
+</svg>

@@ -15,7 +15,7 @@ const digitalProducts = [
     category: "Digital Products",
     productType: "digital",
     images: [
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+      "/stilloak/collection/digital-bundle.svg",
     ],
     stock: 0,
     featured: true,
@@ -34,7 +34,7 @@ const digitalProducts = [
     category: "Digital Products",
     productType: "digital",
     images: [
-      "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1200&q=80",
+      "/stilloak/collection/ai-summaries.svg",
     ],
     stock: 0,
     featured: true,
@@ -53,7 +53,7 @@ const digitalProducts = [
     category: "Digital Products",
     productType: "digital",
     images: [
-      "https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=1200&q=80",
+      "/stilloak/collection/monthly-rhythm.svg",
     ],
     stock: 0,
     featured: false,
@@ -72,7 +72,7 @@ const digitalProducts = [
     category: "Digital Products",
     productType: "digital",
     images: [
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+      "/stilloak/collection/digital-bundle.svg",
     ],
     stock: 0,
     featured: true,
@@ -91,7 +91,7 @@ const digitalProducts = [
     category: "Digital Products",
     productType: "digital",
     images: [
-      "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1200&q=80",
+      "/stilloak/collection/private-archive.svg",
     ],
     stock: 0,
     featured: true,

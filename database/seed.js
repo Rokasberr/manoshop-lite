@@ -31,7 +31,7 @@ const products = [
     price: 89.9,
     category: "Home",
     images: [
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+      "/stilloak/collection/budget-clarity.svg",
     ],
     stock: 18,
     featured: true,
@@ -43,7 +43,7 @@ const products = [
     price: 159,
     category: "Tech",
     images: [
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80",
+      "/stilloak/collection/ai-summaries.svg",
     ],
     stock: 24,
     featured: true,
@@ -55,7 +55,7 @@ const products = [
     price: 74.5,
     category: "Accessories",
     images: [
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80",
+      "/stilloak/collection/recurring-flow.svg",
     ],
     stock: 32,
     featured: false,
@@ -67,7 +67,7 @@ const products = [
     price: 64.9,
     category: "Fashion",
     images: [
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1200&q=80",
+      "/stilloak/collection/private-archive.svg",
     ],
     stock: 27,
     featured: true,
@@ -79,7 +79,7 @@ const products = [
     price: 54,
     category: "Kitchen",
     images: [
-      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1200&q=80",
+      "/stilloak/collection/goal-pace.svg",
     ],
     stock: 14,
     featured: false,
@@ -91,7 +91,7 @@ const products = [
     price: 119,
     category: "Footwear",
     images: [
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80",
+      "/stilloak/collection/monthly-rhythm.svg",
     ],
     stock: 21,
     featured: true,
@@ -104,7 +104,7 @@ const products = [
     category: "Digital Products",
     productType: "digital",
     images: [
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+      "/stilloak/collection/digital-bundle.svg",
     ],
     stock: 0,
     featured: true,
@@ -123,7 +123,7 @@ const products = [
     category: "Digital Products",
     productType: "digital",
     images: [
-      "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1200&q=80",
+      "/stilloak/collection/ai-summaries.svg",
     ],
     stock: 0,
     featured: true,
@@ -142,7 +142,7 @@ const products = [
     category: "Digital Products",
     productType: "digital",
     images: [
-      "https://images.unsplash.com/photo-1517842645767-c639042777db?auto=format&fit=crop&w=1200&q=80",
+      "/stilloak/collection/monthly-rhythm.svg",
     ],
     stock: 0,
     featured: false,
@@ -161,7 +161,7 @@ const products = [
     category: "Digital Products",
     productType: "digital",
     images: [
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80",
+      "/stilloak/collection/digital-bundle.svg",
     ],
     stock: 0,
     featured: true,
@@ -180,7 +180,7 @@ const products = [
     category: "Digital Products",
     productType: "digital",
     images: [
-      "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1200&q=80",
+      "/stilloak/collection/private-archive.svg",
     ],
     stock: 0,
     featured: true,

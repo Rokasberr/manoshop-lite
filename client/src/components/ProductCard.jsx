@@ -4,18 +4,20 @@ import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { STORE_PURCHASES_PAUSED, STORE_PURCHASES_PAUSED_MESSAGE } from "../constants/storefront";
 import { formatCurrency } from "../utils/currency";
+import { getPrimaryProductImage } from "../utils/productVisuals";
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart();
   const isDigital = product.productType === "digital";
   const isUnavailable = STORE_PURCHASES_PAUSED || (!isDigital && product.stock === 0);
+  const productImage = getPrimaryProductImage(product);
 
   return (
     <div className="panel overflow-hidden">
       <Link to={`/products/${product._id}`} className="block">
         <div className="relative aspect-[4/4.5] overflow-hidden">
           <img
-            src={product.images?.[0]}
+            src={productImage}
             alt={product.name}
             className="h-full w-full object-cover transition duration-500 hover:scale-105"
           />
