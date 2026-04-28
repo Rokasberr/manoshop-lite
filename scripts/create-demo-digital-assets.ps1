@@ -135,6 +135,9 @@ function New-MinimalPdf {
 
 foreach ($target in $targets) {
   $fullPath = Join-Path $root $target.Path
+  if (Test-Path $fullPath) {
+    continue
+  }
   New-MinimalPdf -OutputPath $fullPath -Lines $target.Lines
 }
 
