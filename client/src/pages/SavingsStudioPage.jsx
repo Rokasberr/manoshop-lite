@@ -175,6 +175,7 @@ const SavingsStudioPage = () => {
   const [savingRecurring, setSavingRecurring] = useState(false);
   const [savingEmailSettings, setSavingEmailSettings] = useState(false);
   const [sendingSummaryEmail, setSendingSummaryEmail] = useState(false);
+  const [downloadingSummaryKey, setDownloadingSummaryKey] = useState("");
   const [previewingCsv, setPreviewingCsv] = useState(false);
   const [confirmingCsvImport, setConfirmingCsvImport] = useState(false);
   const [downloadingBackup, setDownloadingBackup] = useState(false);
@@ -780,6 +781,34 @@ const SavingsStudioPage = () => {
       toast.error(error.response?.data?.message || "Nepavyko paruošti backup failo.");
     } finally {
       setDownloadingBackup(false);
+    }
+  };
+
+  const handleDownloadSummary = async (frequency) => {
+    setDownloadingSummaryKey(frequency);
+
+    try {
+      const { blob, contentDisposition } = await savingsStudioService.downloadSummaryFile(frequency);
+      const match = contentDisposition.match(/filename="?([^"]+)"?/i);
+      const fallbackFrequency = frequency === "monthly" ? "monthly" : "weekly";
+      const fallbackName = `stilloak-${fallbackFrequency}-summary-${new Date()
+        .toISOString()
+        .replace(/[:.]/g, "-")}.html`;
+      const filename = match?.[1] || fallbackName;
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success(`${frequency === "monthly" ? "Mėnesio" : "Savaitės"} suvestinė paruošta atsisiųsti.`);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Nepavyko paruošti suvestinės failo.");
+    } finally {
+      setDownloadingSummaryKey("");
     }
   };
 
@@ -2149,12 +2178,37 @@ const SavingsStudioPage = () => {
             </button>
           </div>
 
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <button
+              type="button"
+              className="button-secondary w-full justify-center gap-2"
+              onClick={() => handleDownloadSummary("weekly")}
+              disabled={downloadingSummaryKey === "weekly"}
+            >
+              <Download size={16} />
+              {downloadingSummaryKey === "weekly" ? "Ruošiama..." : "Atsisiųsti savaitės suvestinę"}
+            </button>
+            <button
+              type="button"
+              className="button-secondary w-full justify-center gap-2"
+              onClick={() => handleDownloadSummary("monthly")}
+              disabled={downloadingSummaryKey === "monthly"}
+            >
+              <Download size={16} />
+              {downloadingSummaryKey === "monthly" ? "Ruošiama..." : "Atsisiųsti mėnesio suvestinę"}
+            </button>
+          </div>
+
           <div className="mt-6 soft-card rounded-[24px] p-5">
             <p className="text-xs uppercase tracking-[0.18em] text-muted">Statusas</p>
             <p className="mt-3 text-sm leading-6 text-muted">
               {profile?.summaryEmailLastSentAt
                 ? `Paskutinė suvestinė išsiųsta ${dateFormatter.format(new Date(profile.summaryEmailLastSentAt))}.`
                 : "Suvestinių dar nesiuntėme. Gali pasibandyti rankinį siuntimą ir pamatyti, kaip atrodys laiškas."}
+            </p>
+            <p className="mt-3 text-sm leading-6 text-muted">
+              Savaitės ir mėnesio suvestines gali atsisiųsti pakartotinai. Kiekvienas parsisiuntimas sugeneruoja naują
+              failą.
             </p>
           </div>
         </div>

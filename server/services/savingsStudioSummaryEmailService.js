@@ -438,5 +438,6 @@ const sendSavingsSummaryEmail = async ({ frequency = "weekly", profile, summary,
 };
 
 module.exports = {
+  buildSummaryEmail,
   sendSavingsSummaryEmail,
 };

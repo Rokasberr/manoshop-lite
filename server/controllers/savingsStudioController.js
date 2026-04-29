@@ -4,7 +4,7 @@ const SavingsBudget = require("../models/SavingsBudget");
 const SavingsEntry = require("../models/SavingsEntry");
 const SavingsGoal = require("../models/SavingsGoal");
 const SavingsStudioProfile = require("../models/SavingsStudioProfile");
-const { sendSavingsSummaryEmail } = require("../services/savingsStudioSummaryEmailService");
+const { buildSummaryEmail, sendSavingsSummaryEmail } = require("../services/savingsStudioSummaryEmailService");
 const { logSavingsAuditSafe } = require("../services/savingsStudioAuditService");
 
 const CATEGORIES = [
@@ -40,6 +40,7 @@ const MAX_IMPORT_ROWS = 300;
 const MAX_BACKUP_AUDIT_ROWS = 200;
 
 const currentMonthKey = () => new Date().toISOString().slice(0, 7);
+const buildDownloadTimestamp = () => new Date().toISOString().replace(/[:.]/g, "-");
 
 const previousMonthKey = () => {
   const date = new Date();
@@ -1262,6 +1263,47 @@ const exportSavingsBackup = async (req, res) => {
   res.status(200).send(JSON.stringify(backup, null, 2));
 };
 
+const downloadSavingsSummaryDocument = async (req, res) => {
+  const profile = await getProfileDocument(req.user._id);
+  const frequency = String(req.query.frequency || profile.summaryEmailFrequency || "weekly").trim();
+  const format = String(req.query.format || "html").trim().toLowerCase();
+
+  if (!["weekly", "monthly"].includes(frequency)) {
+    throw createHttpError("Pasirink galiojantį suvestinės dažnį.");
+  }
+
+  if (!["html", "txt"].includes(format)) {
+    throw createHttpError("Pasirink galiojantį suvestinės failo formatą.");
+  }
+
+  const { summary } = await buildSavingsSummaryPayload(req.user._id);
+  const email = buildSummaryEmail({
+    frequency,
+    summary,
+    userName: req.user.name,
+  });
+  const frequencyLabel = frequency === "monthly" ? "monthly" : "weekly";
+  const fileStamp = buildDownloadTimestamp();
+  const filename = `stilloak-${frequencyLabel}-summary-${fileStamp}.${format}`;
+
+  await logSavingsAuditSafe({
+    userId: req.user._id,
+    action: "summary-export",
+    entityType: "summary-file",
+    metadata: {
+      frequency,
+      format,
+    },
+  });
+
+  res.setHeader(
+    "Content-Type",
+    format === "html" ? "text/html; charset=utf-8" : "text/plain; charset=utf-8"
+  );
+  res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+  res.status(200).send(format === "html" ? email.html : email.text);
+};
+
 const sendSavingsSummaryEmailNow = async (req, res) => {
   const profile = await getProfileDocument(req.user._id);
   const frequency = String(req.body.frequency || profile.summaryEmailFrequency || "weekly").trim();
@@ -1318,6 +1360,7 @@ module.exports = {
   deleteRecurringExpense,
   getSavingsSummary,
   exportSavingsBackup,
+  downloadSavingsSummaryDocument,
   sendSavingsSummaryEmailNow,
   upsertSavingsBudgets,
   CATEGORIES,

@@ -114,6 +114,18 @@ const sendSummaryEmail = async (payload) => {
   return data;
 };
 
+const downloadSummaryFile = async (frequency, format = "html") => {
+  const response = await api.get("/savings-studio/summary-export", {
+    params: { frequency, format },
+    responseType: "blob",
+  });
+
+  return {
+    blob: response.data,
+    contentDisposition: response.headers["content-disposition"] || "",
+  };
+};
+
 const downloadBackup = async () => {
   const response = await api.get("/savings-studio/backup", {
     responseType: "blob",
@@ -149,5 +161,6 @@ export default {
   updateBudgets,
   deleteEntry,
   sendSummaryEmail,
+  downloadSummaryFile,
   downloadBackup,
 };
