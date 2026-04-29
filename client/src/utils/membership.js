@@ -1,3 +1,5 @@
+export const memberAccessStatuses = ["active", "trialing", "past_due"];
+
 export const hasActiveMembership = (user) => {
   if (!user) {
     return false;
@@ -10,5 +12,5 @@ export const hasActiveMembership = (user) => {
   const plan = user.subscription?.plan || "free";
   const status = user.subscription?.status || "inactive";
 
-  return plan !== "free" && ["active", "trialing"].includes(status);
+  return plan !== "free" && memberAccessStatuses.includes(status);
 };

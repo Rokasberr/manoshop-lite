@@ -6,6 +6,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import SectionTitle from "../components/SectionTitle";
 import { useAuth } from "../context/AuthContext";
 import billingService from "../services/billingService";
+import { hasActiveMembership } from "../utils/membership";
 
 const BillingSuccessPage = () => {
   const { refreshProfile, user } = useAuth();
@@ -15,9 +16,7 @@ const BillingSuccessPage = () => {
   const [statusMessage, setStatusMessage] = useState("Tikriname prenumeratos aktyvaciją...");
   const sessionId = searchParams.get("session_id") || "";
 
-  const isStripeActive =
-    user?.subscription?.provider === "stripe" &&
-    ["active", "trialing"].includes(user?.subscription?.status || "");
+  const isStripeActive = hasActiveMembership(user);
 
   useEffect(() => {
     let cancelled = false;
@@ -34,10 +33,7 @@ const BillingSuccessPage = () => {
             return;
           }
 
-          if (
-            profile?.subscription?.provider === "stripe" &&
-            ["active", "trialing"].includes(profile?.subscription?.status || "")
-          ) {
+          if (hasActiveMembership({ ...(user || {}), subscription: profile?.subscription })) {
             setStatusMessage("Prenumerata aktyvuota. Tuoj atidarysime Stilloak.");
             setLoading(false);
             setTimeout(() => {

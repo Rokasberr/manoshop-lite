@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
+import { hasActiveMembership } from "../utils/membership";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -27,8 +28,8 @@ const LoginPage = () => {
       return;
     }
 
-    if (user.subscription?.provider === "stripe" && user.subscription?.status === "active") {
-      navigate("/profile", { replace: true });
+    if (hasActiveMembership(user)) {
+      navigate("/members/savings-studio", { replace: true });
       return;
     }
 

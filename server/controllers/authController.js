@@ -1,16 +1,36 @@
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
+const { findLatestStripeSubscriptionForUser, serializeSubscription } = require("../services/stripeMembershipService");
+const { getStripeClient } = require("../utils/stripeClient");
 
 const signToken = (userId) =>
   jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-const serializeSubscription = (subscription) => ({
-  plan: subscription?.plan || "free",
-  status: subscription?.status || "active",
-  provider: subscription?.provider || "internal",
-  currentPeriodEnd: subscription?.currentPeriodEnd || null,
-});
+const shouldAttemptStripeRefresh = (user) => {
+  if (!user || user.role === "admin") {
+    return false;
+  }
+
+  const plan = user.subscription?.plan || "free";
+  const provider = user.subscription?.provider || "internal";
+  const stripeCustomerId = user.subscription?.stripeCustomerId || "";
+
+  return plan !== "free" || provider === "stripe" || Boolean(stripeCustomerId);
+};
+
+const refreshMembershipFromStripeIfNeeded = async (user) => {
+  if (!shouldAttemptStripeRefresh(user)) {
+    return user;
+  }
+
+  try {
+    const stripe = getStripeClient();
+    return (await findLatestStripeSubscriptionForUser(stripe, user)) || user;
+  } catch (_error) {
+    return user;
+  }
+};
 
 const formatAuthResponse = (user) => ({
   token: signToken(user._id),
@@ -67,7 +87,9 @@ const loginUser = async (req, res) => {
     throw new Error("Neteisingi prisijungimo duomenys.");
   }
 
-  res.json(formatAuthResponse(user));
+  const refreshedUser = await refreshMembershipFromStripeIfNeeded(user);
+
+  res.json(formatAuthResponse(refreshedUser));
 };
 
 const getCurrentUser = async (req, res) => {
@@ -78,13 +100,15 @@ const getCurrentUser = async (req, res) => {
     throw new Error("Vartotojas nerastas.");
   }
 
+  const refreshedUser = await refreshMembershipFromStripeIfNeeded(user);
+
   res.json({
-    id: user._id,
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    createdAt: user.createdAt,
-    subscription: serializeSubscription(user.subscription),
+    id: refreshedUser._id,
+    name: refreshedUser.name,
+    email: refreshedUser.email,
+    role: refreshedUser.role,
+    createdAt: refreshedUser.createdAt,
+    subscription: serializeSubscription(refreshedUser.subscription),
   });
 };
 

@@ -21,11 +21,6 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
-      if (user) {
-        setIsCheckingAuth(false);
-        return;
-      }
-
       try {
         const profile = await authService.profile();
         setUser(profile);
@@ -41,7 +36,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     restoreAuth();
-  }, [token, user]);
+  }, [token]);
 
   const persistAuth = (payload) => {
     setToken(payload.token);

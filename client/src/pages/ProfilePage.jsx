@@ -76,7 +76,10 @@ const ProfilePage = () => {
       const result = await billingService.syncStripeMembership();
       await refreshProfile();
 
-      if (result.subscription?.provider === "stripe" && hasActiveMembership({ ...user, subscription: result.subscription })) {
+      if (
+        result.subscription?.provider === "stripe" &&
+        hasActiveMembership({ ...(user || {}), subscription: result.subscription })
+      ) {
         toast.success("Narystė atnaujinta iš Stripe.");
         return;
       }
