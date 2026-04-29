@@ -1,5 +1,13 @@
 export const memberAccessStatuses = ["active", "trialing", "past_due"];
 
+export const hasPaidMembershipSignal = (user) => {
+  if (!user) {
+    return false;
+  }
+
+  return (user.subscription?.plan || "free") !== "free";
+};
+
 export const hasActiveMembership = (user) => {
   if (!user) {
     return false;

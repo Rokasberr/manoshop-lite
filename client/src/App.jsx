@@ -69,7 +69,7 @@ const App = () => (
         <Route path="/billing/cancel" element={<BillingCancelPage />} />
       </Route>
 
-      <Route element={<ProtectedRoute requireMembership membershipRedirect="/savings-studio" />}>
+      <Route element={<ProtectedRoute requireMembership membershipRedirect="/profile" />}>
         <Route path="/members/savings-studio" element={<SavingsStudioPage />} />
       </Route>
 

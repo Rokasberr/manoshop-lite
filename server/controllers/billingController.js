@@ -26,7 +26,7 @@ const createPaymentSession = async (req, res) => {
 
   const stripe = getStripeClient();
   const clientUrl = resolveClientUrl(req.headers.origin);
-  const successUrl = `${clientUrl}/billing/success?session_id={CHECKOUT_SESSION_ID}`;
+  const successUrl = `${clientUrl}/members/savings-studio?welcome=membership&session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = `${clientUrl}/billing/cancel?plan=${plan.id}`;
   const sessionPayload = {
     mode: "subscription",
