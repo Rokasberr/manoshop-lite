@@ -577,7 +577,20 @@ const SavingsStudioPage = () => {
         summaryEmailsEnabled: Boolean(result.profile?.summaryEmailsEnabled),
         summaryEmailFrequency: result.profile?.summaryEmailFrequency || "weekly",
       });
-      toast.success("Email suvestinių nustatymai atnaujinti.");
+
+      if (result.initialSummary?.triggered) {
+        if (result.initialSummary.sent) {
+          toast.success(
+            `${result.initialSummary.frequency === "monthly" ? "Pirma mėnesio" : "Pirma savaitės"} suvestinė išsiųsta iškart į tavo el. paštą.`
+          );
+        } else if (result.initialSummary.skipped) {
+          toast.error("Nustatymai išsaugoti, bet pirmos suvestinės iškart išsiųsti nepavyko dėl email konfigūracijos.");
+        } else {
+          toast.error("Nustatymai išsaugoti, bet pirmos suvestinės iškart išsiųsti nepavyko.");
+        }
+      } else {
+        toast.success("Email suvestinių nustatymai atnaujinti.");
+      }
     } catch (error) {
       toast.error(error.response?.data?.message || "Nepavyko išsaugoti email suvestinių nustatymų.");
     } finally {

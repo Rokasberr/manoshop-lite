@@ -741,6 +741,7 @@ const updateSavingsProfile = async (req, res) => {
 
 const updateSavingsEmailSettings = async (req, res) => {
   const input = parseEmailSettingsInput(req.body);
+  const previousProfile = await getProfileDocument(req.user._id);
 
   const profile = await SavingsStudioProfile.findOneAndUpdate(
     { user: req.user._id },
@@ -751,7 +752,62 @@ const updateSavingsEmailSettings = async (req, res) => {
     { new: true, upsert: true }
   );
 
-  res.json({ profile });
+  const shouldTriggerInitialSummary =
+    profile.summaryEmailsEnabled &&
+    (!previousProfile.summaryEmailsEnabled || !previousProfile.summaryEmailLastSentAt);
+
+  let initialSummary = null;
+
+  if (shouldTriggerInitialSummary) {
+    try {
+      const { summary } = await buildSavingsSummaryPayload(req.user._id);
+      const result = await sendSavingsSummaryEmail({
+        frequency: profile.summaryEmailFrequency,
+        profile,
+        summary,
+        user: req.user,
+      });
+
+      initialSummary = {
+        triggered: true,
+        sent: Boolean(result.sent),
+        skipped: Boolean(result.skipped),
+        reason: result.reason || "",
+        frequency: profile.summaryEmailFrequency,
+      };
+
+      await logSavingsAuditSafe({
+        userId: req.user._id,
+        action: result.sent ? "summary-email-initial" : "summary-email-initial-skipped",
+        entityType: "summary-email",
+        metadata: {
+          frequency: profile.summaryEmailFrequency,
+          skipped: Boolean(result.skipped),
+          reason: result.reason || "",
+        },
+      });
+    } catch (error) {
+      initialSummary = {
+        triggered: true,
+        sent: false,
+        skipped: false,
+        reason: error.message,
+        frequency: profile.summaryEmailFrequency,
+      };
+
+      await logSavingsAuditSafe({
+        userId: req.user._id,
+        action: "summary-email-initial-failed",
+        entityType: "summary-email",
+        metadata: {
+          frequency: profile.summaryEmailFrequency,
+          message: error.message,
+        },
+      });
+    }
+  }
+
+  res.json({ profile, initialSummary });
 };
 
 const getSavingsBudgets = async (req, res) => {
