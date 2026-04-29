@@ -1,40 +1,54 @@
 const subscriptionPlans = {
   free: {
     id: "free",
-    name: "Free",
+    name: "Guest",
     price: 0,
     currency: "eur",
     interval: "month",
-    description: "Startinis planas ankstyvam testavimui.",
-    features: ["Basic access", "No recurring charge", "Profile and starter tools"],
+    description: "Peržiūri brand pasaulį, pricing logiką ir paskyrą prieš atrakindamas pilną nario įrankį.",
+    features: ["Account and receipt archive", "Launch updates and public previews", "Secure checkout and profile history"],
     provider: "internal",
   },
-  pro: {
-    id: "pro",
-    name: "Pro",
+  circle: {
+    id: "circle",
+    name: "Circle",
     price: 10,
     currency: "eur",
     interval: "month",
-    description: "Pagrindinis SaaS planas individualiems naudotojams.",
-    features: ["Stripe subscription", "Monthly billing", "Priority account access"],
+    description: "Pagrindinė narystė pilnai Stilloak prieigai: biudžetams, tikslams, recurring išlaidoms ir AI suvestinėms.",
+    features: [
+      "Full Stilloak dashboard access",
+      "Budgets, goals, and recurring spending",
+      "CSV import and monthly money view",
+      "Weekly and monthly AI summary emails",
+      "Members-only Journal access",
+      "Priority support and billing",
+    ],
     provider: "stripe",
   },
-  business: {
-    id: "business",
-    name: "Business",
+  private: {
+    id: "private",
+    name: "Private",
     price: 20,
     currency: "eur",
     interval: "month",
-    description: "Išplėstas planas komandoms ir augančiam verslui.",
-    features: ["Everything in Pro", "Business tier subscription", "Team-ready billing"],
+    description: "Aukštesnio lygio narystė tiems, kas nori gilesnio santykio, daugiau palaikymo ir stipresnio premium sluoksnio.",
+    features: [
+      "Everything in Circle",
+      "Priority member handling",
+      "Private-tier support and billing",
+      "Members-only Journal access",
+      "Stronger launch and early-access layer",
+      "Best fit for deeper ongoing use",
+    ],
     provider: "stripe",
   },
 };
 
 const planAliases = {
   guest: "free",
-  circle: "pro",
-  private: "business",
+  pro: "circle",
+  business: "private",
 };
 
 const normalizePlanId = (planId = "") => {

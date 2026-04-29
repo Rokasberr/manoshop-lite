@@ -10,7 +10,7 @@ export const subscriptionPlans = [
     features: ["Account and receipt archive", "Launch updates and public previews", "Secure checkout and profile history"],
   },
   {
-    id: "pro",
+    id: "circle",
     name: "Circle",
     price: 10,
     intervalLabel: "/ month",
@@ -27,7 +27,7 @@ export const subscriptionPlans = [
     ],
   },
   {
-    id: "business",
+    id: "private",
     name: "Private",
     price: 20,
     intervalLabel: "/ month",

@@ -184,7 +184,7 @@ const PricingPage = () => {
           <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
             {subscriptionPlans.map((plan) => {
               const isCurrentPlan = user?.subscription?.plan === plan.id;
-              const isFeatured = plan.id === "pro";
+              const isFeatured = plan.id === "circle";
               const isPaidPlan = plan.provider === "stripe";
 
               return (

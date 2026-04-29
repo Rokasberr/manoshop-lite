@@ -1,10 +1,10 @@
 const User = require("../models/User");
-const { getPlanById, subscriptionPlans } = require("../config/subscriptionPlans");
+const { getPlanById, normalizePlanId, subscriptionPlans } = require("../config/subscriptionPlans");
 
 const stripePlans = Object.values(subscriptionPlans).filter((plan) => plan.provider === "stripe");
 
 const serializeSubscription = (subscription) => ({
-  plan: subscription?.plan || "free",
+  plan: normalizePlanId(subscription?.plan || "free"),
   status: subscription?.status || "active",
   provider: subscription?.provider || "internal",
   currentPeriodEnd: subscription?.currentPeriodEnd || null,
