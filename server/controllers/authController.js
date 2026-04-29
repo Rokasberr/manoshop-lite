@@ -12,11 +12,7 @@ const shouldAttemptStripeRefresh = (user) => {
     return false;
   }
 
-  const plan = user.subscription?.plan || "free";
-  const provider = user.subscription?.provider || "internal";
-  const stripeCustomerId = user.subscription?.stripeCustomerId || "";
-
-  return plan !== "free" || provider === "stripe" || Boolean(stripeCustomerId);
+  return Boolean(user.email);
 };
 
 const refreshMembershipFromStripeIfNeeded = async (user) => {

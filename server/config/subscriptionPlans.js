@@ -31,10 +31,22 @@ const subscriptionPlans = {
   },
 };
 
-const getPlanById = (planId) => subscriptionPlans[planId] || null;
+const planAliases = {
+  guest: "free",
+  circle: "pro",
+  private: "business",
+};
+
+const normalizePlanId = (planId = "") => {
+  const normalizedValue = String(planId || "").trim().toLowerCase();
+
+  return planAliases[normalizedValue] || normalizedValue;
+};
+
+const getPlanById = (planId) => subscriptionPlans[normalizePlanId(planId)] || null;
 
 module.exports = {
   subscriptionPlans,
+  normalizePlanId,
   getPlanById,
 };
-
