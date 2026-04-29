@@ -5,12 +5,14 @@ import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { useLanguage } from "../context/LanguageContext";
 import { useTheme } from "../context/ThemeContext";
+import { hasActiveMembership } from "../utils/membership";
 
 const navbarCopy = {
   lt: {
     nav: {
       story: "Story",
       stilloak: "Stilloak",
+      memberArea: "Nario zona",
       membership: "Narystė",
       launchSoon: "Netrukus",
       admin: "Admin",
@@ -20,6 +22,7 @@ const navbarCopy = {
     signOut: "Atsijungti",
     signIn: "Prisijungti",
     join: "Atrakinti narystę",
+    openStudio: "Atidaryti Stilloak",
     languageLabel: "Kalba",
     studioLabel: "nario pinigų erdvė",
   },
@@ -27,6 +30,7 @@ const navbarCopy = {
     nav: {
       story: "Story",
       stilloak: "Stilloak",
+      memberArea: "Member area",
       membership: "Membership",
       launchSoon: "Launch soon",
       admin: "Admin",
@@ -36,6 +40,7 @@ const navbarCopy = {
     signOut: "Sign out",
     signIn: "Sign in",
     join: "Unlock membership",
+    openStudio: "Open Stilloak",
     languageLabel: "Language",
     studioLabel: "member money space",
   },
@@ -43,6 +48,7 @@ const navbarCopy = {
     nav: {
       story: "Historia",
       stilloak: "Stilloak",
+      memberArea: "Strefa członka",
       membership: "Członkostwo",
       launchSoon: "Wkrótce",
       admin: "Admin",
@@ -52,6 +58,7 @@ const navbarCopy = {
     signOut: "Wyloguj",
     signIn: "Zaloguj",
     join: "Odblokuj członkostwo",
+    openStudio: "Otwórz Stilloak",
     languageLabel: "Język",
     studioLabel: "prywatna przestrzeń finansów",
   },
@@ -59,6 +66,7 @@ const navbarCopy = {
     nav: {
       story: "Story",
       stilloak: "Stilloak",
+      memberArea: "Mitgliederbereich",
       membership: "Mitgliedschaft",
       launchSoon: "Bald",
       admin: "Admin",
@@ -68,6 +76,7 @@ const navbarCopy = {
     signOut: "Abmelden",
     signIn: "Anmelden",
     join: "Mitgliedschaft freischalten",
+    openStudio: "Stilloak öffnen",
     languageLabel: "Sprache",
     studioLabel: "private geldübersicht",
   },
@@ -75,6 +84,7 @@ const navbarCopy = {
     nav: {
       story: "Histoire",
       stilloak: "Stilloak",
+      memberArea: "Espace membre",
       membership: "Abonnement",
       launchSoon: "Bientôt",
       admin: "Admin",
@@ -84,6 +94,7 @@ const navbarCopy = {
     signOut: "Déconnexion",
     signIn: "Connexion",
     join: "Débloquer l’abonnement",
+    openStudio: "Ouvrir Stilloak",
     languageLabel: "Langue",
     studioLabel: "espace financier privé",
   },
@@ -91,6 +102,7 @@ const navbarCopy = {
     nav: {
       story: "Historia",
       stilloak: "Stilloak",
+      memberArea: "Zona de miembro",
       membership: "Membresía",
       launchSoon: "Próximamente",
       admin: "Admin",
@@ -100,6 +112,7 @@ const navbarCopy = {
     signOut: "Salir",
     signIn: "Entrar",
     join: "Desbloquear membresía",
+    openStudio: "Abrir Stilloak",
     languageLabel: "Idioma",
     studioLabel: "espacio privado financiero",
   },
@@ -113,11 +126,12 @@ const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const { language, languageOptions, setLanguage } = useLanguage();
   const copy = navbarCopy[language] || navbarCopy.lt;
+  const isMember = hasActiveMembership(user);
   const currentLanguageOption =
     languageOptions.find((option) => option.code === language) || languageOptions[0];
   const publicLinks = [
     { label: copy.nav.story, to: "/story" },
-    { label: copy.nav.stilloak, to: "/savings-studio" },
+    { label: copy.nav.stilloak, to: isMember ? "/members/savings-studio" : "/savings-studio" },
     { label: copy.nav.membership, to: "/pricing" },
     { label: copy.nav.launchSoon, to: "/launch-soon" },
   ];
@@ -170,6 +184,16 @@ const Navbar = () => {
               {link.label}
             </Link>
           ))}
+          {isMember && (
+            <Link
+              to="/members/savings-studio"
+              className={`nav-link-public ${
+                location.pathname.startsWith("/members/savings-studio") ? "nav-link-public-active" : ""
+              }`}
+            >
+              {copy.nav.memberArea}
+            </Link>
+          )}
           {user?.role === "admin" && (
             <Link
               to="/admin"
@@ -250,8 +274,8 @@ const Navbar = () => {
             </Link>
           )}
 
-          <Link to="/pricing" className="button-primary gap-2 px-4">
-            <span className="hidden sm:inline">{copy.join}</span>
+          <Link to={isMember ? "/members/savings-studio" : "/pricing"} className="button-primary gap-2 px-4">
+            <span className="hidden sm:inline">{isMember ? copy.openStudio : copy.join}</span>
             <ArrowRight size={16} />
           </Link>
         </div>
