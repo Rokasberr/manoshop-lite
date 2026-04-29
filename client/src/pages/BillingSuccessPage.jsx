@@ -5,6 +5,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
 import SectionTitle from "../components/SectionTitle";
 import { useAuth } from "../context/AuthContext";
+import billingService from "../services/billingService";
 
 const BillingSuccessPage = () => {
   const { refreshProfile, user } = useAuth();
@@ -12,6 +13,7 @@ const BillingSuccessPage = () => {
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [statusMessage, setStatusMessage] = useState("Tikriname prenumeratos aktyvaciją...");
+  const sessionId = searchParams.get("session_id") || "";
 
   const isStripeActive =
     user?.subscription?.provider === "stripe" &&
@@ -26,6 +28,7 @@ const BillingSuccessPage = () => {
         attempts += 1;
 
         try {
+          await billingService.syncStripeMembership(sessionId);
           const profile = await refreshProfile();
           if (cancelled) {
             return;
@@ -84,7 +87,7 @@ const BillingSuccessPage = () => {
             </div>
             <h2 className="mt-6 font-display text-4xl font-bold">{statusMessage}</h2>
             <p className="mt-4 text-muted">
-              Session ID: <span className="font-semibold text-current">{searchParams.get("session_id") || "n/a"}</span>
+              Session ID: <span className="font-semibold text-current">{sessionId || "n/a"}</span>
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link to="/members/savings-studio?welcome=membership" className="button-primary">

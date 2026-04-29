@@ -1,5 +1,5 @@
 const User = require("../models/User");
-const { getPlanById } = require("../config/subscriptionPlans");
+const { getPlanById, subscriptionPlans } = require("../config/subscriptionPlans");
 const { syncStripeOrderFromSession } = require("../services/orderCheckoutService");
 const { getStripeClient, resolveClientUrl } = require("../utils/stripeClient");
 
@@ -37,6 +37,122 @@ const updateUserSubscription = async ({
 
   await user.save();
   return user;
+};
+
+const stripePlans = Object.values(subscriptionPlans).filter((plan) => plan.provider === "stripe");
+
+const inferPlanIdFromStripeSubscription = (subscription) => {
+  const metadataPlanId = subscription?.metadata?.planId;
+
+  if (getPlanById(metadataPlanId)) {
+    return metadataPlanId;
+  }
+
+  const price = subscription?.items?.data?.[0]?.price;
+
+  if (!price) {
+    return "free";
+  }
+
+  const matchedPlan = stripePlans.find(
+    (plan) =>
+      plan.currency === price.currency &&
+      plan.interval === price.recurring?.interval &&
+      Math.round(plan.price * 100) === price.unit_amount
+  );
+
+  return matchedPlan?.id || "free";
+};
+
+const syncUserSubscriptionFromStripeSubscription = async ({
+  userId,
+  stripeCustomerId,
+  subscription,
+}) =>
+  updateUserSubscription({
+    userId,
+    planId: inferPlanIdFromStripeSubscription(subscription),
+    status: subscription?.status || "active",
+    stripeCustomerId: stripeCustomerId || subscription?.customer || "",
+    stripeSubscriptionId: subscription?.id || "",
+    currentPeriodEnd: subscription?.current_period_end
+      ? new Date(subscription.current_period_end * 1000)
+      : null,
+  });
+
+const syncUserSubscriptionFromCheckoutSession = async ({
+  stripe,
+  session,
+  fallbackUserId,
+}) => {
+  const userId = session.metadata?.userId || session.client_reference_id || fallbackUserId;
+
+  if (!userId) {
+    return null;
+  }
+
+  const subscriptionId =
+    typeof session.subscription === "string" ? session.subscription : session.subscription?.id || "";
+
+  let subscription = typeof session.subscription === "object" ? session.subscription : null;
+
+  if (!subscription && subscriptionId) {
+    subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  }
+
+  if (!subscription) {
+    return null;
+  }
+
+  return syncUserSubscriptionFromStripeSubscription({
+    userId,
+    stripeCustomerId: session.customer || "",
+    subscription,
+  });
+};
+
+const findLatestStripeSubscriptionForUser = async (stripe, user) => {
+  const knownCustomerId = user.subscription?.stripeCustomerId || "";
+  let stripeCustomerId = knownCustomerId;
+
+  if (!stripeCustomerId) {
+    const customers = await stripe.customers.list({
+      email: user.email,
+      limit: 10,
+    });
+
+    const matchedCustomer =
+      customers.data.find((customer) => customer.email?.toLowerCase() === user.email.toLowerCase()) ||
+      customers.data[0];
+
+    stripeCustomerId = matchedCustomer?.id || "";
+  }
+
+  if (!stripeCustomerId) {
+    return null;
+  }
+
+  const subscriptionList = await stripe.subscriptions.list({
+    customer: stripeCustomerId,
+    status: "all",
+    limit: 10,
+  });
+
+  const userId = user._id.toString();
+  const subscription =
+    subscriptionList.data.find((entry) => entry.metadata?.userId === userId) ||
+    subscriptionList.data.find((entry) => ["active", "trialing", "past_due", "incomplete"].includes(entry.status)) ||
+    subscriptionList.data[0];
+
+  if (!subscription) {
+    return null;
+  }
+
+  return syncUserSubscriptionFromStripeSubscription({
+    userId,
+    stripeCustomerId,
+    subscription,
+  });
 };
 
 const createPaymentSession = async (req, res) => {
@@ -122,6 +238,49 @@ const getBillingProfile = async (req, res) => {
 
   res.json({
     subscription: serializeSubscription(user.subscription),
+  });
+};
+
+const syncStripeMembership = async (req, res) => {
+  const stripe = getStripeClient();
+  const user = await User.findById(req.user._id).select("-password");
+
+  if (!user) {
+    res.status(404);
+    throw new Error("Vartotojas nerastas.");
+  }
+
+  const { sessionId = "" } = req.body || {};
+  let syncedUser = null;
+
+  if (sessionId) {
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ["subscription"],
+    });
+    const expectedUserId = req.user._id.toString();
+    const sessionUserId = session.metadata?.userId || session.client_reference_id || "";
+
+    if (sessionUserId && sessionUserId !== expectedUserId) {
+      res.status(403);
+      throw new Error("Ši Stripe sesija nepriklauso dabartinei paskyrai.");
+    }
+
+    syncedUser = await syncUserSubscriptionFromCheckoutSession({
+      stripe,
+      session,
+      fallbackUserId: expectedUserId,
+    });
+  }
+
+  if (!syncedUser) {
+    syncedUser = await findLatestStripeSubscriptionForUser(stripe, user);
+  }
+
+  const resultUser = syncedUser || user;
+
+  res.json({
+    synced: Boolean(syncedUser),
+    subscription: serializeSubscription(resultUser.subscription),
   });
 };
 
@@ -239,5 +398,6 @@ const handleStripeWebhook = async (req, res) => {
 module.exports = {
   createPaymentSession,
   getBillingProfile,
+  syncStripeMembership,
   handleStripeWebhook,
 };

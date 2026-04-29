@@ -5,6 +5,11 @@ const createPaymentSession = async (payload) => {
   return data;
 };
 
+const syncStripeMembership = async (sessionId = "") => {
+  const { data } = await api.post("/billing/sync-stripe-membership", { sessionId });
+  return data;
+};
+
 const getBillingProfile = async () => {
   const { data } = await api.get("/billing/me");
   return data;
@@ -12,6 +17,6 @@ const getBillingProfile = async () => {
 
 export default {
   createPaymentSession,
+  syncStripeMembership,
   getBillingProfile,
 };
-

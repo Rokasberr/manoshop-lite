@@ -8,17 +8,19 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import SectionTitle from "../components/SectionTitle";
 import StatusBadge from "../components/admin/StatusBadge";
 import { useAuth } from "../context/AuthContext";
+import billingService from "../services/billingService";
 import orderService from "../services/orderService";
 import { hasActiveMembership } from "../utils/membership";
 import { formatCurrency } from "../utils/currency";
 
 const ProfilePage = () => {
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [downloadingInvoiceId, setDownloadingInvoiceId] = useState("");
   const [downloadingDigitalKey, setDownloadingDigitalKey] = useState("");
+  const [syncingMembership, setSyncingMembership] = useState(false);
 
   useEffect(() => {
     const loadOrders = async () => {
@@ -65,6 +67,25 @@ const ProfilePage = () => {
       toast.error(downloadError.response?.data?.message || "Nepavyko atsisiųsti skaitmeninio failo.");
     } finally {
       setDownloadingDigitalKey("");
+    }
+  };
+
+  const handleSyncStripeMembership = async () => {
+    try {
+      setSyncingMembership(true);
+      const result = await billingService.syncStripeMembership();
+      await refreshProfile();
+
+      if (result.subscription?.provider === "stripe" && hasActiveMembership({ ...user, subscription: result.subscription })) {
+        toast.success("Narystė atnaujinta iš Stripe.");
+        return;
+      }
+
+      toast("Stripe sinchronizacija baigta, bet aktyvi narystė dar nerasta.");
+    } catch (syncError) {
+      toast.error(syncError.response?.data?.message || "Nepavyko atnaujinti narystės iš Stripe.");
+    } finally {
+      setSyncingMembership(false);
     }
   };
 
@@ -120,6 +141,16 @@ const ProfilePage = () => {
               <Link to="/members/savings-studio" className="button-primary mt-4 inline-flex">
                 Open Stilloak
               </Link>
+            )}
+            {!hasActiveMembership(user) && (
+              <button
+                type="button"
+                onClick={handleSyncStripeMembership}
+                disabled={syncingMembership}
+                className="button-primary mt-4 inline-flex disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {syncingMembership ? "Tikrinama..." : "Atnaujinti narystę iš Stripe"}
+              </button>
             )}
           </div>
         </div>
