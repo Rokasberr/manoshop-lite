@@ -280,8 +280,8 @@ const Footer = () => {
           {copy.columns.contact}
         </Link>
         <div className="mt-4 space-y-3 text-sm text-white/58">
-          <a href="mailto:hello@stilloakstudio.com" className="block transition hover:text-white">
-            hello@stilloakstudio.com
+          <a href="mailto:hello@stilloak-studio.com" className="block transition hover:text-white">
+            hello@stilloak-studio.com
           </a>
           <p>+370 600 12345</p>
           <p>Vilnius, Lithuania</p>
