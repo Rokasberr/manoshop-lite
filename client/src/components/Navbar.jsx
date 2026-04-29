@@ -131,13 +131,12 @@ const Navbar = () => {
     <header className="sticky top-0 z-30 px-4 pt-4 sm:px-6 lg:px-8">
       <div className="header-shell mx-auto flex max-w-7xl items-center justify-between gap-4 rounded-[24px] px-4 py-3 shadow-[0_16px_45px_rgba(15,15,35,0.06)] backdrop-blur-xl">
         <Link to="/" className="flex min-w-0 items-center gap-3">
-          <div
-            className="flex h-11 w-11 items-center justify-center rounded-[18px] text-sm font-bold text-white"
-            style={{
-              background: "linear-gradient(135deg, rgb(var(--accent)), rgb(var(--accent-strong)))",
-            }}
-          >
-            ST
+          <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-[18px] shadow-[0_12px_28px_rgba(128,90,42,0.18)]">
+            <img
+              src="/favicon.svg"
+              alt="Stilloak Studio"
+              className="h-full w-full object-cover"
+            />
           </div>
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">

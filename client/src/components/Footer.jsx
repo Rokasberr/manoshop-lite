@@ -239,13 +239,12 @@ const Footer = () => {
     <div className="mt-10 grid gap-8 lg:grid-cols-[1.2fr_1fr_1fr_1fr_1.1fr]">
       <div>
         <div className="flex items-center gap-3">
-          <div
-            className="flex h-10 w-10 items-center justify-center rounded-2xl text-sm font-bold text-white"
-            style={{
-              background: "linear-gradient(135deg, rgb(var(--accent)), rgb(var(--accent-strong)))",
-            }}
-          >
-            SS
+          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl shadow-[0_12px_28px_rgba(128,90,42,0.18)]">
+            <img
+              src="/favicon.svg"
+              alt="Stilloak Studio"
+              className="h-full w-full object-cover"
+            />
           </div>
           <div>
             <p className="font-display text-xl font-bold">Stilloak Studio</p>
