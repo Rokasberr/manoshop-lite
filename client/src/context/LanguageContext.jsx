@@ -3,12 +3,12 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 const STORAGE_KEY = "stilloak_site_language";
 
 export const languageOptions = [
-  { code: "lt", label: "LT" },
-  { code: "en", label: "EN" },
-  { code: "pl", label: "PL" },
-  { code: "de", label: "DE" },
-  { code: "fr", label: "FR" },
-  { code: "es", label: "ES" },
+  { code: "lt", label: "Lietuvių", shortLabel: "LT" },
+  { code: "en", label: "English", shortLabel: "EN" },
+  { code: "pl", label: "Polski", shortLabel: "PL" },
+  { code: "de", label: "Deutsch", shortLabel: "DE" },
+  { code: "fr", label: "Français", shortLabel: "FR" },
+  { code: "es", label: "Español", shortLabel: "ES" },
 ];
 
 const LanguageContext = createContext(null);

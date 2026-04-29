@@ -113,6 +113,8 @@ const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const { language, languageOptions, setLanguage } = useLanguage();
   const copy = navbarCopy[language] || navbarCopy.lt;
+  const currentLanguageOption =
+    languageOptions.find((option) => option.code === language) || languageOptions[0];
   const publicLinks = [
     { label: copy.nav.story, to: "/story" },
     { label: copy.nav.stilloak, to: "/savings-studio" },
@@ -185,12 +187,18 @@ const Navbar = () => {
           <label className="sr-only" htmlFor="site-language-switcher">
             {copy.languageLabel}
           </label>
-          <div className="relative">
+          <div className="button-secondary relative flex h-10 min-w-[152px] items-center justify-between rounded-full px-4">
+            <div className="pointer-events-none flex items-center gap-2">
+              <span className="text-sm font-semibold">{copy.languageLabel}</span>
+              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
+                {currentLanguageOption.shortLabel}
+              </span>
+            </div>
             <select
               id="site-language-switcher"
               value={language}
               onChange={(event) => setLanguage(event.target.value)}
-              className="button-secondary h-10 w-[94px] appearance-none rounded-full pl-4 pr-9 text-center text-sm font-semibold uppercase tracking-[0.18em]"
+              className="absolute inset-0 cursor-pointer appearance-none rounded-full opacity-0"
               aria-label={copy.languageLabel}
             >
               {languageOptions.map((option) => (
