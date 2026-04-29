@@ -92,18 +92,6 @@ const homeCopy = {
     ],
     membershipPrimary: "Peržiūrėti planus",
     membershipSecondary: "Skaityti Story",
-    trustEyebrow: "Paruošta reklamai",
-    trustTitle: "Kai reklamuosi, žmogus turi suprasti vieną dalyką iškart.",
-    trustText:
-      "Stilloak padeda aiškiau valdyti pinigus, suprasti mėnesio spaudimą ir realiau judėti link taupymo tikslų. Visa vieša struktūra turi tarnauti šitam vienam pažadui.",
-    trustSignals: [
-      "Aiški narystės aktyvacija per Stripe",
-      "Privatus nario archyvas su sąskaitomis ir suvestinėmis",
-      "Members-only produktas vietoj viešo demo dashboardo",
-      "AI komentarai, kurie duoda kryptį, ne tik skaičius",
-    ],
-    trustPrimary: "Eiti į Membership",
-    trustSecondary: "Atidaryti Stilloak preview",
   },
   en: {
     chip: "Members-only money clarity",
@@ -185,18 +173,6 @@ const homeCopy = {
     ],
     membershipPrimary: "View membership",
     membershipSecondary: "Read the story",
-    trustEyebrow: "Ready for ads",
-    trustTitle: "When you advertise, one thing should be obvious immediately.",
-    trustText:
-      "Stilloak helps people manage money more clearly, understand monthly pressure, and move toward savings goals more realistically. The full public structure should serve that one promise.",
-    trustSignals: [
-      "Clear Stripe membership activation",
-      "Private member archive with invoices and summaries",
-      "Members-only product instead of a public demo dashboard",
-      "AI commentary that creates direction, not just data",
-    ],
-    trustPrimary: "Go to membership",
-    trustSecondary: "Open Stilloak preview",
   },
 };
 
@@ -337,32 +313,28 @@ const HomePage = () => {
             ))}
           </div>
         </div>
+        <div className="public-section flex flex-col justify-between">
+          <div>
+            <span className="eyebrow">{copy.unlockEyebrow}</span>
+            <h2 className="mt-5 font-display text-4xl font-bold sm:text-5xl">{copy.unlockTitle}</h2>
+            <p className="mt-4 text-base leading-7 text-muted">{copy.unlockText}</p>
+          </div>
 
-        <div className="surface-dark overflow-hidden rounded-[38px] px-6 py-8 sm:px-8">
-          <span className="hero-chip">{copy.trustEyebrow}</span>
-          <h2 className="mt-6 max-w-2xl font-display text-4xl font-bold sm:text-5xl">{copy.trustTitle}</h2>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-white/68">{copy.trustText}</p>
-
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            {copy.trustSignals.map((item) => (
-              <div
-                key={item}
-                className="rounded-[24px] border border-white/8 bg-white/4 px-4 py-4"
-              >
-                <div className="flex items-start gap-3">
-                  <ShieldCheck size={18} className="mt-0.5 shrink-0" style={{ color: "rgb(var(--accent-strong))" }} />
-                  <span className="text-sm leading-6 text-white/76">{item}</span>
-                </div>
+          <div className="mt-8 grid gap-4">
+            {copy.unlockList.map((item) => (
+              <div key={item} className="marketing-card flex items-start gap-3 p-5">
+                <ShieldCheck size={18} className="mt-0.5 shrink-0" style={{ color: "rgb(var(--accent-strong))" }} />
+                <span className="text-sm leading-6 text-muted">{item}</span>
               </div>
             ))}
           </div>
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Link to="/pricing" className="button-primary">
-              {copy.trustPrimary}
+              {copy.membershipPrimary}
             </Link>
-            <Link to="/savings-studio" className="hero-outline-button">
-              {copy.trustSecondary}
+            <Link to="/story" className="button-secondary">
+              {copy.membershipSecondary}
             </Link>
           </div>
         </div>

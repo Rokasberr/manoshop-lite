@@ -350,12 +350,13 @@ const SavingsStudioDemoPage = () => {
                 <h2 className="mt-4 font-display text-4xl font-bold">{money.format(demoSummary.monthTotal)}</h2>
                 <p className="mt-2 text-sm text-white/62">{formatChange(demoSummary.change)}</p>
 
-                <div className="mt-6 grid h-[180px] grid-cols-6 items-end gap-3">
+                <div className="mt-6 grid h-[220px] grid-cols-6 items-end gap-3">
                   {demoSummary.monthlyTotals.map((entry) => {
                     const height = `${Math.max((entry.total / highestMonthlyTotal) * 100, 18)}%`;
+                    const [monthLabel, yearLabel] = entry.label.split(" ");
 
                     return (
-                      <div key={entry.key} className="flex h-full flex-col items-center justify-end gap-2">
+                      <div key={entry.key} className="grid h-full grid-rows-[1fr_auto] items-end gap-3">
                         <div className="relative h-full w-full overflow-hidden rounded-full bg-white/8">
                           <div
                             className="absolute inset-x-0 bottom-0 rounded-full"
@@ -366,9 +367,10 @@ const SavingsStudioDemoPage = () => {
                             }}
                           />
                         </div>
-                        <span className="text-[10px] uppercase tracking-[0.2em] text-white/48">
-                          {entry.label.split(" ")[0]}
-                        </span>
+                        <div className="min-h-[34px] text-center text-[11px] leading-tight text-white/54">
+                          <span className="block font-semibold uppercase tracking-[0.08em]">{monthLabel}</span>
+                          <span className="block text-white/38">{yearLabel}</span>
+                        </div>
                       </div>
                     );
                   })}

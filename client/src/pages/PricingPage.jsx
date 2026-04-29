@@ -164,7 +164,7 @@ const PricingPage = () => {
   return (
     <div className="space-y-10 pb-8">
       <section className="marketing-dark overflow-hidden rounded-[40px] px-6 py-8 sm:px-10 sm:py-10 lg:px-12 lg:py-12">
-        <div className="grid gap-8 xl:grid-cols-[0.92fr_1.08fr] xl:gap-10">
+        <div className="grid gap-8 xl:grid-cols-[0.9fr_1.1fr] xl:gap-10">
           <div>
             <span className="hero-chip">{copy.eyebrow}</span>
             <h1 className="mt-8 max-w-4xl font-display text-5xl font-bold leading-[0.9] sm:text-6xl lg:text-[4.8rem]">
@@ -181,14 +181,14 @@ const PricingPage = () => {
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
             {subscriptionPlans.map((plan) => {
               const isCurrentPlan = user?.subscription?.plan === plan.id;
               const isFeatured = plan.id === "pro";
               const isPaidPlan = plan.provider === "stripe";
 
               return (
-                <div key={plan.id} className={isFeatured ? "plan-shell-featured" : "plan-shell"}>
+                <div key={plan.id} className={isFeatured ? "plan-shell-featured h-full" : "plan-shell h-full"}>
                   <div className="flex items-center justify-between gap-3">
                     <span className={isFeatured ? "hero-chip" : "signal-pill"}>{plan.badge}</span>
                     {isFeatured && <Sparkles size={16} style={{ color: "rgb(var(--accent-strong))" }} />}
@@ -197,9 +197,9 @@ const PricingPage = () => {
                   <h2 className="mt-6 font-display text-4xl font-bold">{plan.name}</h2>
                   <p className={`mt-3 text-sm leading-6 ${isFeatured ? "text-white/64" : "text-muted"}`}>{plan.description}</p>
 
-                  <div className="mt-8 flex items-end gap-2">
-                    <span className="font-display text-5xl font-bold">{formatCurrency(plan.price)}</span>
-                    <span className={`pb-2 text-sm ${isFeatured ? "text-white/56" : "text-muted"}`}>{plan.intervalLabel}</span>
+                  <div className="mt-8 flex flex-wrap items-end gap-x-2 gap-y-1">
+                    <span className="font-display text-4xl font-bold sm:text-5xl">{formatCurrency(plan.price)}</span>
+                    <span className={`pb-1 text-sm ${isFeatured ? "text-white/56" : "text-muted"}`}>{plan.intervalLabel}</span>
                   </div>
 
                   <div className="mt-8 space-y-3">

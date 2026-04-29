@@ -1,4 +1,4 @@
-import { ArrowRight, Moon, ShoppingBag, SunMedium, User2 } from "lucide-react";
+import { ArrowRight, ChevronDown, Moon, ShoppingBag, SunMedium, User2 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
@@ -185,19 +185,25 @@ const Navbar = () => {
           <label className="sr-only" htmlFor="site-language-switcher">
             {copy.languageLabel}
           </label>
-          <select
-            id="site-language-switcher"
-            value={language}
-            onChange={(event) => setLanguage(event.target.value)}
-            className="button-secondary h-10 rounded-full px-4 text-sm"
-            aria-label={copy.languageLabel}
-          >
-            {languageOptions.map((option) => (
-              <option key={option.code} value={option.code}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              id="site-language-switcher"
+              value={language}
+              onChange={(event) => setLanguage(event.target.value)}
+              className="button-secondary h-10 w-[76px] appearance-none rounded-full pl-3 pr-8 text-left text-sm font-semibold uppercase tracking-[0.18em]"
+              aria-label={copy.languageLabel}
+            >
+              {languageOptions.map((option) => (
+                <option key={option.code} value={option.code}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              size={14}
+              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted"
+            />
+          </div>
 
           <button
             type="button"
