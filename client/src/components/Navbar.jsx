@@ -190,7 +190,7 @@ const Navbar = () => {
               id="site-language-switcher"
               value={language}
               onChange={(event) => setLanguage(event.target.value)}
-              className="button-secondary h-10 w-[76px] appearance-none rounded-full pl-3 pr-8 text-left text-sm font-semibold uppercase tracking-[0.18em]"
+              className="button-secondary h-10 w-[94px] appearance-none rounded-full pl-4 pr-9 text-center text-sm font-semibold uppercase tracking-[0.18em]"
               aria-label={copy.languageLabel}
             >
               {languageOptions.map((option) => (

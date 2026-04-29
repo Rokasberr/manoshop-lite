@@ -303,7 +303,8 @@ const SavingsStudioDemoPage = () => {
   const { language } = useLanguage();
   const copy = demoCopy[language] || demoCopy.lt;
   const canOpenStudio = hasActiveMembership(user);
-  const highestMonthlyTotal = Math.max(...demoSummary.monthlyTotals.map((entry) => entry.total), 1);
+  const monthPulseEntries = demoSummary.monthlyTotals.slice(-4);
+  const highestMonthlyTotal = Math.max(...monthPulseEntries.map((entry) => entry.total), 1);
 
   return (
     <div className="space-y-10">
@@ -350,10 +351,11 @@ const SavingsStudioDemoPage = () => {
                 <h2 className="mt-4 font-display text-4xl font-bold">{money.format(demoSummary.monthTotal)}</h2>
                 <p className="mt-2 text-sm text-white/62">{formatChange(demoSummary.change)}</p>
 
-                <div className="mt-6 grid h-[220px] grid-cols-6 items-end gap-3">
-                  {demoSummary.monthlyTotals.map((entry) => {
+                <div className="mt-6 grid h-[216px] grid-cols-4 items-end gap-4">
+                  {monthPulseEntries.map((entry) => {
                     const height = `${Math.max((entry.total / highestMonthlyTotal) * 100, 18)}%`;
-                    const [monthLabel, yearLabel] = entry.label.split(" ");
+                    const [, monthPart] = entry.key.split("-");
+                    const shortLabel = `${monthPart}/${entry.key.slice(2, 4)}`;
 
                     return (
                       <div key={entry.key} className="grid h-full grid-rows-[1fr_auto] items-end gap-3">
@@ -367,9 +369,8 @@ const SavingsStudioDemoPage = () => {
                             }}
                           />
                         </div>
-                        <div className="min-h-[34px] text-center text-[11px] leading-tight text-white/54">
-                          <span className="block font-semibold uppercase tracking-[0.08em]">{monthLabel}</span>
-                          <span className="block text-white/38">{yearLabel}</span>
+                        <div className="min-h-[22px] text-center text-[11px] font-semibold uppercase tracking-[0.08em] text-white/54">
+                          <span className="block">{shortLabel}</span>
                         </div>
                       </div>
                     );
