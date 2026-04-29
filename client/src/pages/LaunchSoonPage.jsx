@@ -60,15 +60,9 @@ const launchCopy = {
     },
     statusLabel: "Statusas",
     targetLabel: "Tikslas",
-    notifyEyebrow: "Pranešk man",
-    notifyTitle: "Leisk žmogui pakelti ranką dar prieš atsidarymą.",
-    notifyText:
-      "Vietoje aklavietės lankytojas supranta, kad sekcija dar ruošiama, ir gali palikti el. paštą, kad primintume vėliau.",
-    notifyButton: "Pranešk man, kai atsidarys",
+    notifyButton: "Gauti pranešimą",
     notifyLoading: "Išsaugoma...",
     contactCta: "Susisiekti",
-    notifyHint:
-      "Forma jau prijungta prie Brevo. Kai paleisime sekciją, šiuos kontaktus galėsime panaudoti švariam launch pranešimui.",
     whileWaitingEyebrow: "Kol lauki",
     whileWaitingTitle: "Gyvas sluoksnis vis dar atidarytas.",
     whileWaitingText:
@@ -120,15 +114,9 @@ const launchCopy = {
     },
     statusLabel: "Status",
     targetLabel: "Target",
-    notifyEyebrow: "Notify me",
-    notifyTitle: "Let people raise a hand before the section opens.",
-    notifyText:
-      "Instead of sending visitors into a dead end, this keeps the page useful: they understand the section is coming, and they can leave an email to be notified later.",
-    notifyButton: "Notify me when it opens",
+    notifyButton: "Get notified",
     notifyLoading: "Saving interest...",
     contactCta: "Contact the studio",
-    notifyHint:
-      "This form is already connected to Brevo, so the launch list can turn into a clean release email when the section is ready.",
     whileWaitingEyebrow: "While you wait",
     whileWaitingTitle: "The live layer is still open.",
     whileWaitingText:
@@ -289,16 +277,8 @@ const LaunchSoonPage = ({ focus = "default" }) => {
       </section>
 
       <section className="public-section">
-        <div className="grid gap-8 lg:grid-cols-[0.92fr_1.08fr]">
-          <div>
-            <span className="eyebrow">{copy.notifyEyebrow}</span>
-            <h2 className="mt-5 max-w-xl font-display text-4xl font-bold sm:text-5xl">{copy.notifyTitle}</h2>
-            <p className="mt-4 max-w-lg text-base leading-7 text-muted">{copy.notifyText}</p>
-          </div>
-
-          <div className="rounded-[32px] border border-[rgb(232,224,214)] bg-[rgb(34,28,24)] px-6 py-7 text-white">
-            <p className="text-xs uppercase tracking-[0.34em] text-white/42">{copy.notifyEyebrow}</p>
-            <form className="mt-5 space-y-4" onSubmit={handleNotifySubmit}>
+        <div className="rounded-[32px] border border-[rgb(232,224,214)] bg-[rgb(34,28,24)] px-6 py-7 text-white sm:px-8">
+          <form className="space-y-4" onSubmit={handleNotifySubmit}>
               <input
                 type="email"
                 value={email}
@@ -314,19 +294,16 @@ const LaunchSoonPage = ({ focus = "default" }) => {
                   {copy.contactCta}
                 </Link>
               </div>
-            </form>
-            {notifyMessage ? (
-              <p
-                className={`mt-4 text-sm leading-6 ${
-                  notifyState === "success" ? "text-[rgb(210,233,193)]" : "text-[rgb(255,193,193)]"
-                }`}
-              >
-                {notifyMessage}
-              </p>
-            ) : (
-              <p className="mt-4 text-sm leading-6 text-white/60">{copy.notifyHint}</p>
-            )}
-          </div>
+          </form>
+          {notifyMessage ? (
+            <p
+              className={`mt-4 text-sm leading-6 ${
+                notifyState === "success" ? "text-[rgb(210,233,193)]" : "text-[rgb(255,193,193)]"
+              }`}
+            >
+              {notifyMessage}
+            </p>
+          ) : null}
         </div>
       </section>
 
