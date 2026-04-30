@@ -38,7 +38,7 @@ const MAX_TEXT_LENGTH = 80;
 const MAX_NOTES_LENGTH = 240;
 const MAX_IMPORT_ROWS = 300;
 const MAX_BACKUP_AUDIT_ROWS = 200;
-const MAX_ACTIVITY_ROWS = 18;
+const MAX_ACTIVITY_ROWS = 36;
 
 const currentMonthKey = () => new Date().toISOString().slice(0, 7);
 const buildDownloadTimestamp = () => new Date().toISOString().replace(/[:.]/g, "-");

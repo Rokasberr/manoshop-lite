@@ -207,6 +207,25 @@ const formatMonthKeyLabel = (monthKey) => {
   return MONTH_KEY_FORMATTER.format(new Date(Date.UTC(year, month - 1, 1)));
 };
 
+const monthsUntilTargetDate = (targetDate) => {
+  if (!targetDate) {
+    return null;
+  }
+
+  const current = new Date();
+  const target = new Date(`${targetDate}T00:00:00`);
+
+  if (Number.isNaN(target.getTime())) {
+    return null;
+  }
+
+  const yearDiff = target.getFullYear() - current.getFullYear();
+  const monthDiff = target.getMonth() - current.getMonth();
+  const rawMonths = yearDiff * 12 + monthDiff + 1;
+
+  return Math.max(rawMonths, 1);
+};
+
 const goalPaceStatusLabel = (status) => {
   if (status === "behind") {
     return "Per lėtas tempas";
@@ -863,6 +882,119 @@ const SavingsStudioPage = () => {
     () => activity.map((item) => ({ ...item, ...describeSavingsActivity(item, recurringFrequencies) })),
     [activity, recurringFrequencies]
   );
+  const summaryArchive = useMemo(
+    () =>
+      activityFeed.filter((item) =>
+        ["summary-export", "summary-email-manual", "summary-email-manual-skipped", "backup-export"].includes(
+          item.action
+        )
+      ),
+    [activityFeed]
+  );
+  const goalStrategyBoard = useMemo(() => {
+    return decoratedGoals
+      .filter((goal) => !goal.complete)
+      .map((goal) => {
+        const remaining = Math.max(Number(goal.remaining || 0), 0);
+        const monthsLeft = monthsUntilTargetDate(goal.targetDate);
+        const recommendedMonthly = remaining
+          ? Number(
+              (
+                remaining /
+                Math.max(
+                  monthsLeft || 6,
+                  1
+                )
+              ).toFixed(2)
+            )
+          : 0;
+        const shareOfFree =
+          safeToSaveAfterRecurring !== null && safeToSaveAfterRecurring !== undefined && safeToSaveAfterRecurring > 0
+            ? Math.round((recommendedMonthly / safeToSaveAfterRecurring) * 100)
+            : null;
+
+        let priority = "steady";
+        let title = "Laikyk tempą";
+        let note = "Šitas tikslas juda tvarkingai ir kol kas neatrodo, kad spaustų visą mėnesį.";
+
+        if ((monthsLeft !== null && monthsLeft <= 3) || (shareOfFree !== null && shareOfFree > 100)) {
+          priority = "focus";
+          title = "Fokusuok dabar";
+          note =
+            "Šitam tikslui jau reikia pirmumo. Dabartinis rezervas jo nebetempia be aiškesnės disciplinos.";
+        } else if ((monthsLeft !== null && monthsLeft <= 6) || (shareOfFree !== null && shareOfFree > 65)) {
+          priority = "watch";
+          title = "Stebėk atidžiau";
+          note = "Tikslas dar telpa, bet verta saugoti jo mėnesio dalį nuo spontaniškų išlaidų.";
+        }
+
+        return {
+          ...goal,
+          remaining,
+          monthsLeft,
+          recommendedMonthly,
+          shareOfFree,
+          priority,
+          strategyTitle: title,
+          strategyNote: note,
+        };
+      })
+      .sort((left, right) => {
+        const priorityRank = { focus: 0, watch: 1, steady: 2 };
+        return (
+          priorityRank[left.priority] - priorityRank[right.priority] ||
+          (left.monthsLeft || Number.POSITIVE_INFINITY) - (right.monthsLeft || Number.POSITIVE_INFINITY) ||
+          right.recommendedMonthly - left.recommendedMonthly
+        );
+      });
+  }, [decoratedGoals, safeToSaveAfterRecurring]);
+  const recurringCategoryLeaders = useMemo(() => {
+    const totals = recurringForecastItems.reduce((accumulator, expense) => {
+      const next = { ...accumulator };
+      next[expense.category] = (next[expense.category] || 0) + Number(expense.annualEquivalent || 0);
+      return next;
+    }, {});
+
+    return Object.entries(totals)
+      .map(([category, annualEquivalent]) => ({ category, annualEquivalent }))
+      .sort((left, right) => right.annualEquivalent - left.annualEquivalent)
+      .slice(0, 3);
+  }, [recurringForecastItems]);
+  const recurringReviewQueue = useMemo(() => {
+    return recurringForecastItems
+      .map((expense) => {
+        const shareOfRecurring = recurringMonthlyTotal
+          ? Math.round((Number(expense.monthlyEquivalent || 0) / recurringMonthlyTotal) * 100)
+          : 0;
+        const shareOfIncome =
+          profile?.monthlyIncome > 0 ? Math.round((Number(expense.monthlyEquivalent || 0) / profile.monthlyIncome) * 100) : null;
+
+        let priority = "steady";
+        let note = "Ši išlaida atrodo valdoma, jei jos vertė vis dar reali tavo šiam etapui.";
+
+        if (shareOfRecurring >= 18 || (shareOfIncome !== null && shareOfIncome >= 8)) {
+          priority = "focus";
+          note = "Ši eilutė jau viena pati suvalgo reikšmingą recurring dalį. Čia verta pradėti peržiūrą.";
+        } else if (shareOfRecurring >= 10 || (shareOfIncome !== null && shareOfIncome >= 5)) {
+          priority = "watch";
+          note = "Dar ne kritinė, bet jau pakankamai sunki, kad verta ją kartais pasitikrinti.";
+        }
+
+        return {
+          ...expense,
+          shareOfRecurring,
+          shareOfIncome,
+          priority,
+          note,
+        };
+      })
+      .sort((left, right) => {
+        const priorityRank = { focus: 0, watch: 1, steady: 2 };
+        return priorityRank[left.priority] - priorityRank[right.priority] || right.monthlyEquivalent - left.monthlyEquivalent;
+      })
+      .slice(0, 4);
+  }, [profile?.monthlyIncome, recurringForecastItems, recurringMonthlyTotal]);
+  const recurringQuarterlyTotal = Number((recurringMonthlyTotal * 3).toFixed(2));
 
   const refreshSummaryAndEntries = async () => {
     const [entriesResult, summaryResult] = await Promise.all([
@@ -2824,6 +2956,113 @@ const SavingsStudioPage = () => {
         </div>
       </section>
 
+      <section className="grid gap-6 xl:grid-cols-[1fr_1fr]">
+        <div className="panel p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow">goal strategy</p>
+              <h2 className="mt-4 text-4xl font-bold">Kaip išdėlioti tikslus protingiau</h2>
+              <p className="mt-3 text-sm leading-6 text-muted">
+                Čia matosi ne tik progresas, bet ir kuriam tikslui verta duoti pirmumą, kiek jam reikėtų per mėnesį
+                ir ar dabartinis rezervas realiai pakelia tą tempą.
+              </p>
+            </div>
+            <Target size={20} style={{ color: "rgb(var(--accent))" }} />
+          </div>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <ForecastMetricTile
+              label="Aktyvūs tikslai"
+              value={String(goalStrategyBoard.length)}
+              hint="Dar nepasiekti tikslai"
+            />
+            <ForecastMetricTile
+              label="Fokusuoti dabar"
+              value={String(goalStrategyBoard.filter((goal) => goal.priority === "focus").length)}
+              hint="Tikslai, kuriems reikia daugiausia dėmesio"
+            />
+            <ForecastMetricTile
+              label="Didžiausias mėn. tempas"
+              value={
+                goalStrategyBoard[0]?.recommendedMonthly ? money.format(goalStrategyBoard[0].recommendedMonthly) : "—"
+              }
+              hint="Didžiausias rekomenduojamas atsidėjimas"
+            />
+          </div>
+
+          <div className="mt-6 space-y-4">
+            {goalStrategyBoard.length ? (
+              goalStrategyBoard.map((goal) => (
+                <GoalStrategyCard key={goal._id} goal={goal} onOpen={() => scrollToSection("savings-goals")} />
+              ))
+            ) : (
+              <div className="soft-card rounded-[24px] p-8 text-center text-muted">
+                Kai turėsi bent vieną aktyvų tikslą, čia galėsi matyti kuriam verta duoti pirmumą ir kokio mėnesio
+                tempo iš tikro jam reikia.
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="panel p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow">recurring intelligence</p>
+              <h2 className="mt-4 text-4xl font-bold">Ką verta peržiūrėti recurring dalyje</h2>
+              <p className="mt-3 text-sm leading-6 text-muted">
+                Čia recurring sąrašas jau pereina iš paprasto registro į kontrolės zoną: matai ketvirčio naštą,
+                stipriausias kategorijas ir kur verta pradėti review.
+              </p>
+            </div>
+            <Repeat size={20} style={{ color: "rgb(var(--accent))" }} />
+          </div>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <ForecastMetricTile
+              label="Per ketvirtį"
+              value={money.format(recurringQuarterlyTotal)}
+              hint="Recurring našta per 3 mėn."
+            />
+            <ForecastMetricTile
+              label="Per metus"
+              value={money.format(recurringAnnualTotal)}
+              hint="Pilnas annual vaizdas"
+            />
+            <ForecastMetricTile
+              label="Top kategorija"
+              value={recurringCategoryLeaders[0]?.category || "—"}
+              hint={
+                recurringCategoryLeaders[0]
+                  ? money.format(recurringCategoryLeaders[0].annualEquivalent)
+                  : "Kai bus daugiau recurring"
+              }
+            />
+          </div>
+
+          <div className="mt-6 space-y-4">
+            {recurringReviewQueue.length ? (
+              recurringReviewQueue.map((expense) => (
+                <RecurringReviewCard
+                  key={expense._id}
+                  expense={expense}
+                  onOpen={() =>
+                    handleActionFocus({
+                      targetId: "savings-ledger",
+                      focusCategory: expense.category,
+                      focusMonth: selectedBudgetMonth,
+                    })
+                  }
+                />
+              ))
+            ) : (
+              <div className="soft-card rounded-[24px] p-8 text-center text-muted">
+                Kai turėsi bent kelias pastovias išlaidas, čia iškart matysi kur review duotų didžiausią naudą.
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
       <section id="savings-automation" className="grid gap-6 lg:grid-cols-2">
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
@@ -2928,6 +3167,37 @@ const SavingsStudioPage = () => {
               Savaitės ir mėnesio suvestines gali atsisiųsti pakartotinai. Kiekvienas parsisiuntimas sugeneruoja naują
               failą.
             </p>
+          </div>
+
+          <div className="mt-6 soft-card rounded-[24px] p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.18em] text-muted">Suvestinių archyvas</p>
+                <h3 className="mt-2 text-xl font-semibold">Paskutiniai suvestinių veiksmai</h3>
+                <p className="mt-2 text-sm leading-6 text-muted">
+                  Vienoje vietoje matai, ką paskutinį siuntei ar atsisiuntei, ir gali pakartoti veiksmą be klaidžiojimo
+                  po visą studio.
+                </p>
+              </div>
+              <History size={18} style={{ color: "rgb(var(--accent))" }} />
+            </div>
+
+            <div className="mt-5 space-y-3">
+              {summaryArchive.length ? (
+                summaryArchive.slice(0, 6).map((item) => (
+                  <SummaryArchiveItem
+                    key={item.id}
+                    item={item}
+                    onDownload={(frequency) => handleDownloadSummary(frequency)}
+                    onSend={(frequency) => handleSendSummaryEmail(frequency)}
+                  />
+                ))
+              ) : (
+                <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-4 text-sm text-muted">
+                  Kai bent kartą išsiųsi ar atsisiųsi suvestinę, čia pradės kauptis patogi istorija.
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -3255,6 +3525,138 @@ const ActivityTimelineItem = ({ item, onOpen }) => {
             {item.ctaLabel}
             <ArrowUpRight size={14} />
           </button>
+        ) : null}
+      </div>
+    </div>
+  );
+};
+
+const GoalStrategyCard = ({ goal, onOpen }) => {
+  const priorityClasses = {
+    focus: "bg-red-50 text-red-600",
+    watch: "bg-amber-50 text-amber-700",
+    steady: "bg-emerald-50 text-emerald-700",
+  };
+
+  return (
+    <div className="soft-card rounded-[24px] p-5">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <div className="flex flex-wrap items-center gap-3">
+            <h3 className="text-lg font-semibold">{goal.title}</h3>
+            <span className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${priorityClasses[goal.priority] || priorityClasses.steady}`}>
+              {goal.strategyTitle}
+            </span>
+          </div>
+          <p className="mt-2 text-sm leading-6 text-muted">{goal.strategyNote}</p>
+        </div>
+        <button type="button" className="button-secondary gap-2 sm:shrink-0" onClick={onOpen}>
+          Peržiūrėti tikslą
+          <ArrowUpRight size={14} />
+        </button>
+      </div>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+        <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
+          <p className="text-xs uppercase tracking-[0.18em] text-muted">Liko sukaupti</p>
+          <p className="mt-2 text-lg font-semibold">{money.format(goal.remaining)}</p>
+        </div>
+        <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
+          <p className="text-xs uppercase tracking-[0.18em] text-muted">Reikia per mėn.</p>
+          <p className="mt-2 text-lg font-semibold">{money.format(goal.recommendedMonthly)}</p>
+        </div>
+        <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
+          <p className="text-xs uppercase tracking-[0.18em] text-muted">Vietos reikalauja</p>
+          <p className="mt-2 text-lg font-semibold">
+            {goal.shareOfFree === null ? "—" : `${goal.shareOfFree}%`}
+          </p>
+        </div>
+      </div>
+
+      <p className="mt-4 text-sm text-muted">
+        {goal.monthsLeft ? `Tikslinė data po maždaug ${goal.monthsLeft} mėn.` : "Šis tikslas dar neturi tikslios datos."}
+      </p>
+    </div>
+  );
+};
+
+const RecurringReviewCard = ({ expense, onOpen }) => {
+  const priorityClasses = {
+    focus: "bg-red-50 text-red-600",
+    watch: "bg-amber-50 text-amber-700",
+    steady: "bg-emerald-50 text-emerald-700",
+  };
+
+  return (
+    <div className="soft-card rounded-[24px] p-5">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <div className="flex flex-wrap items-center gap-3">
+            <h3 className="text-lg font-semibold">{expense.title}</h3>
+            <span className="premium-tag">{expense.category}</span>
+            <span className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${priorityClasses[expense.priority] || priorityClasses.steady}`}>
+              {expense.priority === "focus" ? "Review first" : expense.priority === "watch" ? "Stebėti" : "Stabilu"}
+            </span>
+          </div>
+          <p className="mt-2 text-sm leading-6 text-muted">{expense.note}</p>
+        </div>
+        <button type="button" className="button-secondary gap-2 sm:shrink-0" onClick={onOpen}>
+          Rodyti kategoriją
+          <ArrowUpRight size={14} />
+        </button>
+      </div>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+        <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
+          <p className="text-xs uppercase tracking-[0.18em] text-muted">Per mėn.</p>
+          <p className="mt-2 text-lg font-semibold">{money.format(expense.monthlyEquivalent)}</p>
+        </div>
+        <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
+          <p className="text-xs uppercase tracking-[0.18em] text-muted">Per metus</p>
+          <p className="mt-2 text-lg font-semibold">{money.format(expense.annualEquivalent)}</p>
+        </div>
+        <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
+          <p className="text-xs uppercase tracking-[0.18em] text-muted">Recurring dalis</p>
+          <p className="mt-2 text-lg font-semibold">{expense.shareOfRecurring}%</p>
+        </div>
+      </div>
+
+      <p className="mt-4 text-sm text-muted">
+        {formatRecurringFrequency(expense.frequency, [
+          { value: "weekly", label: "Kas savaitę" },
+          { value: "monthly", label: "Kas mėnesį" },
+          { value: "quarterly", label: "Kas ketvirtį" },
+          { value: "yearly", label: "Kartą per metus" },
+        ])}
+        {expense.shareOfIncome !== null ? ` · apie ${expense.shareOfIncome}% mėnesio pajamų` : ""}
+      </p>
+    </div>
+  );
+};
+
+const SummaryArchiveItem = ({ item, onDownload, onSend }) => {
+  const frequency = item.metadata?.frequency || "weekly";
+  const isBackup = item.action === "backup-export";
+
+  return (
+    <div className="rounded-[20px] bg-[rgb(var(--surface-soft))] px-4 py-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs uppercase tracking-[0.18em] text-muted">{item.timestamp}</p>
+          <h3 className="mt-2 text-base font-semibold">{item.title}</h3>
+          <p className="mt-2 text-sm leading-6 text-muted">{item.body}</p>
+        </div>
+        {!isBackup ? (
+          <div className="flex flex-wrap gap-2 sm:shrink-0">
+            <button type="button" className="button-secondary gap-2" onClick={() => onDownload(frequency)}>
+              <Download size={14} />
+              Atsisiųsti vėl
+            </button>
+            <button type="button" className="button-secondary gap-2" onClick={() => onSend(frequency)}>
+              <Mail size={14} />
+              Siųsti dar kartą
+            </button>
+          </div>
         ) : null}
       </div>
     </div>
