@@ -1,4 +1,9 @@
-const { getEmailTransport, getTransportConfig, isEmailTransportConfigured } = require("../utils/emailTransport");
+const {
+  getEmailTransport,
+  getTransportConfig,
+  isEmailTransportConfigured,
+  normalizeEmailTransportError,
+} = require("../utils/emailTransport");
 
 const COMPANY_NAME = process.env.COMPANY_NAME?.trim() || "Stilloak Studio";
 
@@ -428,6 +433,22 @@ const sendSavingsSummaryEmail = async ({ frequency = "weekly", profile, summary,
 
   try {
     await Promise.race([
+      transport.verify(),
+      new Promise((_, reject) => {
+        timeoutId = setTimeout(() => {
+          const error = new Error("SMTP serveris per ilgai neatsako. Patikrink pašto nustatymus.");
+          error.statusCode = 504;
+          reject(error);
+        }, maxWaitMs);
+      }),
+    ]);
+
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+
+    await Promise.race([
       transport.sendMail({
         from,
         to: user.email,
@@ -452,12 +473,7 @@ const sendSavingsSummaryEmail = async ({ frequency = "weekly", profile, summary,
       transport.close();
     }
 
-    if (!error.statusCode && /timeout|timed out|greeting/i.test(String(error.message || ""))) {
-      error.statusCode = 504;
-      error.message = "SMTP serveris per ilgai neatsako. Patikrink pašto nustatymus.";
-    }
-
-    throw error;
+    throw normalizeEmailTransportError(error);
   }
 
   if (timeoutId) {

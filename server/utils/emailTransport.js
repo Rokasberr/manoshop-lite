@@ -29,6 +29,39 @@ const isEmailTransportConfigured = () => {
   return Boolean(host && port && from);
 };
 
+const normalizeEmailTransportError = (error) => {
+  const message = String(error?.message || "");
+  const response = String(error?.response || "");
+  const combined = `${message}\n${response}`.toLowerCase();
+
+  if (/invalid login|authentication unsuccessful|auth failed|invalid credentials|535/.test(combined)) {
+    error.statusCode = 401;
+    error.message = "SMTP prisijungimo duomenys neteisingi. Patikrink SMTP_USER ir SMTP_PASS.";
+    return error;
+  }
+
+  if (/sender.*not.*verified|sender has not been verified|from address.*not verified/.test(combined)) {
+    error.statusCode = 400;
+    error.message =
+      "Siuntėjas dar nepatvirtintas. Brevo pusėje patvirtink domeną arba senderį hello@stilloak-studio.com.";
+    return error;
+  }
+
+  if (/connection timeout|timeout|timed out|greeting/i.test(combined)) {
+    error.statusCode = 504;
+    error.message = "SMTP serveris per ilgai neatsako. Patikrink SMTP_HOST, SMTP_PORT ir SMTP_SECURE.";
+    return error;
+  }
+
+  if (/enotfound|getaddrinfo|dns/.test(combined)) {
+    error.statusCode = 503;
+    error.message = "SMTP hostas nepasiekiamas. Patikrink SMTP_HOST reikšmę.";
+    return error;
+  }
+
+  return error;
+};
+
 const getEmailTransport = () => {
   let nodemailer;
 
@@ -76,4 +109,5 @@ module.exports = {
   getEmailTransport,
   getTransportConfig,
   isEmailTransportConfigured,
+  normalizeEmailTransportError,
 };
