@@ -114,16 +114,51 @@ const sendSummaryEmail = async (payload) => {
   return data;
 };
 
+const triggerBlobDownload = ({ blobPart, contentType, fileName }) => {
+  const blob = blobPart instanceof Blob ? blobPart : new Blob([blobPart], { type: contentType });
+  const objectUrl = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = objectUrl;
+  link.download = fileName;
+  link.style.display = "none";
+  document.body.appendChild(link);
+  link.click();
+
+  window.setTimeout(() => {
+    link.remove();
+    window.URL.revokeObjectURL(objectUrl);
+  }, 1500);
+};
+
+const extractFilename = (contentDisposition = "", fallbackName = "download") => {
+  const utf8Match = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i);
+
+  if (utf8Match?.[1]) {
+    return decodeURIComponent(utf8Match[1]);
+  }
+
+  const basicMatch = contentDisposition.match(/filename="?([^"]+)"?/i);
+
+  return basicMatch?.[1] || fallbackName;
+};
+
 const downloadSummaryFile = async (frequency, format = "html") => {
   const response = await api.get("/savings-studio/summary-export", {
     params: { frequency, format },
     responseType: "blob",
   });
 
-  return {
-    blob: response.data,
-    contentDisposition: response.headers["content-disposition"] || "",
-  };
+  const fallbackFrequency = frequency === "monthly" ? "monthly" : "weekly";
+  const fallbackName = `stilloak-${fallbackFrequency}-summary-${new Date()
+    .toISOString()
+    .replace(/[:.]/g, "-")}.${format === "txt" ? "txt" : "html"}`;
+
+  triggerBlobDownload({
+    blobPart: response.data,
+    contentType: response.headers["content-type"] || "application/octet-stream",
+    fileName: extractFilename(response.headers["content-disposition"] || "", fallbackName),
+  });
 };
 
 const downloadBackup = async () => {
@@ -131,10 +166,14 @@ const downloadBackup = async () => {
     responseType: "blob",
   });
 
-  return {
-    blob: response.data,
-    contentDisposition: response.headers["content-disposition"] || "",
-  };
+  triggerBlobDownload({
+    blobPart: response.data,
+    contentType: response.headers["content-type"] || "application/json",
+    fileName: extractFilename(
+      response.headers["content-disposition"] || "",
+      `savings-studio-backup-${new Date().toISOString().slice(0, 10)}.json`
+    ),
+  });
 };
 
 export default {

@@ -764,18 +764,7 @@ const SavingsStudioPage = () => {
     setDownloadingBackup(true);
 
     try {
-      const { blob, contentDisposition } = await savingsStudioService.downloadBackup();
-      const match = contentDisposition.match(/filename="?([^"]+)"?/i);
-      const filename = match?.[1] || `savings-studio-backup-${new Date().toISOString().slice(0, 10)}.json`;
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      await savingsStudioService.downloadBackup();
       toast.success("Backup failas paruoštas atsisiųsti.");
     } catch (error) {
       toast.error(error.response?.data?.message || "Nepavyko paruošti backup failo.");
@@ -788,22 +777,7 @@ const SavingsStudioPage = () => {
     setDownloadingSummaryKey(frequency);
 
     try {
-      const { blob, contentDisposition } = await savingsStudioService.downloadSummaryFile(frequency);
-      const match = contentDisposition.match(/filename="?([^"]+)"?/i);
-      const fallbackFrequency = frequency === "monthly" ? "monthly" : "weekly";
-      const fallbackName = `stilloak-${fallbackFrequency}-summary-${new Date()
-        .toISOString()
-        .replace(/[:.]/g, "-")}.html`;
-      const filename = match?.[1] || fallbackName;
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      await savingsStudioService.downloadSummaryFile(frequency);
       toast.success(`${frequency === "monthly" ? "Mėnesio" : "Savaitės"} suvestinė paruošta atsisiųsti.`);
     } catch (error) {
       toast.error(error.response?.data?.message || "Nepavyko paruošti suvestinės failo.");
