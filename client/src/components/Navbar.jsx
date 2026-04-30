@@ -155,16 +155,18 @@ const Navbar = () => {
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <p className="font-display text-[1.45rem] font-bold leading-none">Stilloak Studio</p>
-              <span
-                className="hidden rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] xl:inline-flex"
-                style={{
-                  border: "1px solid rgb(var(--line) / 0.85)",
-                  backgroundColor: "rgb(255 255 255 / 0.62)",
-                  color: "rgb(var(--accent-strong))",
-                }}
-              >
-                {copy.studioLabel}
-              </span>
+              {user && (
+                <span
+                  className="hidden rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] xl:inline-flex"
+                  style={{
+                    border: "1px solid rgb(var(--line) / 0.85)",
+                    backgroundColor: "rgb(255 255 255 / 0.62)",
+                    color: "rgb(var(--accent-strong))",
+                  }}
+                >
+                  {copy.studioLabel}
+                </span>
+              )}
             </div>
             <p className="text-[10px] uppercase tracking-[0.32em] text-muted">{copy.tagline}</p>
           </div>
