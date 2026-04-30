@@ -7,6 +7,8 @@ const {
 const { isBrevoEmailConfigured, sendBrevoTransactionalEmail } = require("../utils/brevoEmail");
 
 const COMPANY_NAME = process.env.COMPANY_NAME?.trim() || "Stilloak Studio";
+const EMAIL_LOGO_URL =
+  process.env.EMAIL_LOGO_URL?.trim() || "https://www.stilloak-studio.com/favicon.svg";
 
 const money = new Intl.NumberFormat("lt-LT", {
   style: "currency",
@@ -255,6 +257,25 @@ const buildSummaryEmail = ({ frequency, summary, userName }) => {
               <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="680" style="width:680px;max-width:100%;border-collapse:separate;background:#ffffff;border:1px solid #ece3d7;border-radius:18px;">
                 <tr>
                   <td style="padding:32px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 18px 0;border-collapse:collapse;">
+                      <tr>
+                        <td style="vertical-align:middle;padding-right:12px;">
+                          <img
+                            src="${EMAIL_LOGO_URL}"
+                            alt="${COMPANY_NAME} logo"
+                            width="48"
+                            height="48"
+                            style="display:block;width:48px;height:48px;border-radius:14px;"
+                          />
+                        </td>
+                        <td style="vertical-align:middle;">
+                          <p style="margin:0;font-size:18px;font-weight:700;color:#2b241d;">${COMPANY_NAME}</p>
+                          <p style="margin:4px 0 0 0;font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:#8a6c46;">
+                            Savings Studio
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
                     <p style="margin:0 0 12px 0;font-size:12px;letter-spacing:0.24em;text-transform:uppercase;color:#8a6c46;">
                       ${periodLabel}
                     </p>
