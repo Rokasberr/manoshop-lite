@@ -38,6 +38,7 @@ const MAX_TEXT_LENGTH = 80;
 const MAX_NOTES_LENGTH = 240;
 const MAX_IMPORT_ROWS = 300;
 const MAX_BACKUP_AUDIT_ROWS = 200;
+const MAX_ACTIVITY_ROWS = 18;
 
 const currentMonthKey = () => new Date().toISOString().slice(0, 7);
 const buildDownloadTimestamp = () => new Date().toISOString().replace(/[:.]/g, "-");
@@ -1222,6 +1223,23 @@ const getSavingsSummary = async (req, res) => {
   });
 };
 
+const getSavingsActivity = async (req, res) => {
+  const auditLogs = await SavingsStudioAuditLog.find({ user: req.user._id })
+    .sort({ createdAt: -1 })
+    .limit(MAX_ACTIVITY_ROWS);
+
+  res.json({
+    activity: auditLogs.map((log) => ({
+      id: log._id.toString(),
+      action: log.action,
+      entityType: log.entityType,
+      entityId: log.entityId || "",
+      metadata: log.metadata || {},
+      createdAt: log.createdAt,
+    })),
+  });
+};
+
 const exportSavingsBackup = async (req, res) => {
   const [payload, allBudgets, auditLogs] = await Promise.all([
     buildSavingsSummaryPayload(req.user._id),
@@ -1359,6 +1377,7 @@ module.exports = {
   logRecurringExpenseAsEntry,
   deleteRecurringExpense,
   getSavingsSummary,
+  getSavingsActivity,
   exportSavingsBackup,
   downloadSavingsSummaryDocument,
   sendSavingsSummaryEmailNow,

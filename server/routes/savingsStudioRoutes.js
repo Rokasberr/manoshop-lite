@@ -25,6 +25,7 @@ const {
   logRecurringExpenseAsEntry,
   deleteRecurringExpense,
   getSavingsSummary,
+  getSavingsActivity,
   exportSavingsBackup,
   downloadSavingsSummaryDocument,
   sendSavingsSummaryEmailNow,
@@ -79,6 +80,7 @@ router.post("/recurring/:recurringId/log", protect, memberOnly, mutationLimiter,
 router.put("/recurring/:recurringId", protect, memberOnly, mutationLimiter, asyncHandler(updateRecurringExpense));
 router.delete("/recurring/:recurringId", protect, memberOnly, mutationLimiter, asyncHandler(deleteRecurringExpense));
 router.get("/summary", protect, memberOnly, asyncHandler(getSavingsSummary));
+router.get("/activity", protect, memberOnly, asyncHandler(getSavingsActivity));
 router.get("/summary-export", protect, memberOnly, asyncHandler(downloadSavingsSummaryDocument));
 router.get("/backup", protect, memberOnly, backupLimiter, asyncHandler(exportSavingsBackup));
 router.post("/summary-email", protect, memberOnly, emailLimiter, asyncHandler(sendSavingsSummaryEmailNow));

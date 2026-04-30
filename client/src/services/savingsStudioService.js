@@ -85,6 +85,11 @@ const getSummary = async () => {
   return data;
 };
 
+const getActivity = async () => {
+  const { data } = await api.get("/savings-studio/activity");
+  return data;
+};
+
 const createEntry = async (payload) => {
   const { data } = await api.post("/savings-studio/entries", payload);
   return data;
@@ -193,6 +198,7 @@ export default {
   updateRecurringExpense,
   deleteRecurringExpense,
   getSummary,
+  getActivity,
   createEntry,
   previewEntriesImport,
   importEntries,

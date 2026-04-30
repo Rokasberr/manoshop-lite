@@ -1,9 +1,12 @@
 import {
   AlertTriangle,
+  ArrowUpRight,
+  CalendarRange,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
   Download,
+  History,
   Mail,
   PiggyBank,
   Pencil,
@@ -137,6 +140,14 @@ const FUTURE_MONTH_FORMATTER = new Intl.DateTimeFormat("lt-LT", {
   month: "long",
   year: "numeric",
 });
+const MONTH_KEY_FORMATTER = new Intl.DateTimeFormat("lt-LT", {
+  month: "long",
+  year: "numeric",
+});
+const ACTIVITY_TIME_FORMATTER = new Intl.DateTimeFormat("lt-LT", {
+  dateStyle: "medium",
+  timeStyle: "short",
+});
 
 const roundScenarioAmount = (value) => {
   const numericValue = Number(value || 0);
@@ -163,6 +174,39 @@ const formatFutureMonthLabel = (monthsAhead) => {
   return FUTURE_MONTH_FORMATTER.format(date);
 };
 
+const shiftMonthKey = (monthKey, delta) => {
+  if (!monthKey || !monthKey.includes("-")) {
+    return currentMonthKey();
+  }
+
+  const [yearPart, monthPart] = monthKey.split("-");
+  const year = Number(yearPart);
+  const month = Number(monthPart);
+
+  if (!Number.isFinite(year) || !Number.isFinite(month)) {
+    return currentMonthKey();
+  }
+
+  const date = new Date(Date.UTC(year, month - 1 + delta, 1));
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
+};
+
+const formatMonthKeyLabel = (monthKey) => {
+  if (!monthKey || !monthKey.includes("-")) {
+    return "šis mėnuo";
+  }
+
+  const [yearPart, monthPart] = monthKey.split("-");
+  const year = Number(yearPart);
+  const month = Number(monthPart);
+
+  if (!Number.isFinite(year) || !Number.isFinite(month)) {
+    return monthKey;
+  }
+
+  return MONTH_KEY_FORMATTER.format(new Date(Date.UTC(year, month - 1, 1)));
+};
+
 const goalPaceStatusLabel = (status) => {
   if (status === "behind") {
     return "Per lėtas tempas";
@@ -175,6 +219,153 @@ const goalPaceStatusLabel = (status) => {
   return "Juda gerai";
 };
 
+const describeSavingsActivity = (log, recurringFrequencies) => {
+  const metadata = log?.metadata || {};
+  const amountLabel =
+    metadata.amount !== undefined && metadata.amount !== null ? money.format(Number(metadata.amount || 0)) : null;
+
+  const activityMap = {
+    "entry-create": {
+      title: "Pridėjai naują išlaidą",
+      body: amountLabel
+        ? `${metadata.category || "Kategorija"} · ${amountLabel}`
+        : metadata.category || "Naujas įrašas ledger dalyje",
+      tone: "info",
+      targetId: "savings-ledger",
+      ctaLabel: "Rodyti ledger",
+    },
+    "entry-import": {
+      title: "Importavai išlaidas iš CSV",
+      body: `${metadata.importedCount || 0} nauji įrašai per vieną veiksmą.`,
+      tone: "success",
+      targetId: "savings-ledger",
+      ctaLabel: "Peržiūrėti įrašus",
+    },
+    "entry-update": {
+      title: "Atnaujinai išlaidos įrašą",
+      body: amountLabel
+        ? `${metadata.category || "Kategorija"} · ${amountLabel}`
+        : metadata.category || "Atnaujintas ledger įrašas",
+      tone: "info",
+      targetId: "savings-ledger",
+      ctaLabel: "Rodyti įrašą",
+    },
+    "entry-delete": {
+      title: "Ištrynėi išlaidos įrašą",
+      body: "Ledger istorija buvo pakoreguota rankiniu veiksmu.",
+      tone: "warning",
+      targetId: "savings-ledger",
+      ctaLabel: "Atidaryti ledger",
+    },
+    "goal-create": {
+      title: "Sukūrei naują taupymo tikslą",
+      body: metadata.targetAmount ? `Tikslas iki ${money.format(Number(metadata.targetAmount || 0))}.` : "Naujas tikslas jau aktyvus.",
+      tone: "success",
+      targetId: "savings-goals",
+      ctaLabel: "Atidaryti tikslus",
+    },
+    "goal-update": {
+      title: "Pakoregavai taupymo tikslą",
+      body:
+        metadata.currentAmount !== undefined
+          ? `Sukaupta ${money.format(Number(metadata.currentAmount || 0))} iš ${money.format(
+              Number(metadata.targetAmount || 0)
+            )}.`
+          : "Tikslas atnaujintas pagal naują planą.",
+      tone: "info",
+      targetId: "savings-goals",
+      ctaLabel: "Peržiūrėti tikslą",
+    },
+    "goal-delete": {
+      title: "Pašalinai taupymo tikslą",
+      body: "Šis tikslas nebedalyvauja tavo mėnesio plane.",
+      tone: "warning",
+      targetId: "savings-goals",
+      ctaLabel: "Peržiūrėti tikslus",
+    },
+    "recurring-create": {
+      title: "Pridėjai recurring išlaidą",
+      body: `${formatRecurringFrequency(metadata.frequency, recurringFrequencies)} · ${money.format(
+        Number(metadata.amount || 0)
+      )}`,
+      tone: "success",
+      targetId: "savings-recurring",
+      ctaLabel: "Atidaryti recurring",
+    },
+    "recurring-update": {
+      title: "Atnaujinai recurring išlaidą",
+      body: `${formatRecurringFrequency(metadata.frequency, recurringFrequencies)} · ${money.format(
+        Number(metadata.amount || 0)
+      )}`,
+      tone: "info",
+      targetId: "savings-recurring",
+      ctaLabel: "Peržiūrėti recurring",
+    },
+    "recurring-log-to-entry": {
+      title: "Recurring mokėjimą perkėlei į ledger",
+      body: metadata.amount ? `${money.format(Number(metadata.amount || 0))} įrašyta į mėnesio išlaidas.` : "Recurring išlaida tapo realiu ledger įrašu.",
+      tone: "success",
+      targetId: "savings-ledger",
+      ctaLabel: "Rodyti ledger",
+    },
+    "recurring-delete": {
+      title: "Pašalinai recurring įrašą",
+      body: "Pastovių išlaidų sąrašas buvo sutrumpintas.",
+      tone: "warning",
+      targetId: "savings-recurring",
+      ctaLabel: "Peržiūrėti recurring",
+    },
+    "backup-export": {
+      title: "Atsisiuntei JSON backup",
+      body: `${metadata.entryCount || 0} išlaidų, ${metadata.goalCount || 0} tikslai ir ${metadata.recurringCount || 0} recurring įrašai.`,
+      tone: "info",
+      targetId: "savings-automation",
+      ctaLabel: "Atidaryti automatizaciją",
+    },
+    "summary-export": {
+      title: "Atsisiuntei suvestinę",
+      body: `${metadata.frequency === "monthly" ? "Mėnesio" : "Savaitės"} suvestinė (${metadata.format || "html"}).`,
+      tone: "success",
+      targetId: "savings-automation",
+      ctaLabel: "Peržiūrėti suvestines",
+    },
+    "summary-email-manual": {
+      title: "Išsiuntei suvestinę el. paštu",
+      body: `${metadata.frequency === "monthly" ? "Mėnesio" : "Savaitės"} suvestinė išėjo rankiniu veiksmu.`,
+      tone: metadata.skipped ? "warning" : "success",
+      targetId: "savings-automation",
+      ctaLabel: "Atidaryti siuntimą",
+    },
+    "summary-email-manual-skipped": {
+      title: "Suvestinės laiškas buvo praleistas",
+      body: metadata.reason || "Programa šį kartą neišsiuntė laiško.",
+      tone: "warning",
+      targetId: "savings-automation",
+      ctaLabel: "Peržiūrėti nustatymus",
+    },
+    "summary-email-initial-failed": {
+      title: "Automatinė suvestinė nesusisiuntė",
+      body: metadata.message || "Pirmas bandymas nepavyko, verta peržiūrėti email nustatymus.",
+      tone: "warning",
+      targetId: "savings-automation",
+      ctaLabel: "Atidaryti email nustatymus",
+    },
+  };
+
+  const fallback = {
+    title: "Užfiksuotas naujas veiksmas",
+    body: "Stilloak išsaugojo dar vieną tavo nario zonos pokytį.",
+    tone: "info",
+    targetId: "savings-analytics",
+    ctaLabel: "Atidaryti studio",
+  };
+
+  return {
+    ...(activityMap[log?.action] || fallback),
+    timestamp: log?.createdAt ? ACTIVITY_TIME_FORMATTER.format(new Date(log.createdAt)) : "Ką tik",
+  };
+};
+
 const SavingsStudioPage = () => {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
@@ -182,6 +373,7 @@ const SavingsStudioPage = () => {
   const [focusOptions, setFocusOptions] = useState(DEFAULT_FOCUS_OPTIONS);
   const [recurringFrequencies, setRecurringFrequencies] = useState(DEFAULT_RECURRING_FREQUENCIES);
   const [profile, setProfile] = useState(null);
+  const [activity, setActivity] = useState([]);
   const [profileForm, setProfileForm] = useState({
     monthlyIncome: "",
     monthlySavingsTarget: "",
@@ -239,7 +431,7 @@ const SavingsStudioPage = () => {
       try {
         setLoading(true);
 
-        const [metaResult, profileResult, entriesResult, summaryResult, budgetsResult, goalsResult, recurringResult] =
+        const [metaResult, profileResult, entriesResult, summaryResult, budgetsResult, goalsResult, recurringResult, activityResult] =
           await Promise.all([
             savingsStudioService.getMeta(),
             savingsStudioService.getProfile(),
@@ -248,6 +440,7 @@ const SavingsStudioPage = () => {
             savingsStudioService.getBudgets(currentMonthKey()),
             savingsStudioService.getGoals(),
             savingsStudioService.getRecurringExpenses(),
+            savingsStudioService.getActivity(),
           ]);
 
         startTransition(() => {
@@ -263,6 +456,7 @@ const SavingsStudioPage = () => {
           setFocusOptions(apiFocusOptions);
           setRecurringFrequencies(apiRecurringFrequencies);
           setProfile(profileResult.profile || null);
+          setActivity(activityResult.activity || []);
           setProfileForm({
             monthlyIncome: profileResult.profile?.monthlyIncome ? String(profileResult.profile.monthlyIncome) : "",
             monthlySavingsTarget: profileResult.profile?.monthlySavingsTarget
@@ -491,8 +685,10 @@ const SavingsStudioPage = () => {
             ? `Viršyta ${money.format(Math.abs(topPressure.projectedSpent - topPressure.limitAmount))}`
             : `${money.format(topPressure.projectedSpent)} iš ${money.format(topPressure.limitAmount)}`,
         tone: topPressure.status === "over" ? "danger" : "warning",
-        targetId: "savings-budgets",
-        ctaLabel: "Peržiūrėti biudžetus",
+        targetId: "savings-ledger",
+        ctaLabel: "Rodyti įrašus",
+        focusCategory: topPressure.category,
+        focusMonth: selectedBudgetMonth,
       });
     }
 
@@ -531,8 +727,10 @@ const SavingsStudioPage = () => {
         )} per mėnesį ir ${money.format(recurringForecastItems[0].annualEquivalent)} per metus.`,
         meta: formatRecurringFrequency(recurringForecastItems[0].frequency, recurringFrequencies),
         tone: "info",
-        targetId: "savings-recurring-forecast",
-        ctaLabel: "Peržiūrėti recurring",
+        targetId: "savings-ledger",
+        ctaLabel: "Rodyti kategoriją",
+        focusCategory: recurringForecastItems[0].category,
+        focusMonth: selectedBudgetMonth,
       });
     }
 
@@ -549,7 +747,7 @@ const SavingsStudioPage = () => {
     }
 
     return actions.slice(0, 3);
-  }, [goalPace, recurringForecastItems, recurringFrequencies, summaryInsights, topPressure]);
+  }, [goalPace, recurringForecastItems, recurringFrequencies, selectedBudgetMonth, summaryInsights, topPressure]);
   const leadAction = nextActions[0] || null;
   const goalScenarios = useMemo(() => {
     if (!goalPace?.remaining) {
@@ -614,6 +812,57 @@ const SavingsStudioPage = () => {
       })
       .slice(0, 3);
   }, [goalPace, profile?.monthlySavingsTarget, safeToSaveAfterRecurring]);
+  const comparisonMonth = useMemo(() => shiftMonthKey(selectedBudgetMonth, -1), [selectedBudgetMonth]);
+  const comparisonMonthLabel = formatMonthKeyLabel(selectedBudgetMonth);
+  const previousComparisonMonthLabel = formatMonthKeyLabel(comparisonMonth);
+  const categoryMomentum = useMemo(() => {
+    const categoryMap = new Map();
+
+    entries.forEach((entry) => {
+      const monthKey = String(entry.date || "").slice(0, 7);
+
+      if (monthKey !== selectedBudgetMonth && monthKey !== comparisonMonth) {
+        return;
+      }
+
+      const current = categoryMap.get(entry.category) || {
+        category: entry.category,
+        currentTotal: 0,
+        previousTotal: 0,
+      };
+
+      if (monthKey === selectedBudgetMonth) {
+        current.currentTotal += Number(entry.amount || 0);
+      } else {
+        current.previousTotal += Number(entry.amount || 0);
+      }
+
+      categoryMap.set(entry.category, current);
+    });
+
+    return Array.from(categoryMap.values())
+      .map((item) => {
+        const delta = Number((item.currentTotal - item.previousTotal).toFixed(2));
+        const baseline = item.previousTotal || item.currentTotal || 1;
+        const deltaPercent = baseline ? Math.round((delta / baseline) * 100) : 0;
+
+        return {
+          ...item,
+          delta,
+          deltaPercent,
+          direction: delta > 0 ? "up" : delta < 0 ? "down" : "flat",
+        };
+      })
+      .filter((item) => item.currentTotal > 0 || item.previousTotal > 0)
+      .sort((left, right) => Math.abs(right.delta) - Math.abs(left.delta) || right.currentTotal - left.currentTotal)
+      .slice(0, 4);
+  }, [comparisonMonth, entries, selectedBudgetMonth]);
+  const biggestCategoryRise = categoryMomentum.find((item) => item.delta > 0) || null;
+  const biggestCategoryDrop = categoryMomentum.find((item) => item.delta < 0) || null;
+  const activityFeed = useMemo(
+    () => activity.map((item) => ({ ...item, ...describeSavingsActivity(item, recurringFrequencies) })),
+    [activity, recurringFrequencies]
+  );
 
   const refreshSummaryAndEntries = async () => {
     const [entriesResult, summaryResult] = await Promise.all([
@@ -635,6 +884,11 @@ const SavingsStudioPage = () => {
   const refreshRecurring = async () => {
     const recurringResult = await savingsStudioService.getRecurringExpenses();
     setRecurringExpenses(recurringResult.recurringExpenses || []);
+  };
+
+  const refreshActivity = async () => {
+    const activityResult = await savingsStudioService.getActivity();
+    setActivity(activityResult.activity || []);
   };
 
   const handleEntryFormChange = (event) => {
@@ -808,6 +1062,8 @@ const SavingsStudioPage = () => {
       } else {
         toast.success("Email suvestinių nustatymai atnaujinti.");
       }
+
+      await refreshActivity();
     } catch (error) {
       toast.error(error.response?.data?.message || "Nepavyko išsaugoti email suvestinių nustatymų.");
     } finally {
@@ -822,12 +1078,12 @@ const SavingsStudioPage = () => {
       const result = await savingsStudioService.sendSummaryEmail({ frequency });
 
       if (result.skipped) {
-        toast.error("SMTP dar nesukonfigūruotas, todėl laiško išsiųsti nepavyko.");
+        toast.error("El. pašto siuntimas dar nesukonfigūruotas, todėl laiško išsiųsti nepavyko.");
       } else {
         toast.success(`${frequency === "monthly" ? "Mėnesio" : "Savaitės"} suvestinė išsiųsta į tavo el. paštą.`);
       }
 
-      const profileResult = await savingsStudioService.getProfile();
+      const [profileResult] = await Promise.all([savingsStudioService.getProfile(), refreshActivity()]);
       setProfile(profileResult.profile || null);
     } catch (error) {
       toast.error(error.response?.data?.message || "Nepavyko išsiųsti suvestinės.");
@@ -982,6 +1238,7 @@ const SavingsStudioPage = () => {
     try {
       await savingsStudioService.downloadBackup();
       toast.success("Backup failas paruoštas atsisiųsti.");
+      await refreshActivity();
     } catch (error) {
       toast.error(error.response?.data?.message || "Nepavyko paruošti backup failo.");
     } finally {
@@ -995,6 +1252,7 @@ const SavingsStudioPage = () => {
     try {
       await savingsStudioService.downloadSummaryFile(frequency);
       toast.success(`${frequency === "monthly" ? "Mėnesio" : "Savaitės"} suvestinė paruošta atsisiųsti.`);
+      await refreshActivity();
     } catch (error) {
       toast.error(error.response?.data?.message || "Nepavyko paruošti suvestinės failo.");
     } finally {
@@ -1155,6 +1413,27 @@ const SavingsStudioPage = () => {
     if (target) {
       target.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+  };
+
+  const handleActionFocus = (action) => {
+    if (!action) {
+      return;
+    }
+
+    if (action.focusCategory || action.focusMonth || action.focusSearch !== undefined) {
+      startTransition(() => {
+        setFilters((current) => ({
+          ...current,
+          category: action.focusCategory || current.category,
+          month: action.focusMonth || current.month,
+          search: action.focusSearch !== undefined ? action.focusSearch : current.search,
+        }));
+      });
+    }
+
+    window.requestAnimationFrame(() => {
+      scrollToSection(action.targetId || "savings-ledger");
+    });
   };
 
   return (
@@ -1404,7 +1683,7 @@ const SavingsStudioPage = () => {
 
               <div className="mt-5 grid gap-3">
                 {nextActions.map((action, index) => (
-                  <ActionPriorityRow key={action.key} action={action} index={index} />
+                  <ActionPriorityRow key={action.key} action={action} index={index} onOpen={handleActionFocus} />
                 ))}
               </div>
 
@@ -1413,7 +1692,7 @@ const SavingsStudioPage = () => {
                   <button
                     type="button"
                     className="button-primary gap-2"
-                    onClick={() => scrollToSection(leadAction.targetId)}
+                    onClick={() => handleActionFocus(leadAction)}
                   >
                     {leadAction.ctaLabel}
                     <ChevronRight size={16} />
@@ -1652,6 +1931,101 @@ const SavingsStudioPage = () => {
               <div className="soft-card rounded-[24px] p-8 text-center text-muted">
                 Kai turėsi aktyvų taupymo tikslą su aiškesniu tempu, čia galėsi palyginti kelis mėnesio scenarijus
                 ir pasirinkti realesnį ritmą.
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[1.04fr_0.96fr]">
+        <div className="panel p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow">category shifts</p>
+              <h2 className="mt-4 text-4xl font-bold">Kas pasikeitė tarp mėnesių</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
+                Čia matai ne tik bendras išlaidas, bet ir kur tikrai pajudėjo ritmas nuo {previousComparisonMonthLabel} iki{" "}
+                {comparisonMonthLabel}. Paspaudęs kortą iškart nusileisi į tos kategorijos ledger vaizdą.
+              </p>
+            </div>
+            <CalendarRange size={20} style={{ color: "rgb(var(--accent))" }} />
+          </div>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <ForecastMetricTile
+              label="Lyginamas mėnuo"
+              value={comparisonMonthLabel}
+              hint={`Palyginimas su ${previousComparisonMonthLabel}`}
+            />
+            <ForecastMetricTile
+              label="Labiausiai augo"
+              value={biggestCategoryRise?.category || "Stabilu"}
+              hint={
+                biggestCategoryRise
+                  ? `${biggestCategoryRise.delta > 0 ? "+" : ""}${money.format(biggestCategoryRise.delta)}`
+                  : "Ryškaus augimo kol kas nėra"
+              }
+            />
+            <ForecastMetricTile
+              label="Labiausiai mažėjo"
+              value={biggestCategoryDrop?.category || "Dar nėra"}
+              hint={
+                biggestCategoryDrop
+                  ? `${money.format(biggestCategoryDrop.delta)} mažiau nei ${previousComparisonMonthLabel}`
+                  : "Kol kas nėra aiškaus mažėjimo"
+              }
+            />
+          </div>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {categoryMomentum.length ? (
+              categoryMomentum.map((item) => (
+                <CategoryShiftCard
+                  key={item.category}
+                  currentMonthLabel={comparisonMonthLabel}
+                  item={item}
+                  previousMonthLabel={previousComparisonMonthLabel}
+                  onOpen={() =>
+                    handleActionFocus({
+                      targetId: "savings-ledger",
+                      focusCategory: item.category,
+                      focusMonth: selectedBudgetMonth,
+                      ctaLabel: "Rodyti įrašus",
+                    })
+                  }
+                />
+              ))
+            ) : (
+              <div className="soft-card rounded-[24px] p-8 text-center text-muted md:col-span-2">
+                Kai turėsi bent dviejų mėnesių išlaidų istoriją, čia iškart pradės matytis, kurios kategorijos auga,
+                kurios rimsta ir kur iš tikro keičiasi tavo mėnesio ritmas.
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="panel p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow">activity timeline</p>
+              <h2 className="mt-4 text-4xl font-bold">Kas jau įvyko tavo studio</h2>
+              <p className="mt-3 text-sm leading-6 text-muted">
+                Šita juosta padeda matyti ne tik duomenis, bet ir tavo veiksmų ritmą: importus, tikslų pokyčius,
+                recurring korekcijas, backupus ir summary siuntimus.
+              </p>
+            </div>
+            <History size={20} style={{ color: "rgb(var(--accent))" }} />
+          </div>
+
+          <div className="mt-6 space-y-4">
+            {activityFeed.length ? (
+              activityFeed.map((item) => (
+                <ActivityTimelineItem key={item.id} item={item} onOpen={handleActionFocus} />
+              ))
+            ) : (
+              <div className="soft-card rounded-[24px] p-8 text-center text-muted">
+                Kai pradėsi aktyviau naudotis Savings Studio, čia matysi savo finansinės darbo eigos istoriją vienoje
+                vietoje.
               </div>
             )}
           </div>
@@ -2702,7 +3076,7 @@ const SavingsStudioPage = () => {
   );
 };
 
-const ActionPriorityRow = ({ action, index }) => {
+const ActionPriorityRow = ({ action, index, onOpen }) => {
   const toneClasses = {
     danger: {
       container: "border-red-400/20 bg-red-400/10 text-red-50",
@@ -2738,6 +3112,16 @@ const ActionPriorityRow = ({ action, index }) => {
           <p className="text-sm font-semibold">{action.title}</p>
           <p className={`mt-2 text-sm leading-6 ${classes.body}`}>{action.body}</p>
           <p className={`mt-3 text-xs uppercase tracking-[0.18em] ${classes.meta}`}>{action.meta}</p>
+          {action.ctaLabel ? (
+            <button
+              type="button"
+              className="mt-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-current"
+              onClick={() => onOpen?.(action)}
+            >
+              {action.ctaLabel}
+              <ArrowUpRight size={14} />
+            </button>
+          ) : null}
         </div>
       </div>
     </div>
@@ -2794,6 +3178,88 @@ const GoalScenarioCard = ({ scenario }) => (
     </div>
   </div>
 );
+
+const CategoryShiftCard = ({ currentMonthLabel, item, onOpen, previousMonthLabel }) => (
+  <div className="soft-card rounded-[24px] p-5">
+    <div className="flex items-start justify-between gap-4">
+      <div>
+        <div className="flex flex-wrap items-center gap-3">
+          <h3 className="text-lg font-semibold">{item.category}</h3>
+          <span
+            className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${
+              item.direction === "up"
+                ? "bg-red-50 text-red-600"
+                : item.direction === "down"
+                ? "bg-emerald-50 text-emerald-700"
+                : "bg-[rgb(var(--surface-soft))] text-muted"
+            }`}
+          >
+            {item.direction === "up" ? "Auga" : item.direction === "down" ? "Mažėja" : "Stabilu"}
+          </span>
+        </div>
+        <p className="mt-2 text-sm leading-6 text-muted">
+          {currentMonthLabel} išleidai {money.format(item.currentTotal)}, o {previousMonthLabel} buvo{" "}
+          {money.format(item.previousTotal)}.
+        </p>
+      </div>
+      <div className="text-right">
+        <p
+          className={`text-lg font-semibold ${
+            item.delta > 0 ? "text-red-600" : item.delta < 0 ? "text-emerald-700" : ""
+          }`}
+        >
+          {item.delta > 0 ? "+" : ""}
+          {money.format(item.delta)}
+        </p>
+        <p className="mt-1 text-xs uppercase tracking-[0.18em] text-muted">
+          {item.deltaPercent > 0 ? "+" : ""}
+          {item.deltaPercent}%
+        </p>
+      </div>
+    </div>
+
+    <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+      <p className="text-xs uppercase tracking-[0.18em] text-muted">
+        {item.direction === "up"
+          ? "Čia verta pažiūrėti konkrečius pirkinius ir tempą."
+          : item.direction === "down"
+          ? "Matyti realus atlaisvėjimas šioje kategorijoje."
+          : "Kategorija kol kas juda gana stabiliai."}
+      </p>
+      <button type="button" className="button-secondary gap-2" onClick={onOpen}>
+        Rodyti įrašus
+        <ArrowUpRight size={14} />
+      </button>
+    </div>
+  </div>
+);
+
+const ActivityTimelineItem = ({ item, onOpen }) => {
+  const toneClasses = {
+    warning: "border-amber-300/25 bg-amber-50/60",
+    success: "border-emerald-300/25 bg-emerald-50/60",
+    info: "border-[rgb(var(--border-soft))] bg-[rgb(var(--surface-soft))]",
+  };
+
+  return (
+    <div className={`rounded-[24px] border p-5 ${toneClasses[item.tone] || toneClasses.info}`}>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs uppercase tracking-[0.18em] text-muted">{item.timestamp}</p>
+          <h3 className="mt-2 text-lg font-semibold">{item.title}</h3>
+          <p className="mt-2 text-sm leading-6 text-muted">{item.body}</p>
+        </div>
+
+        {item.ctaLabel ? (
+          <button type="button" className="button-secondary gap-2 sm:shrink-0" onClick={() => onOpen?.(item)}>
+            {item.ctaLabel}
+            <ArrowUpRight size={14} />
+          </button>
+        ) : null}
+      </div>
+    </div>
+  );
+};
 
 const InsightTile = ({ hint, icon: Icon, label, value }) => (
   <div className="metric-card">
