@@ -226,6 +226,20 @@ const monthsUntilTargetDate = (targetDate) => {
   return Math.max(rawMonths, 1);
 };
 
+const daysSinceDate = (dateValue) => {
+  if (!dateValue) {
+    return null;
+  }
+
+  const timestamp = new Date(dateValue).getTime();
+
+  if (Number.isNaN(timestamp)) {
+    return null;
+  }
+
+  return Math.max(Math.floor((Date.now() - timestamp) / 86400000), 0);
+};
+
 const goalPaceStatusLabel = (status) => {
   if (status === "behind") {
     return "Per lėtas tempas";
@@ -995,6 +1009,265 @@ const SavingsStudioPage = () => {
       .slice(0, 4);
   }, [profile?.monthlyIncome, recurringForecastItems, recurringMonthlyTotal]);
   const recurringQuarterlyTotal = Number((recurringMonthlyTotal * 3).toFixed(2));
+  const coachSignals = useMemo(() => {
+    const items = [];
+
+    if (biggestCategoryDrop) {
+      items.push({
+        key: `win-${biggestCategoryDrop.category}`,
+        title: `${biggestCategoryDrop.category} jau lengvėja`,
+        body: `${comparisonMonthLabel} šioje kategorijoje išleidai ${money.format(
+          biggestCategoryDrop.currentTotal
+        )}, tai yra ${money.format(Math.abs(biggestCategoryDrop.delta))} mažiau nei ${previousComparisonMonthLabel}.`,
+        tone: "success",
+      });
+    } else if (safeToSaveAfterRecurring !== null && safeToSaveAfterRecurring > 0) {
+      items.push({
+        key: "reserve",
+        title: "Po recurring vis dar lieka erdvės",
+        body: `Po pastovių išlaidų dar lieka apie ${money.format(
+          safeToSaveAfterRecurring
+        )}. Čia yra tavo reali erdvė tikslams arba rezervui.`,
+        tone: "success",
+      });
+    }
+
+    if (topPressure) {
+      items.push({
+        key: `pressure-${topPressure.category}`,
+        title: `${topPressure.category} vis dar spaudžia mėnesį`,
+        body:
+          topPressure.status === "over"
+            ? `Ši kategorija jau perlipo limitą ir verta pirmo review.`
+            : `Ši kategorija jau priartėjo prie ribos ir gali suvalgyti likusį rezervą.`,
+        tone: topPressure.status === "over" ? "warning" : "info",
+      });
+    }
+
+    if (goalStrategyBoard[0]) {
+      items.push({
+        key: `goal-${goalStrategyBoard[0]._id}`,
+        title: `Tikslui „${goalStrategyBoard[0].title}“ reikia ritmo`,
+        body: `Kad jis judėtų pagal planą, verta saugoti bent ${money.format(
+          goalStrategyBoard[0].recommendedMonthly
+        )} per mėnesį.`,
+        tone: goalStrategyBoard[0].priority === "focus" ? "warning" : "info",
+      });
+    }
+
+    if (recurringReviewQueue[0]) {
+      items.push({
+        key: `recurring-${recurringReviewQueue[0]._id}`,
+        title: `${recurringReviewQueue[0].title} verta peržiūrėti`,
+        body: `Vien ši eilutė sudaro ${recurringReviewQueue[0].shareOfRecurring}% visų recurring išlaidų.`,
+        tone: recurringReviewQueue[0].priority === "focus" ? "warning" : "info",
+      });
+    }
+
+    return items.slice(0, 4);
+  }, [
+    biggestCategoryDrop,
+    comparisonMonthLabel,
+    goalStrategyBoard,
+    previousComparisonMonthLabel,
+    recurringReviewQueue,
+    safeToSaveAfterRecurring,
+    topPressure,
+  ]);
+  const coachingBrief = useMemo(() => {
+    if (topPressure?.status === "over") {
+      return {
+        title: `Didžiausias svertas dabar yra ${topPressure.category.toLowerCase()}`,
+        body: `Jei šį mėnesį sutvarkysi būtent šitą kategoriją, greičiausiai greičiausiai susigrąžinsi daugiausia laisvos vietos.`,
+      };
+    }
+
+    if (goalStrategyBoard[0]?.priority === "focus") {
+      return {
+        title: `Šį mėnesį verta apsaugoti tikslą „${goalStrategyBoard[0].title}“`,
+        body: `Jam jau reikia aiškaus mėnesio tempo, todėl verta saugoti rezervą nuo atsitiktinių kategorijų šuolių.`,
+      };
+    }
+
+    if (biggestCategoryDrop) {
+      return {
+        title: `Matai tikrą poslinkį ${biggestCategoryDrop.category.toLowerCase()} kategorijoje`,
+        body: `Tai gera vieta ne sustoti, o pakartoti tą patį ritmą ir kitą mėnesį.`,
+      };
+    }
+
+    return {
+      title: "Ritmas atrodo ramus, bet verta jį palaikyti",
+      body: "Kol kas nėra vienos krizės vietos, todėl didžiausia vertė yra tęsti nuoseklų įrašų, recurring ir tikslų ritmą.",
+    };
+  }, [biggestCategoryDrop, goalStrategyBoard, topPressure]);
+  const reflectionPulse = useMemo(() => {
+    const win = biggestCategoryDrop
+      ? `${biggestCategoryDrop.category} sumažėjo ${money.format(Math.abs(biggestCategoryDrop.delta))} ir tai jau atlaisvina mėnesį.`
+      : safeToSaveAfterRecurring !== null && safeToSaveAfterRecurring > 0
+      ? `Po recurring vis dar lieka ${money.format(safeToSaveAfterRecurring)} laisvos vietos.`
+      : "Didžiausia pergalė dabar yra pati disciplina grįžti ir žiūrėti į savo skaičius.";
+
+    const pressure = topPressure
+      ? `${topPressure.category} dabar labiausiai spaudžia mėnesio ritmą.`
+      : recurringReviewQueue[0]
+      ? `${recurringReviewQueue[0].title} jau viena pati sudaro ${recurringReviewQueue[0].shareOfRecurring}% recurring dalies.`
+      : "Ryškaus spaudimo taško kol kas nesimato.";
+
+    const repeat = goalStrategyBoard[0]
+      ? `Kartok aiškų atsidėjimo tempą tikslui „${goalStrategyBoard[0].title}“ ir saugok jo mėnesio dalį.`
+      : profile?.summaryEmailsEnabled
+      ? "Palik įjungtas suvestines ir remkis trumpu savaitės review, o ne vien intuicija."
+      : "Verta įjungti savaitinę suvestinę, kad ritmas laikytųsi automatiškiau.";
+
+    return { win, pressure, repeat };
+  }, [
+    biggestCategoryDrop,
+    goalStrategyBoard,
+    profile?.summaryEmailsEnabled,
+    recurringReviewQueue,
+    safeToSaveAfterRecurring,
+    topPressure,
+  ]);
+  const journeyMilestones = useMemo(() => {
+    const firstImport = activityFeed.find((item) => item.action === "entry-import");
+    const firstGoal = activityFeed.find((item) => item.action === "goal-create");
+    const firstRecurring = activityFeed.find((item) => item.action === "recurring-create");
+    const latestSummary = summaryArchive.find((item) => item.action === "summary-email-manual" || item.action === "summary-export");
+
+    return [
+      {
+        key: "setup",
+        title: profile?.onboardingCompleted ? "Pirmas setup užbaigtas" : "Pirmas setup dar formuojamas",
+        body: profile?.onboardingCompleted
+          ? "Bazinis nario finansinis karkasas jau vietoje: pajamos, tikslas ir pirmi biudžetai."
+          : "Kai užbaigsi pirmą setup, visa studio pradės rodyti daug tikslesnį kontekstą.",
+        done: Boolean(profile?.onboardingCompleted),
+        timestamp: null,
+      },
+      firstImport
+        ? {
+            key: "import",
+            title: "Pirmas importas jau įvyko",
+            body: "Vadinasi, pradedi dirbti ne tik ranka, bet ir su realesne išlaidų istorija.",
+            done: true,
+            timestamp: firstImport.timestamp,
+          }
+        : null,
+      firstGoal
+        ? {
+            key: "goal",
+            title: "Narystė jau turi tikslą",
+            body: "Tikslas suteikia studijai kryptį, o ne tik stebėseną.",
+            done: true,
+            timestamp: firstGoal.timestamp,
+          }
+        : null,
+      firstRecurring
+        ? {
+            key: "recurring",
+            title: "Recurring sistema jau pajungta",
+            body: "Pastovios išlaidos jau dalyvauja tikrame mėnesio vaizde.",
+            done: true,
+            timestamp: firstRecurring.timestamp,
+          }
+        : null,
+      latestSummary
+        ? {
+            key: "summary",
+            title: "Summary ritmas jau gyvas",
+            body: "Suvestinės jau pradėjo kaupti tavo nario istoriją ir grįžtamą ryšį.",
+            done: true,
+            timestamp: latestSummary.timestamp,
+          }
+        : {
+            key: "summary",
+            title: "Summary ritmas dar neįsivažiavo",
+            body: "Kai paleisi pirmą suvestinę, narystė pradės turėti savo savaitinį ar mėnesinį taktą.",
+            done: false,
+            timestamp: null,
+          },
+    ].filter(Boolean).slice(0, 5);
+  }, [activityFeed, profile?.onboardingCompleted, summaryArchive]);
+  const lastBackupEvent = summaryArchive.find((item) => item.action === "backup-export") || null;
+  const lastSummarySendEvent =
+    summaryArchive.find((item) => item.action === "summary-email-manual" && !item.metadata?.skipped) || null;
+  const lastSummaryTouchDays = daysSinceDate(lastSummarySendEvent?.createdAt || profile?.summaryEmailLastSentAt);
+  const lastBackupDays = daysSinceDate(lastBackupEvent?.createdAt);
+  const automationReadiness = useMemo(
+    () => ({
+      summaryStatus: profile?.summaryEmailsEnabled ? "Įjungta" : "Išjungta",
+      summaryHealth:
+        lastSummaryTouchDays === null
+          ? "Dar nebuvo"
+          : lastSummaryTouchDays <= 7
+          ? "Šviežia"
+          : lastSummaryTouchDays <= 30
+          ? "Laikas patikrinti"
+          : "Per sena",
+      backupHealth:
+        lastBackupDays === null
+          ? "Nėra"
+          : lastBackupDays <= 30
+          ? "Atnaujinta"
+          : lastBackupDays <= 90
+          ? "Greitai atsinaujink"
+          : "Pasenusi",
+    }),
+    [lastBackupDays, lastSummaryTouchDays, profile?.summaryEmailsEnabled]
+  );
+  const automationTriggers = useMemo(() => {
+    const triggers = [];
+
+    if (!profile?.summaryEmailsEnabled) {
+      triggers.push({
+        key: "enable-summary",
+        title: "Įjunk savaitinį ritmą",
+        body: "Kol suvestinės išjungtos, studija neturi automatinio grįžtamojo ciklo.",
+        actionLabel: "Atidaryti nustatymus",
+        actionType: "scroll",
+        targetId: "savings-automation",
+        tone: "warning",
+      });
+    }
+
+    if (lastSummaryTouchDays === null || lastSummaryTouchDays > 14) {
+      triggers.push({
+        key: "send-summary",
+        title: "Paleisk naują summary dabar",
+        body: "Trumpa savaitės suvestinė padės greitai pamatyti, kur pradeda slysti mėnesio ritmas.",
+        actionLabel: "Siųsti savaitės suvestinę",
+        actionType: "summary-email",
+        frequency: "weekly",
+        tone: "info",
+      });
+    }
+
+    if (lastBackupDays === null || lastBackupDays > 45) {
+      triggers.push({
+        key: "backup",
+        title: "Atnaujink atsarginę kopiją",
+        body: "Kartinis JSON backup saugo ramybę prieš didesnius importus ar pokyčius.",
+        actionLabel: "Atsisiųsti backup",
+        actionType: "backup",
+        tone: "warning",
+      });
+    }
+
+    if (recurringReviewQueue[0]?.priority === "focus") {
+      triggers.push({
+        key: "recurring-review",
+        title: `Peržiūrėk ${recurringReviewQueue[0].title}`,
+        body: "Šita recurring eilutė jau turi realų svorį visam tavo mėnesio ritmui.",
+        actionLabel: "Atidaryti recurring",
+        actionType: "scroll",
+        targetId: "savings-recurring",
+        tone: "info",
+      });
+    }
+
+    return triggers.slice(0, 4);
+  }, [lastBackupDays, lastSummaryTouchDays, profile?.summaryEmailsEnabled, recurringReviewQueue]);
 
   const refreshSummaryAndEntries = async () => {
     const [entriesResult, summaryResult] = await Promise.all([
@@ -1566,6 +1839,26 @@ const SavingsStudioPage = () => {
     window.requestAnimationFrame(() => {
       scrollToSection(action.targetId || "savings-ledger");
     });
+  };
+
+  const handleAutomationTrigger = (trigger) => {
+    if (!trigger) {
+      return;
+    }
+
+    if (trigger.actionType === "summary-email") {
+      handleSendSummaryEmail(trigger.frequency || "weekly");
+      return;
+    }
+
+    if (trigger.actionType === "backup") {
+      handleDownloadBackup();
+      return;
+    }
+
+    if (trigger.actionType === "scroll") {
+      scrollToSection(trigger.targetId || "savings-automation");
+    }
   };
 
   return (
@@ -3063,6 +3356,108 @@ const SavingsStudioPage = () => {
         </div>
       </section>
 
+      <section className="grid gap-6 xl:grid-cols-[1.04fr_0.96fr_1fr]">
+        <div className="panel p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow">coaching layer</p>
+              <h2 className="mt-4 text-4xl font-bold">Šio mėnesio Stilloak brief</h2>
+              <p className="mt-3 text-sm leading-6 text-muted">
+                Tai jau ne tik dashboardas, o trumpa coaching santrauka: kur esi stiprus, kur slysta ritmas ir ką
+                verta padaryti pirmiausia, kad mėnuo vėl jaustųsi tavo kontrolėje.
+              </p>
+            </div>
+            <ShieldCheck size={20} style={{ color: "rgb(var(--accent))" }} />
+          </div>
+
+          <div className="mt-6 rounded-[24px] border border-[rgb(var(--border))] bg-[rgb(var(--surface-soft))] p-5">
+            <p className="text-xs uppercase tracking-[0.18em] text-muted">Coach brief</p>
+            <h3 className="mt-3 text-2xl font-semibold">{coachingBrief.title}</h3>
+            <p className="mt-3 text-sm leading-6 text-muted">{coachingBrief.body}</p>
+          </div>
+
+          <div className="mt-6 space-y-4">
+            {coachSignals.map((signal) => (
+              <CoachSignalCard key={signal.key} signal={signal} />
+            ))}
+          </div>
+        </div>
+
+        <div className="panel p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow">member journey</p>
+              <h2 className="mt-4 text-4xl font-bold">Kaip bręsta tavo nario kelias</h2>
+              <p className="mt-3 text-sm leading-6 text-muted">
+                Čia susijungia tavo veiksmai, milestone’ai ir mėnesio refleksija. Ne tik skaičiai, bet ir istorija,
+                kaip Stilloak pamažu tampa tavo ritmu.
+              </p>
+            </div>
+            <History size={20} style={{ color: "rgb(var(--accent))" }} />
+          </div>
+
+          <div className="mt-6 space-y-3">
+            {journeyMilestones.map((milestone) => (
+              <JourneyMilestoneItem key={milestone.key} milestone={milestone} />
+            ))}
+          </div>
+
+          <div className="mt-6 soft-card rounded-[24px] p-5">
+            <p className="text-xs uppercase tracking-[0.18em] text-muted">Mėnesio refleksija</p>
+            <div className="mt-4 space-y-4">
+              <ReflectionPulseItem label="Kas sekasi" text={reflectionPulse.win} />
+              <ReflectionPulseItem label="Kur spaudžia" text={reflectionPulse.pressure} />
+              <ReflectionPulseItem label="Ką verta kartoti" text={reflectionPulse.repeat} />
+            </div>
+          </div>
+        </div>
+
+        <div className="panel p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow">automation rhythm</p>
+              <h2 className="mt-4 text-4xl font-bold">Ką verta automatizuoti dabar</h2>
+              <p className="mt-3 text-sm leading-6 text-muted">
+                V8 sluoksnis pradeda dirbti už tave: primena, kada verta siųsti summary, atnaujinti backup ar vėl
+                įjungti finansinį ritmą, kol jis dar neišslydo.
+              </p>
+            </div>
+            <Mail size={20} style={{ color: "rgb(var(--accent))" }} />
+          </div>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <ForecastMetricTile
+              label="Summary"
+              value={automationReadiness.summaryStatus}
+              hint={automationReadiness.summaryHealth}
+            />
+            <ForecastMetricTile
+              label="Backup"
+              value={automationReadiness.backupHealth}
+              hint={lastBackupDays === null ? "Dar nekurta kopija" : `${lastBackupDays} d. nuo paskutinio backup`}
+            />
+            <ForecastMetricTile
+              label="Triggeriai"
+              value={String(automationTriggers.length)}
+              hint="Kiek automatikos veiksmų verta padaryti dabar"
+            />
+          </div>
+
+          <div className="mt-6 space-y-4">
+            {automationTriggers.length ? (
+              automationTriggers.map((trigger) => (
+                <AutomationTriggerCard key={trigger.key} trigger={trigger} onRun={() => handleAutomationTrigger(trigger)} />
+              ))
+            ) : (
+              <div className="soft-card rounded-[24px] p-8 text-center text-muted">
+                Šiuo metu automatikos ritmas atrodo sveikas: summary, backup ir recurring dalis nešaukia papildomo
+                veiksmo.
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
       <section id="savings-automation" className="grid gap-6 lg:grid-cols-2">
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
@@ -3658,6 +4053,73 @@ const SummaryArchiveItem = ({ item, onDownload, onSend }) => {
             </button>
           </div>
         ) : null}
+      </div>
+    </div>
+  );
+};
+
+const CoachSignalCard = ({ signal }) => {
+  const toneClasses = {
+    success: "border-emerald-300/25 bg-emerald-50/60",
+    warning: "border-amber-300/25 bg-amber-50/60",
+    info: "border-[rgb(var(--border-soft))] bg-[rgb(var(--surface-soft))]",
+  };
+
+  return (
+    <div className={`rounded-[20px] border px-4 py-4 ${toneClasses[signal.tone] || toneClasses.info}`}>
+      <p className="text-sm font-semibold">{signal.title}</p>
+      <p className="mt-2 text-sm leading-6 text-muted">{signal.body}</p>
+    </div>
+  );
+};
+
+const JourneyMilestoneItem = ({ milestone }) => (
+  <div className="rounded-[20px] bg-[rgb(var(--surface-soft))] px-4 py-4">
+    <div className="flex items-start gap-3">
+      <div
+        className={`mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${
+          milestone.done ? "bg-emerald-100 text-emerald-700" : "bg-[rgb(var(--surface))] text-muted"
+        }`}
+      >
+        <CheckCircle2 size={15} />
+      </div>
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-sm font-semibold">{milestone.title}</p>
+          {milestone.timestamp ? (
+            <span className="text-[11px] uppercase tracking-[0.18em] text-muted">{milestone.timestamp}</span>
+          ) : null}
+        </div>
+        <p className="mt-2 text-sm leading-6 text-muted">{milestone.body}</p>
+      </div>
+    </div>
+  </div>
+);
+
+const ReflectionPulseItem = ({ label, text }) => (
+  <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-4">
+    <p className="text-xs uppercase tracking-[0.18em] text-muted">{label}</p>
+    <p className="mt-2 text-sm leading-6 text-muted">{text}</p>
+  </div>
+);
+
+const AutomationTriggerCard = ({ onRun, trigger }) => {
+  const toneClasses = {
+    warning: "border-amber-300/25 bg-amber-50/60",
+    info: "border-[rgb(var(--border-soft))] bg-[rgb(var(--surface-soft))]",
+  };
+
+  return (
+    <div className={`rounded-[24px] border p-5 ${toneClasses[trigger.tone] || toneClasses.info}`}>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h3 className="text-lg font-semibold">{trigger.title}</h3>
+          <p className="mt-2 text-sm leading-6 text-muted">{trigger.body}</p>
+        </div>
+        <button type="button" className="button-secondary gap-2 sm:shrink-0" onClick={onRun}>
+          {trigger.actionLabel}
+          <ArrowUpRight size={14} />
+        </button>
       </div>
     </div>
   );
