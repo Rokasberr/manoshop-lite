@@ -415,7 +415,7 @@ const sendSavingsSummaryEmail = async ({ frequency = "weekly", profile, summary,
     return { sent: false, skipped: true, reason: "smtp-not-configured" };
   }
 
-  const { from } = getTransportConfig();
+  const { from, socketTimeout = 15000 } = getTransportConfig();
   const transport = getEmailTransport();
   const email = buildSummaryEmail({
     frequency,
@@ -423,13 +423,46 @@ const sendSavingsSummaryEmail = async ({ frequency = "weekly", profile, summary,
     userName: user?.name,
   });
 
-  await transport.sendMail({
-    from,
-    to: user.email,
-    subject: email.subject,
-    text: email.text,
-    html: email.html,
-  });
+  const maxWaitMs = Math.max(socketTimeout, 15000);
+  let timeoutId = null;
+
+  try {
+    await Promise.race([
+      transport.sendMail({
+        from,
+        to: user.email,
+        subject: email.subject,
+        text: email.text,
+        html: email.html,
+      }),
+      new Promise((_, reject) => {
+        timeoutId = setTimeout(() => {
+          const error = new Error("SMTP serveris per ilgai neatsako. Patikrink pašto nustatymus.");
+          error.statusCode = 504;
+          reject(error);
+        }, maxWaitMs);
+      }),
+    ]);
+  } catch (error) {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
+    if (typeof transport.close === "function") {
+      transport.close();
+    }
+
+    if (!error.statusCode && /timeout|timed out|greeting/i.test(String(error.message || ""))) {
+      error.statusCode = 504;
+      error.message = "SMTP serveris per ilgai neatsako. Patikrink pašto nustatymus.";
+    }
+
+    throw error;
+  }
+
+  if (timeoutId) {
+    clearTimeout(timeoutId);
+  }
 
   profile.summaryEmailLastSentAt = new Date();
   await profile.save();
