@@ -101,11 +101,11 @@ const USAGE_WIZARD_STEPS = [
     eyebrow: "step 3",
     title: "Sujunk biudžetus su pastoviomis išlaidomis",
     description:
-      "Čia atsiranda tikras spaudimo vaizdas: ne tik kiek jau išleidai, bet ir kiek dar suvalgys recurring mokėjimai.",
+      "Čia atsiranda tikras spaudimo vaizdas: ne tik kiek jau išleidai, bet ir kiek dar suvalgys pastovūs mokėjimai.",
     bullets: [
       "Nustatyk biudžeto ribas kiekvienai svarbiai kategorijai.",
       "Pridėk nuomą, prenumeratas ir kitus pastovius mokėjimus.",
-      "Kai recurring nuskaičiuojamas, paversk jį tikru mėnesio įrašu vienu mygtuku.",
+      "Kai pastovus mokėjimas nuskaičiuojamas, paversk jį tikru mėnesio įrašu vienu mygtuku.",
     ],
     targetId: "savings-budgets",
   },
@@ -130,7 +130,7 @@ const USAGE_WIZARD_STEPS = [
       "Kai bazė jau sukurta, verta įjungti automatiką, kad programa pati dirbtų tavo naudai ir turėtum atsarginę duomenų kopiją.",
     bullets: [
       "Įjunk savaitines arba mėnesines email suvestines.",
-      "Prieš didesnius importus naudok CSV preview.",
+      "Prieš didesnius importus pasidaryk CSV peržiūrą.",
       "Kartais atsisiųsk JSON backup savo duomenims.",
     ],
     targetId: "savings-automation",
@@ -270,10 +270,10 @@ const describeSavingsActivity = (log, recurringFrequencies) => {
       title: "Pridėjai naują išlaidą",
       body: amountLabel
         ? `${metadata.category || "Kategorija"} · ${amountLabel}`
-        : metadata.category || "Naujas įrašas ledger dalyje",
+        : metadata.category || "Naujas įrašas išlaidų istorijoje",
       tone: "info",
       targetId: "savings-ledger",
-      ctaLabel: "Rodyti ledger",
+      ctaLabel: "Rodyti įrašus",
     },
     "entry-import": {
       title: "Importavai išlaidas iš CSV",
@@ -286,17 +286,17 @@ const describeSavingsActivity = (log, recurringFrequencies) => {
       title: "Atnaujinai išlaidos įrašą",
       body: amountLabel
         ? `${metadata.category || "Kategorija"} · ${amountLabel}`
-        : metadata.category || "Atnaujintas ledger įrašas",
+        : metadata.category || "Atnaujintas išlaidų įrašas",
       tone: "info",
       targetId: "savings-ledger",
       ctaLabel: "Rodyti įrašą",
     },
     "entry-delete": {
       title: "Ištrynėi išlaidos įrašą",
-      body: "Ledger istorija buvo pakoreguota rankiniu veiksmu.",
+      body: "Išlaidų istorija buvo pakoreguota rankiniu veiksmu.",
       tone: "warning",
       targetId: "savings-ledger",
-      ctaLabel: "Atidaryti ledger",
+      ctaLabel: "Atidaryti įrašus",
     },
     "goal-create": {
       title: "Sukūrei naują taupymo tikslą",
@@ -325,36 +325,38 @@ const describeSavingsActivity = (log, recurringFrequencies) => {
       ctaLabel: "Peržiūrėti tikslus",
     },
     "recurring-create": {
-      title: "Pridėjai recurring išlaidą",
+      title: "Pridėjai pastovią išlaidą",
       body: `${formatRecurringFrequency(metadata.frequency, recurringFrequencies)} · ${money.format(
         Number(metadata.amount || 0)
       )}`,
       tone: "success",
       targetId: "savings-recurring",
-      ctaLabel: "Atidaryti recurring",
+      ctaLabel: "Atidaryti pastovias išlaidas",
     },
     "recurring-update": {
-      title: "Atnaujinai recurring išlaidą",
+      title: "Atnaujinai pastovią išlaidą",
       body: `${formatRecurringFrequency(metadata.frequency, recurringFrequencies)} · ${money.format(
         Number(metadata.amount || 0)
       )}`,
       tone: "info",
       targetId: "savings-recurring",
-      ctaLabel: "Peržiūrėti recurring",
+      ctaLabel: "Peržiūrėti pastovias išlaidas",
     },
     "recurring-log-to-entry": {
-      title: "Recurring mokėjimą perkėlei į ledger",
-      body: metadata.amount ? `${money.format(Number(metadata.amount || 0))} įrašyta į mėnesio išlaidas.` : "Recurring išlaida tapo realiu ledger įrašu.",
+      title: "Pastovų mokėjimą perkėlei į išlaidų istoriją",
+      body: metadata.amount
+        ? `${money.format(Number(metadata.amount || 0))} įrašyta į mėnesio išlaidas.`
+        : "Pastovi išlaida tapo realiu išlaidų įrašu.",
       tone: "success",
       targetId: "savings-ledger",
-      ctaLabel: "Rodyti ledger",
+      ctaLabel: "Rodyti įrašus",
     },
     "recurring-delete": {
-      title: "Pašalinai recurring įrašą",
+      title: "Pašalinai pastovią išlaidą",
       body: "Pastovių išlaidų sąrašas buvo sutrumpintas.",
       tone: "warning",
       targetId: "savings-recurring",
-      ctaLabel: "Peržiūrėti recurring",
+      ctaLabel: "Peržiūrėti pastovias išlaidas",
     },
     "backup-export": {
       title: "Atsisiuntei JSON backup",
@@ -1704,9 +1706,9 @@ const SavingsStudioPage = () => {
       const preview = await savingsStudioService.previewEntriesImport({ rows });
       setCsvPreviewResult(preview);
       setCsvFileName(file.name);
-      toast.success(`Paruoštas preview: ${preview.validCount} tinkamų eilučių.`);
+      toast.success(`Paruošta peržiūra: ${preview.validCount} tinkamų eilučių.`);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Nepavyko paruošti CSV preview.");
+      toast.error(error.response?.data?.message || "Nepavyko paruošti CSV peržiūros.");
     } finally {
       event.target.value = "";
       setPreviewingCsv(false);
@@ -1730,7 +1732,7 @@ const SavingsStudioPage = () => {
       setCsvFileName("");
       toast.success(`Importuota ${result.importedCount} įrašų.`);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Nepavyko importuoti preview eilučių.");
+      toast.error(error.response?.data?.message || "Nepavyko importuoti peržiūros eilučių.");
     } finally {
       setConfirmingCsvImport(false);
     }
@@ -2185,7 +2187,7 @@ const SavingsStudioPage = () => {
       <section id="savings-analytics" className="marketing-dark overflow-hidden rounded-[34px] px-6 py-7 sm:px-8 lg:px-10">
         <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
           <div>
-            <span className="hero-chip">Circle feature</span>
+            <span className="hero-chip">Savings Studio</span>
             <h2 className="mt-6 font-display text-5xl font-bold leading-[0.95]">
               {user?.name?.split(" ")[0]}, čia tavo pinigų aiškumo kambarys.
             </h2>
@@ -2302,7 +2304,7 @@ const SavingsStudioPage = () => {
               <div className="mt-6 rounded-[24px] border border-white/10 bg-white/5 p-5">
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.24em] text-white/45">Goal pace</p>
+                  <p className="text-xs uppercase tracking-[0.24em] text-white/45">Tikslo tempas</p>
                     <h3 className="mt-3 font-display text-3xl font-bold">{goalPace.title}</h3>
                   </div>
                   <Target size={18} style={{ color: "rgb(var(--accent-strong))" }} />
@@ -2371,12 +2373,42 @@ const SavingsStudioPage = () => {
         </div>
       </section>
 
+      <section className="soft-card rounded-[28px] px-5 py-5 sm:px-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="eyebrow">Greita navigacija</p>
+            <h2 className="mt-3 text-2xl font-semibold">Svarbiausios vietos vienoje eilėje</h2>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            {[
+              { label: "Įrašai", targetId: "savings-ledger" },
+              { label: "Biudžetai", targetId: "savings-budgets" },
+              { label: "Tikslai", targetId: "savings-goals" },
+              { label: "Pastovios išlaidos", targetId: "savings-recurring" },
+              { label: "Suvestinės", targetId: "savings-automation" },
+              { label: "Importas", targetId: "savings-import" },
+            ].map((item) => (
+              <button
+                key={item.targetId}
+                type="button"
+                className="button-secondary gap-2"
+                onClick={() => scrollToSection(item.targetId)}
+              >
+                {item.label}
+                <ChevronRight size={14} />
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="grid gap-6 xl:grid-cols-[1.06fr_0.94fr]">
         <div id="savings-recurring-forecast" className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="eyebrow">recurring forecast</p>
-              <h2 className="mt-4 text-4xl font-bold">Kur recurring spaudžia labiausiai</h2>
+              <p className="eyebrow">pastovių išlaidų ritmas</p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Kur pastovios išlaidos spaudžia labiausiai</h2>
               <p className="mt-3 text-sm leading-6 text-muted">
                 Čia matai ne tik bendrą sumą, bet ir kurie pasikartojantys mokėjimai iš tikro suvalgo daugiausia
                 erdvės taupymui.
@@ -2387,12 +2419,12 @@ const SavingsStudioPage = () => {
 
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
             <ForecastMetricTile
-              label="Recurring per mėn."
+              label="Per mėnesį"
               value={money.format(recurringMonthlyTotal)}
               hint={`${recurringExpenses.length} aktyvūs įrašai`}
             />
             <ForecastMetricTile
-              label="Recurring per metus"
+              label="Per metus"
               value={money.format(recurringAnnualTotal)}
               hint="Bendra metinė našta"
             />
@@ -2433,7 +2465,7 @@ const SavingsStudioPage = () => {
               ))
             ) : (
               <div className="soft-card rounded-[24px] p-8 text-center text-muted">
-                Pridėk bent vieną pastovią išlaidą, ir čia iškart matysi kur recurring dalis labiausiai spaudžia
+                Pridėk bent vieną pastovią išlaidą, ir čia iškart matysi kur ši dalis labiausiai spaudžia
                 tavo mėnesį.
               </div>
             )}
@@ -2443,8 +2475,8 @@ const SavingsStudioPage = () => {
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="eyebrow">goal scenarios</p>
-              <h2 className="mt-4 text-4xl font-bold">Kokiu tempu pasieksi tikslą</h2>
+              <p className="eyebrow">tikslų scenarijai</p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Kokiu tempu pasieksi tikslą</h2>
               <p className="mt-3 text-sm leading-6 text-muted">
                 Vietoje vieno skaičiaus matai kelis realius scenarijus: kas nutinka laikantis dabartinio plano,
                 rekomenduojamo tempo ar šiek tiek stipresnio sprinto.
@@ -2470,11 +2502,11 @@ const SavingsStudioPage = () => {
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="eyebrow">category shifts</p>
-              <h2 className="mt-4 text-4xl font-bold">Kas pasikeitė tarp mėnesių</h2>
+              <p className="eyebrow">mėnesių pokytis</p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Kas pasikeitė tarp mėnesių</h2>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
                 Čia matai ne tik bendras išlaidas, bet ir kur tikrai pajudėjo ritmas nuo {previousComparisonMonthLabel} iki{" "}
-                {comparisonMonthLabel}. Paspaudęs kortą iškart nusileisi į tos kategorijos ledger vaizdą.
+                {comparisonMonthLabel}. Paspaudęs kortą iškart nusileisi į tos kategorijos išlaidų vaizdą.
               </p>
             </div>
             <CalendarRange size={20} style={{ color: "rgb(var(--accent))" }} />
@@ -2536,11 +2568,11 @@ const SavingsStudioPage = () => {
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="eyebrow">activity timeline</p>
-              <h2 className="mt-4 text-4xl font-bold">Kas jau įvyko tavo studio</h2>
+              <p className="eyebrow">veiksmų istorija</p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Kas jau įvyko tavo studio</h2>
               <p className="mt-3 text-sm leading-6 text-muted">
                 Šita juosta padeda matyti ne tik duomenis, bet ir tavo veiksmų ritmą: importus, tikslų pokyčius,
-                recurring korekcijas, backupus ir summary siuntimus.
+                pastovių išlaidų korekcijas, kopijas ir suvestinių siuntimus.
               </p>
             </div>
             <History size={20} style={{ color: "rgb(var(--accent))" }} />
@@ -2565,8 +2597,8 @@ const SavingsStudioPage = () => {
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="eyebrow">quick capture</p>
-              <h2 className="mt-4 text-4xl font-bold">{editingId ? "Redaguoti įrašą" : "Pridėti išlaidą"}</h2>
+              <p className="eyebrow">greitas įvedimas</p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">{editingId ? "Redaguoti įrašą" : "Pridėti išlaidą"}</h2>
             </div>
             {editingId ? (
               <button type="button" className="button-secondary" onClick={handleCancelEdit}>
@@ -2649,8 +2681,8 @@ const SavingsStudioPage = () => {
         <div className="panel p-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="eyebrow">ledger</p>
-              <h2 className="mt-4 text-4xl font-bold">Tavo išlaidos</h2>
+              <p className="eyebrow">išlaidų istorija</p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Tavo įrašai</h2>
             </div>
             <p className="text-sm text-muted">Rasta: {filteredEntries.length}</p>
           </div>
@@ -2764,8 +2796,8 @@ const SavingsStudioPage = () => {
           <div id="savings-budgets" className="panel p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="eyebrow">monthly budgets</p>
-                <h2 className="mt-4 text-4xl font-bold">Biudžetų ribos</h2>
+              <p className="eyebrow">mėnesio biudžetai</p>
+                <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Biudžetų ribos</h2>
                 <p className="mt-3 text-sm leading-6 text-muted">
                   Nustatyk, kiek nori skirti kiekvienai kategorijai pasirinktam mėnesiui.
                 </p>
@@ -2795,8 +2827,8 @@ const SavingsStudioPage = () => {
           </div>
 
           <div className="panel p-6">
-            <p className="eyebrow">month pulse</p>
-            <h2 className="mt-4 text-4xl font-bold">6 mėnesių vaizdas</h2>
+              <p className="eyebrow">mėnesio vaizdas</p>
+            <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">6 mėnesių vaizdas</h2>
             <div className="mt-6 grid h-[260px] grid-cols-6 items-end gap-3">
               {monthlyTotals.map((entry) => {
                 const height = `${Math.max((entry.total / highestMonthlyTotal) * 100, entry.total ? 16 : 8)}%`;
@@ -2828,8 +2860,8 @@ const SavingsStudioPage = () => {
           <div className="panel p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="eyebrow">budget progress</p>
-                <h2 className="mt-4 text-4xl font-bold">Kiek liko iki limito</h2>
+              <p className="eyebrow">biudžetų progresas</p>
+                <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Kiek liko iki limito</h2>
               </div>
               <TrendingUp size={20} style={{ color: "rgb(var(--accent))" }} />
             </div>
@@ -2899,8 +2931,8 @@ const SavingsStudioPage = () => {
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="eyebrow">weekly flow</p>
-              <h2 className="mt-4 text-4xl font-bold">Savaitinis mėnesio ritmas</h2>
+              <p className="eyebrow">savaitinis ritmas</p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Savaitinis mėnesio ritmas</h2>
               <p className="mt-3 text-sm leading-6 text-muted">
                 Greitai pamatai, kuri mėnesio dalis suvalgo daugiausia pinigų ir kur prasideda tempas, kuris
                 išmuša visą mėnesio balansą.
@@ -2937,8 +2969,8 @@ const SavingsStudioPage = () => {
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="eyebrow">spend mix</p>
-              <h2 className="mt-4 text-4xl font-bold">Fiksuota vs lanksti dalis</h2>
+              <p className="eyebrow">išlaidų balansas</p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Fiksuota vs lanksti dalis</h2>
             </div>
             <WalletCards size={20} style={{ color: "rgb(var(--accent))" }} />
           </div>
@@ -2946,7 +2978,7 @@ const SavingsStudioPage = () => {
           <div className="mt-6 space-y-4">
             <div className="soft-card rounded-[24px] p-5">
               <div className="flex items-center justify-between gap-4">
-                <span className="font-medium">Jau užfiksuotos recurring išlaidos</span>
+                    <span className="font-medium">Jau užfiksuotos pastovios išlaidos</span>
                 <span className="font-semibold">{money.format(fixedVsFlexible.loggedRecurring)}</span>
               </div>
               <p className="mt-2 text-sm text-muted">Mokėjimai, kuriuos jau pavertei tikrais mėnesio įrašais.</p>
@@ -2954,7 +2986,7 @@ const SavingsStudioPage = () => {
 
             <div className="soft-card rounded-[24px] p-5">
               <div className="flex items-center justify-between gap-4">
-                <span className="font-medium">Dar likusios recurring projekcijos</span>
+                    <span className="font-medium">Dar likusios projekcijos</span>
                 <span className="font-semibold">{money.format(fixedVsFlexible.recurringRemaining)}</span>
               </div>
               <p className="mt-2 text-sm text-muted">Pastovios išlaidos, kurios dar laukia savo mėnesio įrašo.</p>
@@ -2989,8 +3021,8 @@ const SavingsStudioPage = () => {
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="eyebrow">category pressure</p>
-              <h2 className="mt-4 text-4xl font-bold">Kuri kategorija spaudžia labiausiai</h2>
+              <p className="eyebrow">kategorijų spaudimas</p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Kuri kategorija spaudžia labiausiai</h2>
             </div>
             <AlertTriangle size={20} style={{ color: "rgb(var(--accent))" }} />
           </div>
@@ -3043,8 +3075,8 @@ const SavingsStudioPage = () => {
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="eyebrow">savings goals</p>
-              <h2 className="mt-4 text-4xl font-bold">{editingGoalId ? "Redaguoti tikslą" : "Taupymo tikslai"}</h2>
+              <p className="eyebrow">taupymo tikslai</p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">{editingGoalId ? "Redaguoti tikslą" : "Taupymo tikslai"}</h2>
             </div>
             {editingGoalId ? (
               <button type="button" className="button-secondary" onClick={handleCancelGoalEdit}>
@@ -3176,8 +3208,8 @@ const SavingsStudioPage = () => {
         <div id="savings-recurring" className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="eyebrow">recurring expenses</p>
-              <h2 className="mt-4 text-4xl font-bold">
+              <p className="eyebrow">pastovios išlaidos</p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">
                 {editingRecurringId ? "Redaguoti pasikartojančią išlaidą" : "Pastovios išlaidos"}
               </h2>
             </div>
@@ -3358,7 +3390,7 @@ const SavingsStudioPage = () => {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="eyebrow">goal strategy</p>
-              <h2 className="mt-4 text-4xl font-bold">Kaip išdėlioti tikslus protingiau</h2>
+              <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Kaip išdėlioti tikslus protingiau</h2>
               <p className="mt-3 text-sm leading-6 text-muted">
                 Čia matosi ne tik progresas, bet ir kuriam tikslui verta duoti pirmumą, kiek jam reikėtų per mėnesį
                 ir ar dabartinis rezervas realiai pakelia tą tempą.
@@ -3404,8 +3436,8 @@ const SavingsStudioPage = () => {
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="eyebrow">recurring intelligence</p>
-              <h2 className="mt-4 text-4xl font-bold">Ką verta peržiūrėti recurring dalyje</h2>
+              <p className="eyebrow">pastovių išlaidų apžvalga</p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Ką verta peržiūrėti pastovių išlaidų dalyje</h2>
               <p className="mt-3 text-sm leading-6 text-muted">
                 Čia recurring sąrašas jau pereina iš paprasto registro į kontrolės zoną: matai ketvirčio naštą,
                 stipriausias kategorijas ir kur verta pradėti review.
@@ -3431,7 +3463,7 @@ const SavingsStudioPage = () => {
               hint={
                 recurringCategoryLeaders[0]
                   ? money.format(recurringCategoryLeaders[0].annualEquivalent)
-                  : "Kai bus daugiau recurring"
+                  : "Kai bus daugiau pastovių išlaidų"
               }
             />
           </div>
@@ -3464,18 +3496,18 @@ const SavingsStudioPage = () => {
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="eyebrow">coaching layer</p>
-              <h2 className="mt-4 text-4xl font-bold">Šio mėnesio Stilloak brief</h2>
+              <p className="eyebrow">mėnesio gidas</p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Šio mėnesio Stilloak brief</h2>
               <p className="mt-3 text-sm leading-6 text-muted">
-                Tai jau ne tik dashboardas, o trumpa coaching santrauka: kur esi stiprus, kur slysta ritmas ir ką
-                verta padaryti pirmiausia, kad mėnuo vėl jaustųsi tavo kontrolėje.
+                Tai trumpa mėnesio santrauka: kur esi stiprus, kur slysta ritmas ir ką verta padaryti pirmiausia,
+                kad mėnuo vėl jaustųsi tavo kontrolėje.
               </p>
             </div>
             <ShieldCheck size={20} style={{ color: "rgb(var(--accent))" }} />
           </div>
 
           <div className="mt-6 rounded-[24px] border border-[rgb(var(--border))] bg-[rgb(var(--surface-soft))] p-5">
-            <p className="text-xs uppercase tracking-[0.18em] text-muted">Coach brief</p>
+            <p className="text-xs uppercase tracking-[0.18em] text-muted">Mėnesio gidas</p>
             <h3 className="mt-3 text-2xl font-semibold">{coachingBrief.title}</h3>
             <p className="mt-3 text-sm leading-6 text-muted">{coachingBrief.body}</p>
           </div>
@@ -3490,8 +3522,8 @@ const SavingsStudioPage = () => {
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="eyebrow">member journey</p>
-              <h2 className="mt-4 text-4xl font-bold">Kaip bręsta tavo nario kelias</h2>
+              <p className="eyebrow">nario kelias</p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Kaip bręsta tavo nario kelias</h2>
               <p className="mt-3 text-sm leading-6 text-muted">
                 Čia susijungia tavo veiksmai, milestone’ai ir mėnesio refleksija. Ne tik skaičiai, bet ir istorija,
                 kaip Stilloak pamažu tampa tavo ritmu.
@@ -3519,11 +3551,11 @@ const SavingsStudioPage = () => {
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="eyebrow">automation rhythm</p>
-              <h2 className="mt-4 text-4xl font-bold">Ką verta automatizuoti dabar</h2>
+              <p className="eyebrow">automatikos ritmas</p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Ką verta automatizuoti dabar</h2>
               <p className="mt-3 text-sm leading-6 text-muted">
-                V8 sluoksnis pradeda dirbti už tave: primena, kada verta siųsti summary, atnaujinti backup ar vėl
-                įjungti finansinį ritmą, kol jis dar neišslydo.
+                Šita dalis primena, kada verta siųsti suvestinę, atnaujinti kopiją ar vėl įjungti finansinį ritmą,
+                kol jis dar neišslydo.
               </p>
             </div>
             <Mail size={20} style={{ color: "rgb(var(--accent))" }} />
@@ -3531,17 +3563,17 @@ const SavingsStudioPage = () => {
 
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
             <ForecastMetricTile
-              label="Summary"
+              label="Suvestinės"
               value={automationReadiness.summaryStatus}
               hint={automationReadiness.summaryHealth}
             />
             <ForecastMetricTile
-              label="Backup"
+              label="Kopijos"
               value={automationReadiness.backupHealth}
               hint={lastBackupDays === null ? "Dar nekurta kopija" : `${lastBackupDays} d. nuo paskutinio backup`}
             />
             <ForecastMetricTile
-              label="Triggeriai"
+              label="Signalai"
               value={String(automationTriggers.length)}
               hint="Kiek automatikos veiksmų verta padaryti dabar"
             />
@@ -3554,7 +3586,7 @@ const SavingsStudioPage = () => {
               ))
             ) : (
               <div className="soft-card rounded-[24px] p-8 text-center text-muted">
-                Šiuo metu automatikos ritmas atrodo sveikas: summary, backup ir recurring dalis nešaukia papildomo
+                Šiuo metu automatikos ritmas atrodo sveikas: suvestinės, kopijos ir pastovių išlaidų dalis nešaukia papildomo
                 veiksmo.
               </div>
             )}
@@ -3566,8 +3598,8 @@ const SavingsStudioPage = () => {
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="eyebrow">private strategy center</p>
-              <h2 className="mt-4 text-4xl font-bold">Aukšto lygio mėnesio vaizdas</h2>
+              <p className="eyebrow">strategijos centras</p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Aukšto lygio mėnesio vaizdas</h2>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-muted">
                 Čia Stilloak suspaudžia visą studio į vieną aiškų centrą: kiek tavo sistema subrendusi, kur dabar
                 stipriausias fokusas, kokia 90 dienų erdvė ir kiek aktyvių signalų prašo tavo dėmesio.
@@ -3578,14 +3610,14 @@ const SavingsStudioPage = () => {
 
           <div className="mt-6 grid gap-4 sm:grid-cols-4">
             <ForecastMetricTile
-              label="Clarity score"
+              label="Aiškumo balas"
               value={`${strategyCenter.score}/100`}
               hint={strategyCenter.scoreLabel}
             />
             <ForecastMetricTile
               label="90 d. erdvė"
               value={strategyCenter.monthlyRunway === null ? "—" : money.format(strategyCenter.monthlyRunway)}
-              hint="Po recurring, jei ritmas nesikeis"
+              hint="Po pastovių išlaidų, jei ritmas nesikeis"
             />
             <ForecastMetricTile
               label="Pagrindinis fokusas"
@@ -3595,7 +3627,7 @@ const SavingsStudioPage = () => {
             <ForecastMetricTile
               label="Aktyvūs signalai"
               value={String(strategyCenter.signalsCount)}
-              hint="Coach + automation signalai"
+              hint="Gido ir automatikos signalai"
             />
           </div>
 
@@ -3616,7 +3648,7 @@ const SavingsStudioPage = () => {
                   ? "Tavo bazė jau stipri: Stilloak veikia ne tik kaip trackeris, bet kaip tikras mėnesio valdymo centras."
                   : strategyCenter.score >= 65
                   ? "Sistema jau tvirtėja. Didžiausia vertė dabar yra ne pridėti dar daugiau, o išlaikyti ritmą nuoseklų."
-                  : "Pagrindas jau statomas, bet didžiausias šuolis dar bus iš ritmo: daugiau realių įrašų, gyvesni tikslai ir pastovi recurring kontrolė."}
+                  : "Pagrindas jau statomas, bet didžiausias šuolis dar bus iš ritmo: daugiau realių įrašų, gyvesni tikslai ir pastovių išlaidų kontrolė."}
               </p>
             </div>
           </div>
@@ -3625,11 +3657,11 @@ const SavingsStudioPage = () => {
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="eyebrow">import intelligence</p>
-              <h2 className="mt-4 text-4xl font-bold">Ką rodo tavo importų sluoksnis</h2>
+              <p className="eyebrow">importo kokybė</p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Ką rodo tavo importų sluoksnis</h2>
               <p className="mt-3 text-sm leading-6 text-muted">
-                V9 dalis jau žiūri ne tik ar CSV įsikels, bet ir kiek jis švarus, ar kartojasi eilutės, kokių mėnesių
-                duomenis atneša ir kur dažniausiai stringa preview.
+                Čia matai ne tik ar CSV įsikels, bet ir kiek jis švarus, ar kartojasi eilutės, kokių mėnesių
+                duomenis atneša ir kur dažniausiai stringa peržiūra.
               </p>
             </div>
             <Download size={20} style={{ color: "rgb(var(--accent))" }} />
@@ -3642,7 +3674,7 @@ const SavingsStudioPage = () => {
               hint={lastImportEvent ? "Paskutinis activity įrašas" : "Kai importuosi pirmą CSV"}
             />
             <ForecastMetricTile
-              label="Preview kokybė"
+              label="Peržiūros kokybė"
               value={importIntelligence.importQuality === null ? "—" : `${importIntelligence.importQuality}%`}
               hint={importIntelligence.hasPreview ? "Tinkamų eilučių dalis" : "Atsiras įkėlus CSV"}
             />
@@ -3666,22 +3698,22 @@ const SavingsStudioPage = () => {
               }
             />
             <ImportInsightCard
-              label="Dažniausi preview trikdžiai"
+              label="Dažniausios peržiūros klaidos"
               value={
                 importIntelligence.invalidReasonLeaders.length
                   ? importIntelligence.invalidReasonLeaders
                       .map((entry) => `${entry.reason} (${entry.count})`)
                       .join(" · ")
-                  : "Kol kas nėra preview klaidų arba dar nebuvo įkeltas failas."
+                  : "Kol kas nėra peržiūros klaidų arba dar nebuvo įkeltas failas."
               }
             />
             <ImportInsightCard
               label="Importo rekomendacija"
               value={
                 importIntelligence.duplicateCount > 0
-                  ? "Prieš importą verta peržiūrėti galimus dublikatus, kad ledger neprisipildytų kartojimų."
+                  ? "Prieš importą verta peržiūrėti galimus dublikatus, kad išlaidų istorija neprisipildytų kartojimų."
                   : importIntelligence.hasPreview
-                  ? "Preview atrodo švariai. Jei skaičiai atitinka tavo banko išrašą, gali importuoti ramiai."
+                  ? "Peržiūra atrodo švariai. Jei skaičiai atitinka tavo banko išrašą, gali importuoti ramiai."
                   : "Kai įkelsi failą, Stilloak parodys ar importas atrodo švarus, ar verta jį pakoreguoti prieš patvirtinant."
               }
             />
@@ -3693,8 +3725,8 @@ const SavingsStudioPage = () => {
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="eyebrow">summary emails</p>
-              <h2 className="mt-4 text-4xl font-bold">Savaitinės ir mėnesinės suvestinės</h2>
+              <p className="eyebrow">el. pašto suvestinės</p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Savaitinės ir mėnesinės suvestinės</h2>
               <p className="mt-3 text-sm leading-6 text-muted">
                 Įsijunk el. pašto suvestines, kad programa pati primintų, kur išteka pinigai ir kiek dar telpa
                 taupymui.
@@ -3830,8 +3862,8 @@ const SavingsStudioPage = () => {
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="eyebrow">csv import</p>
-              <h2 className="mt-4 text-4xl font-bold">Banko išrašo importas</h2>
+              <p className="eyebrow">banko importas</p>
+              <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Banko išrašo importas</h2>
               <p className="mt-3 text-sm leading-6 text-muted">
                 Jei turi CSV iš banko ar kitos programos, gali greitai sukelti išlaidas ir pamatyti visą mėnesio
                 vaizdą be rankinio suvedimo.
@@ -3854,9 +3886,9 @@ const SavingsStudioPage = () => {
 
             <p className="mt-4 text-sm leading-6 text-muted">
               {previewingCsv
-                ? "CSV preview ruošiamas, palauk kelias sekundes."
+                ? "Ruošiama CSV peržiūra, palauk kelias sekundes."
                 : confirmingCsvImport
-                ? "Preview eilutės importuojamos, palauk kelias sekundes."
+                ? "Peržiūros eilutės importuojamos, palauk kelias sekundes."
                 : "Sistema atpažįsta dažniausius stulpelius ir prieš importą parodo, kaip jos bus suklasifikuotos."}
             </p>
           </div>
@@ -3866,7 +3898,7 @@ const SavingsStudioPage = () => {
               <div className="soft-card rounded-[24px] p-5">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.18em] text-muted">Preview</p>
+                    <p className="text-xs uppercase tracking-[0.18em] text-muted">Peržiūra</p>
                     <h3 className="mt-2 text-xl font-semibold">{csvFileName || "CSV failas"}</h3>
                     <p className="mt-2 text-sm text-muted">
                       Tinkamos eilutės: {csvPreviewResult.validCount} · Netinkamos: {csvPreviewResult.invalidCount}
@@ -3883,7 +3915,7 @@ const SavingsStudioPage = () => {
                       {confirmingCsvImport ? "Importuojama..." : `Importuoti ${csvPreviewResult.validCount} eilučių`}
                     </button>
                     <button type="button" className="button-secondary" onClick={handleClearCsvPreview}>
-                      Išvalyti preview
+                      Išvalyti peržiūrą
                     </button>
                   </div>
                 </div>
@@ -3937,7 +3969,7 @@ const SavingsStudioPage = () => {
               <ol className="mt-3 space-y-2 text-sm leading-6 text-muted">
                 <li>1. Iš banko eksportuoji CSV.</li>
                 <li>2. Įkeli jį čia vienu veiksmu.</li>
-                <li>3. Pirmiausia matai preview, tik tada patvirtini importą.</li>
+                  <li>3. Pirmiausia matai peržiūrą, tik tada patvirtini importą.</li>
               </ol>
             </div>
           </div>
@@ -4221,7 +4253,7 @@ const RecurringReviewCard = ({ expense, onOpen }) => {
             <h3 className="text-lg font-semibold">{expense.title}</h3>
             <span className="premium-tag">{expense.category}</span>
             <span className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${priorityClasses[expense.priority] || priorityClasses.steady}`}>
-              {expense.priority === "focus" ? "Review first" : expense.priority === "watch" ? "Stebėti" : "Stabilu"}
+                    {expense.priority === "focus" ? "Peržiūrėti pirmiausia" : expense.priority === "watch" ? "Stebėti" : "Stabilu"}
             </span>
           </div>
           <p className="mt-2 text-sm leading-6 text-muted">{expense.note}</p>
@@ -4432,7 +4464,7 @@ const UsageWizardModal = ({
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-muted">{currentStep.eyebrow}</p>
-          <h2 className="mt-3 text-4xl font-bold">{currentStep.title}</h2>
+          <h2 className="mt-3 text-3xl font-bold leading-tight sm:text-[2rem]">{currentStep.title}</h2>
           <p className="mt-4 max-w-2xl text-base leading-7 text-muted">{currentStep.description}</p>
         </div>
 
@@ -4508,3 +4540,4 @@ const UsageWizardModal = ({
 );
 
 export default SavingsStudioPage;
+
