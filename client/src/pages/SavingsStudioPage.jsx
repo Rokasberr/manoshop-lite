@@ -240,6 +240,14 @@ const daysSinceDate = (dateValue) => {
   return Math.max(Math.floor((Date.now() - timestamp) / 86400000), 0);
 };
 
+const buildSavingsEntryKey = (entryLike) => {
+  const title = String(entryLike?.title || "").trim().toLowerCase();
+  const date = String(entryLike?.date || "").trim();
+  const amount = Number(entryLike?.amount || 0).toFixed(2);
+
+  return `${date}__${amount}__${title}`;
+};
+
 const goalPaceStatusLabel = (status) => {
   if (status === "behind") {
     return "Per lėtas tempas";
@@ -1268,6 +1276,102 @@ const SavingsStudioPage = () => {
 
     return triggers.slice(0, 4);
   }, [lastBackupDays, lastSummaryTouchDays, profile?.summaryEmailsEnabled, recurringReviewQueue]);
+  const lastImportEvent = activityFeed.find((item) => item.action === "entry-import") || null;
+  const importIntelligence = useMemo(() => {
+    const existingKeys = new Set(entries.map((entry) => buildSavingsEntryKey(entry)));
+    const validRows = csvPreviewResult?.validRows || [];
+    const previewRows = csvPreviewResult?.preview || [];
+    const monthCounts = validRows.reduce((accumulator, row) => {
+      const monthKey = String(row.date || "").slice(0, 7);
+      const next = { ...accumulator };
+
+      if (monthKey) {
+        next[monthKey] = (next[monthKey] || 0) + 1;
+      }
+
+      return next;
+    }, {});
+    const monthSpread = Object.entries(monthCounts)
+      .map(([monthKey, count]) => ({ monthKey, count, label: formatMonthKeyLabel(monthKey) }))
+      .sort((left, right) => right.count - left.count);
+    const duplicateCandidates = validRows.filter((row) => existingKeys.has(buildSavingsEntryKey(row)));
+    const invalidReasons = previewRows
+      .filter((row) => row.status !== "ok")
+      .reduce((accumulator, row) => {
+        const key = row.error || "Nežinoma klaida";
+        const next = { ...accumulator };
+        next[key] = (next[key] || 0) + 1;
+        return next;
+      }, {});
+    const invalidReasonLeaders = Object.entries(invalidReasons)
+      .map(([reason, count]) => ({ reason, count }))
+      .sort((left, right) => right.count - left.count)
+      .slice(0, 3);
+    const importQuality =
+      csvPreviewResult && csvPreviewResult.validCount + csvPreviewResult.invalidCount > 0
+        ? Math.round((csvPreviewResult.validCount / (csvPreviewResult.validCount + csvPreviewResult.invalidCount)) * 100)
+        : null;
+
+    return {
+      hasPreview: Boolean(csvPreviewResult),
+      validCount: csvPreviewResult?.validCount || 0,
+      invalidCount: csvPreviewResult?.invalidCount || 0,
+      duplicateCandidates,
+      duplicateCount: duplicateCandidates.length,
+      importQuality,
+      monthSpread,
+      invalidReasonLeaders,
+    };
+  }, [csvPreviewResult, entries]);
+  const strategyCenter = useMemo(() => {
+    let score = 0;
+
+    if (profile?.onboardingCompleted) score += 15;
+    if (entries.length >= 15) score += 15;
+    if (budgetOverview.setCount >= 3) score += 15;
+    if (recurringExpenses.length >= 2) score += 15;
+    if (goalStrategyBoard.length >= 1) score += 15;
+    if (profile?.summaryEmailsEnabled) score += 10;
+    if (activityFeed.length >= 8) score += 5;
+    if (summaryArchive.length >= 2) score += 10;
+
+    const scoreLabel =
+      score >= 85 ? "Labai stiprus pagrindas" : score >= 65 ? "Tvirtėja" : score >= 40 ? "Statoma sistema" : "Dar formuojasi";
+    const monthlyRunway =
+      safeToSaveAfterRecurring !== null && safeToSaveAfterRecurring !== undefined
+        ? Number((safeToSaveAfterRecurring * 3).toFixed(2))
+        : null;
+    const systemFocus =
+      topPressure?.category || recurringReviewQueue[0]?.category || goalStrategyBoard[0]?.title || "Ritmo stabilumas";
+    const nextMilestone =
+      goalStrategyBoard[0]?.monthsLeft
+        ? `${goalStrategyBoard[0].title} per ~${goalStrategyBoard[0].monthsLeft} mėn.`
+        : lastImportEvent?.timestamp || "Paleisti pirmą stipresnį mėnesio ciklą";
+
+    return {
+      score,
+      scoreLabel,
+      monthlyRunway,
+      systemFocus,
+      nextMilestone,
+      signalsCount: coachSignals.length + automationTriggers.length,
+    };
+  }, [
+    activityFeed.length,
+    automationTriggers.length,
+    budgetOverview.setCount,
+    coachSignals.length,
+    entries.length,
+    goalStrategyBoard,
+    lastImportEvent,
+    profile?.onboardingCompleted,
+    profile?.summaryEmailsEnabled,
+    recurringExpenses.length,
+    recurringReviewQueue,
+    safeToSaveAfterRecurring,
+    summaryArchive.length,
+    topPressure,
+  ]);
 
   const refreshSummaryAndEntries = async () => {
     const [entriesResult, summaryResult] = await Promise.all([
@@ -3458,6 +3562,133 @@ const SavingsStudioPage = () => {
         </div>
       </section>
 
+      <section className="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
+        <div className="panel p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow">private strategy center</p>
+              <h2 className="mt-4 text-4xl font-bold">Aukšto lygio mėnesio vaizdas</h2>
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-muted">
+                Čia Stilloak suspaudžia visą studio į vieną aiškų centrą: kiek tavo sistema subrendusi, kur dabar
+                stipriausias fokusas, kokia 90 dienų erdvė ir kiek aktyvių signalų prašo tavo dėmesio.
+              </p>
+            </div>
+            <PiggyBank size={20} style={{ color: "rgb(var(--accent))" }} />
+          </div>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-4">
+            <ForecastMetricTile
+              label="Clarity score"
+              value={`${strategyCenter.score}/100`}
+              hint={strategyCenter.scoreLabel}
+            />
+            <ForecastMetricTile
+              label="90 d. erdvė"
+              value={strategyCenter.monthlyRunway === null ? "—" : money.format(strategyCenter.monthlyRunway)}
+              hint="Po recurring, jei ritmas nesikeis"
+            />
+            <ForecastMetricTile
+              label="Pagrindinis fokusas"
+              value={strategyCenter.systemFocus}
+              hint="Kur dabar didžiausias svertas"
+            />
+            <ForecastMetricTile
+              label="Aktyvūs signalai"
+              value={String(strategyCenter.signalsCount)}
+              hint="Coach + automation signalai"
+            />
+          </div>
+
+          <div className="mt-6 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+            <div className="soft-card rounded-[24px] p-5">
+              <p className="text-xs uppercase tracking-[0.18em] text-muted">Kitas svarbiausias milestone</p>
+              <h3 className="mt-3 text-2xl font-semibold">{strategyCenter.nextMilestone}</h3>
+              <p className="mt-3 text-sm leading-6 text-muted">
+                Šitas blokas skirtas ne detalėms, o tam vienam dalykui, kuris geriausiai pasako, kur šiuo metu juda
+                tavo nario sistema.
+              </p>
+            </div>
+
+            <div className="soft-card rounded-[24px] p-5">
+              <p className="text-xs uppercase tracking-[0.18em] text-muted">Premium išvada</p>
+              <p className="mt-3 text-sm leading-7 text-muted">
+                {strategyCenter.score >= 85
+                  ? "Tavo bazė jau stipri: Stilloak veikia ne tik kaip trackeris, bet kaip tikras mėnesio valdymo centras."
+                  : strategyCenter.score >= 65
+                  ? "Sistema jau tvirtėja. Didžiausia vertė dabar yra ne pridėti dar daugiau, o išlaikyti ritmą nuoseklų."
+                  : "Pagrindas jau statomas, bet didžiausias šuolis dar bus iš ritmo: daugiau realių įrašų, gyvesni tikslai ir pastovi recurring kontrolė."}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="panel p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow">import intelligence</p>
+              <h2 className="mt-4 text-4xl font-bold">Ką rodo tavo importų sluoksnis</h2>
+              <p className="mt-3 text-sm leading-6 text-muted">
+                V9 dalis jau žiūri ne tik ar CSV įsikels, bet ir kiek jis švarus, ar kartojasi eilutės, kokių mėnesių
+                duomenis atneša ir kur dažniausiai stringa preview.
+              </p>
+            </div>
+            <Download size={20} style={{ color: "rgb(var(--accent))" }} />
+          </div>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <ForecastMetricTile
+              label="Paskutinis importas"
+              value={lastImportEvent?.timestamp || "Dar nebuvo"}
+              hint={lastImportEvent ? "Paskutinis activity įrašas" : "Kai importuosi pirmą CSV"}
+            />
+            <ForecastMetricTile
+              label="Preview kokybė"
+              value={importIntelligence.importQuality === null ? "—" : `${importIntelligence.importQuality}%`}
+              hint={importIntelligence.hasPreview ? "Tinkamų eilučių dalis" : "Atsiras įkėlus CSV"}
+            />
+            <ForecastMetricTile
+              label="Galimi dublikatai"
+              value={String(importIntelligence.duplicateCount)}
+              hint="Pagal datą, sumą ir pavadinimą"
+            />
+          </div>
+
+          <div className="mt-6 space-y-4">
+            <ImportInsightCard
+              label="Mėnesių aprėptis"
+              value={
+                importIntelligence.monthSpread.length
+                  ? importIntelligence.monthSpread
+                      .slice(0, 3)
+                      .map((entry) => `${entry.label} (${entry.count})`)
+                      .join(" · ")
+                  : "Įkelk CSV, ir čia matysi kurių mėnesių istoriją jis atneša."
+              }
+            />
+            <ImportInsightCard
+              label="Dažniausi preview trikdžiai"
+              value={
+                importIntelligence.invalidReasonLeaders.length
+                  ? importIntelligence.invalidReasonLeaders
+                      .map((entry) => `${entry.reason} (${entry.count})`)
+                      .join(" · ")
+                  : "Kol kas nėra preview klaidų arba dar nebuvo įkeltas failas."
+              }
+            />
+            <ImportInsightCard
+              label="Importo rekomendacija"
+              value={
+                importIntelligence.duplicateCount > 0
+                  ? "Prieš importą verta peržiūrėti galimus dublikatus, kad ledger neprisipildytų kartojimų."
+                  : importIntelligence.hasPreview
+                  ? "Preview atrodo švariai. Jei skaičiai atitinka tavo banko išrašą, gali importuoti ramiai."
+                  : "Kai įkelsi failą, Stilloak parodys ar importas atrodo švarus, ar verta jį pakoreguoti prieš patvirtinant."
+              }
+            />
+          </div>
+        </div>
+      </section>
+
       <section id="savings-automation" className="grid gap-6 lg:grid-cols-2">
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
@@ -4124,6 +4355,13 @@ const AutomationTriggerCard = ({ onRun, trigger }) => {
     </div>
   );
 };
+
+const ImportInsightCard = ({ label, value }) => (
+  <div className="rounded-[20px] bg-[rgb(var(--surface-soft))] px-4 py-4">
+    <p className="text-xs uppercase tracking-[0.18em] text-muted">{label}</p>
+    <p className="mt-2 text-sm leading-6 text-muted">{value}</p>
+  </div>
+);
 
 const InsightTile = ({ hint, icon: Icon, label, value }) => (
   <div className="metric-card">
