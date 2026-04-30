@@ -133,6 +133,47 @@ const USAGE_WIZARD_STEPS = [
     targetId: "savings-automation",
   },
 ];
+const FUTURE_MONTH_FORMATTER = new Intl.DateTimeFormat("lt-LT", {
+  month: "long",
+  year: "numeric",
+});
+
+const roundScenarioAmount = (value) => {
+  const numericValue = Number(value || 0);
+
+  if (!Number.isFinite(numericValue) || numericValue <= 0) {
+    return 0;
+  }
+
+  if (numericValue < 20) {
+    return Math.ceil(numericValue);
+  }
+
+  return Math.ceil(numericValue / 10) * 10;
+};
+
+const formatFutureMonthLabel = (monthsAhead) => {
+  if (!Number.isFinite(monthsAhead) || monthsAhead <= 0) {
+    return "dabar";
+  }
+
+  const date = new Date();
+  date.setUTCDate(1);
+  date.setUTCMonth(date.getUTCMonth() + Math.max(monthsAhead - 1, 0));
+  return FUTURE_MONTH_FORMATTER.format(date);
+};
+
+const goalPaceStatusLabel = (status) => {
+  if (status === "behind") {
+    return "Per lėtas tempas";
+  }
+
+  if (status === "tight") {
+    return "Ant ribos";
+  }
+
+  return "Juda gerai";
+};
 
 const SavingsStudioPage = () => {
   const { user } = useAuth();
@@ -396,8 +437,183 @@ const SavingsStudioPage = () => {
   };
   const categoryPressure = summary?.categoryPressure || [];
   const savingsCapacity = summary?.savingsCapacity || null;
+  const monthlyTotals = summary?.monthlyTotals || [];
+  const categoryTotals = summary?.categoryTotals || [];
+  const summaryInsights = summary?.insights || [];
+  const availableToSave = summary?.availableToSave;
+  const highestMonthlyTotal = Math.max(...monthlyTotals.map((entry) => entry.total), 1);
+  const activeGoalsCount = decoratedGoals.filter((goal) => !goal.complete).length;
+  const currentRecurringMonth = currentMonthKey();
   const weeklyTotalsCurrentMonth = summary?.weeklyTotalsCurrentMonth || [];
   const highestWeeklyTotal = Math.max(...weeklyTotalsCurrentMonth.map((entry) => Number(entry.total || 0)), 1);
+  const topPressure = categoryPressure[0] || null;
+  const recurringForecastItems = useMemo(
+    () =>
+      recurringExpenses
+        .map((expense) => {
+          const monthlyEquivalent = Number(
+            expense.monthlyEquivalent || recurringMonthlyEquivalent(expense)
+          );
+
+          return {
+            ...expense,
+            monthlyEquivalent,
+            annualEquivalent: Number((monthlyEquivalent * 12).toFixed(2)),
+          };
+        })
+        .sort((left, right) => right.monthlyEquivalent - left.monthlyEquivalent),
+    [recurringExpenses]
+  );
+  const recurringAnnualTotal = recurringForecastItems.reduce(
+    (sum, expense) => sum + Number(expense.annualEquivalent || 0),
+    0
+  );
+  const recurringShareOfIncome =
+    profile?.monthlyIncome > 0 ? Math.round((recurringMonthlyTotal / profile.monthlyIncome) * 100) : null;
+  const nextActions = useMemo(() => {
+    const actions = [];
+
+    if (topPressure) {
+      actions.push({
+        key: `pressure-${topPressure.category}`,
+        title:
+          topPressure.status === "over"
+            ? `Sustabdyk ${topPressure.category.toLowerCase()} tempą`
+            : `Pristabdyk ${topPressure.category.toLowerCase()} kategoriją`,
+        body:
+          topPressure.status === "over"
+            ? `${topPressure.category} jau valgo ${money.format(topPressure.projectedSpent)} iš ${money.format(
+                topPressure.limitAmount
+              )} limito. Čia dabar greičiausiai dingsta mėnesio rezervas.`
+            : `${topPressure.category} jau artėja prie ribos ir sudaro ${topPressure.shareOfProjected}% projekcinio mėnesio.`,
+        meta:
+          topPressure.status === "over"
+            ? `Viršyta ${money.format(Math.abs(topPressure.projectedSpent - topPressure.limitAmount))}`
+            : `${money.format(topPressure.projectedSpent)} iš ${money.format(topPressure.limitAmount)}`,
+        tone: topPressure.status === "over" ? "danger" : "warning",
+        targetId: "savings-budgets",
+        ctaLabel: "Peržiūrėti biudžetus",
+      });
+    }
+
+    if (goalPace) {
+      actions.push({
+        key: "goal-pace",
+        title:
+          goalPace.status === "behind"
+            ? `Pakelk ${goalPace.title} tempą`
+            : goalPace.status === "tight"
+            ? `Apsaugok rezervą tikslui „${goalPace.title}“`
+            : `Laikyk dabartinį „${goalPace.title}“ ritmą`,
+        body:
+          goalPace.status === "behind"
+            ? `Kad spėtum, reikėtų bent ${money.format(goalPace.recommendedMonthly)} per mėnesį. Dabartinis rezervas to dar nelaiko.`
+            : goalPace.status === "tight"
+            ? `Tikslas dar pasiekiamas, bet riba jau arti. Saugok bent ${money.format(
+                goalPace.recommendedMonthly
+              )} per mėnesį nuo spontaniškų pirkimų.`
+            : `Dabartinis taupymo tempas atrodo tvarus. Toliau laikyk bent ${money.format(
+                goalPace.recommendedMonthly
+              )} per mėnesį.`,
+        meta: goalPace.targetDate ? `Tikslas iki ${goalPace.targetDate}` : "Be fiksuotos datos",
+        tone: goalPace.status === "behind" ? "danger" : goalPace.status === "tight" ? "warning" : "success",
+        targetId: "savings-goals",
+        ctaLabel: "Atidaryti tikslus",
+      });
+    }
+
+    if (recurringForecastItems[0]) {
+      actions.push({
+        key: `recurring-${recurringForecastItems[0]._id}`,
+        title: `Peržiūrėk ${recurringForecastItems[0].title}`,
+        body: `Vien ši pastovi išlaida kainuoja apie ${money.format(
+          recurringForecastItems[0].monthlyEquivalent
+        )} per mėnesį ir ${money.format(recurringForecastItems[0].annualEquivalent)} per metus.`,
+        meta: formatRecurringFrequency(recurringForecastItems[0].frequency, recurringFrequencies),
+        tone: "info",
+        targetId: "savings-recurring-forecast",
+        ctaLabel: "Peržiūrėti recurring",
+      });
+    }
+
+    if (!actions.length && summaryInsights[0]) {
+      actions.push({
+        key: summaryInsights[0].key,
+        title: summaryInsights[0].title,
+        body: summaryInsights[0].body,
+        meta: summaryInsights[0].metric || "Pirmas signalas",
+        tone: summaryInsights[0].tone,
+        targetId: "savings-analytics",
+        ctaLabel: "Peržiūrėti įžvalgas",
+      });
+    }
+
+    return actions.slice(0, 3);
+  }, [goalPace, recurringForecastItems, recurringFrequencies, summaryInsights, topPressure]);
+  const leadAction = nextActions[0] || null;
+  const goalScenarios = useMemo(() => {
+    if (!goalPace?.remaining) {
+      return [];
+    }
+
+    const scenarioCandidates = [
+      {
+        key: "current",
+        label: "Dabartinis planas",
+        monthlyAmount: roundScenarioAmount(profile?.monthlySavingsTarget || 0),
+      },
+      {
+        key: "recommended",
+        label: "Ramesnis tempas",
+        monthlyAmount: roundScenarioAmount(goalPace.recommendedMonthly || 0),
+      },
+      {
+        key: "stretch",
+        label: "Stipresnis sprintas",
+        monthlyAmount: roundScenarioAmount(
+          Math.max(
+            goalPace.recommendedMonthly || 0,
+            profile?.monthlySavingsTarget || 0,
+            safeToSaveAfterRecurring || 0
+          ) * 1.2
+        ),
+      },
+    ];
+
+    const seenMonthlyAmounts = new Set();
+
+    return scenarioCandidates
+      .filter((scenario) => scenario.monthlyAmount > 0)
+      .filter((scenario) => {
+        if (seenMonthlyAmounts.has(scenario.monthlyAmount)) {
+          return false;
+        }
+
+        seenMonthlyAmounts.add(scenario.monthlyAmount);
+        return true;
+      })
+      .map((scenario) => {
+        const monthsToGoal = Math.max(Math.ceil(goalPace.remaining / scenario.monthlyAmount), 1);
+        const slack =
+          safeToSaveAfterRecurring !== null && safeToSaveAfterRecurring !== undefined
+            ? Number((safeToSaveAfterRecurring - scenario.monthlyAmount).toFixed(2))
+            : null;
+
+        return {
+          ...scenario,
+          monthsToGoal,
+          finishLabel: formatFutureMonthLabel(monthsToGoal),
+          status:
+            scenario.monthlyAmount >= goalPace.recommendedMonthly
+              ? "on-track"
+              : scenario.monthlyAmount >= goalPace.recommendedMonthly * 0.75
+              ? "tight"
+              : "behind",
+          slack,
+        };
+      })
+      .slice(0, 3);
+  }, [goalPace, profile?.monthlySavingsTarget, safeToSaveAfterRecurring]);
 
   const refreshSummaryAndEntries = async () => {
     const [entriesResult, summaryResult] = await Promise.all([
@@ -902,13 +1118,6 @@ const SavingsStudioPage = () => {
     return <LoadingSpinner fullScreen />;
   }
 
-  const monthlyTotals = summary?.monthlyTotals || [];
-  const categoryTotals = summary?.categoryTotals || [];
-  const summaryInsights = summary?.insights || [];
-  const availableToSave = summary?.availableToSave;
-  const highestMonthlyTotal = Math.max(...monthlyTotals.map((entry) => entry.total), 1);
-  const activeGoalsCount = decoratedGoals.filter((goal) => !goal.complete).length;
-  const currentRecurringMonth = currentMonthKey();
   const usageWizardCurrentStep = USAGE_WIZARD_STEPS[usageWizardStep];
 
   const openUsageWizard = (stepIndex = 0) => {
@@ -937,6 +1146,14 @@ const SavingsStudioPage = () => {
       target.scrollIntoView({ behavior: "smooth", block: "start" });
     } else {
       window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const scrollToSection = (sectionId) => {
+    const target = document.getElementById(sectionId);
+
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
 
@@ -1169,6 +1386,50 @@ const SavingsStudioPage = () => {
               pamatyti, kurios pasikartojančios išlaidos sunkiausiai leidžia judėti į priekį.
             </p>
 
+            <div className="mt-8 rounded-[24px] border border-white/10 bg-white/5 p-5">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.24em] text-white/45">Ką daryti dabar</p>
+                  <h3 className="mt-3 font-display text-3xl font-bold">
+                    {leadAction ? leadAction.title : "Mėnesio ritmas atrodo tvarkingai"}
+                  </h3>
+                  <p className="mt-3 max-w-2xl text-sm leading-6 text-white/72">
+                    {leadAction
+                      ? leadAction.body
+                      : "Kol kas sistema nemato vienos kritinės vietos. Tęsk įrašų ritmą ir kartą per savaitę peržiūrėk didžiausią kategoriją."}
+                  </p>
+                </div>
+                <PiggyBank size={20} style={{ color: "rgb(var(--accent-strong))" }} />
+              </div>
+
+              <div className="mt-5 grid gap-3">
+                {nextActions.map((action, index) => (
+                  <ActionPriorityRow key={action.key} action={action} index={index} />
+                ))}
+              </div>
+
+              <div className="mt-5 flex flex-wrap gap-3">
+                {leadAction ? (
+                  <button
+                    type="button"
+                    className="button-primary gap-2"
+                    onClick={() => scrollToSection(leadAction.targetId)}
+                  >
+                    {leadAction.ctaLabel}
+                    <ChevronRight size={16} />
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  className="button-secondary gap-2"
+                  onClick={() => scrollToSection("savings-automation")}
+                >
+                  Peržiūrėti suvestines
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            </div>
+
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
               <InsightTile
                 icon={WalletCards}
@@ -1177,10 +1438,18 @@ const SavingsStudioPage = () => {
                 hint={formatChange(summary?.change)}
               />
               <InsightTile
-                icon={Target}
-                label="Mėnesio tikslas"
-                value={money.format(profile?.monthlySavingsTarget || 0)}
-                hint={profile?.primaryFocus || "Dar nesuvestas fokusas"}
+                icon={PiggyBank}
+                label="Po recurring"
+                value={
+                  safeToSaveAfterRecurring !== null && safeToSaveAfterRecurring !== undefined
+                    ? money.format(safeToSaveAfterRecurring)
+                    : "—"
+                }
+                hint={
+                  safeToSaveAfterRecurring !== null && safeToSaveAfterRecurring !== undefined
+                    ? `Po projekcijų lieka ${money.format(safeToSaveAfterRecurring)}`
+                    : "Pridėk pajamas, kad matytum rezervą"
+                }
               />
               <InsightTile
                 icon={Repeat}
@@ -1192,22 +1461,32 @@ const SavingsStudioPage = () => {
 
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
               <InsightTile
-                icon={PiggyBank}
+                icon={Target}
                 label="Tikslai"
                 value={String(activeGoalsCount)}
-                hint="Aktyvūs taupymo tikslai"
+                hint={goalPace ? goalPaceStatusLabel(goalPace.status) : "Aktyvūs taupymo tikslai"}
               />
               <InsightTile
                 icon={AlertTriangle}
-                label="Viršyti"
-                value={String(budgetOverview.overCount)}
-                hint="Kategorijos virš limito"
+                label="Didžiausias spaudimas"
+                value={topPressure?.category || "Ramu"}
+                hint={
+                  topPressure
+                    ? `${money.format(topPressure.projectedSpent)} iš ${money.format(topPressure.limitAmount)}`
+                    : "Kol kas nėra aiškios spaudžiančios kategorijos"
+                }
               />
               <InsightTile
-                icon={TrendingDown}
-                label="Prie ribos"
-                value={String(budgetOverview.warningCount)}
-                hint="85% ir daugiau panaudota"
+                icon={TrendingUp}
+                label="Laisva suma"
+                value={
+                  availableToSave !== null && availableToSave !== undefined ? money.format(availableToSave) : "—"
+                }
+                hint={
+                  availableToSave !== null && availableToSave !== undefined
+                    ? "Po faktinių išlaidų"
+                    : "Pridėk pajamas, kad sistema rodytų laisvą rezervą"
+                }
               />
             </div>
 
@@ -1240,11 +1519,7 @@ const SavingsStudioPage = () => {
                           : "text-emerald-200"
                       }`}
                     >
-                      {goalPace.status === "behind"
-                        ? "Per lėtas tempas"
-                        : goalPace.status === "tight"
-                        ? "Ant ribos"
-                        : "Juda gerai"}
+                      {goalPaceStatusLabel(goalPace.status)}
                     </p>
                   </div>
                 </div>
@@ -1284,6 +1559,101 @@ const SavingsStudioPage = () => {
                 <span>Po recurring: {money.format(safeToSaveAfterRecurring)}</span>
               ) : null}
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[1.06fr_0.94fr]">
+        <div id="savings-recurring-forecast" className="panel p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow">recurring forecast</p>
+              <h2 className="mt-4 text-4xl font-bold">Kur recurring spaudžia labiausiai</h2>
+              <p className="mt-3 text-sm leading-6 text-muted">
+                Čia matai ne tik bendrą sumą, bet ir kurie pasikartojantys mokėjimai iš tikro suvalgo daugiausia
+                erdvės taupymui.
+              </p>
+            </div>
+            <Repeat size={20} style={{ color: "rgb(var(--accent))" }} />
+          </div>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <ForecastMetricTile
+              label="Recurring per mėn."
+              value={money.format(recurringMonthlyTotal)}
+              hint={`${recurringExpenses.length} aktyvūs įrašai`}
+            />
+            <ForecastMetricTile
+              label="Recurring per metus"
+              value={money.format(recurringAnnualTotal)}
+              hint="Bendra metinė našta"
+            />
+            <ForecastMetricTile
+              label="Pajamų dalis"
+              value={recurringShareOfIncome !== null ? `${recurringShareOfIncome}%` : "—"}
+              hint={
+                recurringShareOfIncome !== null
+                  ? "Kiek pajamų suvalgo pastovūs mokėjimai"
+                  : "Pridėk pajamas, kad matytum dalį"
+              }
+            />
+          </div>
+
+          <div className="mt-6 space-y-4">
+            {recurringForecastItems.length ? (
+              recurringForecastItems.slice(0, 3).map((expense) => (
+                <div key={expense._id} className="soft-card rounded-[24px] p-5">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <h3 className="text-lg font-semibold">{expense.title}</h3>
+                        <span className="premium-tag">{expense.category}</span>
+                      </div>
+                      <p className="mt-2 text-sm leading-6 text-muted">
+                        {formatRecurringFrequency(expense.frequency, recurringFrequencies)} · {money.format(
+                          expense.monthlyEquivalent
+                        )} per mėn. · {money.format(expense.annualEquivalent)} per metus
+                      </p>
+                    </div>
+
+                    <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3 text-left sm:min-w-[180px] sm:text-right">
+                      <p className="text-xs uppercase tracking-[0.18em] text-muted">Metinė našta</p>
+                      <p className="mt-2 text-lg font-semibold">{money.format(expense.annualEquivalent)}</p>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="soft-card rounded-[24px] p-8 text-center text-muted">
+                Pridėk bent vieną pastovią išlaidą, ir čia iškart matysi kur recurring dalis labiausiai spaudžia
+                tavo mėnesį.
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="panel p-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow">goal scenarios</p>
+              <h2 className="mt-4 text-4xl font-bold">Kokiu tempu pasieksi tikslą</h2>
+              <p className="mt-3 text-sm leading-6 text-muted">
+                Vietoje vieno skaičiaus matai kelis realius scenarijus: kas nutinka laikantis dabartinio plano,
+                rekomenduojamo tempo ar šiek tiek stipresnio sprinto.
+              </p>
+            </div>
+            <Target size={20} style={{ color: "rgb(var(--accent))" }} />
+          </div>
+
+          <div className="mt-6 space-y-4">
+            {goalScenarios.length ? (
+              goalScenarios.map((scenario) => <GoalScenarioCard key={scenario.key} scenario={scenario} />)
+            ) : (
+              <div className="soft-card rounded-[24px] p-8 text-center text-muted">
+                Kai turėsi aktyvų taupymo tikslą su aiškesniu tempu, čia galėsi palyginti kelis mėnesio scenarijus
+                ir pasirinkti realesnį ritmą.
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -1900,7 +2270,7 @@ const SavingsStudioPage = () => {
           </div>
         </div>
 
-        <div className="panel p-6">
+        <div id="savings-recurring" className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="eyebrow">recurring expenses</p>
@@ -2331,6 +2701,99 @@ const SavingsStudioPage = () => {
     </div>
   );
 };
+
+const ActionPriorityRow = ({ action, index }) => {
+  const toneClasses = {
+    danger: {
+      container: "border-red-400/20 bg-red-400/10 text-red-50",
+      body: "text-red-50/80",
+      meta: "text-red-100/70",
+    },
+    warning: {
+      container: "border-amber-300/20 bg-amber-300/10 text-amber-50",
+      body: "text-amber-50/80",
+      meta: "text-amber-100/70",
+    },
+    success: {
+      container: "border-emerald-400/20 bg-emerald-400/10 text-emerald-50",
+      body: "text-emerald-50/80",
+      meta: "text-emerald-100/70",
+    },
+    info: {
+      container: "border-white/10 bg-white/5 text-white",
+      body: "text-white/72",
+      meta: "text-white/48",
+    },
+  };
+
+  const classes = toneClasses[action.tone] || toneClasses.info;
+
+  return (
+    <div className={`rounded-[18px] border px-4 py-4 ${classes.container}`}>
+      <div className="flex items-start gap-4">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-semibold">
+          {index + 1}
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold">{action.title}</p>
+          <p className={`mt-2 text-sm leading-6 ${classes.body}`}>{action.body}</p>
+          <p className={`mt-3 text-xs uppercase tracking-[0.18em] ${classes.meta}`}>{action.meta}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ForecastMetricTile = ({ hint, label, value }) => (
+  <div className="soft-card rounded-[24px] p-5">
+    <p className="text-xs uppercase tracking-[0.18em] text-muted">{label}</p>
+    <p className="mt-3 text-2xl font-semibold">{value}</p>
+    <p className="mt-2 text-sm leading-6 text-muted">{hint}</p>
+  </div>
+);
+
+const GoalScenarioCard = ({ scenario }) => (
+  <div className="soft-card rounded-[24px] p-5">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div>
+        <p className="text-xs uppercase tracking-[0.18em] text-muted">{scenario.label}</p>
+        <h3 className="mt-2 text-xl font-semibold">{money.format(scenario.monthlyAmount)} / mėn.</h3>
+        <p className="mt-2 text-sm leading-6 text-muted">
+          Jei laikysies tokio tempo, tikslą pasieksi apie {scenario.finishLabel}.
+        </p>
+      </div>
+
+      <span
+        className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${
+          scenario.status === "behind"
+            ? "bg-red-50 text-red-600"
+            : scenario.status === "tight"
+            ? "bg-amber-50 text-amber-700"
+            : "bg-emerald-50 text-emerald-700"
+        }`}
+      >
+        {goalPaceStatusLabel(scenario.status)}
+      </span>
+    </div>
+
+    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+      <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
+        <p className="text-xs uppercase tracking-[0.18em] text-muted">Mėnesiai iki tikslo</p>
+        <p className="mt-2 text-lg font-semibold">{scenario.monthsToGoal}</p>
+      </div>
+      <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
+        <p className="text-xs uppercase tracking-[0.18em] text-muted">Rezervas po recurring</p>
+        <p
+          className={`mt-2 text-lg font-semibold ${
+            scenario.slack !== null && scenario.slack < 0 ? "text-red-600" : ""
+          }`}
+        >
+          {scenario.slack === null ? "—" : money.format(scenario.slack)}
+        </p>
+      </div>
+    </div>
+  </div>
+);
 
 const InsightTile = ({ hint, icon: Icon, label, value }) => (
   <div className="metric-card">
