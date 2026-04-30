@@ -4,6 +4,7 @@ const {
   isEmailTransportConfigured,
   normalizeEmailTransportError,
 } = require("../utils/emailTransport");
+const { isBrevoEmailConfigured, sendBrevoTransactionalEmail } = require("../utils/brevoEmail");
 
 const COMPANY_NAME = process.env.COMPANY_NAME?.trim() || "Stilloak Studio";
 
@@ -415,19 +416,32 @@ const buildSummaryEmail = ({ frequency, summary, userName }) => {
   return { subject, html, text };
 };
 
-const sendSavingsSummaryEmail = async ({ frequency = "weekly", profile, summary, user }) => {
-  if (!isEmailTransportConfigured()) {
-    return { sent: false, skipped: true, reason: "smtp-not-configured" };
-  }
+const markSummaryEmailSent = async (profile) => {
+  profile.summaryEmailLastSentAt = new Date();
+  await profile.save();
+};
 
-  const { from, socketTimeout = 15000 } = getTransportConfig();
-  const transport = getEmailTransport();
-  const email = buildSummaryEmail({
-    frequency,
-    summary,
-    userName: user?.name,
+const sendSummaryThroughBrevo = async ({ frequency, profile, user, email }) => {
+  const result = await sendBrevoTransactionalEmail({
+    to: user.email,
+    subject: email.subject,
+    html: email.html,
+    text: email.text,
+    tags: ["savings-studio", `summary-${frequency}`],
   });
 
+  await markSummaryEmailSent(profile);
+
+  return {
+    sent: true,
+    provider: "brevo-api",
+    messageId: result?.messageId || null,
+  };
+};
+
+const sendSummaryThroughSmtp = async ({ profile, user, email }) => {
+  const { from, socketTimeout = 15000 } = getTransportConfig();
+  const transport = getEmailTransport();
   const maxWaitMs = Math.max(socketTimeout, 15000);
   let timeoutId = null;
 
@@ -480,10 +494,39 @@ const sendSavingsSummaryEmail = async ({ frequency = "weekly", profile, summary,
     clearTimeout(timeoutId);
   }
 
-  profile.summaryEmailLastSentAt = new Date();
-  await profile.save();
+  await markSummaryEmailSent(profile);
 
-  return { sent: true };
+  return {
+    sent: true,
+    provider: "smtp",
+  };
+};
+
+const sendSavingsSummaryEmail = async ({ frequency = "weekly", profile, summary, user }) => {
+  const email = buildSummaryEmail({
+    frequency,
+    summary,
+    userName: user?.name,
+  });
+
+  if (isBrevoEmailConfigured()) {
+    return sendSummaryThroughBrevo({
+      frequency,
+      profile,
+      user,
+      email,
+    });
+  }
+
+  if (!isEmailTransportConfigured()) {
+    return { sent: false, skipped: true, reason: "email-not-configured" };
+  }
+
+  return sendSummaryThroughSmtp({
+    profile,
+    user,
+    email,
+  });
 };
 
 module.exports = {
