@@ -10,11 +10,11 @@ import { hasActiveMembership } from "../utils/membership";
 const navbarCopy = {
   lt: {
     nav: {
-      story: "Story",
-      stilloak: "Stilloak",
+      program: "Programa",
+      journal: "Journal",
+      contact: "Kontaktai",
       memberArea: "Nario zona",
       membership: "Narystė",
-      launchSoon: "Netrukus",
       admin: "Admin",
     },
     tagline: "ramesnis aiškumas",
@@ -28,11 +28,11 @@ const navbarCopy = {
   },
   en: {
     nav: {
-      story: "Story",
-      stilloak: "Stilloak",
+      program: "Program",
+      journal: "Journal",
+      contact: "Contact",
       memberArea: "Member area",
       membership: "Membership",
-      launchSoon: "Launch soon",
       admin: "Admin",
     },
     tagline: "calmer clarity",
@@ -46,11 +46,11 @@ const navbarCopy = {
   },
   pl: {
     nav: {
-      story: "Historia",
-      stilloak: "Stilloak",
+      program: "Program",
+      journal: "Journal",
+      contact: "Kontakt",
       memberArea: "Strefa członka",
       membership: "Członkostwo",
-      launchSoon: "Wkrótce",
       admin: "Admin",
     },
     tagline: "spokojniejsza kontrola",
@@ -64,11 +64,11 @@ const navbarCopy = {
   },
   de: {
     nav: {
-      story: "Story",
-      stilloak: "Stilloak",
+      program: "Programm",
+      journal: "Journal",
+      contact: "Kontakt",
       memberArea: "Mitgliederbereich",
       membership: "Mitgliedschaft",
-      launchSoon: "Bald",
       admin: "Admin",
     },
     tagline: "ruhigere klarheit",
@@ -82,11 +82,11 @@ const navbarCopy = {
   },
   fr: {
     nav: {
-      story: "Histoire",
-      stilloak: "Stilloak",
+      program: "Programme",
+      journal: "Journal",
+      contact: "Contact",
       memberArea: "Espace membre",
       membership: "Abonnement",
-      launchSoon: "Bientôt",
       admin: "Admin",
     },
     tagline: "une clarté plus calme",
@@ -100,11 +100,11 @@ const navbarCopy = {
   },
   es: {
     nav: {
-      story: "Historia",
-      stilloak: "Stilloak",
+      program: "Programa",
+      journal: "Journal",
+      contact: "Contacto",
       memberArea: "Zona de miembro",
       membership: "Membresía",
-      launchSoon: "Próximamente",
       admin: "Admin",
     },
     tagline: "claridad más serena",
@@ -130,10 +130,10 @@ const Navbar = () => {
   const currentLanguageOption =
     languageOptions.find((option) => option.code === language) || languageOptions[0];
   const publicLinks = [
-    { label: copy.nav.story, to: "/story" },
-    { label: copy.nav.stilloak, to: isMember ? "/members/savings-studio" : "/savings-studio" },
+    { label: copy.nav.program, to: isMember ? "/members/savings-studio" : "/savings-studio" },
     { label: copy.nav.membership, to: "/pricing" },
-    { label: copy.nav.launchSoon, to: "/launch-soon" },
+    { label: copy.nav.journal, to: "/journal" },
+    { label: copy.nav.contact, to: "/contact" },
   ];
 
   const handleLogout = () => {

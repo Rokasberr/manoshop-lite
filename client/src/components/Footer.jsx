@@ -4,8 +4,8 @@ import { useLanguage } from "../context/LanguageContext";
 const footerCopy = {
   lt: {
     ctaEyebrow: "Įeik į erdvę",
-    ctaTitle: "Pasiruošęs ramesnei, aiškesnei nario patirčiai?",
-    ctaText: "Stilloak sujungia narystę, aiškų pinigų vaizdą ir tvarkingą paskyros istoriją į vieną vientisą patirtį.",
+    ctaTitle: "Pasiruošęs paleisti aiškesnį mėnesio ritmą?",
+    ctaText: "Stilloak sujungia narystę, aiškų pinigų vaizdą ir tvarkingą paskyros istoriją į vieną vientisą produkto patirtį.",
     ctaButton: "Peržiūrėti narystę",
     summary: "Stilloak padeda aiškiau valdyti išlaidas, sekti biudžetus ir ramiau judėti link taupymo tikslų vienoje apgalvotoje nario erdvėje.",
     columns: {
@@ -15,10 +15,10 @@ const footerCopy = {
       contact: "Kontaktai",
     },
     links: {
-      story: "Mūsų istorija",
+      program: "Programa",
+      journal: "Journal",
       collection: "Kolekcija",
       membership: "Narystė",
-      launchSoon: "Netrukus",
       secureCheckout: "Saugus apmokėjimas",
       receiptArchive: "Sąskaitų archyvas",
       memberPricing: "Nario kainodara",
@@ -34,8 +34,8 @@ const footerCopy = {
   },
   en: {
     ctaEyebrow: "Enter the house",
-    ctaTitle: "Ready for a calmer, clearer member experience?",
-    ctaText: "Stilloak brings membership, money clarity, and a tidy account archive into one consistent experience.",
+    ctaTitle: "Ready to launch a calmer monthly rhythm?",
+    ctaText: "Stilloak brings membership, money clarity, and a tidy account archive into one consistent product experience.",
     ctaButton: "View membership",
     summary: "Stilloak helps members understand spending, track budgets, and move toward savings goals with more clarity.",
     columns: {
@@ -45,10 +45,10 @@ const footerCopy = {
       contact: "Contact",
     },
     links: {
-      story: "Our story",
+      program: "Program",
+      journal: "Journal",
       collection: "Collection",
       membership: "Membership",
-      launchSoon: "Launch soon",
       secureCheckout: "Secure checkout",
       receiptArchive: "Receipt archive",
       memberPricing: "Member pricing",
@@ -75,10 +75,10 @@ const footerCopy = {
       contact: "Kontakt",
     },
     links: {
-      story: "Nasza historia",
+      program: "Program",
+      journal: "Journal",
       collection: "Kolekcja",
       membership: "Członkostwo",
-      launchSoon: "Wkrótce",
       secureCheckout: "Bezpieczna płatność",
       receiptArchive: "Archiwum rachunków",
       memberPricing: "Ceny dla członków",
@@ -105,10 +105,10 @@ const footerCopy = {
       contact: "Kontakt",
     },
     links: {
-      story: "Unsere Geschichte",
+      program: "Programm",
+      journal: "Journal",
       collection: "Kollektion",
       membership: "Mitgliedschaft",
-      launchSoon: "Bald",
       secureCheckout: "Sicherer Checkout",
       receiptArchive: "Belegarchiv",
       memberPricing: "Mitgliederpreise",
@@ -135,10 +135,10 @@ const footerCopy = {
       contact: "Contact",
     },
     links: {
-      story: "Notre histoire",
+      program: "Programme",
+      journal: "Journal",
       collection: "Collection",
       membership: "Abonnement",
-      launchSoon: "Bientôt",
       secureCheckout: "Paiement sécurisé",
       receiptArchive: "Archive des reçus",
       memberPricing: "Tarifs membres",
@@ -165,10 +165,10 @@ const footerCopy = {
       contact: "Contacto",
     },
     links: {
-      story: "Nuestra historia",
+      program: "Programa",
+      journal: "Journal",
       collection: "Colección",
       membership: "Membresía",
-      launchSoon: "Próximamente",
       secureCheckout: "Pago seguro",
       receiptArchive: "Archivo de recibos",
       memberPricing: "Precios para miembros",
@@ -191,10 +191,10 @@ const Footer = () => {
     {
       title: copy.columns.house,
       items: [
-        { label: copy.links.story, to: "/story" },
-        { label: copy.links.collection, to: "/shop" },
+        { label: copy.links.program, to: "/savings-studio" },
         { label: copy.links.membership, to: "/pricing" },
-        { label: copy.links.launchSoon, to: "/launch-soon" },
+        { label: copy.links.journal, to: "/journal" },
+        { label: copy.links.collection, to: "/shop" },
       ],
     },
     {

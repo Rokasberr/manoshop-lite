@@ -131,7 +131,7 @@ const USAGE_WIZARD_STEPS = [
     bullets: [
       "Įjunk savaitines arba mėnesines email suvestines.",
       "Prieš didesnius importus pasidaryk CSV peržiūrą.",
-      "Kartais atsisiųsk JSON backup savo duomenims.",
+      "Kartais atsisiųsk JSON kopiją savo duomenims.",
     ],
     targetId: "savings-automation",
   },
@@ -359,7 +359,7 @@ const describeSavingsActivity = (log, recurringFrequencies) => {
       ctaLabel: "Peržiūrėti pastovias išlaidas",
     },
     "backup-export": {
-      title: "Atsisiuntei JSON backup",
+      title: "Atsisiuntei JSON kopiją",
       body: `${metadata.entryCount || 0} išlaidų, ${metadata.goalCount || 0} tikslai ir ${metadata.recurringCount || 0} recurring įrašai.`,
       tone: "info",
       targetId: "savings-automation",
@@ -1034,7 +1034,7 @@ const SavingsStudioPage = () => {
     } else if (safeToSaveAfterRecurring !== null && safeToSaveAfterRecurring > 0) {
       items.push({
         key: "reserve",
-        title: "Po recurring vis dar lieka erdvės",
+        title: "Po pastovių išlaidų vis dar lieka erdvės",
         body: `Po pastovių išlaidų dar lieka apie ${money.format(
           safeToSaveAfterRecurring
         )}. Čia yra tavo reali erdvė tikslams arba rezervui.`,
@@ -1108,20 +1108,20 @@ const SavingsStudioPage = () => {
 
     return {
       title: "Ritmas atrodo ramus, bet verta jį palaikyti",
-      body: "Kol kas nėra vienos krizės vietos, todėl didžiausia vertė yra tęsti nuoseklų įrašų, recurring ir tikslų ritmą.",
+      body: "Kol kas nėra vienos krizės vietos, todėl didžiausia vertė yra tęsti nuoseklų įrašų, pastovių išlaidų ir tikslų ritmą.",
     };
   }, [biggestCategoryDrop, goalStrategyBoard, topPressure]);
   const reflectionPulse = useMemo(() => {
     const win = biggestCategoryDrop
       ? `${biggestCategoryDrop.category} sumažėjo ${money.format(Math.abs(biggestCategoryDrop.delta))} ir tai jau atlaisvina mėnesį.`
       : safeToSaveAfterRecurring !== null && safeToSaveAfterRecurring > 0
-      ? `Po recurring vis dar lieka ${money.format(safeToSaveAfterRecurring)} laisvos vietos.`
+      ? `Po pastovių išlaidų vis dar lieka ${money.format(safeToSaveAfterRecurring)} laisvos vietos.`
       : "Didžiausia pergalė dabar yra pati disciplina grįžti ir žiūrėti į savo skaičius.";
 
     const pressure = topPressure
       ? `${topPressure.category} dabar labiausiai spaudžia mėnesio ritmą.`
       : recurringReviewQueue[0]
-      ? `${recurringReviewQueue[0].title} jau viena pati sudaro ${recurringReviewQueue[0].shareOfRecurring}% recurring dalies.`
+      ? `${recurringReviewQueue[0].title} jau viena pati sudaro ${recurringReviewQueue[0].shareOfRecurring}% pastovių išlaidų dalies.`
       : "Ryškaus spaudimo taško kol kas nesimato.";
 
     const repeat = goalStrategyBoard[0]
@@ -1176,7 +1176,7 @@ const SavingsStudioPage = () => {
       firstRecurring
         ? {
             key: "recurring",
-            title: "Recurring sistema jau pajungta",
+            title: "Pastovių išlaidų sistema jau pajungta",
             body: "Pastovios išlaidos jau dalyvauja tikrame mėnesio vaizde.",
             done: true,
             timestamp: firstRecurring.timestamp,
@@ -1244,7 +1244,7 @@ const SavingsStudioPage = () => {
     if (lastSummaryTouchDays === null || lastSummaryTouchDays > 14) {
       triggers.push({
         key: "send-summary",
-        title: "Paleisk naują summary dabar",
+        title: "Išsiųsk naują suvestinę dabar",
         body: "Trumpa savaitės suvestinė padės greitai pamatyti, kur pradeda slysti mėnesio ritmas.",
         actionLabel: "Siųsti savaitės suvestinę",
         actionType: "summary-email",
@@ -1257,8 +1257,8 @@ const SavingsStudioPage = () => {
       triggers.push({
         key: "backup",
         title: "Atnaujink atsarginę kopiją",
-        body: "Kartinis JSON backup saugo ramybę prieš didesnius importus ar pokyčius.",
-        actionLabel: "Atsisiųsti backup",
+        body: "Kartinė JSON kopija saugo ramybę prieš didesnius importus ar pokyčius.",
+        actionLabel: "Atsisiųsti kopiją",
         actionType: "backup",
         tone: "warning",
       });
@@ -1268,8 +1268,8 @@ const SavingsStudioPage = () => {
       triggers.push({
         key: "recurring-review",
         title: `Peržiūrėk ${recurringReviewQueue[0].title}`,
-        body: "Šita recurring eilutė jau turi realų svorį visam tavo mėnesio ritmui.",
-        actionLabel: "Atidaryti recurring",
+        body: "Šita pastovi išlaida jau turi realų svorį visam tavo mėnesio ritmui.",
+        actionLabel: "Atidaryti pastovias išlaidas",
         actionType: "scroll",
         targetId: "savings-recurring",
         tone: "info",
@@ -2020,7 +2020,7 @@ const SavingsStudioPage = () => {
               <div className="mt-4 space-y-3 text-sm leading-6 text-muted">
                 <p>1. Nustatai pirmą mėnesio planą.</p>
                 <p>2. Matai biudžetų spaudimą ir taupymo tempą.</p>
-                <p>3. Gali gauti summary email ir importuoti banko CSV.</p>
+                <p>3. Gali gauti suvestines el. paštu ir importuoti banko CSV.</p>
               </div>
             </div>
           </div>
@@ -2249,7 +2249,7 @@ const SavingsStudioPage = () => {
               />
               <InsightTile
                 icon={PiggyBank}
-                label="Po recurring"
+                label="Po pastovių išlaidų"
                 value={
                   safeToSaveAfterRecurring !== null && safeToSaveAfterRecurring !== undefined
                     ? money.format(safeToSaveAfterRecurring)
@@ -2366,7 +2366,7 @@ const SavingsStudioPage = () => {
                 <span>Laisva suma: {money.format(availableToSave)}</span>
               ) : null}
               {safeToSaveAfterRecurring !== null && safeToSaveAfterRecurring !== undefined ? (
-                <span>Po recurring: {money.format(safeToSaveAfterRecurring)}</span>
+                <span>Po pastovių išlaidų: {money.format(safeToSaveAfterRecurring)}</span>
               ) : null}
             </div>
           </div>
@@ -2376,7 +2376,7 @@ const SavingsStudioPage = () => {
       <section className="soft-card rounded-[28px] px-5 py-5 sm:px-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="eyebrow">Greita navigacija</p>
+            <p className="eyebrow">greita navigacija</p>
             <h2 className="mt-3 text-2xl font-semibold">Svarbiausios vietos vienoje eilėje</h2>
           </div>
 
@@ -3389,7 +3389,7 @@ const SavingsStudioPage = () => {
         <div className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="eyebrow">goal strategy</p>
+              <p className="eyebrow">tikslų strategija</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Kaip išdėlioti tikslus protingiau</h2>
               <p className="mt-3 text-sm leading-6 text-muted">
                 Čia matosi ne tik progresas, bet ir kuriam tikslui verta duoti pirmumą, kiek jam reikėtų per mėnesį
@@ -3570,7 +3570,7 @@ const SavingsStudioPage = () => {
             <ForecastMetricTile
               label="Kopijos"
               value={automationReadiness.backupHealth}
-              hint={lastBackupDays === null ? "Dar nekurta kopija" : `${lastBackupDays} d. nuo paskutinio backup`}
+              hint={lastBackupDays === null ? "Dar nekurta kopija" : `${lastBackupDays} d. nuo paskutinės kopijos`}
             />
             <ForecastMetricTile
               label="Signalai"
@@ -3859,7 +3859,7 @@ const SavingsStudioPage = () => {
           </div>
         </div>
 
-        <div className="panel p-6">
+        <div id="savings-import" className="panel p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="eyebrow">banko importas</p>
@@ -3981,7 +3981,7 @@ const SavingsStudioPage = () => {
             disabled={downloadingBackup}
           >
             <Download size={16} />
-            {downloadingBackup ? "Ruošiama..." : "Atsisiųsti JSON backup"}
+            {downloadingBackup ? "Ruošiama..." : "Atsisiųsti JSON kopiją"}
           </button>
         </div>
       </section>
@@ -4094,7 +4094,7 @@ const GoalScenarioCard = ({ scenario }) => (
         <p className="mt-2 text-lg font-semibold">{scenario.monthsToGoal}</p>
       </div>
       <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
-        <p className="text-xs uppercase tracking-[0.18em] text-muted">Rezervas po recurring</p>
+        <p className="text-xs uppercase tracking-[0.18em] text-muted">Rezervas po pastovių išlaidų</p>
         <p
           className={`mt-2 text-lg font-semibold ${
             scenario.slack !== null && scenario.slack < 0 ? "text-red-600" : ""
@@ -4274,7 +4274,7 @@ const RecurringReviewCard = ({ expense, onOpen }) => {
           <p className="mt-2 text-lg font-semibold">{money.format(expense.annualEquivalent)}</p>
         </div>
         <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
-          <p className="text-xs uppercase tracking-[0.18em] text-muted">Recurring dalis</p>
+          <p className="text-xs uppercase tracking-[0.18em] text-muted">Pastovių išlaidų dalis</p>
           <p className="mt-2 text-lg font-semibold">{expense.shareOfRecurring}%</p>
         </div>
       </div>
