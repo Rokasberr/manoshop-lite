@@ -142,10 +142,10 @@ const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-30 px-4 pt-4 sm:px-6 lg:px-8">
-      <div className="header-shell mx-auto flex max-w-7xl items-center justify-between gap-4 rounded-[24px] px-4 py-3 shadow-[0_16px_45px_rgba(15,15,35,0.06)] backdrop-blur-xl">
+    <header className="sticky top-0 z-30 px-3 pt-3 sm:px-6 lg:px-8">
+      <div className="header-shell mx-auto flex max-w-7xl items-center justify-between gap-3 px-3 py-2.5 backdrop-blur-xl sm:px-4">
         <Link to="/" className="flex min-w-0 items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-[18px] shadow-[0_12px_28px_rgba(128,90,42,0.18)]">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg shadow-[0_12px_28px_rgba(26,79,64,0.14)]">
             <img
               src="/favicon.svg"
               alt="Stilloak Studio"
@@ -154,10 +154,10 @@ const Navbar = () => {
           </div>
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <p className="font-display text-[1.45rem] font-bold leading-none">Stilloak Studio</p>
+              <p className="truncate font-display text-lg font-bold leading-none sm:text-[1.35rem]">Stilloak Studio</p>
               {user && (
                 <span
-                  className="hidden rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] xl:inline-flex"
+                  className="hidden rounded-lg px-2.5 py-1 text-[10px] font-semibold uppercase xl:inline-flex"
                   style={{
                     border: "1px solid rgb(var(--line) / 0.85)",
                     backgroundColor: "rgb(255 255 255 / 0.62)",
@@ -168,11 +168,11 @@ const Navbar = () => {
                 </span>
               )}
             </div>
-            <p className="text-[10px] uppercase tracking-[0.32em] text-muted">{copy.tagline}</p>
+            <p className="hidden text-[10px] uppercase text-muted sm:block">{copy.tagline}</p>
           </div>
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex">
+        <nav className="hidden items-center gap-1 xl:flex">
           {publicLinks.map((link) => (
             <Link
               key={link.label}
@@ -208,13 +208,13 @@ const Navbar = () => {
           )}
         </nav>
 
-        <div className="flex flex-wrap items-center justify-end gap-2">
+        <div className="flex flex-wrap items-center justify-end gap-1.5 sm:gap-2">
           <label className="sr-only" htmlFor="site-language-switcher">
             {copy.languageLabel}
           </label>
-          <div className="button-secondary relative flex h-10 min-w-[152px] items-center justify-between rounded-full px-4">
+          <div className="button-secondary relative flex h-10 min-w-[78px] items-center justify-between px-3 sm:min-w-[132px] sm:px-4">
             <div className="pointer-events-none flex items-center gap-2">
-              <span className="text-sm font-semibold">{copy.languageLabel}</span>
+              <span className="hidden text-sm font-semibold sm:inline">{copy.languageLabel}</span>
               <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
                 {currentLanguageOption.shortLabel}
               </span>
@@ -241,13 +241,13 @@ const Navbar = () => {
           <button
             type="button"
             onClick={toggleTheme}
-            className="button-secondary h-10 w-10 rounded-full px-0"
+            className="button-secondary h-10 w-10 px-0"
             aria-label="Pakeisti temą"
           >
             {theme === "dark" ? <SunMedium size={18} /> : <Moon size={18} />}
           </button>
 
-          <Link to="/cart" className="button-secondary gap-2 px-4">
+          <Link to="/cart" className="button-secondary h-10 gap-2 px-3 sm:px-4">
             <ShoppingBag size={18} />
             <span className="hidden sm:inline">{copy.bag}</span>
             {cartCount > 0 && (
@@ -262,22 +262,22 @@ const Navbar = () => {
 
           {user ? (
             <>
-              <Link to={user.role === "admin" ? "/admin" : "/profile"} className="button-secondary gap-2 px-4">
+              <Link to={user.role === "admin" ? "/admin" : "/profile"} className="button-secondary h-10 gap-2 px-3 sm:px-4">
                 <User2 size={18} />
                 <span className="hidden sm:inline">{user.name.split(" ")[0]}</span>
               </Link>
-              <button type="button" onClick={handleLogout} className="button-secondary px-4">
+              <button type="button" onClick={handleLogout} className="button-secondary h-10 px-3 sm:px-4">
                 {copy.signOut}
               </button>
             </>
           ) : (
-            <Link to="/login" className="button-secondary px-4">
+            <Link to="/login" className="button-secondary h-10 px-3 sm:px-4">
               {copy.signIn}
             </Link>
           )}
 
-          <Link to={isMember ? "/members/savings-studio" : "/pricing"} className="button-primary gap-2 px-4">
-            <span className="hidden sm:inline">{isMember ? copy.openStudio : copy.join}</span>
+          <Link to={isMember ? "/members/savings-studio" : "/pricing"} className="button-primary h-10 gap-2 px-3 sm:px-4">
+            <span className="hidden lg:inline">{isMember ? copy.openStudio : copy.join}</span>
             <ArrowRight size={16} />
           </Link>
         </div>

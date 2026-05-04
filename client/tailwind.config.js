@@ -5,8 +5,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["'Plus Jakarta Sans'", "sans-serif"],
-        display: ["'Space Grotesk'", "sans-serif"],
+        sans: ["'Manrope'", "sans-serif"],
+        display: ["'Manrope'", "sans-serif"],
       },
       boxShadow: {
         float: "0 24px 60px rgba(23, 18, 9, 0.12)",
@@ -15,4 +15,3 @@ export default {
   },
   plugins: [],
 };
-

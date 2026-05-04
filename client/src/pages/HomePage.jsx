@@ -251,20 +251,20 @@ const HomePage = () => {
   const copy = homeCopy[language] || homeCopy.lt;
 
   return (
-    <div className="space-y-10 pb-8">
-      <section className="marketing-dark overflow-hidden rounded-[40px] px-6 py-8 sm:px-10 sm:py-10 lg:px-12 lg:py-12">
-        <div className="grid gap-8 xl:grid-cols-[1.02fr_0.98fr] xl:gap-10">
+    <div className="space-y-12 pb-6">
+      <section className="marketing-dark overflow-hidden px-5 py-10 sm:px-8 sm:py-14 lg:px-12 lg:py-16">
+        <div className="grid gap-10 xl:grid-cols-[0.98fr_1.02fr] xl:items-stretch xl:gap-12">
           <div className="flex flex-col justify-between">
             <div>
               <span className="hero-chip">{copy.chip}</span>
-              <h1 className="mt-8 max-w-4xl font-display text-5xl font-bold leading-[0.9] sm:text-6xl lg:text-[5rem]">
+              <h1 className="mt-7 max-w-4xl font-display text-4xl font-bold leading-[1.02] sm:text-6xl lg:text-[4.7rem]">
                 {copy.title}
               </h1>
               <p className="mt-6 max-w-2xl text-base leading-7 text-white/72 sm:text-lg">{copy.intro}</p>
 
-              <div className="mt-7 space-y-3">
+              <div className="mt-7 grid gap-3">
                 {copy.highlights.map((item) => (
-                  <div key={item} className="flex items-start gap-3 text-sm text-white/76">
+                  <div key={item} className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/76">
                     <CheckCircle2 size={16} className="mt-0.5 shrink-0" style={{ color: "rgb(var(--accent-strong))" }} />
                     <span>{item}</span>
                   </div>
@@ -294,25 +294,33 @@ const HomePage = () => {
           </div>
 
           <div className="flex flex-col gap-4">
-            <div className="editorial-dark-card">
-              <div className="flex items-center justify-between gap-3">
+            <div className="editorial-dark-card h-full">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="text-xs uppercase tracking-[0.3em] text-white/40">{copy.previewEyebrow}</p>
-                  <h2 className="mt-3 font-display text-4xl font-bold">{copy.previewTitle}</h2>
+                  <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">{copy.previewTitle}</h2>
                 </div>
                 <span className="hero-chip">Circle access</span>
               </div>
 
               <p className="mt-4 max-w-xl text-sm leading-6 text-white/66">{copy.previewText}</p>
 
+              <div className="mt-6 overflow-hidden rounded-lg border border-white/10 bg-white/95 p-2">
+                <img
+                  src="/story/members-dashboard-preview.svg"
+                  alt="Stilloak member dashboard preview"
+                  className="block w-full rounded-md"
+                />
+              </div>
+
               <div className="mt-6 grid gap-3">
                 {copy.previewRows.map(([label, value]) => (
                   <div
                     key={label}
-                    className="flex items-center justify-between rounded-[20px] border border-white/8 bg-white/4 px-4 py-3 text-sm"
+                    className="grid gap-2 rounded-lg border border-white/8 bg-white/4 px-4 py-3 text-sm sm:grid-cols-[0.92fr_1.08fr] sm:items-center"
                   >
                     <span className="text-white/54">{label}</span>
-                    <span className="font-semibold text-white">{value}</span>
+                    <span className="font-semibold text-white sm:text-right">{value}</span>
                   </div>
                 ))}
               </div>
@@ -332,7 +340,7 @@ const HomePage = () => {
                 </div>
                 <div className="mt-5 space-y-3">
                   {copy.unlockList.map((item) => (
-                    <div key={item} className="flex items-start gap-3 rounded-[18px] bg-[rgb(255,250,244)] px-4 py-3 text-sm text-[rgb(98,87,74)]">
+                    <div key={item} className="flex items-start gap-3 rounded-lg bg-white px-4 py-3 text-sm text-[rgb(var(--muted))]">
                       <CheckCircle2 size={16} className="mt-0.5 shrink-0" style={{ color: "rgb(var(--accent-strong))" }} />
                       <span>{item}</span>
                     </div>
@@ -351,10 +359,10 @@ const HomePage = () => {
           <p className="mt-4 text-base leading-7 text-muted">{copy.layersIntro}</p>
         </div>
 
-        <div className="mt-8 grid gap-4 lg:grid-cols-4">
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {copy.layers.map((item) => (
             <div key={item.title} className="marketing-card p-6">
-              <div className="flex h-12 w-12 items-center justify-center rounded-[18px] bg-[rgb(var(--accent)/0.12)]">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[rgb(var(--accent)/0.12)]">
                 <item.icon size={22} style={{ color: "rgb(var(--accent-strong))" }} />
               </div>
               <h3 className="mt-6 font-display text-2xl font-bold">{item.title}</h3>
@@ -372,9 +380,9 @@ const HomePage = () => {
 
           <div className="mt-8 grid gap-4">
             {copy.workflowSteps.map((item) => (
-              <div key={item.step} className="soft-card rounded-[26px] px-5 py-5">
+              <div key={item.step} className="soft-card rounded-lg px-5 py-5">
                 <div className="flex items-start gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[18px] bg-[rgb(var(--accent)/0.12)] text-sm font-semibold text-[rgb(var(--accent-strong))]">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[rgb(var(--accent)/0.12)] text-sm font-semibold text-[rgb(var(--accent-strong))]">
                     {item.step}
                   </div>
                   <div>
@@ -396,7 +404,7 @@ const HomePage = () => {
 
           <div className="mt-8 space-y-4">
             {copy.membershipCards.map((item) => (
-              <div key={item.label} className="soft-card rounded-[26px] px-5 py-5">
+              <div key={item.label} className="soft-card rounded-lg px-5 py-5">
                 <p className="text-xs uppercase tracking-[0.3em] text-muted">{item.label}</p>
                 <h3 className="mt-3 font-display text-3xl font-bold">{item.title}</h3>
                 <p className="mt-3 text-sm leading-6 text-muted">{item.description}</p>
