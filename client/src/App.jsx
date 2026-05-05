@@ -8,7 +8,7 @@ import DigitalLandingPage from "./pages/DigitalLandingPage";
 import StoryPage from "./pages/StoryPage";
 import LaunchSoonPage from "./pages/LaunchSoonPage";
 import SavingsStudioDemoPage from "./pages/SavingsStudioDemoPage";
-import SavingsStudioPage from "./pages/SavingsStudioPage";
+import MemberAreaPage from "./pages/MemberAreaPage";
 import ShopPage from "./pages/ShopPage";
 import ProductPage from "./pages/ProductPage";
 import CartPage from "./pages/CartPage";
@@ -69,8 +69,8 @@ const App = () => (
         <Route path="/billing/cancel" element={<BillingCancelPage />} />
       </Route>
 
-      <Route element={<ProtectedRoute requireMembership membershipRedirect="/profile" />}>
-        <Route path="/members/savings-studio" element={<SavingsStudioPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/members/savings-studio" element={<MemberAreaPage />} />
       </Route>
 
       <Route element={<ProtectedRoute requireAdmin />}>
