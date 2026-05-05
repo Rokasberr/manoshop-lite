@@ -26,7 +26,7 @@ const JournalArticlePage = () => {
       <JournalAccessGate
         user={user}
         title={`“${article.title}” is reserved for active members.`}
-        description="This article becomes fully visible after your Circle or Private membership is active. The lock is tied to your paid membership status, not just account creation."
+        description="This article becomes fully visible after your Asmeninis or Privatus verslas membership is active. The lock is tied to your paid membership status, not just account creation."
       />
     );
   }

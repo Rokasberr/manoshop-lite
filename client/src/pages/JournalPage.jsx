@@ -55,7 +55,7 @@ const JournalPage = () => {
       <JournalAccessGate
         user={user}
         title="Journal unlocks after membership purchase."
-        description="This editorial archive is part of the Circle and Private membership layer. Once your paid plan becomes active, the full Journal and every article open automatically."
+        description="This editorial archive is part of the Asmeninis and Privatus verslas membership layer. Once your paid plan becomes active, the full Journal and every article open automatically."
       />
     );
   }

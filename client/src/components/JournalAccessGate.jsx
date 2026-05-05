@@ -7,7 +7,7 @@ import { journalArticles } from "../content/journalArticles";
 const JournalAccessGate = ({
   user,
   title = "Journal atsiveria aktyviems nariams.",
-  description = "Circle ir Private nariai gauna pilną redakcinį archyvą savo privačioje Stilloak patirtyje.",
+  description = "Asmeninio ir Privataus verslo nariai gauna pilną redakcinį archyvą savo privačioje Stilloak patirtyje.",
 }) => {
   const previewArticles = journalArticles.slice(0, 3);
 
@@ -41,7 +41,7 @@ const JournalAccessGate = ({
           <div className="rounded-[28px] border border-white/8 bg-white/5 p-6">
             <div className="inline-flex items-center gap-3 rounded-full bg-white/6 px-4 py-2 text-sm text-white/72">
               <LockKeyhole size={16} style={{ color: "rgb(var(--accent-strong))" }} />
-              Circle ir Private atrakina pilną redakcinį archyvą
+              Asmeninis ir Privatus verslas planai atrakina pilną redakcinį archyvą
             </div>
             <div className="mt-6 space-y-3 text-sm text-white/68">
               <div className="rounded-[18px] bg-white/4 px-4 py-4">

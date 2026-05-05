@@ -1,0 +1,530 @@
+warning: in the working copy of 'client/src/components/JournalAccessGate.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/constants/subscriptionPlans.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/HomePage.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/JournalArticlePage.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/JournalPage.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/PricingPage.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/ProfilePage.jsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'client/src/pages/SavingsStudioDemoPage.jsx', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/client/src/components/JournalAccessGate.jsx b/client/src/components/JournalAccessGate.jsx[m
+[1mindex fd1c8b4..4be5188 100644[m
+[1m--- a/client/src/components/JournalAccessGate.jsx[m
+[1m+++ b/client/src/components/JournalAccessGate.jsx[m
+[36m@@ -7,7 +7,7 @@[m [mimport { journalArticles } from "../content/journalArticles";[m
+ const JournalAccessGate = ({[m
+   user,[m
+   title = "Journal atsiveria aktyviems nariams.",[m
+[31m-  description = "Circle ir Private nariai gauna pilną redakcinį archyvą savo privačioje Stilloak patirtyje.",[m
+[32m+[m[32m  description = "Asmeninio ir Privataus verslo nariai gauna pilną redakcinį archyvą savo privačioje Stilloak patirtyje.",[m
+ }) => {[m
+   const previewArticles = journalArticles.slice(0, 3);[m
+ [m
+[36m@@ -41,7 +41,7 @@[m [mconst JournalAccessGate = ({[m
+           <div className="rounded-[28px] border border-white/8 bg-white/5 p-6">[m
+             <div className="inline-flex items-center gap-3 rounded-full bg-white/6 px-4 py-2 text-sm text-white/72">[m
+               <LockKeyhole size={16} style={{ color: "rgb(var(--accent-strong))" }} />[m
+[31m-              Circle ir Private atrakina pilną redakcinį archyvą[m
+[32m+[m[32m              Asmeninis ir Privatus verslas planai atrakina pilną redakcinį archyvą[m
+             </div>[m
+             <div className="mt-6 space-y-3 text-sm text-white/68">[m
+               <div className="rounded-[18px] bg-white/4 px-4 py-4">[m
+[1mdiff --git a/client/src/constants/subscriptionPlans.js b/client/src/constants/subscriptionPlans.js[m
+[1mindex fd510c7..6830ca1 100644[m
+[1m--- a/client/src/constants/subscriptionPlans.js[m
+[1m+++ b/client/src/constants/subscriptionPlans.js[m
+[36m@@ -1,46 +1,52 @@[m
+ export const subscriptionPlans = [[m
+   {[m
+     id: "free",[m
+[31m-    name: "Guest",[m
+[31m-    price: 0,[m
+[31m-    intervalLabel: "/ visada",[m
+[31m-    description: "Trumpa įžanga į Stilloak pasaulį prieš pasirenkant pilną narystę.",[m
+[32m+[m[32m    name: "Bazinis",[m
+[32m+[m[32m    price: 9,[m
+[32m+[m[32m    intervalLabel: "/mėn.",[m
+[32m+[m[32m    description: "Ramus pradžios lygis su pagrindine nario erdve, mėnesio apžvalga ir ribotais skaitmeniniais resursais.",[m
+     provider: "internal",[m
+     badge: "Pradžia",[m
+[31m-    features: ["Privati paskyra", "Atidarymo peržiūros", "Privati užsakymų istorija"],[m
+[32m+[m[32m    features: [[m
+[32m+[m[32m      "Pagrindinė nario erdvė",[m
+[32m+[m[32m      "Mėnesio apžvalga",[m
+[32m+[m[32m      "Riboti skaitmeniniai resursai",[m
+[32m+[m[32m      "Nario naujienos",[m
+[32m+[m[32m      "Atšauk bet kada",[m
+[32m+[m[32m    ],[m
+   },[m
+   {[m
+     id: "circle",[m
+[31m-    name: "Circle",[m
+[31m-    price: 10,[m
+[31m-    intervalLabel: "/ mėn.",[m
+[31m-    description: "Pagrindinė narystė pilnai Stilloak patirčiai: aiškesniems mėnesiams, tikslams ir privačiam archyvui.",[m
+[32m+[m[32m    name: "Asmeninis",[m
+[32m+[m[32m    price: 24,[m
+[32m+[m[32m    intervalLabel: "/mėn.",[m
+[32m+[m[32m    description: "Pilna asmeninė Stilloak narystė mėnesio suvestinėms, tikslų progresui, Journal ir premium resursams.",[m
+     provider: "stripe",[m
+[31m-    badge: "Populiariausia",[m
+[32m+[m[32m    badge: "Rekomenduojama",[m
+     features: [[m
+[31m-      "Pilna Stilloak darbo erdvė",[m
+[31m-      "Biudžetai, tikslai ir pastovios išlaidos",[m
+[31m-      "CSV importas ir mėnesio apžvalga",[m
+[31m-      "Savaitinės ir mėnesinės suvestinės",[m
+[32m+[m[32m      "Pilna nario erdvė",[m
+[32m+[m[32m      "Mėnesinės suvestinės",[m
+[32m+[m[32m      "Tikslų ir progreso kortelės",[m
+       "Journal tik nariams",[m
+[31m-      "Prioritetinė paskyros priežiūra",[m
+[32m+[m[32m      "Premium skaitmeniniai resursai",[m
+[32m+[m[32m      "Ankstyva prieiga prie produktų pristatymų",[m
+     ],[m
+   },[m
+   {[m
+     id: "private",[m
+[31m-    name: "Private",[m
+[31m-    price: 20,[m
+[31m-    intervalLabel: "/ mėn.",[m
+[31m-    description: "Aukštesnis narystės lygis tiems, kurie nori daugiau priežiūros, ramybės ir prioriteto.",[m
+[32m+[m[32m    name: "Privatus verslas",[m
+[32m+[m[32m    price: 99,[m
+[32m+[m[32m    intervalLabel: "/mėn.",[m
+[32m+[m[32m    description: "Aukščiausias lygis verslui ar projektams: prioritetas, verslo šablonai, premium patirtis ir aiškesnė kryptis.",[m
+     provider: "stripe",[m
+[31m-    badge: "Aukštesnis lygis",[m
+[32m+[m[32m    badge: "Verslui",[m
+     features: [[m
+[31m-      "Viskas iš Circle",[m
+[31m-      "Prioritetinė nario priežiūra",[m
+[31m-      "Aiškesnė sąskaitų pagalba",[m
+[31m-      "Journal tik nariams",[m
+[31m-      "Ankstyva prieiga prie atidarymų",[m
+[31m-      "Tinka gilesniam nuolatiniam naudojimui",[m
+[32m+[m[32m      "Viskas iš Asmeninio plano",[m
+[32m+[m[32m      "Verslo ir projektų skydelis",[m
+[32m+[m[32m      "Prioritetinė pagalba",[m
+[32m+[m[32m      "Verslo resursai ir šablonai",[m
+[32m+[m[32m      "Premium nario patirtis",[m
+[32m+[m[32m      "Individualios rekomendacijos (netrukus)",[m
+     ],[m
+   },[m
+ ];[m
+[1mdiff --git a/client/src/pages/HomePage.jsx b/client/src/pages/HomePage.jsx[m
+[1mindex f098932..d205054 100644[m
+[1m--- a/client/src/pages/HomePage.jsx[m
+[1m+++ b/client/src/pages/HomePage.jsx[m
+[36m@@ -97,24 +97,25 @@[m [mconst homeCopy = {[m
+       },[m
+     ],[m
+     plansEyebrow: "Narystė",[m
+[31m-    plansTitle: "Pasirink paprastai: peržiūra, Circle arba Private",[m
+[32m+[m[32m    plansTitle: "Pasirink paprastai: Bazinis, Asmeninis arba Privatus verslas",[m
+     plansIntro:[m
+[31m-      "Kiekvienas lygis turi aiškią paskirtį: susipažinti, naudoti kas savaitę arba gauti daugiau prioritetinės priežiūros.",[m
+[32m+[m[32m      "Bazinis suteikia ramų pagrindą. Asmeninis atveria pilną nario patirtį. Privatus verslas skirtas projektams ir didesniam prioritetui.",[m
+[32m+[m[32m    includedInPlan: "Įtraukta į Asmeninį",[m
+     membershipCards: [[m
+       {[m
+[31m-        label: "Guest",[m
+[31m-        title: "Pamatai patirtį prieš sprendimą",[m
+[31m-        description: "Trumpa peržiūra padeda suprasti Stilloak logiką, vertę ir narystės skirtumus.",[m
+[32m+[m[32m        label: "Bazinis",[m
+[32m+[m[32m        title: "Pagrindinė nario erdvė",[m
+[32m+[m[32m        description: "Mėnesio apžvalga, riboti skaitmeniniai resursai, nario naujienos ir atšaukimas bet kada.",[m
+       },[m
+       {[m
+[31m-        label: "Circle",[m
+[31m-        title: "Pilna Savings Studio prieiga",[m
+[31m-        description: "Pagrindinis planas kas savaitę naudoti biudžetus, tikslus ir suvestines vienoje vietoje.",[m
+[32m+[m[32m        label: "Asmeninis",[m
+[32m+[m[32m        title: "Pilna asmeninė narystė",[m
+[32m+[m[32m        description: "Mėnesinės suvestinės, tikslų kortelės, Journal, premium resursai ir ankstyva prieiga.",[m
+       },[m
+       {[m
+[31m-        label: "Private",[m
+[31m-        title: "Daugiau prioriteto",[m
+[31m-        description: "Aukštesnis lygis nariams, kuriems svarbu daugiau priežiūros ir ramesnis aptarnavimas.",[m
+[32m+[m[32m        label: "Privatus verslas",[m
+[32m+[m[32m        title: "Verslo ir projektų sluoksnis",[m
+[32m+[m[32m        description: "Verslo skydelis, prioritetinė pagalba, šablonai, premium patirtis ir rekomendacijos netrukus.",[m
+       },[m
+     ],[m
+     membershipPrimary: "Pasirinkti planą",[m
+[36m@@ -122,7 +123,7 @@[m [mconst homeCopy = {[m
+     closingEyebrow: "Pradėk šiandien",[m
+     closingTitle: "Peržiūrėk programą arba atrakink Stilloak iškart.",[m
+     closingText:[m
+[31m-      "Aiškus mėnuo prasideda nuo vieno sprendimo: pamatyti kaip tai veikia arba iškart pradėti su Circle.",[m
+[32m+[m[32m      "Aiškus mėnuo prasideda nuo vieno sprendimo: pamatyti kaip tai veikia arba iškart pradėti su Asmeninis.",[m
+     closingPrimary: "Atrakinti narystę",[m
+     closingSecondary: "Peržiūrėti Savings Studio",[m
+   },[m
+[36m@@ -211,24 +212,25 @@[m [mconst homeCopy = {[m
+       },[m
+     ],[m
+     plansEyebrow: "Membership",[m
+[31m-    plansTitle: "Choose simply: preview, Circle, or Private",[m
+[32m+[m[32m    plansTitle: "Choose simply: Bazinis, Asmeninis, or Privatus verslas",[m
+     plansIntro:[m
+[31m-      "Each level has a clear role: explore, use weekly, or receive a higher-touch member experience.",[m
+[32m+[m[32m      "Bazinis gives the foundation. Asmeninis opens the full member experience. Privatus verslas is for projects and higher priority.",[m
+[32m+[m[32m    includedInPlan: "Included in Asmeninis",[m
+     membershipCards: [[m
+       {[m
+[31m-        label: "Guest",[m
+[31m-        title: "Preview before deciding",[m
+[31m-        description: "A short preview helps you understand the logic, value, and membership difference.",[m
+[32m+[m[32m        label: "Bazinis",[m
+[32m+[m[32m        title: "Basic member area",[m
+[32m+[m[32m        description: "Monthly overview, limited digital resources, member updates, and cancel anytime.",[m
+       },[m
+       {[m
+[31m-        label: "Circle",[m
+[31m-        title: "Full Savings Studio access",[m
+[31m-        description: "The core plan for using budgets, goals, and summaries every week in one place.",[m
+[32m+[m[32m        label: "Asmeninis",[m
+[32m+[m[32m        title: "Full personal membership",[m
+[32m+[m[32m        description: "Monthly summaries, progress cards, Journal, premium resources, and early product access.",[m
+       },[m
+       {[m
+[31m-        label: "Private",[m
+[31m-        title: "More priority",[m
+[31m-        description: "A higher tier for members who want more care, more calm, and priority handling.",[m
+[32m+[m[32m        label: "Privatus verslas",[m
+[32m+[m[32m        title: "Business and project layer",[m
+[32m+[m[32m        description: "Business dashboard, priority support, templates, premium experience, and recommendations soon.",[m
+       },[m
+     ],[m
+     membershipPrimary: "Choose a plan",[m
+[36m@@ -236,7 +238,7 @@[m [mconst homeCopy = {[m
+     closingEyebrow: "Start today",[m
+     closingTitle: "View the demo or unlock Stilloak now.",[m
+     closingText:[m
+[31m-      "A clearer month starts with one choice: see how it works or begin with Circle.",[m
+[32m+[m[32m      "A clearer month starts with one choice: see how it works or begin with Asmeninis.",[m
+     closingPrimary: "Unlock membership",[m
+     closingSecondary: "View Savings Studio",[m
+   },[m
+[36m@@ -306,7 +308,7 @@[m [mconst HomePage = () => {[m
+                   <p className="text-xs uppercase tracking-[0.3em] text-white/40">{copy.previewEyebrow}</p>[m
+                   <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">{copy.previewTitle}</h2>[m
+                 </div>[m
+[31m-                <span className="hero-chip">Įtraukta į Circle</span>[m
+[32m+[m[32m                <span className="hero-chip">{copy.includedInPlan}</span>[m
+               </div>[m
+ [m
+               <p className="mt-4 max-w-xl text-sm leading-6 text-white/66">{copy.previewText}</p>[m
+[1mdiff --git a/client/src/pages/JournalArticlePage.jsx b/client/src/pages/JournalArticlePage.jsx[m
+[1mindex b2fc7b5..4fcc26a 100644[m
+[1m--- a/client/src/pages/JournalArticlePage.jsx[m
+[1m+++ b/client/src/pages/JournalArticlePage.jsx[m
+[36m@@ -26,7 +26,7 @@[m [mconst JournalArticlePage = () => {[m
+       <JournalAccessGate[m
+         user={user}[m
+         title={`“${article.title}” is reserved for active members.`}[m
+[31m-        description="This article becomes fully visible after your Circle or Private membership is active. The lock is tied to your paid membership status, not just account creation."[m
+[32m+[m[32m        description="This article becomes fully visible after your Asmeninis or Privatus verslas membership is active. The lock is tied to your paid membership status, not just account creation."[m
+       />[m
+     );[m
+   }[m
+[1mdiff --git a/client/src/pages/JournalPage.jsx b/client/src/pages/JournalPage.jsx[m
+[1mindex 2c4ce9d..ac4d4d7 100644[m
+[1m--- a/client/src/pages/JournalPage.jsx[m
+[1m+++ b/client/src/pages/JournalPage.jsx[m
+[36m@@ -55,7 +55,7 @@[m [mconst JournalPage = () => {[m
+       <JournalAccessGate[m
+         user={user}[m
+         title="Journal unlocks after membership purchase."[m
+[31m-        description="This editorial archive is part of the Circle and Private membership layer. Once your paid plan becomes active, the full Journal and every article open automatically."[m
+[32m+[m[32m        description="This editorial archive is part of the Asmeninis and Privatus verslas membership layer. Once your paid plan becomes active, the full Journal and every article open automatically."[m
+       />[m
+     );[m
+   }[m
+[1mdiff --git a/client/src/pages/PricingPage.jsx b/client/src/pages/PricingPage.jsx[m
+[1mindex 0dbc514..020fb65 100644[m
+[1m--- a/client/src/pages/PricingPage.jsx[m
+[1m+++ b/client/src/pages/PricingPage.jsx[m
+[36m@@ -7,98 +7,105 @@[m [mimport { useAuth } from "../context/AuthContext";[m
+ import { useLanguage } from "../context/LanguageContext";[m
+ import { subscriptionPlans } from "../constants/subscriptionPlans";[m
+ import billingService from "../services/billingService";[m
+[31m-import { formatCurrency } from "../utils/currency";[m
+[32m+[m
+[32m+[m[32mconst formatPlanPrice = (value) =>[m
+[32m+[m[32m  new Intl.NumberFormat("lt-LT", {[m
+[32m+[m[32m    style: "currency",[m
+[32m+[m[32m    currency: "EUR",[m
+[32m+[m[32m    maximumFractionDigits: 0,[m
+[32m+[m[32m  }).format(value || 0);[m
+ [m
+ const pricingCopy = {[m
+   lt: {[m
+     pills: [[m
+[31m-      "Pilna Stilloak prieiga",[m
+[31m-      "Savaitinės ir mėnesinės suvestinės",[m
+[31m-      "Privatus nario archyvas",[m
+[32m+[m[32m      "Pilna nario erdvė",[m
+[32m+[m[32m      "Mėnesinės suvestinės",[m
+[32m+[m[32m      "Tikslų ir progreso kortelės",[m
+       "Journal tik nariams",[m
+     ],[m
+     eyebrow: "Narystė",[m
+[31m-    title: "Pasirink narystę, kuri suteikia tavo mėnesiui daugiau aiškumo",[m
+[32m+[m[32m    title: "Pasirink narystę, kuri ramiai palaiko tavo mėnesį",[m
+     intro:[m
+[31m-      "Circle ir Private atrakina Stilloak branduolį: biudžetus, tikslus, pastovias išlaidas, suvestines ir privačią nario erdvę.",[m
+[32m+[m[32m      "Bazinis suteikia aiškų pradžios sluoksnį. Asmeninis atveria pilną nario patirtį. Privatus verslas skirtas projektams, prioritetui ir gilesnei atramai.",[m
+     joinLoading: "Jungiama...",[m
+[31m-    currentPlan: "Dabartinis planas",[m
+[31m-    continueStripe: "Pradėti saugų apmokėjimą",[m
+[31m-    enterGuest: "Pradėti kaip svečiui",[m
+[32m+[m[32m    currentPlan: "Aktyvus planas",[m
+[32m+[m[32m    continueStripe: "Tęsti į saugų apmokėjimą",[m
+[32m+[m[32m    enterGuest: "Pasirinkti Bazinį",[m
+     compareEyebrow: "Kas skiriasi",[m
+[31m-    compareTitle: "Trys aiškūs keliai. Vienas ramesnis mėnuo.",[m
+[32m+[m[32m    compareTitle: "Trys aiškūs lygiai. Viena ramesnė sistema.",[m
+     compareIntro:[m
+[31m-      "Guest leidžia susipažinti. Circle skirtas reguliariam naudojimui. Private prideda daugiau prioritetinės priežiūros.",[m
+[32m+[m[32m      "Bazinis skirtas pradžiai. Asmeninis tinka nuosekliam asmeniniam ritmui. Privatus verslas prideda verslo sluoksnį ir prioritetą.",[m
+     compare: [[m
+       {[m
+[31m-        label: "Guest",[m
+[31m-        title: "Lengva pradžia",[m
+[31m-        text: "Susikuri paskyrą, pamatai patirtį ir gali pereiti į narystę, kai esi pasiruošęs.",[m
+[32m+[m[32m        label: "Bazinis",[m
+[32m+[m[32m        title: "Ramus pagrindas",[m
+[32m+[m[32m        text: "Pagrindinė nario erdvė, mėnesio apžvalga, riboti skaitmeniniai resursai ir aiškus būdas pradėti.",[m
+       },[m
+       {[m
+[31m-        label: "Circle",[m
+[31m-        title: "Pagrindinė Stilloak patirtis",[m
+[31m-        text: "Pilni biudžetai, tikslai, CSV importas ir suvestinės žmogui, kuris nori naudoti sistemą kas savaitę.",[m
+[32m+[m[32m        label: "Asmeninis",[m
+[32m+[m[32m        title: "Pilna asmeninė patirtis",[m
+[32m+[m[32m        text: "Pilna nario erdvė, mėnesinės suvestinės, tikslų kortelės, Journal ir premium skaitmeniniai resursai.",[m
+       },[m
+       {[m
+[31m-        label: "Private",[m
+[31m-        title: "Daugiau prioriteto",[m
+[31m-        text: "Skirtas nariams, kuriems svarbu daugiau priežiūros, ramesnis aptarnavimas ir aukštesnis santykio lygis.",[m
+[32m+[m[32m        label: "Privatus verslas",[m
+[32m+[m[32m        title: "Verslui ir projektams",[m
+[32m+[m[32m        text: "Verslo skydelis, prioritetinė pagalba, šablonai, premium patirtis ir individualios rekomendacijos, kai jos paruoštos.",[m
+       },[m
+     ],[m
+     memberEyebrow: "Ką gauni",[m
+[31m-    memberTitle: "Narystė atrakina aiškesnį mėnesį, ne tik uždarą zoną",[m
+[32m+[m[32m    memberTitle: "Narystė suteikia aiškesnį mėnesį, ne tik uždarą zoną",[m
+     memberText:[m
+       "Stilloak sujungia privačią darbo erdvę, archyvą, suvestines ir nuoseklią nario patirtį nuo apmokėjimo iki kasdienio naudojimo.",[m
+     memberSignals: [[m
+       "Po apmokėjimo iškart aktyvuojama nario prieiga",[m
+       "Visos suvestinės ir sąskaitos lieka privačiame archyve",[m
+[31m-      "Pirmas mėnesio setup padeda pradėti be chaoso",[m
+[31m-      "Private lygis suteikia daugiau prioriteto ir priežiūros",[m
+[32m+[m[32m      "Mėnesio apžvalga padeda pradėti be chaoso",[m
+[32m+[m[32m      "Privatus verslas suteikia daugiau prioriteto ir verslo resursų",[m
+     ],[m
+[31m-    circleSummaryTitle: "Pilna darbo versija",[m
+[31m-    circleSummaryText: "Visi pagrindiniai Stilloak sluoksniai vienoje nuoseklioje nario sistemoje.",[m
+[31m-    privateSummaryTitle: "Aukštesnio prioriteto patirtis",[m
+[31m-    privateSummaryText: "Daugiau priežiūros, ramybės ir aiškesnis kelias nariui.",[m
+[32m+[m[32m    circleSummaryTitle: "Asmeninis ritmas",[m
+[32m+[m[32m    circleSummaryText: "Pilna Stilloak nario erdvė aiškesniam mėnesio valdymui.",[m
+[32m+[m[32m    privateSummaryTitle: "Privatus verslas",[m
+[32m+[m[32m    privateSummaryText: "Daugiau prioriteto, verslo resursų ir premium patirties.",[m
+     previewCta: "Peržiūrėti Stilloak",[m
+     storyCta: "Skaityti istoriją",[m
+[31m-    freeToast: "Free planas jau aktyvus tavo paskyrai.",[m
+[32m+[m[32m    freeToast: "Bazinis planas jau aktyvus tavo paskyrai.",[m
+     sessionError: "Nepavyko paruošti saugaus apmokėjimo.",[m
+   },[m
+   en: {[m
+     pills: [[m
+       "Full Stilloak access",[m
+[31m-      "Weekly and monthly summaries",[m
+[32m+[m[32m      "Monthly summaries",[m
+[32m+[m[32m      "Goal and progress cards",[m
+       "Private member archive",[m
+[31m-      "Members-only Journal",[m
+[32m+[m[32m      "Premium digital resources",[m
+     ],[m
+     eyebrow: "Membership",[m
+     title: "Choose the membership that gives your month more clarity",[m
+     intro:[m
+[31m-      "Circle and Private unlock the core Stilloak experience: budgets, goals, recurring spend, summaries, and a private member space.",[m
+[32m+[m[32m      "Bazinis gives you the foundation. Asmeninis opens the full member experience. Privatus verslas is built for projects, priority, and business resources.",[m
+     joinLoading: "Connecting...",[m
+     currentPlan: "Current plan",[m
+     continueStripe: "Start secure checkout",[m
+[31m-    enterGuest: "Continue as guest",[m
+[32m+[m[32m    enterGuest: "Choose Bazinis",[m
+     compareEyebrow: "What changes",[m
+     compareTitle: "Three clear paths. One calmer month.",[m
+     compareIntro:[m
+[31m-      "Guest lets you explore. Circle is for regular weekly use. Private adds a higher-priority member experience.",[m
+[32m+[m[32m      "Bazinis is the foundation. Asmeninis supports regular personal use. Privatus verslas adds a business layer and priority support.",[m
+     compare: [[m
+       {[m
+[31m-        label: "Guest",[m
+[31m-        title: "An easy first step",[m
+[31m-        text: "Create an account, preview the experience, and move into membership when you are ready.",[m
+[32m+[m[32m        label: "Bazinis",[m
+[32m+[m[32m        title: "A calm foundation",[m
+[32m+[m[32m        text: "Basic member area, monthly overview, limited digital resources, member updates, and cancel anytime.",[m
+       },[m
+       {[m
+[31m-        label: "Circle",[m
+[31m-        title: "The core Stilloak experience",[m
+[31m-        text: "Full budgets, goals, CSV import, and summaries for people who want to use the system every week.",[m
+[32m+[m[32m        label: "Asmeninis",[m
+[32m+[m[32m        title: "The full personal experience",[m
+[32m+[m[32m        text: "Full member area, monthly summaries, progress cards, Journal, premium resources, and early product access.",[m
+       },[m
+       {[m
+[31m-        label: "Private",[m
+[31m-        title: "More priority",[m
+[31m-        text: "For members who want more care, calmer support, and a higher-touch relationship.",[m
+[32m+[m[32m        label: "Privatus verslas",[m
+[32m+[m[32m        title: "For business and projects",[m
+[32m+[m[32m        text: "Business dashboard, priority support, business templates, premium experience, and recommendations when available.",[m
+       },[m
+     ],[m
+     memberEyebrow: "What you get",[m
+[36m@@ -109,15 +116,15 @@[m [mconst pricingCopy = {[m
+       "Member access activates immediately after payment",[m
+       "Summaries and invoices stay inside a private archive",[m
+       "The first monthly setup helps you start without chaos",[m
+[31m-      "Private adds more priority and member care",[m
+[32m+[m[32m      "Privatus verslas adds more priority and business resources",[m
+     ],[m
+[31m-    circleSummaryTitle: "The full working version",[m
+[31m-    circleSummaryText: "All core Stilloak layers inside one coherent member system.",[m
+[31m-    privateSummaryTitle: "A higher-priority experience",[m
+[31m-    privateSummaryText: "More care, more calm, and a clearer path for the member.",[m
+[32m+[m[32m    circleSummaryTitle: "Asmeninis rhythm",[m
+[32m+[m[32m    circleSummaryText: "The full Stilloak member area for a clearer month.",[m
+[32m+[m[32m    privateSummaryTitle: "Privatus verslas",[m
+[32m+[m[32m    privateSummaryText: "More priority, business resources, and a premium experience.",[m
+     previewCta: "Preview Stilloak",[m
+     storyCta: "Read the story",[m
+[31m-    freeToast: "The free plan is already active on your account.",[m
+[32m+[m[32m    freeToast: "Bazinis is already active on your account.",[m
+     sessionError: "Could not prepare secure checkout.",[m
+   },[m
+ };[m
+[36m@@ -198,12 +205,12 @@[m [mconst PricingPage = () => {[m
+                   <p className={`mt-3 text-sm leading-6 ${isFeatured ? "text-white/64" : "text-muted"}`}>{plan.description}</p>[m
+ [m
+                   <div className="mt-8 flex flex-wrap items-end gap-x-2 gap-y-1">[m
+[31m-                    <span className="font-display text-4xl font-bold sm:text-5xl">{formatCurrency(plan.price)}</span>[m
+[32m+[m[32m                    <span className="font-display text-4xl font-bold sm:text-5xl">{formatPlanPrice(plan.price)}</span>[m
+                     <span className={`pb-1 text-sm ${isFeatured ? "text-white/56" : "text-muted"}`}>{plan.intervalLabel}</span>[m
+                   </div>[m
+ [m
+                   <div className="mt-8 space-y-3">[m
+[31m-                    {plan.features.slice(0, 4).map((feature) => ([m
+[32m+[m[32m                    {plan.features.map((feature) => ([m
+                       <div[m
+                         key={feature}[m
+                         className={`flex items-start gap-3 rounded-[18px] px-3 py-3 text-sm ${isFeatured ? "bg-white/5 text-white/78" : ""}`}[m
+[36m@@ -294,12 +301,12 @@[m [mconst PricingPage = () => {[m
+ [m
+           <div className="mt-8 grid gap-4 sm:grid-cols-2">[m
+             <div className="metric-card">[m
+[31m-              <p className="text-xs uppercase tracking-[0.3em] text-white/45">Circle</p>[m
+[32m+[m[32m              <p className="text-xs uppercase tracking-[0.3em] text-white/45">Asmeninis</p>[m
+               <p className="mt-3 font-display text-3xl font-bold">{copy.circleSummaryTitle}</p>[m
+               <p className="mt-2 text-sm leading-6 text-white/64">{copy.circleSummaryText}</p>[m
+             </div>[m
+             <div className="metric-card">[m
+[31m-              <p className="text-xs uppercase tracking-[0.3em] text-white/45">Private</p>[m
+[32m+[m[32m              <p className="text-xs uppercase tracking-[0.3em] text-white/45">Privatus verslas</p>[m
+               <p className="mt-3 font-display text-3xl font-bold">{copy.privateSummaryTitle}</p>[m
+               <p className="mt-2 text-sm leading-6 text-white/64">{copy.privateSummaryText}</p>[m
+             </div>[m
+[1mdiff --git a/client/src/pages/ProfilePage.jsx b/client/src/pages/ProfilePage.jsx[m
+[1mindex 9e89956..b35a74b 100644[m
+[1m--- a/client/src/pages/ProfilePage.jsx[m
+[1m+++ b/client/src/pages/ProfilePage.jsx[m
+[36m@@ -26,9 +26,9 @@[m [mconst subscriptionStatusLabels = {[m
+ };[m
+ [m
+ const subscriptionPlanLabels = {[m
+[31m-  free: "Guest",[m
+[31m-  circle: "Circle",[m
+[31m-  private: "Private",[m
+[32m+[m[32m  free: "Bazinis",[m
+[32m+[m[32m  circle: "Asmeninis",[m
+[32m+[m[32m  private: "Privatus verslas",[m
+ };[m
+ [m
+ const subscriptionProviderLabels = {[m
+[36m@@ -145,8 +145,8 @@[m [mconst ProfilePage = () => {[m
+ [m
+           <div className="panel p-6">[m
+             <p className="eyebrow">narystė</p>[m
+[31m-            <h2 className="mt-4 font-display text-3xl font-bold capitalize">[m
+[31m-              {subscriptionPlanLabels[user?.subscription?.plan] || user?.subscription?.plan || "Guest"} planas[m
+[32m+[m[32m            <h2 className="mt-4 font-display text-3xl font-bold">[m
+[32m+[m[32m              {subscriptionPlanLabels[user?.subscription?.plan] || user?.subscription?.plan || "Bazinis"} planas[m
+             </h2>[m
+             <p className="mt-2 text-muted">[m
+               Būsena:{" "}[m
+[1mdiff --git a/client/src/pages/SavingsStudioDemoPage.jsx b/client/src/pages/SavingsStudioDemoPage.jsx[m
+[1mindex 13b44a9..5b23d75 100644[m
+[1m--- a/client/src/pages/SavingsStudioDemoPage.jsx[m
+[1m+++ b/client/src/pages/SavingsStudioDemoPage.jsx[m
+[36m@@ -75,7 +75,7 @@[m [mconst demoCopy = {[m
+     title: "Stilloak parodo, kur pinigai slysta ir ką verta keisti pirmiausia.",[m
+     intro:[m
+       "Stilloak yra privati nario erdvė išlaidoms, biudžetams, tikslams ir mėnesio signalams. Ji padeda priimti mažiau sprendimų iš nuojautos ir daugiau iš aiškaus vaizdo.",[m
+[31m-    primary: "Atrakinti Circle",[m
+[32m+[m[32m    primary: "Atrakinti Asmeninį",[m
+     primaryOpen: "Atidaryti Stilloak",[m
+     secondary: "Peržiūrėti narystę",[m
+     monthLabel: "Šis mėnuo",[m
+[36m@@ -172,13 +172,13 @@[m [mconst demoCopy = {[m
+     accessChip: "Prieiga",[m
+     accessTitle: "Pilna versija atrakinta nariams.",[m
+     accessText:[m
+[31m-      "Peržiūra parodo, kaip Stilloak veikia. Pilna darbo erdvė atsiranda aktyviame Circle arba Private plane.",[m
+[32m+[m[32m      "Peržiūra parodo, kaip Stilloak veikia. Pilna darbo erdvė atsiranda aktyvavus Asmeninį arba Privataus verslo planą.",[m
+     accessBullets: [[m
+       { icon: LockKeyhole, text: "Pilna darbo erdvė atsidaro tik aktyviems nariams." },[m
+       { icon: ShieldCheck, text: "Prieiga susieta su tavo privačia paskyra." },[m
+       { icon: BadgeEuro, text: "Tikslas aiškus: pamatyti taupymo vietas ir biudžeto ribas." },[m
+     ],[m
+[31m-    includedTitle: "Įskaičiuota į Circle",[m
+[32m+[m[32m    includedTitle: "Įtraukta į Asmeninį",[m
+     journalCta: "Peržiūrėti Journal",[m
+   },[m
+   en: {[m
+[36m@@ -186,7 +186,7 @@[m [mconst demoCopy = {[m
+     title: "Stilloak shows where money slips and what to change first.",[m
+     intro:[m
+       "`Stilloak` is a private member space for spending, budgets, goals, and monthly signals. It helps you make fewer decisions from instinct and more from a clear picture.",[m
+[31m-    primary: "Start with Circle",[m
+[32m+[m[32m    primary: "Start with Asmeninis",[m
+     primaryOpen: "Open Stilloak",[m
+     secondary: "View membership",[m
+     monthLabel: "This month",[m
+[36m@@ -283,13 +283,13 @@[m [mconst demoCopy = {[m
+     accessChip: "Access",[m
+     accessTitle: "The full version unlocks for members.",[m
+     accessText:[m
+[31m-      "The demo shows how Stilloak works. The full workspace appears inside an active Circle or Private plan.",[m
+[32m+[m[32m      "The demo shows how Stilloak works. The full workspace appears inside an active Asmeninis or Privatus verslas plan.",[m
+     accessBullets: [[m
+       { icon: LockKeyhole, text: "The full dashboard opens only for active members." },[m
+       { icon: ShieldCheck, text: "Access is tied to your private account." },[m
+       { icon: BadgeEuro, text: "The goal is clear: spot savings opportunities and budget pressure." },[m
+     ],[m
+[31m-    includedTitle: "Included in Circle",[m
+[32m+[m[32m    includedTitle: "Included in Asmeninis",[m
+     journalCta: "View Journal",[m
+   },[m
+ };[m

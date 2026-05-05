@@ -7,98 +7,105 @@ import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import { subscriptionPlans } from "../constants/subscriptionPlans";
 import billingService from "../services/billingService";
-import { formatCurrency } from "../utils/currency";
+
+const formatPlanPrice = (value) =>
+  new Intl.NumberFormat("lt-LT", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(value || 0);
 
 const pricingCopy = {
   lt: {
     pills: [
-      "Pilna Stilloak prieiga",
-      "Savaitinės ir mėnesinės suvestinės",
-      "Privatus nario archyvas",
+      "Pilna nario erdvė",
+      "Mėnesinės suvestinės",
+      "Tikslų ir progreso kortelės",
       "Journal tik nariams",
     ],
     eyebrow: "Narystė",
-    title: "Pasirink narystę, kuri suteikia tavo mėnesiui daugiau aiškumo",
+    title: "Pasirink narystę, kuri ramiai palaiko tavo mėnesį",
     intro:
-      "Circle ir Private atrakina Stilloak branduolį: biudžetus, tikslus, pastovias išlaidas, suvestines ir privačią nario erdvę.",
+      "Bazinis suteikia aiškų pradžios sluoksnį. Asmeninis atveria pilną nario patirtį. Privatus verslas skirtas projektams, prioritetui ir gilesnei atramai.",
     joinLoading: "Jungiama...",
-    currentPlan: "Dabartinis planas",
-    continueStripe: "Pradėti saugų apmokėjimą",
-    enterGuest: "Pradėti kaip svečiui",
+    currentPlan: "Aktyvus planas",
+    continueStripe: "Tęsti į saugų apmokėjimą",
+    enterGuest: "Pasirinkti Bazinį",
     compareEyebrow: "Kas skiriasi",
-    compareTitle: "Trys aiškūs keliai. Vienas ramesnis mėnuo.",
+    compareTitle: "Trys aiškūs lygiai. Viena ramesnė sistema.",
     compareIntro:
-      "Guest leidžia susipažinti. Circle skirtas reguliariam naudojimui. Private prideda daugiau prioritetinės priežiūros.",
+      "Bazinis skirtas pradžiai. Asmeninis tinka nuosekliam asmeniniam ritmui. Privatus verslas prideda verslo sluoksnį ir prioritetą.",
     compare: [
       {
-        label: "Guest",
-        title: "Lengva pradžia",
-        text: "Susikuri paskyrą, pamatai patirtį ir gali pereiti į narystę, kai esi pasiruošęs.",
+        label: "Bazinis",
+        title: "Ramus pagrindas",
+        text: "Pagrindinė nario erdvė, mėnesio apžvalga, riboti skaitmeniniai resursai ir aiškus būdas pradėti.",
       },
       {
-        label: "Circle",
-        title: "Pagrindinė Stilloak patirtis",
-        text: "Pilni biudžetai, tikslai, CSV importas ir suvestinės žmogui, kuris nori naudoti sistemą kas savaitę.",
+        label: "Asmeninis",
+        title: "Pilna asmeninė patirtis",
+        text: "Pilna nario erdvė, mėnesinės suvestinės, tikslų kortelės, Journal ir premium skaitmeniniai resursai.",
       },
       {
-        label: "Private",
-        title: "Daugiau prioriteto",
-        text: "Skirtas nariams, kuriems svarbu daugiau priežiūros, ramesnis aptarnavimas ir aukštesnis santykio lygis.",
+        label: "Privatus verslas",
+        title: "Verslui ir projektams",
+        text: "Verslo skydelis, prioritetinė pagalba, šablonai, premium patirtis ir individualios rekomendacijos, kai jos paruoštos.",
       },
     ],
     memberEyebrow: "Ką gauni",
-    memberTitle: "Narystė atrakina aiškesnį mėnesį, ne tik uždarą zoną",
+    memberTitle: "Narystė suteikia aiškesnį mėnesį, ne tik uždarą zoną",
     memberText:
       "Stilloak sujungia privačią darbo erdvę, archyvą, suvestines ir nuoseklią nario patirtį nuo apmokėjimo iki kasdienio naudojimo.",
     memberSignals: [
       "Po apmokėjimo iškart aktyvuojama nario prieiga",
       "Visos suvestinės ir sąskaitos lieka privačiame archyve",
-      "Pirmas mėnesio setup padeda pradėti be chaoso",
-      "Private lygis suteikia daugiau prioriteto ir priežiūros",
+      "Mėnesio apžvalga padeda pradėti be chaoso",
+      "Privatus verslas suteikia daugiau prioriteto ir verslo resursų",
     ],
-    circleSummaryTitle: "Pilna darbo versija",
-    circleSummaryText: "Visi pagrindiniai Stilloak sluoksniai vienoje nuoseklioje nario sistemoje.",
-    privateSummaryTitle: "Aukštesnio prioriteto patirtis",
-    privateSummaryText: "Daugiau priežiūros, ramybės ir aiškesnis kelias nariui.",
+    circleSummaryTitle: "Asmeninis ritmas",
+    circleSummaryText: "Pilna Stilloak nario erdvė aiškesniam mėnesio valdymui.",
+    privateSummaryTitle: "Privatus verslas",
+    privateSummaryText: "Daugiau prioriteto, verslo resursų ir premium patirties.",
     previewCta: "Peržiūrėti Stilloak",
     storyCta: "Skaityti istoriją",
-    freeToast: "Free planas jau aktyvus tavo paskyrai.",
+    freeToast: "Bazinis planas jau aktyvus tavo paskyrai.",
     sessionError: "Nepavyko paruošti saugaus apmokėjimo.",
   },
   en: {
     pills: [
       "Full Stilloak access",
-      "Weekly and monthly summaries",
+      "Monthly summaries",
+      "Goal and progress cards",
       "Private member archive",
-      "Members-only Journal",
+      "Premium digital resources",
     ],
     eyebrow: "Membership",
     title: "Choose the membership that gives your month more clarity",
     intro:
-      "Circle and Private unlock the core Stilloak experience: budgets, goals, recurring spend, summaries, and a private member space.",
+      "Bazinis gives you the foundation. Asmeninis opens the full member experience. Privatus verslas is built for projects, priority, and business resources.",
     joinLoading: "Connecting...",
     currentPlan: "Current plan",
     continueStripe: "Start secure checkout",
-    enterGuest: "Continue as guest",
+    enterGuest: "Choose Bazinis",
     compareEyebrow: "What changes",
     compareTitle: "Three clear paths. One calmer month.",
     compareIntro:
-      "Guest lets you explore. Circle is for regular weekly use. Private adds a higher-priority member experience.",
+      "Bazinis is the foundation. Asmeninis supports regular personal use. Privatus verslas adds a business layer and priority support.",
     compare: [
       {
-        label: "Guest",
-        title: "An easy first step",
-        text: "Create an account, preview the experience, and move into membership when you are ready.",
+        label: "Bazinis",
+        title: "A calm foundation",
+        text: "Basic member area, monthly overview, limited digital resources, member updates, and cancel anytime.",
       },
       {
-        label: "Circle",
-        title: "The core Stilloak experience",
-        text: "Full budgets, goals, CSV import, and summaries for people who want to use the system every week.",
+        label: "Asmeninis",
+        title: "The full personal experience",
+        text: "Full member area, monthly summaries, progress cards, Journal, premium resources, and early product access.",
       },
       {
-        label: "Private",
-        title: "More priority",
-        text: "For members who want more care, calmer support, and a higher-touch relationship.",
+        label: "Privatus verslas",
+        title: "For business and projects",
+        text: "Business dashboard, priority support, business templates, premium experience, and recommendations when available.",
       },
     ],
     memberEyebrow: "What you get",
@@ -109,15 +116,15 @@ const pricingCopy = {
       "Member access activates immediately after payment",
       "Summaries and invoices stay inside a private archive",
       "The first monthly setup helps you start without chaos",
-      "Private adds more priority and member care",
+      "Privatus verslas adds more priority and business resources",
     ],
-    circleSummaryTitle: "The full working version",
-    circleSummaryText: "All core Stilloak layers inside one coherent member system.",
-    privateSummaryTitle: "A higher-priority experience",
-    privateSummaryText: "More care, more calm, and a clearer path for the member.",
+    circleSummaryTitle: "Asmeninis rhythm",
+    circleSummaryText: "The full Stilloak member area for a clearer month.",
+    privateSummaryTitle: "Privatus verslas",
+    privateSummaryText: "More priority, business resources, and a premium experience.",
     previewCta: "Preview Stilloak",
     storyCta: "Read the story",
-    freeToast: "The free plan is already active on your account.",
+    freeToast: "Bazinis is already active on your account.",
     sessionError: "Could not prepare secure checkout.",
   },
 };
@@ -198,12 +205,12 @@ const PricingPage = () => {
                   <p className={`mt-3 text-sm leading-6 ${isFeatured ? "text-white/64" : "text-muted"}`}>{plan.description}</p>
 
                   <div className="mt-8 flex flex-wrap items-end gap-x-2 gap-y-1">
-                    <span className="font-display text-4xl font-bold sm:text-5xl">{formatCurrency(plan.price)}</span>
+                    <span className="font-display text-4xl font-bold sm:text-5xl">{formatPlanPrice(plan.price)}</span>
                     <span className={`pb-1 text-sm ${isFeatured ? "text-white/56" : "text-muted"}`}>{plan.intervalLabel}</span>
                   </div>
 
                   <div className="mt-8 space-y-3">
-                    {plan.features.slice(0, 4).map((feature) => (
+                    {plan.features.map((feature) => (
                       <div
                         key={feature}
                         className={`flex items-start gap-3 rounded-[18px] px-3 py-3 text-sm ${isFeatured ? "bg-white/5 text-white/78" : ""}`}
@@ -294,12 +301,12 @@ const PricingPage = () => {
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             <div className="metric-card">
-              <p className="text-xs uppercase tracking-[0.3em] text-white/45">Circle</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-white/45">Asmeninis</p>
               <p className="mt-3 font-display text-3xl font-bold">{copy.circleSummaryTitle}</p>
               <p className="mt-2 text-sm leading-6 text-white/64">{copy.circleSummaryText}</p>
             </div>
             <div className="metric-card">
-              <p className="text-xs uppercase tracking-[0.3em] text-white/45">Private</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-white/45">Privatus verslas</p>
               <p className="mt-3 font-display text-3xl font-bold">{copy.privateSummaryTitle}</p>
               <p className="mt-2 text-sm leading-6 text-white/64">{copy.privateSummaryText}</p>
             </div>

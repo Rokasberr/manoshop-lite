@@ -26,9 +26,9 @@ const subscriptionStatusLabels = {
 };
 
 const subscriptionPlanLabels = {
-  free: "Guest",
-  circle: "Circle",
-  private: "Private",
+  free: "Bazinis",
+  circle: "Asmeninis",
+  private: "Privatus verslas",
 };
 
 const subscriptionProviderLabels = {
@@ -145,8 +145,8 @@ const ProfilePage = () => {
 
           <div className="panel p-6">
             <p className="eyebrow">narystė</p>
-            <h2 className="mt-4 font-display text-3xl font-bold capitalize">
-              {subscriptionPlanLabels[user?.subscription?.plan] || user?.subscription?.plan || "Guest"} planas
+            <h2 className="mt-4 font-display text-3xl font-bold">
+              {subscriptionPlanLabels[user?.subscription?.plan] || user?.subscription?.plan || "Bazinis"} planas
             </h2>
             <p className="mt-2 text-muted">
               Būsena:{" "}

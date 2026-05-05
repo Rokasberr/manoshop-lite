@@ -75,7 +75,7 @@ const demoCopy = {
     title: "Stilloak parodo, kur pinigai slysta ir ką verta keisti pirmiausia.",
     intro:
       "Stilloak yra privati nario erdvė išlaidoms, biudžetams, tikslams ir mėnesio signalams. Ji padeda priimti mažiau sprendimų iš nuojautos ir daugiau iš aiškaus vaizdo.",
-    primary: "Atrakinti Circle",
+    primary: "Atrakinti Asmeninį",
     primaryOpen: "Atidaryti Stilloak",
     secondary: "Peržiūrėti narystę",
     monthLabel: "Šis mėnuo",
@@ -172,13 +172,13 @@ const demoCopy = {
     accessChip: "Prieiga",
     accessTitle: "Pilna versija atrakinta nariams.",
     accessText:
-      "Peržiūra parodo, kaip Stilloak veikia. Pilna darbo erdvė atsiranda aktyviame Circle arba Private plane.",
+      "Peržiūra parodo, kaip Stilloak veikia. Pilna darbo erdvė atsiranda aktyvavus Asmeninį arba Privataus verslo planą.",
     accessBullets: [
       { icon: LockKeyhole, text: "Pilna darbo erdvė atsidaro tik aktyviems nariams." },
       { icon: ShieldCheck, text: "Prieiga susieta su tavo privačia paskyra." },
       { icon: BadgeEuro, text: "Tikslas aiškus: pamatyti taupymo vietas ir biudžeto ribas." },
     ],
-    includedTitle: "Įskaičiuota į Circle",
+    includedTitle: "Įtraukta į Asmeninį",
     journalCta: "Peržiūrėti Journal",
   },
   en: {
@@ -186,7 +186,7 @@ const demoCopy = {
     title: "Stilloak shows where money slips and what to change first.",
     intro:
       "`Stilloak` is a private member space for spending, budgets, goals, and monthly signals. It helps you make fewer decisions from instinct and more from a clear picture.",
-    primary: "Start with Circle",
+    primary: "Start with Asmeninis",
     primaryOpen: "Open Stilloak",
     secondary: "View membership",
     monthLabel: "This month",
@@ -283,13 +283,13 @@ const demoCopy = {
     accessChip: "Access",
     accessTitle: "The full version unlocks for members.",
     accessText:
-      "The demo shows how Stilloak works. The full workspace appears inside an active Circle or Private plan.",
+      "The demo shows how Stilloak works. The full workspace appears inside an active Asmeninis or Privatus verslas plan.",
     accessBullets: [
       { icon: LockKeyhole, text: "The full dashboard opens only for active members." },
       { icon: ShieldCheck, text: "Access is tied to your private account." },
       { icon: BadgeEuro, text: "The goal is clear: spot savings opportunities and budget pressure." },
     ],
-    includedTitle: "Included in Circle",
+    includedTitle: "Included in Asmeninis",
     journalCta: "View Journal",
   },
 };

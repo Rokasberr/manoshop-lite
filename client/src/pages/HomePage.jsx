@@ -97,24 +97,25 @@ const homeCopy = {
       },
     ],
     plansEyebrow: "Narystė",
-    plansTitle: "Pasirink paprastai: peržiūra, Circle arba Private",
+    plansTitle: "Pasirink paprastai: Bazinis, Asmeninis arba Privatus verslas",
     plansIntro:
-      "Kiekvienas lygis turi aiškią paskirtį: susipažinti, naudoti kas savaitę arba gauti daugiau prioritetinės priežiūros.",
+      "Bazinis suteikia ramų pagrindą. Asmeninis atveria pilną nario patirtį. Privatus verslas skirtas projektams ir didesniam prioritetui.",
+    includedInPlan: "Įtraukta į Asmeninį",
     membershipCards: [
       {
-        label: "Guest",
-        title: "Pamatai patirtį prieš sprendimą",
-        description: "Trumpa peržiūra padeda suprasti Stilloak logiką, vertę ir narystės skirtumus.",
+        label: "Bazinis",
+        title: "Pagrindinė nario erdvė",
+        description: "Mėnesio apžvalga, riboti skaitmeniniai resursai, nario naujienos ir atšaukimas bet kada.",
       },
       {
-        label: "Circle",
-        title: "Pilna Savings Studio prieiga",
-        description: "Pagrindinis planas kas savaitę naudoti biudžetus, tikslus ir suvestines vienoje vietoje.",
+        label: "Asmeninis",
+        title: "Pilna asmeninė narystė",
+        description: "Mėnesinės suvestinės, tikslų kortelės, Journal, premium resursai ir ankstyva prieiga.",
       },
       {
-        label: "Private",
-        title: "Daugiau prioriteto",
-        description: "Aukštesnis lygis nariams, kuriems svarbu daugiau priežiūros ir ramesnis aptarnavimas.",
+        label: "Privatus verslas",
+        title: "Verslo ir projektų sluoksnis",
+        description: "Verslo skydelis, prioritetinė pagalba, šablonai, premium patirtis ir rekomendacijos netrukus.",
       },
     ],
     membershipPrimary: "Pasirinkti planą",
@@ -122,7 +123,7 @@ const homeCopy = {
     closingEyebrow: "Pradėk šiandien",
     closingTitle: "Peržiūrėk programą arba atrakink Stilloak iškart.",
     closingText:
-      "Aiškus mėnuo prasideda nuo vieno sprendimo: pamatyti kaip tai veikia arba iškart pradėti su Circle.",
+      "Aiškus mėnuo prasideda nuo vieno sprendimo: pamatyti kaip tai veikia arba iškart pradėti su Asmeninis.",
     closingPrimary: "Atrakinti narystę",
     closingSecondary: "Peržiūrėti Savings Studio",
   },
@@ -211,24 +212,25 @@ const homeCopy = {
       },
     ],
     plansEyebrow: "Membership",
-    plansTitle: "Choose simply: preview, Circle, or Private",
+    plansTitle: "Choose simply: Bazinis, Asmeninis, or Privatus verslas",
     plansIntro:
-      "Each level has a clear role: explore, use weekly, or receive a higher-touch member experience.",
+      "Bazinis gives the foundation. Asmeninis opens the full member experience. Privatus verslas is for projects and higher priority.",
+    includedInPlan: "Included in Asmeninis",
     membershipCards: [
       {
-        label: "Guest",
-        title: "Preview before deciding",
-        description: "A short preview helps you understand the logic, value, and membership difference.",
+        label: "Bazinis",
+        title: "Basic member area",
+        description: "Monthly overview, limited digital resources, member updates, and cancel anytime.",
       },
       {
-        label: "Circle",
-        title: "Full Savings Studio access",
-        description: "The core plan for using budgets, goals, and summaries every week in one place.",
+        label: "Asmeninis",
+        title: "Full personal membership",
+        description: "Monthly summaries, progress cards, Journal, premium resources, and early product access.",
       },
       {
-        label: "Private",
-        title: "More priority",
-        description: "A higher tier for members who want more care, more calm, and priority handling.",
+        label: "Privatus verslas",
+        title: "Business and project layer",
+        description: "Business dashboard, priority support, templates, premium experience, and recommendations soon.",
       },
     ],
     membershipPrimary: "Choose a plan",
@@ -236,7 +238,7 @@ const homeCopy = {
     closingEyebrow: "Start today",
     closingTitle: "View the demo or unlock Stilloak now.",
     closingText:
-      "A clearer month starts with one choice: see how it works or begin with Circle.",
+      "A clearer month starts with one choice: see how it works or begin with Asmeninis.",
     closingPrimary: "Unlock membership",
     closingSecondary: "View Savings Studio",
   },
@@ -306,7 +308,7 @@ const HomePage = () => {
                   <p className="text-xs uppercase tracking-[0.3em] text-white/40">{copy.previewEyebrow}</p>
                   <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">{copy.previewTitle}</h2>
                 </div>
-                <span className="hero-chip">Įtraukta į Circle</span>
+                <span className="hero-chip">{copy.includedInPlan}</span>
               </div>
 
               <p className="mt-4 max-w-xl text-sm leading-6 text-white/66">{copy.previewText}</p>
