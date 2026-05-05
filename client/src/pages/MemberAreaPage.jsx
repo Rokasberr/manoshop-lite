@@ -2,14 +2,17 @@ import { useState } from "react";
 
 import { useAuth } from "../context/AuthContext";
 import BazinisMemberPage from "./BazinisMemberPage";
+import PrivateBusinessWorkspacePage from "./PrivateBusinessWorkspacePage";
 import SavingsStudioPage from "./SavingsStudioPage";
 
 const basicPlanIds = new Set(["free", "guest", "basic", "bazinis"]);
-const fullMemberPlanIds = new Set([
+const personalPlanIds = new Set([
   "circle",
   "asmeninis",
   "personal",
   "pro",
+]);
+const privatePlanIds = new Set([
   "private",
   "privatus",
   "privatus-verslas",
@@ -91,8 +94,8 @@ const MemberAreaPage = () => {
   const realPlanId = normalizePlanId(user?.subscription?.plan);
   const canUsePreview = user?.role === "admin" || import.meta.env.DEV;
   const effectivePlanId = canUsePreview && previewPlanId !== "current" ? previewPlanId : realPlanId;
-  const shouldRenderFullArea =
-    (user?.role === "admin" && previewPlanId === "current") || fullMemberPlanIds.has(effectivePlanId);
+  const shouldRenderPrivateArea = privatePlanIds.has(effectivePlanId);
+  const shouldRenderPersonalArea = personalPlanIds.has(effectivePlanId);
 
   return (
     <div className="space-y-6">
@@ -100,8 +103,13 @@ const MemberAreaPage = () => {
         <PreviewSwitch currentPlanId={realPlanId} selectedPlanId={previewPlanId} onChange={setPreviewPlanId} />
       )}
 
-      {shouldRenderFullArea || (!basicPlanIds.has(effectivePlanId) && fullMemberPlanIds.has(effectivePlanId)) ? (
-        <SavingsStudioPage />
+      {shouldRenderPrivateArea ? (
+        <PrivateBusinessWorkspacePage />
+      ) : shouldRenderPersonalArea ? (
+        <>
+          <SavingsStudioPage />
+          <PrivateBusinessWorkspacePage lockedPreview />
+        </>
       ) : (
         <BazinisMemberPage />
       )}
