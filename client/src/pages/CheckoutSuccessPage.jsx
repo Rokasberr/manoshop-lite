@@ -9,6 +9,19 @@ import { useCart } from "../context/CartContext";
 import orderService from "../services/orderService";
 import { formatCurrency } from "../utils/currency";
 
+const checkoutStatusLabels = {
+  complete: "užbaigta",
+  open: "atidaryta",
+  expired: "pasibaigusi",
+};
+
+const paymentStatusLabels = {
+  paid: "apmokėta",
+  pending: "laukiama",
+  unpaid: "neapmokėta",
+  failed: "nepavyko",
+};
+
 const CheckoutSuccessPage = () => {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
@@ -25,7 +38,7 @@ const CheckoutSuccessPage = () => {
 
     const loadCheckoutStatus = async () => {
       if (!sessionId) {
-        setError("Trūksta Stripe session ID.");
+        setError("Trūksta apmokėjimo patvirtinimo.");
         setLoading(false);
         return;
       }
@@ -46,7 +59,7 @@ const CheckoutSuccessPage = () => {
         }
       } catch (loadError) {
         if (!cancelled) {
-          setError(loadError.response?.data?.message || "Nepavyko patvirtinti Stripe mokėjimo.");
+          setError(loadError.response?.data?.message || "Nepavyko patvirtinti apmokėjimo.");
         }
       } finally {
         if (!cancelled) {
@@ -83,14 +96,14 @@ const CheckoutSuccessPage = () => {
   return (
     <div className="space-y-8">
       <SectionTitle
-        eyebrow="stripe checkout"
+        eyebrow="apmokėjimas"
         title="Mokėjimo būsena"
-        subtitle="Patikrinome Stripe sesiją ir sinchronizavome jos rezultatą su tavo užsakymu."
+        subtitle="Patikrinome apmokėjimą ir išsaugojome užsakymo informaciją tavo paskyroje."
       />
 
       <div className="panel mx-auto max-w-3xl p-8 text-center">
         {loading ? (
-          <LoadingSpinner label="Tikriname Stripe mokėjimą..." />
+          <LoadingSpinner label="Patvirtiname apmokėjimą..." />
         ) : error ? (
           <>
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-300">
@@ -103,7 +116,7 @@ const CheckoutSuccessPage = () => {
                 Eiti į profilį
               </Link>
               <Link to="/checkout" className="button-primary">
-                Grįžti į checkout
+                Grįžti į apmokėjimą
               </Link>
             </div>
           </>
@@ -117,7 +130,7 @@ const CheckoutSuccessPage = () => {
             </h2>
             <p className="mt-4 text-muted">
               {isPaid
-                ? "Stripe pažymėjo sesiją kaip apmokėtą, todėl užsakymas jau išsaugotas tavo istorijoje."
+                ? "Mokėjimas priimtas, todėl užsakymas jau išsaugotas tavo istorijoje."
                 : "Sesija užbaigta, bet apmokėjimo būsena dar nėra galutinė. Po kelių sekundžių patikrink profilį dar kartą."}
             </p>
 
@@ -125,28 +138,28 @@ const CheckoutSuccessPage = () => {
               <div className="soft-card mt-8 rounded-[28px] p-6 text-left">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.3em] text-muted">order</p>
+                    <p className="text-xs uppercase tracking-[0.3em] text-muted">užsakymas</p>
                     <p className="mt-2 font-display text-2xl font-bold">
                       {order.invoice?.number || `#${order._id.slice(-6).toUpperCase()}`}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs uppercase tracking-[0.3em] text-muted">total</p>
+                    <p className="text-xs uppercase tracking-[0.3em] text-muted">suma</p>
                     <p className="mt-2 font-display text-2xl font-bold">{formatCurrency(order.totalPrice)}</p>
                   </div>
                 </div>
 
                 <div className="mt-5 grid gap-4 sm:grid-cols-3">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.25em] text-muted">checkout</p>
-                    <p className="mt-2 font-semibold capitalize">{checkoutStatus || "unknown"}</p>
+                    <p className="text-xs uppercase tracking-[0.25em] text-muted">būsena</p>
+                    <p className="mt-2 font-semibold">{checkoutStatusLabels[checkoutStatus] || checkoutStatus || "tikrinama"}</p>
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-[0.25em] text-muted">payment</p>
-                    <p className="mt-2 font-semibold capitalize">{paymentStatus || "pending"}</p>
+                    <p className="text-xs uppercase tracking-[0.25em] text-muted">apmokėjimas</p>
+                    <p className="mt-2 font-semibold">{paymentStatusLabels[paymentStatus] || paymentStatus || "laukiama"}</p>
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-[0.25em] text-muted">items</p>
+                    <p className="text-xs uppercase tracking-[0.25em] text-muted">prekės</p>
                     <p className="mt-2 font-semibold">{order.items?.length || 0}</p>
                   </div>
                 </div>

@@ -27,9 +27,9 @@ const products = [
   {
     name: "Aurora Desk Lamp",
     description:
-      "Skulptūriškas stalo šviestuvas su šilta šviesa, puikiai tinkantis moderniam darbo kampui.",
+      "Skulptūriškas stalo šviestuvas su šilta, minkšta šviesa ramesniam darbo kampui.",
     price: 89.9,
-    category: "Home",
+    category: "Namai",
     images: [
       "/stilloak/collection/budget-clarity.svg",
     ],
@@ -39,9 +39,9 @@ const products = [
   {
     name: "Studio Headphones X2",
     description:
-      "Belaidės ausinės su aktyviu triukšmo slopinimu ir giliu, švariu garsu.",
+      "Belaidės ausinės su aktyviu triukšmo slopinimu ir švariu, giliu garsu.",
     price: 159,
-    category: "Tech",
+    category: "Technika",
     images: [
       "/stilloak/collection/ai-summaries.svg",
     ],
@@ -51,9 +51,9 @@ const products = [
   {
     name: "Atlas Carry Backpack",
     description:
-      "Kasdienė kuprinė su paminkštintu skyriumi nešiojamam kompiuteriui ir vandeniui atspariu audiniu.",
+      "Kasdienė kuprinė su paminkštintu kompiuterio skyriumi ir vandeniui atspariu audiniu.",
     price: 74.5,
-    category: "Accessories",
+    category: "Aksesuarai",
     images: [
       "/stilloak/collection/recurring-flow.svg",
     ],
@@ -63,9 +63,9 @@ const products = [
   {
     name: "Linen Relax Set",
     description:
-      "Lengvas lininis namų drabužių komplektas, skirtas komfortui ir minimalistiniam stiliui.",
+      "Lengvas lininis komplektas namams, sukurtas komfortui ir santūriam stiliui.",
     price: 64.9,
-    category: "Fashion",
+    category: "Apranga",
     images: [
       "/stilloak/collection/private-archive.svg",
     ],
@@ -75,9 +75,9 @@ const products = [
   {
     name: "Stoneware Brew Kit",
     description:
-      "Keraminis kavos paruošimo rinkinys su puodeliu, filtru ir matavimo šaukšteliu.",
+      "Keraminis kavos rinkinys ramiam rytui: puodelis, filtras ir matavimo šaukštelis.",
     price: 54,
-    category: "Kitchen",
+    category: "Virtuvė",
     images: [
       "/stilloak/collection/goal-pace.svg",
     ],
@@ -89,7 +89,7 @@ const products = [
     description:
       "Universalūs sportbačiai su minkštu padu ir kvėpuojančiu viršumi aktyviai dienai.",
     price: 119,
-    category: "Footwear",
+    category: "Avalynė",
     images: [
       "/stilloak/collection/monthly-rhythm.svg",
     ],
@@ -99,9 +99,9 @@ const products = [
   {
     name: "Calm Home Poster Bundle",
     description:
-      "10 minimalist printable pieces for a calmer, warmer home. Instant digital download in multiple frame-ready sizes.",
+      "Šiltas spausdinamų sienos darbų rinkinys ramesniems namams, paruoštas keliems rėminimo formatams.",
     price: 24,
-    category: "Digital Products",
+    category: "Skaitmeniniai produktai",
     productType: "digital",
     images: [
       "/stilloak/collection/digital-bundle.svg",
@@ -111,16 +111,16 @@ const products = [
     digitalAsset: {
       storagePath: "posters/calm-home-poster-bundle-guide.pdf",
       fileName: "calm-home-poster-bundle-guide.pdf",
-      downloadLabel: "Atsisiųsti poster bundle",
+      downloadLabel: "Atsisiųsti plakatų rinkinį",
       mimeType: "application/pdf",
     },
   },
   {
     name: "The Atelier Living Room Guide",
     description:
-      "A premium digital guide to layout, palette, texture, and styling choices that make your living room feel calmer and more elevated.",
+      "Ramus gidas svetainės išdėstymui, paletei, tekstūroms ir jaukesniems stilistikos sprendimams.",
     price: 29,
-    category: "Digital Products",
+    category: "Skaitmeniniai produktai",
     productType: "digital",
     images: [
       "/stilloak/collection/ai-summaries.svg",
@@ -137,9 +137,9 @@ const products = [
   {
     name: "Sunday Reset Ritual Planner",
     description:
-      "A calm digital planner for weekly resets, self-care rituals, reflection, and more intentional routines.",
+      "Ramus skaitmeninis planavimo įrankis savaitės peržiūrai, refleksijai ir sąmoningesnėms rutinoms.",
     price: 16,
-    category: "Digital Products",
+    category: "Skaitmeniniai produktai",
     productType: "digital",
     images: [
       "/stilloak/collection/monthly-rhythm.svg",
@@ -149,16 +149,16 @@ const products = [
     digitalAsset: {
       storagePath: "planners/sunday-reset-ritual-planner.pdf",
       fileName: "sunday-reset-ritual-planner.pdf",
-      downloadLabel: "Atsisiųsti plannerį",
+      downloadLabel: "Atsisiųsti planavimo įrankį",
       mimeType: "application/pdf",
     },
   },
   {
     name: "Home Edit Bundle",
     description:
-      "A premium two-part digital set that combines the Calm Home Poster Bundle with The Atelier Living Room Guide for a quiet but practical room refresh.",
+      "Dviejų dalių skaitmeninis rinkinys su sienos darbais ir svetainės gidu ramiam kambario atnaujinimui.",
     price: 39,
-    category: "Digital Products",
+    category: "Skaitmeniniai produktai",
     productType: "digital",
     images: [
       "/stilloak/collection/digital-bundle.svg",
@@ -168,16 +168,16 @@ const products = [
     digitalAsset: {
       storagePath: "bundles/home-edit-bundle.pdf",
       fileName: "home-edit-bundle.pdf",
-      downloadLabel: "Atsisiųsti Home Edit Bundle",
+      downloadLabel: "Atsisiųsti Home Edit rinkinį",
       mimeType: "application/pdf",
     },
   },
   {
     name: "Calm Living Bundle",
     description:
-      "The full three-part digital collection with printable wall art, an interior styling guide, and the Sunday Reset planner in one higher-value bundle.",
+      "Pilnas skaitmeninis rinkinys su spausdinamais sienos darbais, interjero gidu ir Sunday Reset planuokliu.",
     price: 49,
-    category: "Digital Products",
+    category: "Skaitmeniniai produktai",
     productType: "digital",
     images: [
       "/stilloak/collection/private-archive.svg",
@@ -187,7 +187,7 @@ const products = [
     digitalAsset: {
       storagePath: "bundles/calm-living-bundle.pdf",
       fileName: "calm-living-bundle.pdf",
-      downloadLabel: "Atsisiųsti Calm Living Bundle",
+      downloadLabel: "Atsisiųsti Calm Living rinkinį",
       mimeType: "application/pdf",
     },
   },

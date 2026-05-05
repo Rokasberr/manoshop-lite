@@ -13,7 +13,7 @@ const BillingSuccessPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
-  const [statusMessage, setStatusMessage] = useState("Tikriname prenumeratos aktyvaciją...");
+  const [statusMessage, setStatusMessage] = useState("Tikriname narystės aktyvaciją...");
   const sessionId = searchParams.get("session_id") || "";
 
   const isStripeActive = hasActiveMembership(user);
@@ -34,7 +34,7 @@ const BillingSuccessPage = () => {
           }
 
           if (hasActiveMembership({ ...(user || {}), subscription: profile?.subscription })) {
-            setStatusMessage("Prenumerata aktyvuota. Tuoj atidarysime Stilloak.");
+            setStatusMessage("Narystė aktyvuota. Tuoj atidarysime Stilloak.");
             setLoading(false);
             setTimeout(() => {
               if (!cancelled) {
@@ -53,7 +53,7 @@ const BillingSuccessPage = () => {
       }
 
       if (!cancelled) {
-        setStatusMessage("Checkout pavyko. Jei planas dar neatsinaujino, po kelių sekundžių atsidaryk profilį dar kartą.");
+        setStatusMessage("Apmokėjimas pavyko. Jei planas dar neatsinaujino, po kelių sekundžių atsidaryk profilį dar kartą.");
         setLoading(false);
       }
     };
@@ -68,14 +68,14 @@ const BillingSuccessPage = () => {
   return (
     <div className="space-y-8">
       <SectionTitle
-        eyebrow="payment success"
+        eyebrow="apmokėjimas pavyko"
         title="Mokėjimas priimtas"
-        subtitle="Stripe grąžino sėkmingą checkout rezultatą, o mes sinchronizuojame tavo prenumeratos planą su paskyra."
+        subtitle="Sinchronizuojame tavo narystę su paskyra."
       />
 
       <div className="panel mx-auto max-w-3xl p-8 text-center">
         {loading ? (
-          <LoadingSpinner label="Tikriname webhook aktyvaciją..." />
+          <LoadingSpinner label="Tikriname narystės aktyvaciją..." />
         ) : (
           <>
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300">
@@ -83,14 +83,14 @@ const BillingSuccessPage = () => {
             </div>
             <h2 className="mt-6 font-display text-4xl font-bold">{statusMessage}</h2>
             <p className="mt-4 text-muted">
-              Session ID: <span className="font-semibold text-current">{sessionId || "n/a"}</span>
+              Narystės informacija išsaugota tavo paskyroje. Jei būsena dar atsinaujina, profilis ją parodys po kelių akimirkų.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link to="/members/savings-studio?welcome=membership" className="button-primary">
                 Atidaryti Stilloak
               </Link>
               <Link to="/pricing" className="button-secondary">
-                Peržiūrėti planus
+                Peržiūrėti narystę
               </Link>
             </div>
           </>

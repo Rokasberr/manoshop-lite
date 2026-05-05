@@ -1,23 +1,23 @@
 const ProductFilters = ({ filters, categories, onChange, onSubmit, onReset }) => (
   <form className="panel grid gap-4 p-5 lg:grid-cols-[2fr_1fr_1fr_1fr_auto_auto]" onSubmit={onSubmit}>
     <div>
-      <label className="mb-2 block text-sm font-semibold">Search the collection</label>
+      <label className="mb-2 block text-sm font-semibold">Ieškoti kolekcijoje</label>
       <input
         className="input-field"
-        placeholder="Search by piece name or mood"
+        placeholder="Ieškok pagal pavadinimą arba nuotaiką"
         value={filters.search}
         onChange={(event) => onChange("search", event.target.value)}
       />
     </div>
 
     <div>
-      <label className="mb-2 block text-sm font-semibold">Category</label>
+      <label className="mb-2 block text-sm font-semibold">Kategorija</label>
       <select
         className="select-field"
         value={filters.category}
         onChange={(event) => onChange("category", event.target.value)}
       >
-        <option value="all">All categories</option>
+        <option value="all">Visos kategorijos</option>
         {categories.map((category) => (
           <option key={category} value={category}>
             {category}
@@ -27,38 +27,38 @@ const ProductFilters = ({ filters, categories, onChange, onSubmit, onReset }) =>
     </div>
 
     <div>
-      <label className="mb-2 block text-sm font-semibold">Sort</label>
+      <label className="mb-2 block text-sm font-semibold">Rikiavimas</label>
       <select
         className="select-field"
         value={filters.sort}
         onChange={(event) => onChange("sort", event.target.value)}
       >
-        <option value="latest">Newest arrivals</option>
-        <option value="price-asc">Price: low to high</option>
-        <option value="price-desc">Price: high to low</option>
-        <option value="name">Name</option>
+        <option value="latest">Naujausi</option>
+        <option value="price-asc">Kaina: nuo mažiausios</option>
+        <option value="price-desc">Kaina: nuo didžiausios</option>
+        <option value="name">Pavadinimas</option>
       </select>
     </div>
 
     <div>
-      <label className="mb-2 block text-sm font-semibold">Product type</label>
+      <label className="mb-2 block text-sm font-semibold">Produkto tipas</label>
       <select
         className="select-field"
         value={filters.productType}
         onChange={(event) => onChange("productType", event.target.value)}
       >
-        <option value="all">All products</option>
-        <option value="physical">Physical</option>
-        <option value="digital">Digital products</option>
+        <option value="all">Visi produktai</option>
+        <option value="physical">Fiziniai</option>
+        <option value="digital">Skaitmeniniai</option>
       </select>
     </div>
 
     <button type="submit" className="button-primary self-end">
-      Refine
+      Filtruoti
     </button>
 
     <button type="button" onClick={onReset} className="button-secondary self-end">
-      Reset
+      Išvalyti
     </button>
   </form>
 );

@@ -80,7 +80,7 @@ const ProductPage = () => {
 
       <div className="panel p-8">
         <Link to="/shop" className="eyebrow">
-          grįžti į kolekciją
+          Grįžti į kolekciją
         </Link>
 
         <div className="mt-5 flex flex-wrap items-center gap-3">
@@ -92,30 +92,30 @@ const ProductPage = () => {
               className="rounded-full px-3 py-1 text-xs font-semibold text-white"
               style={{ backgroundColor: "rgb(var(--accent))" }}
             >
-              Redakcijos pasirinkimas
+              Atrinkta
             </span>
           )}
           {isDigital && (
             <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">
-              Momentinis atsisiuntimas
+              Atsisiuntimas
             </span>
           )}
         </div>
 
         <h1 className="mt-5 font-display text-4xl font-bold">{product.name}</h1>
         <p className="mt-4 text-lg text-muted">
-          {product.description} Šis objektas pristatomas kaip kolekcijos dalis, ne kaip generinė prekė iš demo katalogo.
+          {product.description}
         </p>
 
         <div className="soft-card-strong mt-8 rounded-[24px] p-6">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-muted">kaina</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-muted">Kaina</p>
               <p className="mt-2 font-display text-4xl font-bold">{formatCurrency(product.price)}</p>
             </div>
             <p className="text-sm text-muted">
               {STORE_PURCHASES_PAUSED
-                ? "Laikinai neaktyvu"
+                ? "Atidarymas netrukus"
                 : isDigital
                 ? "Po apmokėjimo atsiras tavo paskyroje"
                 : product.stock > 0
@@ -155,12 +155,12 @@ const ProductPage = () => {
             >
               <ShoppingCart size={16} />
               {STORE_PURCHASES_PAUSED
-                ? "Laikinai neaktyvu"
+                ? "Netrukus"
                 : isUnavailable
                   ? "Išparduota"
                   : isDigital
-                    ? "Pridėti skaitmeninį produktą"
-                    : "Rezervuoti šį objektą"}
+                    ? "Pridėti failą"
+                    : "Pridėti į krepšelį"}
             </button>
           </div>
         </div>
@@ -174,7 +174,7 @@ const ProductPage = () => {
         <div className="premium-divider mt-8 pt-8">
           <div className="grid gap-4 sm:grid-cols-3">
             {[
-              "Saugus Stripe apmokėjimas",
+              "Saugus kortelės apmokėjimas",
               "PDF sąskaita išsaugoma tavo paskyroje",
               isDigital ? "Atsisiuntimas atsiras profilyje po apmokėjimo" : "Aiškūs pristatymo atnaujinimai po pirkimo",
             ].map((item) => (

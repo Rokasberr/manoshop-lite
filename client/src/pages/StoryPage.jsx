@@ -13,61 +13,61 @@ import { useLanguage } from "../context/LanguageContext";
 const storyCopy = {
   lt: {
     heroChip: "Mūsų istorija",
-    heroTitle: "Stilloak Studio buvo sukurtas tam, kad atrodytų ramiau nei įprastas storefront.",
+    heroTitle: "Stilloak Studio sukurta ramesniam santykiui su mėnesio pinigais.",
     heroText:
-      "Norėjome kažko rafinuotesnio nei standartinis katalogas, bet vis dar pakankamai praktiško realiam pirkimui, narystei ir grįžimui. Rezultatas – privatesnė, ramesnė erdvė aiškesniam pinigų vaizdui.",
-    heroPrimary: "Peržiūrėti narystę",
+      "Norėjome privačios erdvės, kuri sujungia aiškų finansų vaizdą, narystę ir tvarkingą paskyros istoriją be perteklinio triukšmo.",
+    heroPrimary: "Atrakinti narystę",
     heroSecondary: "Peržiūrėti programą",
     pillars: [
-      { title: "Mažiau triukšmo", text: "Renkamės mažiau, bet aiškesnių sluoksnių, kad žmogus greitai suprastų vertę." },
-      { title: "Naudinga estetika", text: "Visa patirtis turi būti ir graži, ir praktiška: nuo pirmo hero iki savaitinio laiško." },
+      { title: "Mažiau triukšmo", text: "Renkamės mažiau, bet aiškesnių sluoksnių, kad vertė būtų suprantama greitai." },
+      { title: "Naudinga estetika", text: "Visa patirtis turi būti ir graži, ir praktiška: nuo pirmo ekrano iki savaitinio laiško." },
       { title: "Rami kontrolė", text: "Svarbu ne tik rinkti skaičius, bet ir padėti žmogui ramiau priimti sprendimus." },
     ],
     previewEyebrow: "Nario peržiūra",
-    previewTitle: "Trumpa istorija apie tai, ką realiai atrakina narystė.",
+    previewTitle: "Trumpai apie tai, ką atrakina narystė.",
     previewText:
-      "Vietoje abstraktaus pažado rodomas privatus sluoksnis: dashboardas, el. pašto suvestinės ir užrakinta nario aplinka, kuri atsiveria po pirkimo.",
+      "Vietoje abstraktaus pažado rodomas privatus sluoksnis: darbo erdvė, el. pašto suvestinės ir nario aplinka, kuri atsiveria po pirkimo.",
     unlocks: [
       {
         icon: WalletCards,
         title: "Stilloak",
-        text: "Privatus dashboardas su biudžetais, taupymo tikslais, recurring išlaidomis, CSV importu ir mėnesio aiškumu.",
+        text: "Privati darbo erdvė su biudžetais, taupymo tikslais, pasikartojančiomis išlaidomis, CSV importu ir mėnesio aiškumu.",
       },
       {
         icon: MailCheck,
-        title: "AI suvestinės",
+        title: "Aiškios suvestinės",
         text: "Savaitiniai ir mėnesiniai laiškai su komentaru, rizikos signalais ir aiškiu kitu žingsniu.",
       },
       {
         icon: LockKeyhole,
         title: "Užrakintas nario sluoksnis",
-        text: "Journal prieiga, sąskaitų archyvas, downloadai ir privatesnė nario patirtis visoje svetainėje.",
+        text: "Journal prieiga, sąskaitų archyvas, atsisiuntimai ir privatesnė nario patirtis visoje svetainėje.",
       },
     ],
     unlockPrimary: "Atrakinti narystę",
-    unlockSecondary: "Peržiūrėti launch status",
+    unlockSecondary: "Peržiūrėti atidarymo būseną",
     whyEyebrow: "Kodėl tai egzistuoja",
-    whyTitle: "Norėjome house brand mąstymo, ne šabloninio projekto pojūčio.",
+    whyTitle: "Norėjome produkto, kuris jaučiasi ramus, aiškus ir tikras.",
     whyText:
-      "Stilloak Studio augo iš paprastos idėjos: pinigų valdymas gali jaustis aiškiau, ramiau ir estetiškiau neprarandant praktiškumo.",
+      "Stilloak Studio augo iš paprastos idėjos: pinigų valdymas gali jaustis aiškiau ir ramiau neprarandant praktiškumo.",
     moments: [
-      "Brandas prasidėjo nuo noro pabėgti nuo demo-shop energijos ir pereiti į ramesnį, labiau editorial ritmą.",
+      "Studija prasidėjo nuo noro pabėgti nuo triukšmingos finansų patirties ir pereiti į ramesnį ritmą.",
       "Kiekvienas sluoksnis turi jaustis vientisiau: pirmas įspūdis, planai, atsiskaitymas, laiškai ir nario archyvas.",
       "Tikslas nėra daugiau triukšmo. Tikslas – geresnis ritmas, stipresnis pasitikėjimas ir aiškesnė vertė.",
     ],
     beliefEyebrow: "Kuo tikime",
     beliefTitle: "Stiprus premium jausmas dažniausiai atsiranda iš geresnio redagavimo, ne iš daugiau dekoracijų.",
     beliefText:
-      "Tai galioja objektams, sąsajoms, tekstams ir checkout keliui. Kai kiekvienas sluoksnis yra sąmoningesnis, visa svetainė jaučiasi lengvesnė ir patikimesnė.",
-    beliefPrimary: "Peržiūrėti narystę",
+      "Tai galioja objektams, sąsajoms, tekstams ir apmokėjimo keliui. Kai kiekvienas sluoksnis yra sąmoningesnis, visa svetainė jaučiasi lengvesnė ir patikimesnė.",
+    beliefPrimary: "Atrakinti narystę",
     beliefSecondary: "Susisiekti",
   },
   en: {
     heroChip: "Our story",
-    heroTitle: "Stilloak Studio was built to feel calmer than the average storefront.",
+    heroTitle: "Stilloak Studio was built for a calmer relationship with monthly money.",
     heroText:
-      "We wanted something more refined than a standard catalog, but still practical enough for real purchases, membership, and return visits. The result is a quieter, more private space for financial clarity.",
-    heroPrimary: "View membership",
+      "We wanted a private space that brings financial clarity, membership, and a tidy account history together without unnecessary noise.",
+    heroPrimary: "Unlock membership",
     heroSecondary: "Preview the program",
     pillars: [
       { title: "Less noise", text: "We prefer fewer, clearer layers so people understand the value quickly." },
@@ -75,18 +75,18 @@ const storyCopy = {
       { title: "Calm control", text: "The point is not only to collect numbers, but to help people make calmer decisions." },
     ],
     previewEyebrow: "Member preview",
-    previewTitle: "A short story of what membership actually unlocks.",
+    previewTitle: "A concise view of the member layer.",
     previewText:
-      "Instead of an abstract promise, we show the private layer: the dashboard, the email summaries, and the locked member environment that opens after purchase.",
+      "Instead of an abstract promise, we show the private workspace, the email summaries, and the locked member environment that opens after purchase.",
     unlocks: [
       {
         icon: WalletCards,
         title: "Stilloak",
-        text: "A private dashboard with budgets, savings goals, recurring spend, CSV import, and a clearer monthly view.",
+        text: "A private workspace with budgets, savings goals, recurring spend, CSV import, and a clearer monthly view.",
       },
       {
         icon: MailCheck,
-        title: "AI summaries",
+        title: "Clear summaries",
         text: "Weekly and monthly emails with commentary, risk signals, and a clear next step.",
       },
       {
@@ -96,21 +96,21 @@ const storyCopy = {
       },
     ],
     unlockPrimary: "Unlock membership",
-    unlockSecondary: "View launch status",
+    unlockSecondary: "View opening plan",
     whyEyebrow: "Why it exists",
-    whyTitle: "We wanted a house-brand mindset, not the feel of a template project.",
+    whyTitle: "We wanted a product that feels calm, clear, and real.",
     whyText:
       "Stilloak Studio grew from a simple idea: money management can feel clearer, calmer, and more intentional without losing practicality.",
     moments: [
-      "The brand started as a move away from demo-shop energy and toward a quieter editorial rhythm.",
-      "Each layer should feel more coherent: the first impression, plans, checkout, emails, and the member archive.",
+      "The brand started as a move away from noisy finance tools and toward a quieter rhythm.",
+      "Each layer should feel more coherent: the first impression, plans, payment, emails, and the member archive.",
       "The goal is not more noise. The goal is better rhythm, stronger trust, and clearer value.",
     ],
     beliefEyebrow: "What we believe",
     beliefTitle: "A strong premium feeling usually comes from better editing, not more decoration.",
     beliefText:
-      "That applies to objects, interfaces, copy, and checkout. When every layer is more intentional, the whole site feels lighter and more trustworthy.",
-    beliefPrimary: "View membership",
+      "That applies to objects, interfaces, copy, and payment. When every layer is more intentional, the whole site feels lighter and more trustworthy.",
+    beliefPrimary: "Unlock membership",
     beliefSecondary: "Contact us",
   },
 };

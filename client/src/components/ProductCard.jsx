@@ -30,17 +30,17 @@ const ProductCard = ({ product }) => {
                 className="rounded-full px-3 py-1 text-xs font-semibold text-white"
                 style={{ backgroundColor: "rgb(var(--accent))" }}
               >
-                Editor's pick
+                Atrinkta
               </span>
             )}
             {isDigital && (
               <span className="rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-slate-900">
-                Digital
+                Skaitmeninis
               </span>
             )}
           </div>
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 via-black/5 to-transparent px-5 pb-5 pt-12 text-white">
-            <p className="text-[11px] uppercase tracking-[0.28em] text-white/62">Curated piece</p>
+            <p className="text-[11px] uppercase tracking-[0.28em] text-white/62">Atrinktas objektas</p>
             <p className="mt-2 font-display text-3xl font-bold">{product.name}</p>
           </div>
         </div>
@@ -53,14 +53,14 @@ const ProductCard = ({ product }) => {
 
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-muted">from</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-muted">Kaina</p>
             <p className="mt-1 font-display text-2xl font-bold">{formatCurrency(product.price)}</p>
             <p className="mt-1 text-xs text-muted">
               {STORE_PURCHASES_PAUSED
-                ? "Laikinai neaktyvu"
+                ? "Atidarymas netrukus"
                 : isDigital
                   ? "Atsisiuntimas po apmokėjimo"
-                  : `Stock ${product.stock}`}
+                  : `Liko ${product.stock}`}
             </p>
           </div>
           <button
@@ -71,7 +71,7 @@ const ProductCard = ({ product }) => {
             className="button-primary gap-2 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <ShoppingCart size={16} />
-            {STORE_PURCHASES_PAUSED ? "Netrukus" : isUnavailable ? "Išparduota" : isDigital ? "Pridėti atsisiuntimą" : "Rezervuoti"}
+            {STORE_PURCHASES_PAUSED ? "Netrukus" : isUnavailable ? "Išparduota" : "Pridėti"}
           </button>
         </div>
       </div>

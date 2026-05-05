@@ -3,11 +3,12 @@ import { useLanguage } from "../context/LanguageContext";
 
 const footerCopy = {
   lt: {
-    ctaEyebrow: "Įeik į erdvę",
-    ctaTitle: "Pasiruošęs paleisti aiškesnį mėnesio ritmą?",
-    ctaText: "Stilloak sujungia narystę, aiškų pinigų vaizdą ir tvarkingą paskyros istoriją į vieną vientisą produkto patirtį.",
-    ctaButton: "Peržiūrėti narystę",
-    summary: "Stilloak padeda aiškiau valdyti išlaidas, sekti biudžetus ir ramiau judėti link taupymo tikslų vienoje apgalvotoje nario erdvėje.",
+    ctaEyebrow: "Pradėk ramiau",
+    ctaTitle: "Atrakink aiškesnį mėnesio ritmą.",
+    ctaText: "Stilloak sujungia narystę, biudžetus, tikslus ir privatų archyvą į vieną ramią nario patirtį.",
+    ctaButton: "Atrakinti narystę",
+    tagline: "privatus mėnesio aiškumas",
+    summary: "Stilloak padeda aiškiau valdyti išlaidas, sekti biudžetus ir ramiau judėti link taupymo tikslų.",
     columns: {
       house: "Studija",
       services: "Paslaugos",
@@ -27,16 +28,18 @@ const footerCopy = {
       returns: "Grąžinimai",
       privacy: "Privatumas",
       terms: "Taisyklės",
-      visitContact: "Atidaryti kontaktų puslapį",
+      visitContact: "Susisiekti",
       rights: "Visos teisės saugomos.",
       hours: "I–V 9:00–18:00",
+      location: "Vilnius, Lietuva",
     },
   },
   en: {
-    ctaEyebrow: "Enter the house",
-    ctaTitle: "Ready to launch a calmer monthly rhythm?",
-    ctaText: "Stilloak brings membership, money clarity, and a tidy account archive into one consistent product experience.",
-    ctaButton: "View membership",
+    ctaEyebrow: "Start calmer",
+    ctaTitle: "Unlock a clearer monthly rhythm.",
+    ctaText: "Stilloak brings membership, budgets, goals, and a private archive into one calm member experience.",
+    ctaButton: "Unlock membership",
+    tagline: "private finance clarity",
     summary: "Stilloak helps members understand spending, track budgets, and move toward savings goals with more clarity.",
     columns: {
       house: "Studio",
@@ -49,7 +52,7 @@ const footerCopy = {
       journal: "Journal",
       collection: "Collection",
       membership: "Membership",
-      secureCheckout: "Secure checkout",
+      secureCheckout: "Secure payment",
       receiptArchive: "Receipt archive",
       memberPricing: "Member pricing",
       privateSupport: "Private support",
@@ -57,9 +60,10 @@ const footerCopy = {
       returns: "Returns",
       privacy: "Privacy",
       terms: "Terms",
-      visitContact: "Visit contact page",
+      visitContact: "Contact us",
       rights: "All rights reserved.",
       hours: "Mon–Fri 9:00–18:00",
+      location: "Vilnius, Lithuania",
     },
   },
   pl: {
@@ -67,6 +71,7 @@ const footerCopy = {
     ctaTitle: "Gotowy na spokojniejsze i jaśniejsze doświadczenie członkowskie?",
     ctaText: "Stilloak łączy członkostwo, przejrzystość finansową i uporządkowaną historię konta w jedno spójne doświadczenie.",
     ctaButton: "Zobacz członkostwo",
+    tagline: "prywatna jasność finansowa",
     summary: "Stilloak pomaga lepiej rozumieć wydatki, śledzić budżety i spokojniej zbliżać się do celów oszczędnościowych.",
     columns: {
       house: "Studio",
@@ -90,6 +95,7 @@ const footerCopy = {
       visitContact: "Otwórz stronę kontaktu",
       rights: "Wszelkie prawa zastrzeżone.",
       hours: "Pon–Pt 9:00–18:00",
+      location: "Wilno, Litwa",
     },
   },
   de: {
@@ -97,6 +103,7 @@ const footerCopy = {
     ctaTitle: "Bereit für ein ruhigeres und klareres Member-Erlebnis?",
     ctaText: "Stilloak verbindet Mitgliedschaft, Finanzklarheit und ein ordentliches Kontoarchiv zu einem stimmigen Erlebnis.",
     ctaButton: "Mitgliedschaft ansehen",
+    tagline: "private finanzklarheit",
     summary: "Stilloak hilft dabei, Ausgaben klarer zu verstehen, Budgets zu verfolgen und ruhiger auf Sparziele hinzuarbeiten.",
     columns: {
       house: "Studio",
@@ -109,7 +116,7 @@ const footerCopy = {
       journal: "Journal",
       collection: "Kollektion",
       membership: "Mitgliedschaft",
-      secureCheckout: "Sicherer Checkout",
+      secureCheckout: "Sichere Zahlung",
       receiptArchive: "Belegarchiv",
       memberPricing: "Mitgliederpreise",
       privateSupport: "Privater Support",
@@ -120,6 +127,7 @@ const footerCopy = {
       visitContact: "Kontaktseite öffnen",
       rights: "Alle Rechte vorbehalten.",
       hours: "Mo–Fr 9:00–18:00",
+      location: "Vilnius, Litauen",
     },
   },
   fr: {
@@ -127,6 +135,7 @@ const footerCopy = {
     ctaTitle: "Prêt pour une expérience membre plus calme et plus claire ?",
     ctaText: "Stilloak réunit l’abonnement, la clarté financière et un historique de compte soigné dans une seule expérience cohérente.",
     ctaButton: "Voir l’abonnement",
+    tagline: "clarté financière privée",
     summary: "Stilloak aide à mieux comprendre les dépenses, suivre les budgets et avancer plus sereinement vers les objectifs d’épargne.",
     columns: {
       house: "Studio",
@@ -150,6 +159,7 @@ const footerCopy = {
       visitContact: "Ouvrir la page contact",
       rights: "Tous droits réservés.",
       hours: "Lun–Ven 9:00–18:00",
+      location: "Vilnius, Lituanie",
     },
   },
   es: {
@@ -157,6 +167,7 @@ const footerCopy = {
     ctaTitle: "¿Listo para una experiencia de membresía más clara y serena?",
     ctaText: "Stilloak une membresía, claridad financiera e historial de cuenta ordenado en una sola experiencia coherente.",
     ctaButton: "Ver membresía",
+    tagline: "claridad financiera privada",
     summary: "Stilloak ayuda a entender mejor el gasto, seguir presupuestos y avanzar con más calma hacia objetivos de ahorro.",
     columns: {
       house: "Estudio",
@@ -180,6 +191,7 @@ const footerCopy = {
       visitContact: "Abrir página de contacto",
       rights: "Todos los derechos reservados.",
       hours: "Lun–Vie 9:00–18:00",
+      location: "Vilna, Lituania",
     },
   },
 };
@@ -248,7 +260,7 @@ const Footer = () => {
             </div>
             <div>
               <p className="font-display text-xl font-bold">Stilloak Studio</p>
-              <p className="text-xs uppercase text-white/36">private money clarity</p>
+              <p className="text-xs uppercase text-white/36">{copy.tagline}</p>
             </div>
           </div>
           <p className="mt-5 max-w-xs text-sm leading-7 text-white/62">
@@ -284,7 +296,7 @@ const Footer = () => {
               hello@stilloak-studio.com
             </a>
             <p>+370 600 12345</p>
-            <p>Vilnius, Lithuania</p>
+            <p>{copy.links.location}</p>
             <p>{copy.links.hours}</p>
           </div>
           <Link to="/contact" className="mt-5 inline-flex text-sm font-medium accent-text transition hover:opacity-80">

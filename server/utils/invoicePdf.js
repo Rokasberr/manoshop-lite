@@ -48,15 +48,15 @@ const createInvoicePdfBuffer = (order) => {
   };
 
   addText(50, cursorY, companyName, 22, "F2");
-  addText(380, cursorY, "INVOICE", 18, "F2");
-  addText(380, nextRow(20), `No: ${invoiceNumber}`, 11, "F1");
-  addText(380, nextRow(16), `Date: ${formatDate(invoiceDate)}`, 11, "F1");
+  addText(380, cursorY, "SASKAITA", 18, "F2");
+  addText(380, nextRow(20), `Nr: ${invoiceNumber}`, 11, "F1");
+  addText(380, nextRow(16), `Data: ${formatDate(invoiceDate)}`, 11, "F1");
 
   cursorY -= 28;
   addLine(50, cursorY, 545, cursorY);
   cursorY -= 24;
 
-  addText(50, cursorY, "Client details", 13, "F2");
+  addText(50, cursorY, "Kliento duomenys", 13, "F2");
   addText(50, nextRow(18), order.shippingAddress.fullName || "-", 11, "F1");
   addText(50, nextRow(16), customerEmail, 11, "F1");
   addText(
@@ -75,19 +75,19 @@ const createInvoicePdfBuffer = (order) => {
   );
 
   if (order.shippingAddress.phone) {
-    addText(50, nextRow(16), `Phone: ${order.shippingAddress.phone}`, 11, "F1");
+    addText(50, nextRow(16), `Telefonas: ${order.shippingAddress.phone}`, 11, "F1");
   }
 
   cursorY -= 28;
-  addText(50, cursorY, "Products", 13, "F2");
+  addText(50, cursorY, "Produktai", 13, "F2");
   cursorY -= 18;
   addLine(50, cursorY, 545, cursorY);
   cursorY -= 16;
 
-  addText(50, cursorY, "Product", 11, "F2");
-  addText(340, cursorY, "Qty", 11, "F2");
-  addText(400, cursorY, "Unit", 11, "F2");
-  addText(480, cursorY, "Total", 11, "F2");
+  addText(50, cursorY, "Produktas", 11, "F2");
+  addText(340, cursorY, "Kiekis", 11, "F2");
+  addText(400, cursorY, "Vnt.", 11, "F2");
+  addText(480, cursorY, "Suma", 11, "F2");
   cursorY -= 12;
   addLine(50, cursorY, 545, cursorY);
 
@@ -102,18 +102,18 @@ const createInvoicePdfBuffer = (order) => {
   cursorY -= 26;
   addLine(300, cursorY, 545, cursorY);
   cursorY -= 20;
-  addText(360, cursorY, "Subtotal", 11, "F2");
+  addText(360, cursorY, "Tarpine suma", 11, "F2");
   addText(470, cursorY, formatAmount(order.itemsPrice), 11, "F1");
-  addText(360, nextRow(18), "Shipping", 11, "F2");
+  addText(360, nextRow(18), "Pristatymas", 11, "F2");
   addText(470, cursorY, formatAmount(order.shippingPrice), 11, "F1");
-  addText(360, nextRow(18), "Tax (PVM)", 11, "F2");
+  addText(360, nextRow(18), "Mokesciai (PVM)", 11, "F2");
   addText(470, cursorY, formatAmount(order.taxPrice), 11, "F1");
-  addText(360, nextRow(22), "Total", 13, "F2");
+  addText(360, nextRow(22), "Is viso", 13, "F2");
   addText(470, cursorY, formatAmount(order.totalPrice), 13, "F2");
 
   cursorY -= 30;
-  addText(50, cursorY, `Payment: ${sanitizeText(order.paymentMethod || "card")}`, 10, "F1");
-  addText(50, nextRow(16), "Invoice generated automatically from checkout cart.", 10, "F1");
+  addText(50, cursorY, `Apmokejimas: ${sanitizeText(order.paymentMethod || "kortele")}`, 10, "F1");
+  addText(50, nextRow(16), "Saskaita sugeneruota automatiskai pagal krepselio duomenis.", 10, "F1");
 
   const content = commands.join("\n");
   const objects = [

@@ -9,14 +9,14 @@ const launchCardsBase = [
   {
     key: "digital",
     icon: Download,
-    status: "In staging",
-    target: "May 2026",
+    status: "Ruošiama",
+    target: "2026 m. gegužė",
   },
   {
     key: "journal",
     icon: BookOpenText,
-    status: "Held for release",
-    target: "After digital launch",
+    status: "Laikoma atidarymui",
+    target: "Po skaitmeninės kolekcijos",
   },
 ];
 
@@ -25,37 +25,37 @@ const launchCopy = {
     focus: {
       default: {
         eyebrow: "Netrukus",
-        title: "Dvi sekcijos dar ruošiamos atidarymui.",
-        text: "Digital Collection ir Journal laikinai sugrupuoti čia, kol užveržiame paleidimo sluoksnį ir užtikriname, kad abi sekcijos atsidarytų pilnesnės.",
+        title: "Skaitmeninė kolekcija ir Journal ruošiami tikslesniam atidarymui.",
+        text: "Abi sekcijos laikinai laikomos čia, kad atsidarytų pilnesnės, aiškesnės ir vertos sugrįžimo.",
       },
       digital: {
-        eyebrow: "Digital collection",
-        title: "Skaitmeninė kolekcija ruošiama švaresniam atidarymui.",
-        text: "Produktai, bundle’ai ir instant-download patirtis dar tvarkomi prieš pilną atidarymą.",
+        eyebrow: "Skaitmeninė kolekcija",
+        title: "Skaitmeninė kolekcija ruošiama ramesniam atidarymui.",
+        text: "PDF produktai, rinkiniai ir atsisiuntimo patirtis dar ruošiami prieš pilną atidarymą.",
       },
       journal: {
         eyebrow: "Journal",
-        title: "Journal laikinai laikomas launch-soon režime.",
-        text: "Užrakintas editorial sluoksnis tvarkomas taip, kad nario skaitymo patirtis nuo pirmos dienos būtų verta atrakinti.",
+        title: "Journal ruošiama ramesniam atidarymui.",
+        text: "Užrakintas redakcinis sluoksnis tvarkomas taip, kad nario skaitymo patirtis nuo pirmos dienos būtų verta atrakinti.",
       },
     },
-    cardsTitle: "Kas laikinai laikoma čia",
+    cardsTitle: "Kas ruošiama",
     cardsText:
-      "Vietoje pusiau atidarytų sekcijų navigacijoje, abi zonos šiuo metu gyvena viename aiškesniame staging sluoksnyje.",
+      "Abi zonos šiuo metu laikomos viename aiškiame laukimo puslapyje, kol patirtis bus paruošta.",
     cards: {
       digital: {
-        eyebrow: "Digital collection",
-        title: "Printable gidai, bundle’ai ir instant download produktai",
+        eyebrow: "Skaitmeninė kolekcija",
+        title: "PDF gidai, rinkiniai ir iškart pasiekiami produktai",
         description:
-          "Digital lentyna dar tvarkoma, kad pirmas release jaustųsi pilnas, premium ir paruoštas pirkimui be nebaigtų kraštų.",
-        bullets: ["Printable art bundle’ai", "PDF gidai ir planneriai", "Švaresnė launch seka ir bundle logika"],
+          "Skaitmeninė lentyna dar tvarkoma, kad pirmas atidarymas jaustųsi pilnas, aiškus ir paruoštas pirkimui.",
+        bullets: ["Spausdinami plakatų rinkiniai", "PDF gidai ir planavimo įrankiai", "Aiškesnė atidarymo seka ir rinkinių logika"],
       },
       journal: {
         eyebrow: "Journal",
-        title: "Ramesnis editorial sluoksnis nariams",
+        title: "Ramesnis redakcinis sluoksnis nariams",
         description:
           "Journal laikomas atskirai iki stipresnio paleidimo sluoksnio, kad privatūs tekstai jaustųsi pilnai paruošti.",
-        bullets: ["Members-only straipsniai", "Aiškesnis editorial kalendorius", "Pilnesnė užrakinta skaitymo patirtis"],
+        bullets: ["Straipsniai tik nariams", "Aiškesnis redakcinis kalendorius", "Pilnesnė užrakinta skaitymo patirtis"],
       },
     },
     statusLabel: "Statusas",
@@ -66,11 +66,11 @@ const launchCopy = {
     whileWaitingEyebrow: "Kol lauki",
     whileWaitingTitle: "Gyvas sluoksnis vis dar atidarytas.",
     whileWaitingText:
-      "Kol Digital Collection ir Journal dar ruošiami, gali peržiūrėti pagrindinę kolekciją, narystę ir Stilloak programą.",
+      "Kol skaitmeninė kolekcija ir Journal dar ruošiami, gali peržiūrėti pagrindinę kolekciją, narystę ir Stilloak programą.",
     browseCollection: "Peržiūrėti kolekciją",
     viewMembership: "Peržiūrėti narystę",
     launchMap: "Paleidimo planas",
-    stagingTag: "Laikinas staging",
+    stagingTag: "Ruošiama",
     invalidEmail: "Įvesk tvarkingą el. pašto adresą, kad galėtume išsaugoti tavo susidomėjimą.",
     successDefault: "Susidomėjimas išsaugotas. Parašysime, kai ši sekcija atsidarys.",
     errorDefault: "Nepavyko išsaugoti susidomėjimo. Pabandyk dar kartą kiek vėliau.",
@@ -79,13 +79,13 @@ const launchCopy = {
     focus: {
       default: {
         eyebrow: "Launch soon",
-        title: "Two sections are still being prepared for launch.",
-        text: "Digital Collection and Journal are temporarily grouped here while we tighten the release layer and make sure both sections open in a more complete state.",
+        title: "Digital Collection and Journal are being prepared for a cleaner launch.",
+        text: "Both sections are temporarily held here so they can open in a fuller, clearer, more useful state.",
       },
       digital: {
         eyebrow: "Digital collection",
         title: "The digital collection is being prepared for a cleaner launch.",
-        text: "Products, bundles, and the instant-download experience are still being refined before full release.",
+        text: "The collection, product framing, and delivery path are being refined before full release.",
       },
       journal: {
         eyebrow: "Journal",
@@ -93,15 +93,15 @@ const launchCopy = {
         text: "The locked editorial layer is being refined so the member reading experience feels worth unlocking from day one.",
       },
     },
-    cardsTitle: "What is temporarily held here",
+    cardsTitle: "What is being prepared",
     cardsText:
-      "Instead of leaving half-open sections in the navigation, both areas currently live inside one clearer staging layer.",
+      "Both areas currently live on one clear waiting page until the experience is ready.",
     cards: {
       digital: {
         eyebrow: "Digital collection",
-        title: "Printable guides, bundles, and instant downloads",
+        title: "Printable guides and ready-to-use digital tools",
         description:
-          "The digital shelf is being refined so the first release feels complete, premium, and ready to buy without half-finished edges.",
+          "The digital shelf is being refined so the first release feels complete, premium, and ready to buy.",
         bullets: ["Printable art bundles", "PDF guides and planners", "Cleaner launch sequence and bundle logic"],
       },
       journal: {
@@ -124,7 +124,7 @@ const launchCopy = {
     browseCollection: "Browse collection",
     viewMembership: "View membership",
     launchMap: "Launch map",
-    stagingTag: "Temporary staging",
+    stagingTag: "In preparation",
     invalidEmail: "Enter a valid email address so we can save your interest.",
     successDefault: "Interest saved. We’ll write when this section opens.",
     errorDefault: "Could not save your interest. Please try again later.",

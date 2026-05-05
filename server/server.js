@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
+const path = require("path");
 
 const connectDatabase = require("../database/connect");
 const authRoutes = require("./routes/authRoutes");
@@ -46,6 +47,15 @@ app.use(express.urlencoded({ extended: true }));
 if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
 }
+
+const uploadsDirectories = [
+  path.join(__dirname, "uploads"),
+  path.join(__dirname, "..", "uploads"),
+];
+
+uploadsDirectories.forEach((uploadsDirectory) => {
+  app.use("/uploads", express.static(uploadsDirectory));
+});
 
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", service: "manoshop-server" });

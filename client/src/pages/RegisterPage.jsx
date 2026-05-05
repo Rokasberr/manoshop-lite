@@ -60,22 +60,22 @@ const RegisterPage = () => {
       <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
         <div className="panel flex flex-col justify-between p-8">
           <div>
-            <span className="eyebrow">new member</span>
-            <h1 className="mt-5 font-display text-4xl font-bold">Create your account and step into the house</h1>
+            <span className="eyebrow">naujas narys</span>
+            <h1 className="mt-5 font-display text-4xl font-bold">Sukurk paskyrą ir pradėk ramiau</h1>
             <p className="mt-4 text-muted">
-              Po registracijos iškart galėsi tęsti checkout, matyti sąskaitas ir atrakinti nario lygio patirtį.
+              Po registracijos galėsi tęsti apmokėjimą, matyti sąskaitas ir atrakinti nario lygio patirtį.
             </p>
           </div>
 
           <div className="soft-border mt-8 rounded-[24px] border p-5 text-sm text-muted">
-            Your profile stores orders, receipts and membership access in one refined place from the very first purchase.
+            Paskyroje saugomi užsakymai, sąskaitos ir narystės prieiga nuo pirmo pirkimo.
           </div>
         </div>
 
         <form className="panel space-y-5 p-8" onSubmit={handleSubmit}>
           <div>
-            <h2 className="font-display text-3xl font-bold">Create account</h2>
-            <p className="mt-2 text-muted">A soft, fast start into your private profile.</p>
+            <h2 className="font-display text-3xl font-bold">Sukurti paskyrą</h2>
+            <p className="mt-2 text-muted">Greita pradžia į tavo privačią Stilloak erdvę.</p>
           </div>
 
           {error && (
@@ -126,13 +126,13 @@ const RegisterPage = () => {
           </div>
 
           <button type="submit" disabled={loading} className="button-primary w-full">
-            {loading ? "Creating..." : "Create account"}
+            {loading ? "Kuriama..." : "Sukurti paskyrą"}
           </button>
 
           <p className="text-sm text-muted">
-            Already have an account?{" "}
+            Jau turi paskyrą?{" "}
             <Link to="/login" className="font-semibold" style={{ color: "rgb(var(--accent-strong))" }}>
-              Sign in
+              Prisijungti
             </Link>
           </p>
         </form>

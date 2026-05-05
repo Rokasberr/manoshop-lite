@@ -9,6 +9,18 @@ import orderService from "../../services/orderService";
 import { formatCurrency } from "../../utils/currency";
 
 const statusOptions = ["pending", "shipped", "delivered"];
+const statusOptionLabels = {
+  pending: "Laukiama",
+  shipped: "Išsiųsta",
+  delivered: "Pristatyta",
+};
+
+const paymentMethodLabels = {
+  card: "Kortelė",
+  stripe: "Kortelė",
+  "bank-transfer": "Bankinis pavedimas",
+  "cash-on-delivery": "Apmokėjimas pristatymo metu",
+};
 
 const OrdersManagerPage = () => {
   const [orders, setOrders] = useState([]);
@@ -57,9 +69,9 @@ const OrdersManagerPage = () => {
       setProcessingPaymentId(orderId);
       const response = await orderService.refundOrderPayment(orderId);
       replaceOrder(response.order);
-      toast.success("Refund išsiųstas į Stripe.");
+      toast.success("Grąžinimas išsiųstas mokėjimų partneriui.");
     } catch (refundError) {
-      toast.error(refundError.response?.data?.message || "Nepavyko atlikti refund.");
+      toast.error(refundError.response?.data?.message || "Nepavyko atlikti grąžinimo.");
     } finally {
       setProcessingPaymentId("");
     }
@@ -81,18 +93,18 @@ const OrdersManagerPage = () => {
   return (
     <div className="space-y-8 font-admin">
       <AdminPageHeader
-        eyebrow="Order operations"
-        title="Track and update every order from one queue"
-        description="Review all recent purchases, monitor shipment status, and keep fulfillment moving without leaving the dashboard."
+        eyebrow="Užsakymų operacijos"
+        title="Stebėk ir atnaujink užsakymus vienoje eilėje"
+        description="Peržiūrėk naujausius pirkimus, siuntimo būseną ir apdorojimą vienoje aiškioje vietoje."
       />
 
       <div className="dashboard-panel p-6">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="dashboard-eyebrow">Orders overview</p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.03em] text-slate-950">All orders</h2>
+            <p className="dashboard-eyebrow">Užsakymų apžvalga</p>
+            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.03em] text-slate-950">Visi užsakymai</h2>
           </div>
-          <p className="text-sm text-slate-500">Total: {orders.length}</p>
+          <p className="text-sm text-slate-500">Iš viso: {orders.length}</p>
         </div>
 
         {loading ? (
@@ -113,14 +125,14 @@ const OrdersManagerPage = () => {
             <table className="min-w-full text-left text-sm">
               <thead>
                 <tr className="border-b border-slate-200 text-slate-500">
-                  <th className="pb-4 pr-4 font-medium">Order</th>
-                  <th className="pb-4 pr-4 font-medium">Customer</th>
-                  <th className="pb-4 pr-4 font-medium">Date</th>
-                  <th className="pb-4 pr-4 font-medium">Total</th>
-                  <th className="pb-4 pr-4 font-medium">Payment</th>
-                  <th className="pb-4 pr-4 font-medium">Status</th>
-                  <th className="pb-4 pr-4 font-medium">Payment actions</th>
-                  <th className="pb-4 font-medium">Update</th>
+                  <th className="pb-4 pr-4 font-medium">Užsakymas</th>
+                  <th className="pb-4 pr-4 font-medium">Klientas</th>
+                  <th className="pb-4 pr-4 font-medium">Data</th>
+                  <th className="pb-4 pr-4 font-medium">Suma</th>
+                  <th className="pb-4 pr-4 font-medium">Apmokėjimas</th>
+                  <th className="pb-4 pr-4 font-medium">Būsena</th>
+                  <th className="pb-4 pr-4 font-medium">Mokėjimo veiksmai</th>
+                  <th className="pb-4 font-medium">Atnaujinti</th>
                 </tr>
               </thead>
               <tbody>
@@ -135,11 +147,11 @@ const OrdersManagerPage = () => {
                     <tr key={order._id} className="border-b border-slate-100 align-top last:border-b-0">
                       <td className="py-4 pr-4">
                         <p className="font-semibold">#{order._id.slice(-6).toUpperCase()}</p>
-                        <p className="mt-1 text-slate-500">{order.items.length} items</p>
-                        <p className="mt-1 text-slate-500 capitalize">{order.paymentMethod}</p>
+                        <p className="mt-1 text-slate-500">{order.items.length} prekės</p>
+                        <p className="mt-1 text-slate-500">{paymentMethodLabels[order.paymentMethod] || order.paymentMethod}</p>
                       </td>
                       <td className="py-4 pr-4">
-                        <p className="font-semibold">{order.user?.name || "Customer"}</p>
+                        <p className="font-semibold">{order.user?.name || "Klientas"}</p>
                         <p className="mt-1 text-slate-500">{order.user?.email || "-"}</p>
                       </td>
                       <td className="py-4 pr-4">{new Date(order.createdAt).toLocaleDateString("lt-LT")}</td>
@@ -158,7 +170,7 @@ const OrdersManagerPage = () => {
                             onClick={() => handleRefund(order._id)}
                             className="button-secondary justify-center disabled:cursor-not-allowed disabled:opacity-50"
                           >
-                            {processingPaymentId === order._id && canRefund ? "Refundinama..." : "Refund"}
+                            {processingPaymentId === order._id && canRefund ? "Grąžinama..." : "Grąžinti"}
                           </button>
                           <button
                             type="button"
@@ -166,7 +178,7 @@ const OrdersManagerPage = () => {
                             onClick={() => handleCancelPayment(order._id)}
                             className="button-secondary justify-center disabled:cursor-not-allowed disabled:opacity-50"
                           >
-                            {processingPaymentId === order._id && canCancelPayment ? "Atšaukiama..." : "Cancel payment"}
+                            {processingPaymentId === order._id && canCancelPayment ? "Atšaukiama..." : "Atšaukti mokėjimą"}
                           </button>
                         </div>
                       </td>
@@ -179,7 +191,7 @@ const OrdersManagerPage = () => {
                         >
                           {statusOptions.map((status) => (
                             <option key={status} value={status}>
-                              {status}
+                              {statusOptionLabels[status] || status}
                             </option>
                           ))}
                         </select>

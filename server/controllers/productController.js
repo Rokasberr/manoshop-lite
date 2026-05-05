@@ -1,18 +1,57 @@
 const Product = require("../models/Product");
 
+const normalizeUploadImagePath = (image) => {
+  const normalizedImage = String(image || "").trim().replace(/\\/g, "/");
+
+  if (!normalizedImage) {
+    return "";
+  }
+
+  if (/^(https?:)?\/\//i.test(normalizedImage) || /^(data|blob):/i.test(normalizedImage)) {
+    return normalizedImage;
+  }
+
+  const lowerImage = normalizedImage.toLowerCase();
+
+  if (lowerImage.startsWith("/uploads/")) {
+    return normalizedImage;
+  }
+
+  if (lowerImage.startsWith("uploads/")) {
+    return `/${normalizedImage}`;
+  }
+
+  const uploadsIndex = lowerImage.lastIndexOf("/uploads/");
+
+  if (uploadsIndex >= 0) {
+    return normalizedImage.slice(uploadsIndex);
+  }
+
+  return normalizedImage;
+};
+
 const parseImages = (images) => {
   if (Array.isArray(images)) {
-    return images.filter(Boolean);
+    return images.map(normalizeUploadImagePath).filter(Boolean);
   }
 
   if (typeof images === "string") {
     return images
       .split(/[\n,]/)
-      .map((image) => image.trim())
+      .map(normalizeUploadImagePath)
       .filter(Boolean);
   }
 
   return [];
+};
+
+const serializeProduct = (product) => {
+  const productObject = product?.toObject ? product.toObject() : product;
+
+  return {
+    ...productObject,
+    images: parseImages(productObject?.images || []),
+  };
 };
 
 const normalizeProductType = (productType) =>
@@ -80,7 +119,7 @@ const getProducts = async (req, res) => {
     .limit(limit);
 
   res.json({
-    products,
+    products: products.map(serializeProduct),
     pagination: {
       page,
       pages: Math.max(Math.ceil(total / limit), 1),
@@ -98,7 +137,7 @@ const getProductById = async (req, res) => {
     throw new Error("Produktas nerastas.");
   }
 
-  res.json(product);
+  res.json(serializeProduct(product));
 };
 
 const getProductCategories = async (_req, res) => {
@@ -135,7 +174,7 @@ const createProduct = async (req, res) => {
     digitalAsset: normalizedProductType === "digital" ? normalizedDigitalAsset : undefined,
   });
 
-  res.status(201).json(product);
+  res.status(201).json(serializeProduct(product));
 };
 
 const updateProduct = async (req, res) => {
@@ -177,7 +216,7 @@ const updateProduct = async (req, res) => {
         };
 
   const updatedProduct = await product.save();
-  res.json(updatedProduct);
+  res.json(serializeProduct(updatedProduct));
 };
 
 const deleteProduct = async (req, res) => {

@@ -47,9 +47,9 @@ const CheckoutPage = () => {
   if (!cartItems.length) {
     return (
       <EmptyState
-        title="Checkout negalimas"
-        description="Pirmiausia įsidėk produktų į krepšelį."
-        actionLabel="Eiti į parduotuvę"
+        title="Krepšelis tuščias"
+        description="Pasirink produktą prieš tęsiant į apmokėjimą."
+        actionLabel="Peržiūrėti kolekciją"
       />
     );
   }
@@ -57,9 +57,9 @@ const CheckoutPage = () => {
   if (STORE_PURCHASES_PAUSED) {
     return (
       <EmptyState
-        title="Checkout laikinai sustabdytas"
+        title="Apmokėjimas laikinai pristabdytas"
         description={STORE_PURCHASES_PAUSED_MESSAGE}
-        actionLabel="Grįžti į Netrukus"
+        actionLabel="Peržiūrėti atidarymo būseną"
         actionTo="/launch-soon"
       />
     );
@@ -121,7 +121,7 @@ const CheckoutPage = () => {
         const session = await orderService.createStripeCheckoutSession(orderPayload);
 
         if (!session?.url) {
-          throw new Error("Stripe checkout nuoroda negauta.");
+          throw new Error("Nepavyko paruošti saugaus apmokėjimo.");
         }
 
         window.location.assign(session.url);
@@ -149,9 +149,9 @@ const CheckoutPage = () => {
   return (
     <div className="space-y-8">
       <SectionTitle
-        eyebrow="checkout"
-        title="Pabaik užsakymą be trinties"
-        subtitle="Forma validuojama klientinėje pusėje, serveris perskaičiuoja sumas, o mokėjimui kortele naudosime Stripe Checkout."
+        eyebrow="apmokėjimas"
+        title="Užbaik pirkimą ramiai"
+        subtitle="Patikrink duomenis, peržiūrėk sumą ir tęsk į saugų apmokėjimą."
       />
 
       <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
@@ -236,7 +236,7 @@ const CheckoutPage = () => {
               <label className="mb-2 block text-sm font-semibold">Mokėjimo būdas</label>
               {hasDigitalProducts ? (
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                  Skaitmeniniams produktams naudojamas tik atsiskaitymas kortele per Stripe.
+                  Skaitmeniniams produktams naudojamas saugus atsiskaitymas kortele.
                 </div>
               ) : (
                 <select
@@ -244,7 +244,7 @@ const CheckoutPage = () => {
                   value={formData.paymentMethod}
                   onChange={(event) => handleChange("paymentMethod", event.target.value)}
                 >
-                  <option value="card">Kortelė (Stripe)</option>
+                  <option value="card">Kortelė</option>
                   <option value="bank-transfer">Bankinis pavedimas</option>
                   <option value="cash-on-delivery">Apmokėti pristatymo metu</option>
                 </select>
@@ -256,13 +256,13 @@ const CheckoutPage = () => {
             {submitting
               ? "Tvirtinama..."
               : formData.paymentMethod === "card"
-                ? "Tęsti į Stripe"
+                ? "Tęsti į saugų apmokėjimą"
                 : "Patvirtinti užsakymą"}
           </button>
         </form>
 
         <aside className="panel h-fit p-6">
-          <p className="eyebrow">order summary</p>
+          <p className="eyebrow">suvestinė</p>
           <h2 className="mt-4 font-display text-3xl font-bold">Galutinė suma</h2>
 
           <div className="mt-6 space-y-4">

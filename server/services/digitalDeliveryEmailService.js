@@ -25,11 +25,11 @@ const buildDigitalDeliveryEmail = ({ order, digitalItems, from }) => {
     <div style="margin:0;padding:24px;background:#f8f4ee;font-family:Arial,sans-serif;color:#2b241d;">
       <div style="max-width:680px;margin:0 auto;background:#ffffff;border-radius:18px;padding:32px;border:1px solid #ece3d7;">
         <p style="margin:0 0 12px 0;font-size:12px;letter-spacing:0.24em;text-transform:uppercase;color:#8a6c46;">
-          Digital delivery
+          Skaitmeninis pristatymas
         </p>
         <h1 style="margin:0 0 18px 0;font-size:32px;line-height:1.1;">Tavo skaitmeniniai produktai jau paruošti.</h1>
         <p style="margin:0 0 20px 0;font-size:15px;line-height:1.7;color:#6d5c4c;">
-          Ačiū už pirkimą. Failai pridėti prie šio laiško kaip attachments, o taip pat liks pasiekiami tavo paskyroje.
+          Ačiū už pirkimą. Failai pridėti prie šio laiško kaip priedai, o taip pat liks pasiekiami tavo paskyroje.
         </p>
         <div style="margin:0 0 20px 0;padding:18px;border-radius:14px;background:#faf7f2;">
           <p style="margin:0 0 10px 0;font-size:13px;color:#8a6c46;text-transform:uppercase;letter-spacing:0.18em;">Užsakymas</p>
@@ -97,7 +97,7 @@ const markDigitalDeliveryFailure = async (order, message) => {
     status: "failed",
     sentAt: order.digitalDeliveryEmail?.sentAt || null,
     lastAttemptAt: new Date(),
-    error: String(message || "Digital delivery email failed.").slice(0, 500),
+    error: String(message || "Nepavyko išsiųsti skaitmeninio pristatymo laiško.").slice(0, 500),
   };
 
   await order.save();
@@ -166,7 +166,7 @@ const ensureDigitalDeliveryEmail = async (order) => {
     await order.save();
     return order;
   } catch (error) {
-    console.error("Digital delivery email klaida:", error.message);
+    console.error("Skaitmeninio pristatymo laiško klaida:", error.message);
     return markDigitalDeliveryFailure(order, error.message);
   }
 };

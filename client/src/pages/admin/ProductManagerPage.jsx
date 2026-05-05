@@ -8,6 +8,7 @@ import AdminPageHeader from "../../components/admin-dashboard/AdminPageHeader";
 import ProductForm from "../../components/admin/ProductForm";
 import productService from "../../services/productService";
 import { formatCurrency } from "../../utils/currency";
+import { getPrimaryProductImage } from "../../utils/productVisuals";
 
 const ProductManagerPage = () => {
   const [products, setProducts] = useState([]);
@@ -70,9 +71,9 @@ const ProductManagerPage = () => {
   return (
     <div className="space-y-8 font-admin">
       <AdminPageHeader
-        eyebrow="Catalog control"
-        title="Manage the product catalog with reusable CRUD tools"
-        description="Create, update, and remove products while keeping featured placements and inventory details in sync."
+        eyebrow="Katalogo valdymas"
+        title="Valdyk produktų katalogą vienoje vietoje"
+        description="Kurk, atnaujink ir pašalink produktus išlaikydamas atrinktų pozicijų, kainų ir likučių aiškumą."
       />
 
       <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
@@ -86,10 +87,10 @@ const ProductManagerPage = () => {
         <div className="dashboard-panel p-6">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="dashboard-eyebrow">Catalog list</p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.03em] text-slate-950">All products</h2>
+              <p className="dashboard-eyebrow">Katalogo sąrašas</p>
+              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.03em] text-slate-950">Visi produktai</h2>
             </div>
-            <p className="text-sm text-slate-500">Total: {products.length}</p>
+            <p className="text-sm text-slate-500">Iš viso: {products.length}</p>
           </div>
 
           {loading ? (
@@ -113,7 +114,7 @@ const ProductManagerPage = () => {
                   className="rounded-[24px] border border-slate-200 bg-slate-50 p-4 shadow-sm sm:flex sm:flex-row sm:gap-4"
                 >
                   <img
-                    src={product.images?.[0]}
+                    src={getPrimaryProductImage(product)}
                     alt={product.name}
                     className="h-28 w-full rounded-[20px] object-cover sm:w-28"
                   />
@@ -125,22 +126,22 @@ const ProductManagerPage = () => {
                         <p className="mt-1 text-sm text-slate-500">
                           {product.category} •{" "}
                           {product.productType === "digital"
-                            ? `digital • ${product.digitalAsset?.storagePath || "no file linked"}`
-                            : `stock ${product.stock}`}
+                            ? `skaitmeninis • ${product.digitalAsset?.storagePath || "failas nepriskirtas"}`
+                            : `likutis ${product.stock}`}
                         </p>
                       </div>
                       <div className="text-right">
                         <p className="text-2xl font-semibold tracking-[-0.03em] text-slate-950">{formatCurrency(product.price)}</p>
                         {product.productType === "digital" && (
                           <span className="mt-2 inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
-                            Digital
+                            Skaitmeninis
                           </span>
                         )}
                         {product.featured && (
                           <span
                             className="mt-2 ml-2 inline-flex rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700"
                           >
-                            Featured
+                            Atrinkta
                           </span>
                         )}
                       </div>

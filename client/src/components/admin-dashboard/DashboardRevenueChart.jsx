@@ -1,5 +1,5 @@
 const formatCompact = (value) =>
-  new Intl.NumberFormat("en", {
+  new Intl.NumberFormat("lt-LT", {
     notation: "compact",
     maximumFractionDigits: 1,
   }).format(value);
@@ -33,16 +33,16 @@ const DashboardRevenueChart = ({ points }) => {
     <div className="dashboard-panel p-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-sm font-medium text-slate-500">Revenue trend</p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-slate-950">Sales performance</h2>
+          <p className="text-sm font-medium text-slate-500">Pajamų ritmas</p>
+          <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-slate-950">Pardavimų eiga</h2>
         </div>
         <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-500">
-          Last {points.length} days
+          Paskutinės {points.length} dienos
         </div>
       </div>
 
       <div className="mt-6 overflow-hidden rounded-[24px] border border-slate-200 bg-gradient-to-b from-white to-slate-50/80 p-4 sm:p-5">
-        <svg viewBox={`0 0 ${width} ${height}`} className="h-72 w-full" role="img" aria-label="Revenue chart">
+        <svg viewBox={`0 0 ${width} ${height}`} className="h-72 w-full" role="img" aria-label="Pajamų grafikas">
           <defs>
             <linearGradient id="dashboardAreaFill" x1="0" x2="0" y1="0" y2="1">
               <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.28" />

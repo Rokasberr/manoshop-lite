@@ -11,7 +11,7 @@ const CheckoutCancelPage = () => {
   const orderId = searchParams.get("order_id");
   const [loading, setLoading] = useState(Boolean(orderId));
   const [message, setMessage] = useState(
-    "Stripe checkout nebuvo užbaigtas. Tavo krepšelis liko nepaliestas."
+    "Apmokėjimas nebuvo užbaigtas. Tavo krepšelis liko nepaliestas."
   );
 
   useEffect(() => {
@@ -49,14 +49,14 @@ const CheckoutCancelPage = () => {
   return (
     <div className="space-y-8">
       <SectionTitle
-        eyebrow="payment canceled"
-        title="Stripe mokėjimas atšauktas"
-        subtitle="Jei apsigalvojai, gali grįžti į checkout ir pabandyti dar kartą su tuo pačiu krepšeliu."
+        eyebrow="apmokėjimas atšauktas"
+        title="Mokėjimas atšauktas"
+        subtitle="Gali grįžti į apmokėjimą ir pabandyti dar kartą su tuo pačiu krepšeliu."
       />
 
       <div className="panel mx-auto max-w-3xl p-8 text-center">
         {loading ? (
-          <LoadingSpinner label="Atšaukiame Stripe sesiją..." />
+          <LoadingSpinner label="Atšaukiame apmokėjimą..." />
         ) : (
           <>
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-300">
@@ -67,7 +67,7 @@ const CheckoutCancelPage = () => {
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link to="/checkout" className="button-primary gap-2">
                 <ArrowLeft size={16} />
-                Grįžti į checkout
+                Grįžti į apmokėjimą
               </Link>
               <Link to="/cart" className="button-secondary">
                 Peržiūrėti krepšelį

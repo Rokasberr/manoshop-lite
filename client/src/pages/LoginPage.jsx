@@ -69,22 +69,22 @@ const LoginPage = () => {
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="panel flex flex-col justify-between p-8">
           <div>
-            <span className="eyebrow">welcome back</span>
-            <h1 className="mt-5 font-display text-4xl font-bold">Return to your private order archive</h1>
+            <span className="eyebrow">sugrįžimas</span>
+            <h1 className="mt-5 font-display text-4xl font-bold">Grįžk į savo privačią Stilloak erdvę</h1>
             <p className="mt-4 text-muted">
               Prisijungęs tęsi pirkimą, matai savo sąskaitas ir valdai narystę be papildomo triukšmo.
             </p>
           </div>
 
           <div className="soft-border mt-8 rounded-[24px] border p-5 text-sm text-muted">
-            Private account access keeps orders, invoices and member details in one calm, secure space.
+            Užsakymai, sąskaitos ir narystės informacija lieka vienoje saugioje paskyroje.
           </div>
         </div>
 
         <form className="panel space-y-5 p-8" onSubmit={handleSubmit}>
           <div>
-            <h2 className="font-display text-3xl font-bold">Sign in</h2>
-            <p className="mt-2 text-muted">Enter your account details to continue.</p>
+            <h2 className="font-display text-3xl font-bold">Prisijungti</h2>
+            <p className="mt-2 text-muted">Įvesk paskyros duomenis ir tęsk.</p>
           </div>
 
           {error && (
@@ -114,13 +114,13 @@ const LoginPage = () => {
           </div>
 
           <button type="submit" disabled={loading} className="button-primary w-full">
-            {loading ? "Signing in..." : "Enter account"}
+            {loading ? "Jungiama..." : "Įeiti į paskyrą"}
           </button>
 
           <p className="text-sm text-muted">
-            New here?{" "}
+            Naujas narys?{" "}
             <Link to="/register" className="font-semibold" style={{ color: "rgb(var(--accent-strong))" }}>
-              Create an account
+              Sukurti paskyrą
             </Link>
           </p>
         </form>

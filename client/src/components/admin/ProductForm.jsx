@@ -96,15 +96,15 @@ const ProductForm = ({
     <form className="dashboard-panel font-admin space-y-5 p-6" onSubmit={handleSubmit}>
       <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="dashboard-eyebrow">{initialProduct ? "Edit product" : "New product"}</p>
+          <p className="dashboard-eyebrow">{initialProduct ? "Produkto redagavimas" : "Naujas produktas"}</p>
           <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-slate-950">
-            {initialProduct ? "Update product details" : "Add a new product"}
+            {initialProduct ? "Atnaujinti produkto informaciją" : "Pridėti naują produktą"}
           </h2>
         </div>
 
         {initialProduct && (
           <button type="button" onClick={onCancel} className="dashboard-button-secondary">
-            Cancel
+            Atšaukti
           </button>
         )}
       </div>
@@ -117,7 +117,7 @@ const ProductForm = ({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
-          <label className="mb-2 block text-sm font-semibold">Product name</label>
+          <label className="mb-2 block text-sm font-semibold">Produkto pavadinimas</label>
           <input
             className="input-field"
             value={formData.name}
@@ -126,7 +126,7 @@ const ProductForm = ({
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-semibold">Category</label>
+          <label className="mb-2 block text-sm font-semibold">Kategorija</label>
           <input
             className="input-field"
             value={formData.category}
@@ -135,7 +135,7 @@ const ProductForm = ({
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-semibold">Price</label>
+          <label className="mb-2 block text-sm font-semibold">Kaina</label>
           <input
             className="input-field"
             type="number"
@@ -147,20 +147,20 @@ const ProductForm = ({
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-semibold">Product type</label>
+          <label className="mb-2 block text-sm font-semibold">Produkto tipas</label>
           <select
             className="select-field"
             value={formData.productType}
             onChange={(event) => handleChange("productType", event.target.value)}
           >
-            <option value="physical">Physical</option>
-            <option value="digital">Digital</option>
+            <option value="physical">Fizinis</option>
+            <option value="digital">Skaitmeninis</option>
           </select>
         </div>
 
         {formData.productType === "physical" ? (
           <div>
-            <label className="mb-2 block text-sm font-semibold">Stock</label>
+            <label className="mb-2 block text-sm font-semibold">Likutis</label>
             <input
               className="input-field"
               type="number"
@@ -172,9 +172,9 @@ const ProductForm = ({
           </div>
         ) : (
           <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
-            Place the actual file in
+            Įkelk tikrą failą į
             <span className="mx-1 font-semibold">server/digital-downloads/</span>
-            and enter the relative path below.
+            ir žemiau nurodyk santykinį kelią.
           </div>
         )}
 
@@ -184,14 +184,14 @@ const ProductForm = ({
             checked={formData.featured}
             onChange={(event) => handleChange("featured", event.target.checked)}
           />
-          Feature this product
+          Rodyti kaip atrinktą produktą
         </label>
 
         <div className="sm:col-span-2">
-          <label className="mb-2 block text-sm font-semibold">Image URLs</label>
+          <label className="mb-2 block text-sm font-semibold">Paveikslėlių URL</label>
           <textarea
             className="textarea-field"
-            placeholder="One image URL per line or comma-separated"
+            placeholder="Vienas paveikslėlio URL eilutėje arba atskirtas kableliais"
             value={formData.imagesText}
             onChange={(event) => handleChange("imagesText", event.target.value)}
           />
@@ -200,7 +200,7 @@ const ProductForm = ({
         {formData.productType === "digital" && (
           <>
             <div className="sm:col-span-2">
-              <label className="mb-2 block text-sm font-semibold">Storage path</label>
+              <label className="mb-2 block text-sm font-semibold">Failo kelias</label>
               <input
                 className="input-field"
                 placeholder="guides/the-atelier-living-room-guide.pdf"
@@ -210,7 +210,7 @@ const ProductForm = ({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-semibold">Download file name</label>
+              <label className="mb-2 block text-sm font-semibold">Atsisiuntimo failo pavadinimas</label>
               <input
                 className="input-field"
                 placeholder="the-atelier-living-room-guide.pdf"
@@ -220,7 +220,7 @@ const ProductForm = ({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-semibold">Download button label</label>
+              <label className="mb-2 block text-sm font-semibold">Atsisiuntimo mygtuko tekstas</label>
               <input
                 className="input-field"
                 placeholder="Atsisiųsti gidą"
@@ -230,7 +230,7 @@ const ProductForm = ({
             </div>
 
             <div className="sm:col-span-2">
-              <label className="mb-2 block text-sm font-semibold">MIME type</label>
+              <label className="mb-2 block text-sm font-semibold">MIME tipas</label>
               <input
                 className="input-field"
                 placeholder="application/pdf"
@@ -242,7 +242,7 @@ const ProductForm = ({
         )}
 
         <div className="sm:col-span-2">
-          <label className="mb-2 block text-sm font-semibold">Description</label>
+          <label className="mb-2 block text-sm font-semibold">Aprašymas</label>
           <textarea
             className="textarea-field"
             value={formData.description}
@@ -252,7 +252,7 @@ const ProductForm = ({
       </div>
 
       <button type="submit" disabled={isSubmitting} className="dashboard-button-primary w-full justify-center">
-        {isSubmitting ? "Saving..." : initialProduct ? "Update product" : "Create product"}
+        {isSubmitting ? "Saugoma..." : initialProduct ? "Atnaujinti produktą" : "Sukurti produktą"}
       </button>
     </form>
   );

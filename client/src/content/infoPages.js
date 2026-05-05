@@ -1,33 +1,33 @@
 export const serviceLinks = [
-  { label: "Secure checkout", to: "/secure-checkout" },
-  { label: "Receipt archive", to: "/receipt-archive" },
-  { label: "Member pricing", to: "/member-pricing" },
-  { label: "Private support", to: "/private-support" },
+  { label: "Saugus apmokėjimas", to: "/secure-checkout" },
+  { label: "Sąskaitų archyvas", to: "/receipt-archive" },
+  { label: "Narystė", to: "/member-pricing" },
+  { label: "Pagalba", to: "/private-support" },
 ];
 
 export const clientCareLinks = [
-  { label: "Shipping", to: "/shipping" },
-  { label: "Returns", to: "/returns" },
-  { label: "Privacy", to: "/privacy" },
-  { label: "Terms", to: "/terms" },
+  { label: "Pristatymas", to: "/shipping" },
+  { label: "Grąžinimai", to: "/returns" },
+  { label: "Privatumas", to: "/privacy" },
+  { label: "Taisyklės", to: "/terms" },
 ];
 
 export const houseLinks = [
-  { label: "Our story", to: "/story" },
-  { label: "Collection", to: "/shop" },
-  { label: "Membership", to: "/pricing" },
-  { label: "Launch soon", to: "/launch-soon" },
+  { label: "Istorija", to: "/story" },
+  { label: "Kolekcija", to: "/shop" },
+  { label: "Narystė", to: "/pricing" },
+  { label: "Netrukus", to: "/launch-soon" },
 ];
 
 export const infoPages = {
   secureCheckout: {
-    title: "Secure checkout",
-    eyebrow: "Services",
+    title: "Saugus apmokėjimas",
+    eyebrow: "Paslaugos",
     summary:
       "Apmokėjimas Stilloak Studio svetainėje sukurtas taip, kad jaustųsi ramus, aiškus ir patikimas tiek fiziniams, tiek skaitmeniniams produktams.",
-    lastUpdated: "April 28, 2026",
+    lastUpdated: "2026 m. balandžio 28 d.",
     highlights: [
-      "Stripe kortelių apmokėjimai",
+      "Saugus kortelių apmokėjimas",
       "Aiškus užsakymo suvestinės peržiūrėjimas prieš mokant",
       "PDF sąskaita ir užsakymo įrašas po pirkimo",
     ],
@@ -36,7 +36,7 @@ export const infoPages = {
         heading: "Kaip vyksta apmokėjimas",
         paragraphs: [
           "Mokėjimo metu klientas mato visą užsakymo suvestinę, pasirinktą pristatymo būdą ir galutinę sumą prieš patvirtindamas pirkimą.",
-          "Kortelių apmokėjimai apdorojami per Stripe. Stilloak Studio tiesiogiai nekaupia pilnų kortelės duomenų savo serveryje.",
+          "Kortelių apmokėjimai vyksta per sertifikuotą mokėjimų partnerį. Stilloak Studio tiesiogiai nekaupia pilnų kortelės duomenų.",
         ],
       },
       {
@@ -55,14 +55,14 @@ export const infoPages = {
         ],
       },
     ],
-    cta: { label: "View collection", to: "/shop" },
+    cta: { label: "Peržiūrėti kolekciją", to: "/shop" },
   },
   receiptArchive: {
-    title: "Receipt archive",
-    eyebrow: "Services",
+    title: "Sąskaitų archyvas",
+    eyebrow: "Paslaugos",
     summary:
       "Kiekvienas pirkimas išsaugomas tavo paskyroje, kad bet kada galėtum greitai rasti užsakymo istoriją, PDF sąskaitas ir skaitmeninius atsisiuntimus.",
-    lastUpdated: "April 28, 2026",
+    lastUpdated: "2026 m. balandžio 28 d.",
     highlights: [
       "Visa užsakymų istorija vienoje vietoje",
       "PDF sąskaitos atsisiuntimas",
@@ -91,25 +91,25 @@ export const infoPages = {
         ],
       },
     ],
-    cta: { label: "Open profile", to: "/profile" },
+    cta: { label: "Atidaryti profilį", to: "/profile" },
   },
   memberPricing: {
-    title: "Member pricing",
-    eyebrow: "Services",
+    title: "Nario kainodara",
+    eyebrow: "Paslaugos",
     summary:
       "Narystės sluoksnis sukurtas tam, kad nuolatiniai klientai gautų ankstesnę prieigą, aiškesnę vertę ir švelnesnę kainodarą be agresyvių nuolaidų kultūros.",
-    lastUpdated: "April 28, 2026",
+    lastUpdated: "2026 m. balandžio 28 d.",
     highlights: [
-      "Ankstyva prieiga prie selected drops",
-      "Specialūs membership tarifai, kai taikoma",
-      "Aiškus planų palyginimas pricing puslapyje",
+      "Ankstyva prieiga prie atrinktų atidarymų",
+      "Specialūs nario tarifai, kai taikoma",
+      "Aiškus planų palyginimas narystės puslapyje",
     ],
     sections: [
       {
         heading: "Kaip veikia narystės kaina",
         paragraphs: [
-          "Kai kuriems produktams ar kolekcijoms gali būti taikomi member-only tarifai, ankstyvos prieigos langai arba papildomi vertės paketai.",
-          "Aktualius planus, įtrauktas naudas ir jų kainas visada rasi membership puslapyje prieš priimdamas sprendimą.",
+          "Kai kuriems produktams ar kolekcijoms gali būti taikomi nario tarifai, ankstyvos prieigos langai arba papildomi vertės paketai.",
+          "Aktualius planus, įtrauktas naudas ir jų kainas visada rasi narystės puslapyje prieš priimdamas sprendimą.",
         ],
       },
       {
@@ -127,14 +127,14 @@ export const infoPages = {
         ],
       },
     ],
-    cta: { label: "View membership", to: "/pricing" },
+    cta: { label: "Peržiūrėti narystę", to: "/pricing" },
   },
   privateSupport: {
-    title: "Private support",
-    eyebrow: "Services",
+    title: "Privati pagalba",
+    eyebrow: "Paslaugos",
     summary:
-      "Jei reikia pagalbos dėl užsakymo, atsisiuntimo ar paskyros, Stilloak Studio support siekia atsakyti aiškiai, žmogiškai ir be papildomo triukšmo.",
-    lastUpdated: "April 28, 2026",
+      "Jei reikia pagalbos dėl užsakymo, atsisiuntimo ar paskyros, Stilloak Studio komanda siekia atsakyti aiškiai, žmogiškai ir be papildomo triukšmo.",
+    lastUpdated: "2026 m. balandžio 28 d.",
     highlights: [
       "Pagalba dėl užsakymų ir atsisiuntimų",
       "Aiškus atsakymas dėl grąžinimų ar mokėjimų",
@@ -151,7 +151,7 @@ export const infoPages = {
       {
         heading: "Kuo galime padėti",
         bullets: [
-          "mokėjimo ir checkout klausimais",
+          "mokėjimo klausimais",
           "užsakymo būsenos patikslinimu",
           "sąskaitos ar atsisiuntimo prieiga",
           "grąžinimo ar keitimo proceso paaiškinimu",
@@ -164,18 +164,18 @@ export const infoPages = {
         ],
       },
     ],
-    cta: { label: "Contact us", to: "/contact" },
+    cta: { label: "Susisiekti", to: "/contact" },
   },
   contact: {
-    title: "Contact",
-    eyebrow: "Client care",
+    title: "Kontaktai",
+    eyebrow: "Pagalba",
     summary:
       "Jei turi klausimą dėl užsakymo, skaitmeninio atsisiuntimo, narystės ar bendro bendradarbiavimo, Stilloak Studio komanda pasiruošusi padėti aiškiai ir be bereikalingo triukšmo.",
-    lastUpdated: "April 28, 2026",
+    lastUpdated: "2026 m. balandžio 28 d.",
     highlights: [
       "Atsakymas per 1–2 darbo dienas",
       "Pagalba dėl fizinių ir skaitmeninių produktų",
-      "Kontaktas el. paštu ir aiškus support kelias",
+      "Kontaktas el. paštu ir aiškus pagalbos kelias",
     ],
     sections: [
       {
@@ -196,11 +196,11 @@ export const infoPages = {
       {
         heading: "Klausimų tipai",
         bullets: [
-          "mokėjimai ir checkout",
+          "mokėjimai",
           "fizinių prekių pristatymas",
           "skaitmeninių failų prieiga",
           "narystės planai ir sąskaitos",
-          "bendradarbiavimas ar brand partnerystės",
+          "bendradarbiavimas ar studijos partnerystės",
         ],
       },
       {
@@ -210,17 +210,17 @@ export const infoPages = {
         ],
       },
     ],
-    cta: { label: "Write to support", to: "/private-support" },
+    cta: { label: "Parašyti pagalbai", to: "/private-support" },
   },
   shipping: {
-    title: "Shipping",
-    eyebrow: "Client care",
+    title: "Pristatymas",
+    eyebrow: "Pagalba",
     summary:
-      "Fiziniai ir skaitmeniniai produktai Stilloak Studio svetainėje apdorojami skirtingai, todėl pristatymo logika visada aiškiai rodoma checkout metu.",
-    lastUpdated: "April 28, 2026",
+      "Fiziniai ir skaitmeniniai produktai Stilloak Studio svetainėje apdorojami skirtingai, todėl pristatymo logika visada aiškiai rodoma apmokėjimo metu.",
+    lastUpdated: "2026 m. balandžio 28 d.",
     highlights: [
       "Skaitmeniniams produktams pristatymas netaikomas",
-      "Fiziniams produktams kaina rodoma checkout suvestinėje",
+      "Fiziniams produktams kaina rodoma apmokėjimo suvestinėje",
       "Pristatymo informacija lieka ir tavo paskyroje",
     ],
     sections: [
@@ -228,7 +228,7 @@ export const infoPages = {
         heading: "Fiziniai produktai",
         paragraphs: [
           "Fiziniai užsakymai paprastai paruošiami per 1–3 darbo dienas, nebent produkto puslapyje nurodyta kitaip.",
-          "Pristatymo mokestis ir galutinis užsakymo laikas pateikiami checkout metu prieš apmokėjimą.",
+          "Pristatymo mokestis ir galutinis užsakymo laikas pateikiami prieš apmokėjimą.",
         ],
       },
       {
@@ -244,14 +244,14 @@ export const infoPages = {
         ],
       },
     ],
-    cta: { label: "Browse products", to: "/shop" },
+    cta: { label: "Peržiūrėti kolekciją", to: "/shop" },
   },
   returns: {
-    title: "Returns",
-    eyebrow: "Client care",
+    title: "Grąžinimai",
+    eyebrow: "Pagalba",
     summary:
       "Siekiame, kad grąžinimų politika būtų aiški ir sąžininga tiek fiziniams, tiek skaitmeniniams produktams.",
-    lastUpdated: "April 28, 2026",
+    lastUpdated: "2026 m. balandžio 28 d.",
     highlights: [
       "Fizinius produktus galima grąžinti per 14 dienų",
       "Skaitmeniniai produktai paprastai negrąžinami po prieigos suteikimo",
@@ -271,23 +271,23 @@ export const infoPages = {
         ],
       },
       {
-        heading: "Refund eiga",
+        heading: "Grąžinimo eiga",
         paragraphs: [
           "Patvirtinus grąžinimą, lėšos į pradinį mokėjimo metodą grąžinamos pagal mokėjimo tiekėjo terminus. Tiksli grąžinimo trukmė priklauso nuo tavo banko ar kortelės išdavėjo.",
         ],
       },
     ],
-    cta: { label: "Need support?", to: "/private-support" },
+    cta: { label: "Reikia pagalbos?", to: "/private-support" },
   },
   privacy: {
-    title: "Privacy",
-    eyebrow: "Client care",
+    title: "Privatumas",
+    eyebrow: "Pagalba",
     summary:
       "Stilloak Studio renka tik tuos duomenis, kurių reikia užsakymams, paskyrai ir saugesnei pirkimo patirčiai užtikrinti.",
-    lastUpdated: "April 28, 2026",
+    lastUpdated: "2026 m. balandžio 28 d.",
     highlights: [
       "Tvarkome paskyros ir užsakymo duomenis",
-      "Mokėjimus apdoroja Stripe",
+      "Mokėjimus apdoroja saugus partneris",
       "Nenaudojame duomenų daugiau, nei reikia paslaugai suteikti",
     ],
     sections: [
@@ -309,7 +309,7 @@ export const infoPages = {
       {
         heading: "Trečiosios šalys",
         paragraphs: [
-          "Mokėjimo duomenis apdoroja Stripe. Svetainės veikimui ir hostinimui naudojame išorines platformas, kurios padeda saugiai pateikti paslaugą, tačiau jos tvarko tik būtinus duomenis.",
+          "Mokėjimo duomenis apdoroja sertifikuotas mokėjimų partneris. Svetainės veikimui ir talpinimui naudojame išorines platformas, kurios padeda saugiai pateikti paslaugą, tačiau jos tvarko tik būtinus duomenis.",
         ],
       },
       {
@@ -319,14 +319,14 @@ export const infoPages = {
         ],
       },
     ],
-    cta: { label: "Contact support", to: "/private-support" },
+    cta: { label: "Susisiekti su pagalba", to: "/private-support" },
   },
   terms: {
-    title: "Terms",
-    eyebrow: "Client care",
+    title: "Taisyklės",
+    eyebrow: "Pagalba",
     summary:
       "Naudodamasis Stilloak Studio svetaine ir pirkdamas produktus sutinki su toliau pateiktomis pagrindinėmis naudojimo ir pirkimo sąlygomis.",
-    lastUpdated: "April 28, 2026",
+    lastUpdated: "2026 m. balandžio 28 d.",
     highlights: [
       "Produktų kainos ir aprašymai gali būti atnaujinami",
       "Skaitmeniniai failai skirti asmeniniam naudojimui",
@@ -336,7 +336,7 @@ export const infoPages = {
       {
         heading: "Pirkimai ir kainos",
         paragraphs: [
-          "Visos kainos ir produktų aprašymai gali būti atnaujinami be išankstinio įspėjimo, tačiau už jau patvirtintą ir apmokėtą užsakymą taikoma checkout metu parodyta kaina.",
+          "Visos kainos ir produktų aprašymai gali būti atnaujinami be išankstinio įspėjimo, tačiau už jau patvirtintą ir apmokėtą užsakymą taikoma apmokėjimo metu parodyta kaina.",
         ],
       },
       {
@@ -364,6 +364,6 @@ export const infoPages = {
         ],
       },
     ],
-    cta: { label: "Back to home", to: "/" },
+    cta: { label: "Grįžti į pradžią", to: "/" },
   },
 };

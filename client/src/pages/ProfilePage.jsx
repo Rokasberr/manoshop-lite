@@ -13,6 +13,35 @@ import orderService from "../services/orderService";
 import { hasActiveMembership } from "../utils/membership";
 import { formatCurrency } from "../utils/currency";
 
+const roleLabels = {
+  admin: "Administratorius",
+  customer: "Narys",
+};
+
+const subscriptionStatusLabels = {
+  active: "aktyvi",
+  inactive: "neaktyvi",
+  canceled: "atšaukta",
+  past_due: "laukiama apmokėjimo",
+};
+
+const subscriptionPlanLabels = {
+  free: "Guest",
+  circle: "Circle",
+  private: "Private",
+};
+
+const subscriptionProviderLabels = {
+  internal: "Stilloak",
+  stripe: "Saugus mokėjimų partneris",
+};
+
+const paymentMethodLabels = {
+  card: "Kortelė",
+  "bank-transfer": "Bankinis pavedimas",
+  "cash-on-delivery": "Apmokėjimas pristatymo metu",
+};
+
 const ProfilePage = () => {
   const { user, refreshProfile } = useAuth();
   const [orders, setOrders] = useState([]);
@@ -80,13 +109,13 @@ const ProfilePage = () => {
         result.subscription?.provider === "stripe" &&
         hasActiveMembership({ ...(user || {}), subscription: result.subscription })
       ) {
-        toast.success("Narystė atnaujinta iš Stripe.");
+        toast.success("Narystė atnaujinta.");
         return;
       }
 
-      toast("Stripe sinchronizacija baigta, bet aktyvi narystė dar nerasta.");
+      toast("Patikrinimas baigtas, bet aktyvi narystė dar nerasta.");
     } catch (syncError) {
-      toast.error(syncError.response?.data?.message || "Nepavyko atnaujinti narystės iš Stripe.");
+      toast.error(syncError.response?.data?.message || "Nepavyko atnaujinti narystės.");
     } finally {
       setSyncingMembership(false);
     }
@@ -95,54 +124,56 @@ const ProfilePage = () => {
   return (
     <div className="space-y-8">
       <SectionTitle
-        eyebrow="profile"
+        eyebrow="paskyra"
         title={`Sveikas, ${user?.name?.split(" ")[0] || "vartotojau"}`}
-        subtitle="Čia matai savo prenumeratos planą, sąskaitas ir užsakymų istoriją vienoje vietoje."
+        subtitle="Čia matai narystę, sąskaitas ir užsakymų istoriją vienoje vietoje."
       />
 
       <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
         <div className="space-y-6">
           <div className="panel p-6">
-            <p className="eyebrow">account</p>
+            <p className="eyebrow">paskyra</p>
             <h2 className="mt-4 font-display text-3xl font-bold">{user?.name}</h2>
             <p className="mt-2 text-muted">{user?.email}</p>
             <div className="soft-card mt-6 rounded-[24px] p-5">
-              <p className="text-xs uppercase tracking-[0.3em] text-muted">role</p>
-              <p className="mt-2 font-display text-2xl font-bold capitalize">{user?.role}</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-muted">rolė</p>
+              <p className="mt-2 font-display text-2xl font-bold">
+                {roleLabels[user?.role] || user?.role || "Narys"}
+              </p>
             </div>
           </div>
 
           <div className="panel p-6">
-            <p className="eyebrow">subscription</p>
+            <p className="eyebrow">narystė</p>
             <h2 className="mt-4 font-display text-3xl font-bold capitalize">
-              {user?.subscription?.plan || "free"} plan
+              {subscriptionPlanLabels[user?.subscription?.plan] || user?.subscription?.plan || "Guest"} planas
             </h2>
             <p className="mt-2 text-muted">
-              Status:{" "}
+              Būsena:{" "}
               <span className="font-semibold capitalize text-current">
-                {user?.subscription?.status || "inactive"}
+                {subscriptionStatusLabels[user?.subscription?.status] || user?.subscription?.status || "neaktyvi"}
               </span>
             </p>
             <p className="mt-2 text-muted">
-              Provider:{" "}
+              Teikėjas:{" "}
               <span className="font-semibold capitalize text-current">
-                {user?.subscription?.provider || "internal"}
+                {subscriptionProviderLabels[user?.subscription?.provider] || user?.subscription?.provider || "Stilloak"}
               </span>
             </p>
             {user?.subscription?.currentPeriodEnd && (
               <p className="mt-2 text-muted">
-                Renew/ends:{" "}
+                Atnaujinama iki:{" "}
                 <span className="font-semibold text-current">
                   {new Date(user.subscription.currentPeriodEnd).toLocaleDateString("lt-LT")}
                 </span>
               </p>
             )} 
             <Link to="/pricing" className="button-secondary mt-6 inline-flex">
-              Manage plan
+              Valdyti planą
             </Link>
             {hasActiveMembership(user) && (
               <Link to="/members/savings-studio" className="button-primary mt-4 inline-flex">
-                Open Stilloak
+                Atidaryti Stilloak
               </Link>
             )}
             {!hasActiveMembership(user) && (
@@ -152,7 +183,7 @@ const ProfilePage = () => {
                 disabled={syncingMembership}
                 className="button-primary mt-4 inline-flex disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {syncingMembership ? "Tikrinama..." : "Atnaujinti narystę iš Stripe"}
+                {syncingMembership ? "Tikrinama..." : "Patikrinti narystę"}
               </button>
             )}
           </div>
@@ -161,8 +192,8 @@ const ProfilePage = () => {
         <div className="panel p-6">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="eyebrow">orders</p>
-              <h2 className="mt-4 font-display text-3xl font-bold">Užsakymų istorija</h2>
+            <p className="eyebrow">užsakymai</p>
+              <h2 className="mt-4 font-display text-3xl font-bold">Užsakymų archyvas</h2>
             </div>
             <p className="text-sm text-muted">Viso: {orders.length}</p>
           </div>
@@ -176,7 +207,7 @@ const ProfilePage = () => {
               <EmptyState
                 title="Dar nėra užsakymų"
                 description="Kai tik sukursi pirmą užsakymą, jis atsiras čia."
-                actionLabel="Pereiti į shop"
+                actionLabel="Peržiūrėti kolekciją"
               />
             </div>
           ) : (
@@ -204,21 +235,21 @@ const ProfilePage = () => {
 
                   <div className="mt-4 grid gap-4 sm:grid-cols-4">
                     <div>
-                      <p className="text-xs uppercase tracking-[0.25em] text-muted">items</p>
+                      <p className="text-xs uppercase tracking-[0.25em] text-muted">prekės</p>
                       <p className="mt-2 font-semibold">{order.items.length}</p>
                     </div>
                     <div>
-                      <p className="text-xs uppercase tracking-[0.25em] text-muted">payment</p>
-                      <p className="mt-2 font-semibold capitalize">{order.paymentMethod}</p>
+                      <p className="text-xs uppercase tracking-[0.25em] text-muted">apmokėjimas</p>
+                      <p className="mt-2 font-semibold">{paymentMethodLabels[order.paymentMethod] || order.paymentMethod}</p>
                     </div>
                     <div>
-                      <p className="text-xs uppercase tracking-[0.25em] text-muted">payment status</p>
+                      <p className="text-xs uppercase tracking-[0.25em] text-muted">būsena</p>
                       <div className="mt-2">
                         <StatusBadge status={order.paymentStatus || "pending"} />
                       </div>
                     </div>
                     <div>
-                      <p className="text-xs uppercase tracking-[0.25em] text-muted">total</p>
+                      <p className="text-xs uppercase tracking-[0.25em] text-muted">suma</p>
                       <p className="mt-2 font-semibold">{formatCurrency(order.totalPrice)}</p>
                     </div>
                   </div>

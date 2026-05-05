@@ -7,18 +7,18 @@ const infoPageCopy = {
     lastUpdated: "Atnaujinta",
     noteTitle: "Kalbos pastaba",
     noteBody:
-      "Išsamūs privatumo, taisyklių ir pagalbos puslapiai šiuo metu pirmiausia paruošti lietuvių kalba. Viešoji marketingo dalis jau persijungia pagal pasirinktą kalbą.",
-    helpEyebrow: "Vis dar reikia aiškumo?",
-    helpTitle: "Jei reikia tikslesnio atsakymo, geriau paaiškinsime, nei paliksime spėlioti.",
+      "Išsamūs pagalbos puslapiai šiuo metu prižiūrimi lietuvių kalba. Pagrindinė viešoji patirtis prisitaiko pagal pasirinktą kalbą.",
+    helpEyebrow: "Reikia pagalbos?",
+    helpTitle: "Parašyk mums ir padėsime aiškiai.",
     contactSupport: "Susisiekti su pagalba",
   },
   en: {
     lastUpdated: "Last updated",
     noteTitle: "Language note",
     noteBody:
-      "Detailed privacy, terms, and support pages are currently maintained in Lithuanian first. The main public marketing pages already switch with your selected language.",
-    helpEyebrow: "Still need something else?",
-    helpTitle: "If you need a clearer answer, we’d rather explain than leave you guessing.",
+      "Detailed support pages are currently maintained in Lithuanian first. The main public experience follows your selected language.",
+    helpEyebrow: "Need help?",
+    helpTitle: "Write to us and we will help clearly.",
     contactSupport: "Contact support",
   },
 };

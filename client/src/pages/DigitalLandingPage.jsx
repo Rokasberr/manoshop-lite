@@ -4,54 +4,54 @@ import { Link } from "react-router-dom";
 const ritualCards = [
   {
     icon: LayoutPanelTop,
-    title: "Download without waiting",
-    description: "No shipping, no warehouse, no parcel delays. Payment unlocks the file in your account.",
+    title: "Prieiga be laukimo",
+    description: "Jokio siuntimo ar logistikos. Po apmokėjimo failas atsiranda tavo paskyroje.",
   },
   {
     icon: Palette,
-    title: "Built for your visual world",
-    description: "Printable art, interior guides, and planners designed to match the same quiet premium brand.",
+    title: "Sukurta vientisam skoniui",
+    description: "Spausdinamas menas, interjero gidai ir planavimo įrankiai dera su ramiu Stilloak tonu.",
   },
   {
     icon: Sparkles,
-    title: "High margin, clean offer",
-    description: "A digital layer lets you sell instantly and bundle beautifully without physical logistics.",
+    title: "Aiškus skaitmeninis pasiūlymas",
+    description: "Skaitmeninis sluoksnis leidžia kurti vertingus rinkinius be fizinio pristatymo triukšmo.",
   },
 ];
 
 const steps = [
   {
     step: "01",
-    title: "Choose",
-    description: "Select a printable bundle, PDF guide, or planning tool that fits the mood you want to create.",
+    title: "Rinkis",
+    description: "Pasirink PDF gidą, spausdinamą rinkinį ar planavimo įrankį, kuris atitinka tavo ritmą.",
   },
   {
     step: "02",
-    title: "Pay",
-    description: "Complete checkout securely with Stripe just like any other premium product in the store.",
+    title: "Apmokėk",
+    description: "Patvirtink pirkimą per tą patį saugų apmokėjimo kelią kaip ir visoje parduotuvėje.",
   },
   {
     step: "03",
-    title: "Download",
-    description: "Your file appears inside your profile after payment, ready to download whenever you need it.",
+    title: "Atsisiųsk",
+    description: "Failas atsiranda tavo profilyje po apmokėjimo ir lieka pasiekiamas, kai jo prireikia.",
   },
 ];
 
 const teaserPanels = [
   {
-    eyebrow: "Planned release",
-    title: "Printable bundles and premium PDF guides",
-    text: "The first release is being curated to open as one cleaner shelf instead of scattered individual product drops.",
+    eyebrow: "Planuojamas atidarymas",
+    title: "Spausdinami rinkiniai ir PDF gidai",
+    text: "Pirmas atidarymas kuruojamas kaip viena aiški lentyna, o ne atsitiktiniai pavieniai produktai.",
   },
   {
-    eyebrow: "What will be inside",
-    title: "Poster sets, room guides, planners",
-    text: "The collection is meant to feel editorial and intentional, with fewer but stronger digital products from day one.",
+    eyebrow: "Kas bus viduje",
+    title: "Plakatų setai, kambarių gidai, planavimo įrankiai",
+    text: "Kolekcija kuriama kaip redakcinis, sąmoningas sluoksnis su mažiau, bet stipresnių produktų.",
   },
   {
-    eyebrow: "Current status",
-    title: "Temporarily staged under Launch Soon",
-    text: "For now, the digital layer stays in preview mode while the files, bundles, and launch flow are tightened.",
+    eyebrow: "Dabartinė būsena",
+    title: "Laikinai rodoma atidarymo puslapyje",
+    text: "Kol failai, rinkiniai ir atidarymo kelias dar ruošiami, skaitmeninis sluoksnis lieka peržiūroje.",
   },
 ];
 
@@ -62,9 +62,9 @@ const teaserProducts = [
 ];
 
 const launchSignals = [
-  "Protected account download flow",
-  "Bundle logic for higher-margin offers",
-  "Cleaner release sequence before opening the shelf",
+  "Apsaugota atsisiuntimo prieiga paskyroje",
+  "Rinkinių logika didesnei vertei",
+  "Aiškesnė atidarymo seka prieš atveriant lentyną",
 ];
 
 const DigitalLandingPage = () => {
@@ -74,45 +74,45 @@ const DigitalLandingPage = () => {
         <div className="grid gap-10 lg:grid-cols-[1.02fr_0.98fr]">
           <div className="flex flex-col justify-between">
             <div>
-              <span className="hero-chip">Digital collection</span>
+              <span className="hero-chip">Skaitmeninė kolekcija</span>
               <h1 className="mt-8 max-w-3xl font-display text-5xl font-bold leading-[0.92] sm:text-6xl lg:text-7xl">
-                Instant digital products for calmer rooms and clearer routines.
+                Skaitmeniniai produktai ramesnėms erdvėms ir aiškesnėms rutinoms.
               </h1>
               <p className="mt-6 max-w-2xl text-base leading-7 text-white/72 sm:text-lg">
-                Ši kolekcija skirta PDF gidams, printable rinkiniams ir planavimo įrankiams, kurie jaučiasi
-                kaip natūrali tavo brand&apos;o tąsa, o ne atsitiktinis priedas prie fizinio shop&apos;o.
+                Ši kolekcija skirta PDF gidams, spausdinamiems rinkiniams ir planavimo įrankiams, kurie jaučiasi
+                kaip natūrali Stilloak tąsa, o ne atsitiktinis priedas prie kolekcijos.
               </p>
               <p className="mt-4 max-w-2xl text-sm leading-6 text-white/58">
-                Pilna Digital Collection šiuo metu perkelta į atskirą <span className="font-semibold text-white/80">Launch soon</span> sluoksnį,
+                Pilna skaitmeninė kolekcija šiuo metu perkelta į atskirą <span className="font-semibold text-white/80">Netrukus</span> sluoksnį,
                 kad atsidarytų tik tada, kai visa patirtis bus iki galo paruošta.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link to="/launch-soon" className="button-primary gap-2">
-                  View launch status
+                  Peržiūrėti atidarymą
                   <ArrowRight size={16} />
                 </Link>
                 <Link to="/pricing" className="hero-outline-button">
-                  View bundles & membership
+                  Peržiūrėti narystę
                 </Link>
               </div>
             </div>
 
             <div className="mt-10 grid gap-4 sm:grid-cols-3">
               <div className="metric-card">
-                <p className="text-xs uppercase tracking-[0.3em] text-white/45">Format</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-white/45">Formatas</p>
                 <p className="mt-3 font-display text-3xl font-bold">PDF</p>
-                <p className="mt-2 text-sm text-white/60">Printable guides, planners, and digital bundles.</p>
+                <p className="mt-2 text-sm text-white/60">Gidai, planavimo įrankiai ir skaitmeniniai rinkiniai.</p>
               </div>
               <div className="metric-card">
-                <p className="text-xs uppercase tracking-[0.3em] text-white/45">Access</p>
-                <p className="mt-3 font-display text-3xl font-bold">Instant</p>
-                <p className="mt-2 text-sm text-white/60">Protected downloads appear in the buyer profile after payment.</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-white/45">Prieiga</p>
+                <p className="mt-3 font-display text-3xl font-bold">Iškart</p>
+                <p className="mt-2 text-sm text-white/60">Atsisiuntimai atsiranda pirkėjo profilyje po apmokėjimo.</p>
               </div>
               <div className="metric-card">
-                <p className="text-xs uppercase tracking-[0.3em] text-white/45">Brand fit</p>
-                <p className="mt-3 font-display text-3xl font-bold">Curated</p>
-                <p className="mt-2 text-sm text-white/60">Designed to feel editorial, warm, and intentionally premium.</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-white/45">Kryptis</p>
+                <p className="mt-3 font-display text-3xl font-bold">Atrinkta</p>
+                <p className="mt-2 text-sm text-white/60">Sukurta taip, kad jaustųsi ramu, šilta ir sąmoninga.</p>
               </div>
             </div>
           </div>
@@ -121,35 +121,34 @@ const DigitalLandingPage = () => {
             <div className="hero-screen relative w-full max-w-[620px]">
               <div className="flex items-center justify-between rounded-[22px] border border-white/8 bg-white/5 px-4 py-3">
                 <div>
-                  <p className="text-sm font-semibold text-white">Digital collection</p>
-                  <p className="text-xs text-white/50">Printable art, guides, planners</p>
+                  <p className="text-sm font-semibold text-white">Skaitmeninė kolekcija</p>
+                  <p className="text-xs text-white/50">Plakatai, gidai, planavimo įrankiai</p>
                 </div>
-                <span className="hero-chip">Instant download</span>
+                <span className="hero-chip">Iškart pasiekiama</span>
               </div>
 
               <div className="mt-6 grid gap-4 lg:grid-cols-[1.08fr_0.92fr]">
                 <div className="rounded-[24px] border border-white/8 bg-white/4 p-5">
-                  <p className="text-xs uppercase tracking-[0.3em] text-white/42">Launch mode</p>
-                  <h3 className="mt-4 font-display text-3xl font-bold">The shelf is visible as a teaser for now</h3>
+                  <p className="text-xs uppercase tracking-[0.3em] text-white/42">Atidarymo būsena</p>
+                  <h3 className="mt-4 font-display text-3xl font-bold">Lentyna kol kas rodoma kaip peržiūra</h3>
                   <p className="mt-3 text-sm leading-6 text-white/62">
-                    Instead of exposing half-ready product pages, the digital layer is temporarily shown as a curated
-                    preview until launch day.
+                    Užuot rodžius pusiau paruoštus produktus, skaitmeninis sluoksnis laikinai lieka kuruotoje peržiūroje.
                   </p>
                   <div className="mt-6 grid gap-3 sm:grid-cols-2">
                     <div className="rounded-[20px] bg-white/5 p-4">
-                      <p className="text-xs text-white/45">Status</p>
-                      <p className="mt-2 font-display text-2xl font-bold">Launch soon</p>
+                      <p className="text-xs text-white/45">Būsena</p>
+                      <p className="mt-2 font-display text-2xl font-bold">Netrukus</p>
                     </div>
                     <div className="rounded-[20px] bg-white/5 p-4">
-                      <p className="text-xs text-white/45">Focus</p>
-                      <p className="mt-2 font-display text-2xl font-bold">Better first release</p>
+                      <p className="text-xs text-white/45">Tikslas</p>
+                      <p className="mt-2 font-display text-2xl font-bold">Stipresnis pirmas leidimas</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <div className="rounded-[24px] border border-white/8 bg-white/4 p-5">
-                    <p className="text-xs uppercase tracking-[0.3em] text-white/42">What is being prepared</p>
+                    <p className="text-xs uppercase tracking-[0.3em] text-white/42">Kas ruošiama</p>
                     <div className="mt-4 space-y-3">
                       {launchSignals.map((item) => (
                         <div key={item} className="flex items-start gap-3 text-sm text-white/74">
@@ -161,7 +160,7 @@ const DigitalLandingPage = () => {
                   </div>
 
                   <div className="rounded-[24px] border border-white/8 bg-white/4 p-5">
-                    <p className="text-xs uppercase tracking-[0.3em] text-white/42">Preview titles</p>
+                    <p className="text-xs uppercase tracking-[0.3em] text-white/42">Peržiūros pavadinimai</p>
                     <div className="mt-4 grid gap-3">
                       {teaserProducts.map((product, index) => (
                         <div
@@ -199,15 +198,14 @@ const DigitalLandingPage = () => {
       <section className="public-section">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <span className="eyebrow">Teaser only</span>
-            <h2 className="mt-5 font-display text-4xl font-bold sm:text-5xl">The digital shelf is visible as a promise, not a live catalog.</h2>
+            <span className="eyebrow">Kol kas peržiūra</span>
+            <h2 className="mt-5 font-display text-4xl font-bold sm:text-5xl">Skaitmeninė lentyna dabar veikia kaip pažadas, ne kaip gyvas katalogas.</h2>
             <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
-              Instead of showing clickable product cards right now, this section stays in teaser mode and points people
-              into the launch-soon layer until the collection is fully ready.
+              Kol produktai dar ruošiami, ši sekcija nukreipia į atidarymo būseną ir nekuria pusiau užbaigto pirkimo kelio.
             </p>
           </div>
           <Link to="/launch-soon" className="button-secondary">
-            Open launch soon
+            Peržiūrėti atidarymą
           </Link>
         </div>
 
@@ -226,11 +224,10 @@ const DigitalLandingPage = () => {
         <div className="rounded-[32px] border border-[rgb(232,224,214)] bg-[linear-gradient(135deg,rgba(255,252,247,0.96),rgba(247,241,233,0.94))] px-6 py-7 sm:px-8">
           <div className="grid gap-5 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
             <div>
-              <span className="eyebrow">What will open later</span>
-              <h2 className="mt-5 font-display text-4xl font-bold sm:text-5xl">The first release is planned to open as one tighter edit.</h2>
+              <span className="eyebrow">Kas atsidarys vėliau</span>
+              <h2 className="mt-5 font-display text-4xl font-bold sm:text-5xl">Pirmas leidimas planuojamas kaip viena aiškesnė atranka.</h2>
               <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
-                The goal is to launch with stronger bundles, cleaner product framing, and a better instant-download
-                experience instead of opening the shelf too early.
+                Tikslas - atsidaryti su stipresniais rinkiniais, aiškesniu produktų pateikimu ir geresne atsisiuntimo patirtimi.
               </p>
             </div>
             <div className="grid gap-3">
@@ -249,10 +246,10 @@ const DigitalLandingPage = () => {
 
       <section className="public-section">
         <div className="text-center">
-          <span className="eyebrow">How it works</span>
-          <h2 className="mt-5 font-display text-4xl font-bold sm:text-5xl">A cleaner purchase flow for digital goods.</h2>
+          <span className="eyebrow">Kaip tai veiks</span>
+          <h2 className="mt-5 font-display text-4xl font-bold sm:text-5xl">Švaresnis pirkimo kelias skaitmeniniams produktams.</h2>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-muted">
-            Visa patirtis remiasi tuo pačiu tavo checkout, bet rezultatas pirkėjui daug greitesnis: jokios logistikos,
+            Visa patirtis remiasi tuo pačiu saugiu apmokėjimu, bet rezultatas pirkėjui daug greitesnis: jokios logistikos,
             tik iškart atrakintas turinys paskyroje.
           </p>
         </div>
@@ -271,38 +268,38 @@ const DigitalLandingPage = () => {
       <section className="surface-dark overflow-hidden rounded-[38px] px-6 py-8 sm:px-10 sm:py-10 lg:px-12">
         <div className="grid gap-8 lg:grid-cols-[0.88fr_1.12fr]">
           <div>
-            <span className="hero-chip">Bundle potential</span>
+            <span className="hero-chip">Rinkinių potencialas</span>
             <h2 className="mt-6 font-display text-4xl font-bold sm:text-5xl">
-              This is where higher-margin bundles start to make sense.
+              Čia skaitmeniniai rinkiniai pradeda kurti daugiau vertės.
             </h2>
             <p className="mt-4 max-w-lg text-base leading-7 text-white/68">
-              Skaitmeniniai produktai leidžia tau parduoti ne tik atskirą failą, bet ir aiškią patirtį:
-              posteriai + interjero gidas + planneris viename premium pakete.
+              Skaitmeniniai produktai leidžia pasiūlyti ne tik atskirą failą, bet ir aiškią patirtį:
+              plakatai, interjero gidas ir planavimo įrankis viename ramesniame pakete.
             </p>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
             <div className="rounded-[24px] bg-white/6 p-5">
-              <p className="text-xs uppercase tracking-[0.3em] text-white/42">Bundle idea</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-white/42">Rinkinio idėja</p>
               <h3 className="mt-4 font-display text-3xl font-bold">Home Edit Bundle</h3>
               <p className="mt-3 text-sm leading-6 text-white/74">
-                Poster bundle + living room guide framed as one cleaner room reset offer.
+                Plakatų rinkinys ir svetainės gidas, sujungti į vieną aiškų kambario atnaujinimą.
               </p>
               <div className="mt-6 flex items-center justify-between gap-3">
-                <p className="font-semibold text-[rgb(227,196,149)]">Launch soon</p>
-                <span className="text-sm font-medium text-white/72">Teaser</span>
+                <p className="font-semibold text-[rgb(227,196,149)]">Netrukus</p>
+                <span className="text-sm font-medium text-white/72">Peržiūra</span>
               </div>
             </div>
 
             <div className="rounded-[24px] bg-white/6 p-5">
-              <p className="text-xs uppercase tracking-[0.3em] text-white/42">Bundle idea</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-white/42">Rinkinio idėja</p>
               <h3 className="mt-4 font-display text-3xl font-bold">Calm Living Bundle</h3>
               <p className="mt-3 text-sm leading-6 text-white/74">
-                Poster bundle + guide + planner shaped as a fuller digital lifestyle layer.
+                Plakatų rinkinys, gidas ir planavimo įrankis kaip pilnesnis skaitmeninis gyvenimo ritmo sluoksnis.
               </p>
               <div className="mt-6 flex items-center justify-between gap-3">
-                <p className="font-semibold text-[rgb(227,196,149)]">Launch soon</p>
-                <span className="text-sm font-medium text-white/72">Teaser</span>
+                <p className="font-semibold text-[rgb(227,196,149)]">Netrukus</p>
+                <span className="text-sm font-medium text-white/72">Peržiūra</span>
               </div>
             </div>
           </div>
@@ -312,19 +309,19 @@ const DigitalLandingPage = () => {
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.34em]" style={{ color: "rgb(var(--accent-strong))" }}>
-                Ready to launch
+                Paruošta atidarymui
               </p>
-              <h3 className="mt-3 font-display text-3xl font-bold">Open the digital shelf and start building it product by product.</h3>
+              <h3 className="mt-3 font-display text-3xl font-bold">Atverk skaitmeninę lentyną ir augink ją produktas po produkto.</h3>
               <p className="mt-2 text-sm text-[rgb(98,87,74)]">
-                Begin with three signature products, then expand into themed bundles and guided collections.
+                Pradėk nuo trijų stiprių produktų, tada plėsk į teminius rinkinius ir kuruotas kolekcijas.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
                 <Link to="/launch-soon" className="button-primary">
-                  Open launch soon
+                  Peržiūrėti atidarymą
                 </Link>
               <Link to="/admin/products" className="button-secondary">
-                Add products in admin
+                Valdyti kolekciją
               </Link>
             </div>
           </div>

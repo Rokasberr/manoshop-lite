@@ -101,15 +101,15 @@ const ShopPage = ({ defaultProductType = "all" }) => {
   return (
     <div className="space-y-8">
       <SectionTitle
-        eyebrow={defaultProductType === "digital" ? "digital collection" : "collection"}
+        eyebrow={defaultProductType === "digital" ? "skaitmeninė kolekcija" : "kolekcija"}
         title={
           defaultProductType === "digital"
-            ? "Digital products for calmer routines and more elevated spaces"
-            : "A considered edit, presented with more room to breathe"
+            ? "Skaitmeniniai produktai ramesnėms rutinoms ir jaukesnėms erdvėms"
+            : "Atrinkta kolekcija ramesnėms, naudingesnėms erdvėms"
         }
         subtitle={
           defaultProductType === "digital"
-            ? "Naršyk PDF gidus, printable rinkinius ir kitus instant download produktus, kuriuos gali gauti iškart po apmokėjimo."
+            ? "Naršyk PDF gidus, spausdinamus rinkinius ir kitus skaitmeninius produktus, kurie atsiranda paskyroje iškart po apmokėjimo."
             : "Naršyk atrinktą kolekciją, filtruok pagal nuotaiką ar kategoriją ir išsirink objektus, kurie jaučiasi verti vietos tavo namuose."
         }
       />
@@ -117,17 +117,17 @@ const ShopPage = ({ defaultProductType = "all" }) => {
       <div className="public-section grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
           <span className="premium-tag">
-            {defaultProductType === "digital" ? "Instant download" : "Seasonal selection"}
+            {defaultProductType === "digital" ? "Iškart po apmokėjimo" : "Sezono atranka"}
           </span>
           <h3 className="mt-5 font-display text-4xl font-bold sm:text-5xl">
             {defaultProductType === "digital"
-              ? "Build a digital ritual shelf instead of waiting for a parcel."
-              : "The collection now feels more editorial than template-like."}
+              ? "Atrakink skaitmeninį turinį nelaukdamas siuntos."
+              : "Rinkis mažiau objektų, bet su daugiau intencijos."}
           </h3>
           <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
             {defaultProductType === "digital"
-              ? "Šioje dalyje rasi printable plakatus, PDF gidus ir plannerius, kuriuos gali atsisiųsti iškart po apmokėjimo. Tai ramus, aukštos maržos sluoksnis tavo brand'ui be fizinės logistikos."
-              : "Vietoje bendro demo katalogo akcentuojame ramesnę naršymo patirtį: švarius kortelių santykius, mažiau triukšmo ir aiškesnį dėmesį pačiam objektui."}
+              ? "Čia rasi spausdinamus plakatus, PDF gidus ir planavimo įrankius, kurie atsiranda paskyroje po apmokėjimo."
+              : "Naršyk atrinktus objektus, filtruok pagal kategoriją ir rinkis tai, kas verta vietos tavo namuose."}
           </p>
         </div>
 
@@ -135,16 +135,16 @@ const ShopPage = ({ defaultProductType = "all" }) => {
           {(
             defaultProductType === "digital"
               ? [
-                  "Instant download access",
-                  "Protected file delivery",
-                  "Receipt archive",
-                  "Bundle-friendly pricing",
+                  "Iškart pasiekiama prieiga",
+                  "Saugus failų pateikimas",
+                  "Sąskaitų archyvas",
+                  "Rinkinių vertė",
                 ]
               : [
-                  "Curated categories",
-                  "Secure checkout",
-                  "Receipt archive",
-                  "Member-only pricing",
+                  "Atrinktos kategorijos",
+                  "Saugus apmokėjimas",
+                  "Sąskaitų archyvas",
+                  "Nario kainodara",
                 ]
           ).map((item) => (
             <div key={item} className="marketing-mini-card flex items-center justify-between">
@@ -165,10 +165,10 @@ const ShopPage = ({ defaultProductType = "all" }) => {
 
       <div className="flex items-center justify-between gap-4">
         <p className="text-sm text-muted">
-          Pieces found: <span className="font-semibold text-current">{pagination.total}</span>
+          Rasta: <span className="font-semibold text-current">{pagination.total}</span>
         </p>
         <p className="text-sm text-muted">
-          Page {pagination.page} of {pagination.pages}
+          Puslapis {pagination.page} iš {pagination.pages}
         </p>
       </div>
 
@@ -180,15 +180,14 @@ const ShopPage = ({ defaultProductType = "all" }) => {
         <EmptyState
           title="No pieces matched this edit"
           description="Pabandyk kitą paieškos frazę arba nuimk dalį filtrų."
-          actionLabel="Show everything"
+          actionLabel="Rodyti viską"
           onAction={handleReset}
         />
       ) : (
         <>
           {filters.productType === "digital" && (
             <div className="rounded-[28px] border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800">
-              Rodomi tik skaitmeniniai produktai: PDF gidai, printable rinkiniai ir instant download
-              kolekcijos.
+              Rodomi tik skaitmeniniai produktai: PDF gidai, spausdinami rinkiniai ir iškart pasiekiamos kolekcijos.
             </div>
           )}
 

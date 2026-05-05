@@ -72,25 +72,25 @@ const demoEntries = [
 const demoCopy = {
   lt: {
     chip: "Nario programa",
-    title: "Programa, kuri parodo, kur realiai pradėti taupyti pinigus.",
+    title: "Stilloak parodo, kur pinigai slysta ir ką verta keisti pirmiausia.",
     intro:
-      "`Stilloak` yra members-only modulis tavo paskyroje: išlaidų sekimas, mėnesių palyginimai, biudžetų ribos ir automatiniai signalai, kurie parodo, kur pirmiausia atsiranda vietos sutaupyti.",
+      "Stilloak yra privati nario erdvė išlaidoms, biudžetams, tikslams ir mėnesio signalams. Ji padeda priimti mažiau sprendimų iš nuojautos ir daugiau iš aiškaus vaizdo.",
     primary: "Atrakinti Circle",
     primaryOpen: "Atidaryti Stilloak",
     secondary: "Peržiūrėti narystę",
     monthLabel: "Šis mėnuo",
     averageLabel: "Vidutinė išlaida",
     topLabel: "Top kategorija",
-    previewTitle: "Stilloak preview",
-    previewSubtitle: "Kaip programa padeda taupyti",
+    previewTitle: "Stilloak peržiūra",
+    previewSubtitle: "Kaip atrodo aiškesnis mėnuo",
     monthPulse: "Mėnesio pulsas",
     signalTitle: "Taupymo signalas",
-    signalText: "Maistas šį mėnesį sudaro didžiausią dalį, todėl būtent čia verta pradėti nuo mažų pokyčių.",
+    signalText: "Maisto kategorija artėja prie ribos, todėl čia verta pradėti nuo mažų, aiškių korekcijų.",
     memberChangeTitle: "Kas pasikeičia su naryste",
     reasons: [
       {
         icon: WalletCards,
-        title: "Matai, kur pinigai išteka",
+        title: "Matai, kur pinigai slysta",
         description: "Ne per bendrą jausmą, o per aiškias kategorijas, sumas ir pasikartojančius įpročius.",
       },
       {
@@ -100,7 +100,7 @@ const demoCopy = {
       },
       {
         icon: PiggyBank,
-        title: "Lengviau priimi sprendimus",
+        title: "Sprendimai tampa lengvesni",
         description: "Kai skaičiai aiškūs, lengviau nuspręsti, ką mažinti, o ko nereikia liesti.",
       },
       {
@@ -110,15 +110,15 @@ const demoCopy = {
       },
     ],
     transformations: [
-      "Matai kuri kategorija brangsta greičiausiai",
-      "Gali nustatyti mėnesio limitus maistui, transportui ar laisvalaikiui",
-      "Matai ar likai biudžete, ar viršijai",
-      "Gali grįžti prie aiškaus mėnesio vaizdo bet kada",
+      "Matai, kuri kategorija brangsta greičiausiai",
+      "Nustatai mėnesio limitus maistui, transportui ar laisvalaikiui",
+      "Iš karto matai, ar likai biudžete",
+      "Grįžti prie aiškaus mėnesio vaizdo bet kada",
     ],
     first10Eyebrow: "Pirmos 10 minučių",
-    first10Title: "Taip narys pradeda naudotis programa realiai.",
+    first10Title: "Taip narys pradeda be chaoso.",
     first10Intro:
-      "Narystė čia parduodama ne dėl papildomų ekranų, o dėl greitesnio rezultato: aiškesnio mėnesio vaizdo ir mažiau chaoso sprendžiant, ką mažinti.",
+      "Narystė suteikia greitesnį rezultatą: aiškesnį mėnesio vaizdą ir mažiau chaoso sprendžiant, ką mažinti.",
     journey: [
       {
         step: "01",
@@ -136,13 +136,13 @@ const demoCopy = {
         text: "Vietoje bendro jausmo gauni konkretų veiksmą: ką pristabdyti, kur neviršyti limito ir kiek atsidėti tikslui.",
       },
     ],
-    compareChip: "Public vs member",
-    compareTitle: "Viešai matai pažadą, narys gauna sistemą.",
+    compareChip: "Peržiūra ir narystė",
+    compareTitle: "Peržiūra parodo pažadą. Narystė atrakina sistemą.",
     comparisonRows: [
       {
-        label: "Demo puslapis",
-        publicValue: "Matai kaip veikia ir kokias problemas sprendžia",
-        memberValue: "Naudoji pilną dashboardą su savo skaičiais",
+        label: "Peržiūra",
+        publicValue: "Matai, kaip veikia pagrindinė logika",
+        memberValue: "Naudoji pilną darbo erdvę su savo skaičiais",
       },
       {
         label: "Biudžetai",
@@ -151,7 +151,7 @@ const demoCopy = {
       },
       {
         label: "Automatinės įžvalgos",
-        publicValue: "Supranti, kad jos egzistuoja",
+        publicValue: "Matai pavyzdinius signalus",
         memberValue: "Gauni konkrečius signalus iš savo mėnesio duomenų",
       },
       {
@@ -162,46 +162,46 @@ const demoCopy = {
     ],
     openMember: "Atidaryti nario versiją",
     unlockMember: "Atrakinti nario prieigą",
-    viewPricing: "Peržiūrėti kainodarą",
-    publicLabel: "Vieša peržiūra",
-    memberLabel: "Nario versija",
+    viewPricing: "Peržiūrėti narystę",
+    publicLabel: "Peržiūra",
+    memberLabel: "Narystė",
     whatMemberSees: "Ką mato narys",
-    memberTitle: "Programa ne tik seka išlaidas, bet parodo aiškią kryptį.",
+    memberTitle: "Programa ne tik seka išlaidas. Ji parodo kryptį.",
     memberText:
-      "Tikras narys savo paskyroje mato gyvą dashboardą: gali pridėti išlaidas, jas redaguoti, filtruoti pagal kategoriją, stebėti mėnesio pokytį ir iškart matyti, ar telpa į nusistatytus biudžetus.",
-    accessChip: "Prieigos modelis",
-    accessTitle: "Atrakinta tik po narystės pirkimo.",
+      "Tikras narys savo paskyroje mato gyvą darbo erdvę: gali pridėti išlaidas, jas redaguoti, filtruoti pagal kategoriją, stebėti mėnesio pokytį ir iškart matyti, ar telpa į nusistatytus biudžetus.",
+    accessChip: "Prieiga",
+    accessTitle: "Pilna versija atrakinta nariams.",
     accessText:
-      "Viešai matai, kaip programa atrodo ir kuo ji naudinga. Pilnas įrankis atsiranda tik aktyviame Circle arba Private plane, prisijungus prie paskyros.",
+      "Peržiūra parodo, kaip Stilloak veikia. Pilna darbo erdvė atsiranda aktyviame Circle arba Private plane.",
     accessBullets: [
-      { icon: LockKeyhole, text: "Pilnas dashboardas atsidaro tik aktyviems nariams." },
-      { icon: ShieldCheck, text: "Serveris irgi tikrina membership, ne tik frontend." },
-      { icon: BadgeEuro, text: "Paskirtis aiški: padėti pamatyti realias taupymo vietas ir biudžeto ribas." },
+      { icon: LockKeyhole, text: "Pilna darbo erdvė atsidaro tik aktyviems nariams." },
+      { icon: ShieldCheck, text: "Prieiga susieta su tavo privačia paskyra." },
+      { icon: BadgeEuro, text: "Tikslas aiškus: pamatyti taupymo vietas ir biudžeto ribas." },
     ],
     includedTitle: "Įskaičiuota į Circle",
     journalCta: "Peržiūrėti Journal",
   },
   en: {
     chip: "Member program",
-    title: "A program that shows where to start saving money for real.",
+    title: "Stilloak shows where money slips and what to change first.",
     intro:
-      "`Stilloak` is the members-only module inside your account: spending tracking, month-to-month comparison, budget limits, and automated signals that show where room to save appears first.",
+      "`Stilloak` is a private member space for spending, budgets, goals, and monthly signals. It helps you make fewer decisions from instinct and more from a clear picture.",
     primary: "Start with Circle",
     primaryOpen: "Open Stilloak",
     secondary: "View membership",
     monthLabel: "This month",
     averageLabel: "Average expense",
     topLabel: "Top category",
-    previewTitle: "Stilloak preview",
-    previewSubtitle: "How the program helps you save",
+    previewTitle: "Stilloak demo",
+    previewSubtitle: "What a clearer month looks like",
     monthPulse: "Month pulse",
     signalTitle: "Savings signal",
-    signalText: "Food takes the largest share this month, so that is where small changes are most worth starting with.",
+    signalText: "Food is moving close to its limit, so this is where small, clear adjustments are worth starting.",
     memberChangeTitle: "What changes with membership",
     reasons: [
       {
         icon: WalletCards,
-        title: "You see where money leaks out",
+        title: "You see where money slips",
         description: "Not through a vague feeling, but through clear categories, totals, and recurring habits.",
       },
       {
@@ -211,7 +211,7 @@ const demoCopy = {
       },
       {
         icon: PiggyBank,
-        title: "You make decisions faster",
+        title: "Decisions become easier",
         description: "Once the numbers are clear, it becomes easier to decide what to cut and what to leave alone.",
       },
       {
@@ -223,13 +223,13 @@ const demoCopy = {
     transformations: [
       "See which category is rising fastest",
       "Set monthly limits for food, transport, or lifestyle",
-      "See whether you stayed inside budget or exceeded it",
+      "See immediately whether you stayed inside budget",
       "Return to a clearer monthly picture at any time",
     ],
     first10Eyebrow: "First 10 minutes",
-    first10Title: "How a member starts using the program for real.",
+    first10Title: "How a member starts without chaos.",
     first10Intro:
-      "Membership is not sold here because of extra screens. It is sold because it creates a faster result: a clearer month and less chaos when deciding what to reduce.",
+      "Membership creates a faster result: a clearer month and less chaos when deciding what to reduce.",
     journey: [
       {
         step: "01",
@@ -247,12 +247,12 @@ const demoCopy = {
         text: "Instead of a vague feeling, you get a concrete next step: what to slow down, where not to exceed the limit, and how much to set aside.",
       },
     ],
-    compareChip: "Public vs member",
-    compareTitle: "Public visitors see the promise. Members get the system.",
+    compareChip: "Demo and membership",
+    compareTitle: "The demo shows the promise. Membership unlocks the system.",
     comparisonRows: [
       {
-        label: "Demo page",
-        publicValue: "You understand how it works and what problem it solves",
+        label: "Demo",
+        publicValue: "You see how the core logic works",
         memberValue: "You use the full dashboard with your own numbers",
       },
       {
@@ -262,7 +262,7 @@ const demoCopy = {
       },
       {
         label: "Automatic insights",
-        publicValue: "You understand that they exist",
+        publicValue: "You see example signals",
         memberValue: "You receive concrete signals from your own monthly data",
       },
       {
@@ -273,21 +273,21 @@ const demoCopy = {
     ],
     openMember: "Open member version",
     unlockMember: "Unlock member access",
-    viewPricing: "View pricing",
-    publicLabel: "Public",
-    memberLabel: "Member",
+    viewPricing: "View membership",
+    publicLabel: "Demo",
+    memberLabel: "Membership",
     whatMemberSees: "What the member sees",
-    memberTitle: "The program does more than track expenses. It gives a direction.",
+    memberTitle: "The program does more than track expenses. It gives direction.",
     memberText:
       "A real member sees a living dashboard inside the account: they can add expenses, edit them, filter by category, track monthly change, and instantly see whether spending still fits their budgets.",
-    accessChip: "Access model",
-    accessTitle: "Unlocked only after membership purchase.",
+    accessChip: "Access",
+    accessTitle: "The full version unlocks for members.",
     accessText:
-      "Publicly, you see how the program looks and what it helps with. The full tool appears only inside an active Circle or Private plan after sign-in.",
+      "The demo shows how Stilloak works. The full workspace appears inside an active Circle or Private plan.",
     accessBullets: [
       { icon: LockKeyhole, text: "The full dashboard opens only for active members." },
-      { icon: ShieldCheck, text: "The server also checks membership, not just the frontend." },
-      { icon: BadgeEuro, text: "Its role is clear: help you spot real savings opportunities and budget pressure." },
+      { icon: ShieldCheck, text: "Access is tied to your private account." },
+      { icon: BadgeEuro, text: "The goal is clear: spot savings opportunities and budget pressure." },
     ],
     includedTitle: "Included in Circle",
     journalCta: "View Journal",
@@ -342,7 +342,7 @@ const SavingsStudioDemoPage = () => {
                 <p className="text-sm font-semibold text-white">{copy.previewTitle}</p>
                 <p className="text-xs text-white/50">{copy.previewSubtitle}</p>
               </div>
-              <span className="hero-chip">Demo</span>
+              <span className="hero-chip">{copy.publicLabel}</span>
             </div>
 
             <div className="mt-6 grid gap-4 lg:grid-cols-[1.08fr_0.92fr]">

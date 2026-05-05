@@ -17,8 +17,8 @@ const CartPage = () => {
     return (
       <EmptyState
         title="Krepšelis dar tuščias"
-        description="Pridėk bent vieną produktą, kad galėtum tęsti checkout procesą."
-        actionLabel="Pradėti apsipirkti"
+        description="Pridėk produktą ir saugiai užbaik pirkimą, kai būsi pasiruošęs."
+        actionLabel="Peržiūrėti kolekciją"
       />
     );
   }
@@ -26,15 +26,15 @@ const CartPage = () => {
   return (
     <div className="space-y-8">
       <SectionTitle
-        eyebrow="cart"
-        title="Tavo krepšelis realiu laiku"
-        subtitle="Keisk kiekius, pašalink prekes ir matyk sumą iš karto per Context API."
+        eyebrow="krepšelis"
+        title="Tavo krepšelis"
+        subtitle="Peržiūrėk pasirinkimus, pakoreguok kiekį ir tęsk į saugų apmokėjimą."
       />
 
       {STORE_PURCHASES_PAUSED && (
         <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-          {STORE_PURCHASES_PAUSED_MESSAGE} Jei krepšelyje liko senesnių prekių, jas gali pašalinti, bet checkout
-          laikinai sustabdytas.
+          {STORE_PURCHASES_PAUSED_MESSAGE} Jei krepšelyje liko ankstesnių prekių, jas gali pašalinti, bet apmokėjimas
+          laikinai pristabdytas.
         </div>
       )}
 
@@ -86,7 +86,7 @@ const CartPage = () => {
         </div>
 
         <aside className="panel h-fit p-6">
-          <p className="eyebrow">summary</p>
+          <p className="eyebrow">suvestinė</p>
           <h2 className="mt-4 font-display text-3xl font-bold">Užsakymo suvestinė</h2>
 
           <div className="mt-6 space-y-4 text-sm">
@@ -112,11 +112,11 @@ const CartPage = () => {
 
           {STORE_PURCHASES_PAUSED ? (
             <button type="button" disabled className="button-primary mt-8 w-full cursor-not-allowed opacity-60">
-              Checkout paused
+              Apmokėjimas pristabdytas
             </button>
           ) : (
             <Link to="/checkout" className="button-primary mt-8 w-full">
-              Tęsti į checkout
+              Tęsti į apmokėjimą
             </Link>
           )}
         </aside>

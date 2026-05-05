@@ -17,14 +17,14 @@ const navbarCopy = {
       membership: "Narystė",
       admin: "Admin",
     },
-    tagline: "ramesnis aiškumas",
+    tagline: "aiškesnis mėnuo",
     bag: "Krepšelis",
     signOut: "Atsijungti",
     signIn: "Prisijungti",
     join: "Atrakinti narystę",
     openStudio: "Atidaryti Stilloak",
     languageLabel: "Kalba",
-    studioLabel: "nario pinigų erdvė",
+    studioLabel: "privati nario erdvė",
   },
   en: {
     nav: {
@@ -35,14 +35,14 @@ const navbarCopy = {
       membership: "Membership",
       admin: "Admin",
     },
-    tagline: "calmer clarity",
+    tagline: "clearer months",
     bag: "Bag",
     signOut: "Sign out",
     signIn: "Sign in",
     join: "Unlock membership",
     openStudio: "Open Stilloak",
     languageLabel: "Language",
-    studioLabel: "member money space",
+    studioLabel: "private member space",
   },
   pl: {
     nav: {

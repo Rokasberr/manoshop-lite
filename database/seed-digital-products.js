@@ -10,9 +10,9 @@ const digitalProducts = [
   {
     name: "Calm Home Poster Bundle",
     description:
-      "A curated printable wall art bundle with warm neutrals, abstract forms, and quiet typography for a calmer, more elevated home.",
+      "Šiltas spausdinamų sienos darbų rinkinys su švelniais neutralais, abstrakčiomis formomis ir ramia tipografija.",
     price: 24,
-    category: "Digital Products",
+    category: "Skaitmeniniai produktai",
     productType: "digital",
     images: [
       "/stilloak/collection/digital-bundle.svg",
@@ -22,16 +22,16 @@ const digitalProducts = [
     digitalAsset: {
       storagePath: "posters/calm-home-poster-bundle-guide.pdf",
       fileName: "calm-home-poster-bundle-guide.pdf",
-      downloadLabel: "Atsisiųsti poster bundle",
+      downloadLabel: "Atsisiųsti plakatų rinkinį",
       mimeType: "application/pdf",
     },
   },
   {
     name: "The Atelier Living Room Guide",
     description:
-      "A premium digital guide to layout, palette, texture, and styling choices that make your living room feel calmer and more elevated.",
+      "Ramus gidas svetainės išdėstymui, paletei, tekstūroms ir jaukesniems stilistikos sprendimams.",
     price: 29,
-    category: "Digital Products",
+    category: "Skaitmeniniai produktai",
     productType: "digital",
     images: [
       "/stilloak/collection/ai-summaries.svg",
@@ -48,9 +48,9 @@ const digitalProducts = [
   {
     name: "Sunday Reset Ritual Planner",
     description:
-      "A calm digital planner for weekly resets, self-care rituals, reflection, and more intentional routines.",
+      "Ramus skaitmeninis planavimo įrankis savaitės peržiūrai, refleksijai ir sąmoningesnėms rutinoms.",
     price: 16,
-    category: "Digital Products",
+    category: "Skaitmeniniai produktai",
     productType: "digital",
     images: [
       "/stilloak/collection/monthly-rhythm.svg",
@@ -60,16 +60,16 @@ const digitalProducts = [
     digitalAsset: {
       storagePath: "planners/sunday-reset-ritual-planner.pdf",
       fileName: "sunday-reset-ritual-planner.pdf",
-      downloadLabel: "Atsisiųsti plannerį",
+      downloadLabel: "Atsisiųsti planavimo įrankį",
       mimeType: "application/pdf",
     },
   },
   {
     name: "Home Edit Bundle",
     description:
-      "A premium two-part digital set that combines the Calm Home Poster Bundle with The Atelier Living Room Guide for a quiet but practical room refresh.",
+      "Dviejų dalių skaitmeninis rinkinys su sienos darbais ir svetainės gidu ramiam kambario atnaujinimui.",
     price: 39,
-    category: "Digital Products",
+    category: "Skaitmeniniai produktai",
     productType: "digital",
     images: [
       "/stilloak/collection/digital-bundle.svg",
@@ -79,16 +79,16 @@ const digitalProducts = [
     digitalAsset: {
       storagePath: "bundles/home-edit-bundle.pdf",
       fileName: "home-edit-bundle.pdf",
-      downloadLabel: "Atsisiųsti Home Edit Bundle",
+      downloadLabel: "Atsisiųsti Home Edit rinkinį",
       mimeType: "application/pdf",
     },
   },
   {
     name: "Calm Living Bundle",
     description:
-      "The full three-part digital collection with printable wall art, an interior styling guide, and the Sunday Reset planner in one higher-value bundle.",
+      "Pilnas skaitmeninis rinkinys su spausdinamais sienos darbais, interjero gidu ir Sunday Reset planuokliu.",
     price: 49,
-    category: "Digital Products",
+    category: "Skaitmeniniai produktai",
     productType: "digital",
     images: [
       "/stilloak/collection/private-archive.svg",
@@ -98,7 +98,7 @@ const digitalProducts = [
     digitalAsset: {
       storagePath: "bundles/calm-living-bundle.pdf",
       fileName: "calm-living-bundle.pdf",
-      downloadLabel: "Atsisiųsti Calm Living Bundle",
+      downloadLabel: "Atsisiųsti Calm Living rinkinį",
       mimeType: "application/pdf",
     },
   },
