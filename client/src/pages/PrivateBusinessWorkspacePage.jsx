@@ -160,79 +160,84 @@ const offerFields = [
 const websiteAuditItems = [
   {
     id: "first-screen",
-    title: "Pirmas ekranas pasako, kam skirtas pasiūlymas",
-    text: "Per kelias sekundes aišku, kas čia padedama ir kokį rezultatą žmogus gali tikėtis gauti.",
+    title: "Pirmas sakinys aiškiai pasako vertę",
+    text: "Lankytojas iš karto supranta, kokį rezultatą ar pokytį siūlai.",
   },
   {
     id: "main-cta",
-    title: "Pagrindinis CTA yra vienas ir lengvai randamas",
-    text: "Svarbiausias veiksmas nekonkuruoja su keliais kitais mygtukais ar skirtingomis kryptimis.",
+    title: "Pagrindinis CTA matomas",
+    text: "Svarbiausias veiksmas yra lengvai randamas ir nekonkuruoja su kitais kvietimais.",
   },
   {
-    id: "offer-value",
-    title: "Vertė aprašyta prieš funkcijas",
-    text: "Klientas pirmiausia pamato naudą, situaciją ir pokytį, o tik tada detales ar sąrašus.",
+    id: "plan-difference",
+    title: "Narystės / paslaugų planai aiškiai skiriasi",
+    text: "Klientas supranta, kodėl vienas planas ar paslauga verta daugiau nei kita.",
   },
   {
     id: "trust-signal",
-    title: "Prieš sprendimą yra pasitikėjimo signalas",
-    text: "Matomas procesas, patirtis, pavyzdys, saugumo sakinys arba aiškus paaiškinimas, kas vyksta toliau.",
+    title: "Yra pasitikėjimo tekstas",
+    text: "Matomas procesas, saugumo sakinys, patirtis arba paaiškinimas, kas vyksta toliau.",
   },
   {
     id: "mobile-scan",
-    title: "Mobilus vaizdas lengvai nuskaitomas",
-    text: "Antraštės, mygtukai ir kainos telpa be horizontalaus slinkimo ar tekstų susigrūdimo.",
+    title: "Mobilus vaizdas atrodo tvarkingai",
+    text: "Tekstai, mygtukai ir kainos telpa be horizontalaus slinkimo ar susigrūdimo.",
   },
   {
-    id: "pricing-clarity",
-    title: "Kaina arba pasirinkimai turi aiškų skirtumą",
-    text: "Jei yra keli lygiai, žmogus supranta, kodėl verta rinktis aukštesnį variantą.",
+    id: "next-step",
+    title: "Klientas supranta kitą žingsnį",
+    text: "Po pasiūlymo aišku, ar reikia pirkti, registruotis, rašyti ar peržiūrėti detales.",
+  },
+  {
+    id: "payment-trust",
+    title: "Kontaktas / apmokėjimas atrodo patikimai",
+    text: "Kontaktų, užklausos ar apmokėjimo vieta atrodo saugi, aiški ir profesionali.",
   },
 ];
 
 const growthRoadmapPhases = [
   {
     id: "week-1",
-    label: "1 savaitė",
-    title: "Sutvarkyti aiškumą",
-    focus: "Pasiūlymas, pirmas ekranas ir vienas pagrindinis veiksmas.",
+    label: "Week 1",
+    title: "Aiškumas",
+    focus: "Sutvarkyk pagrindinę žinutę, kad klientas greitai suprastų vertę.",
     actions: [
-      { id: "w1-profile", text: "Užpildyti verslo profilį ir pagrindinį mėnesio tikslą." },
-      { id: "w1-offer", text: "Pabaigti pasiūlymo aiškumo tekstą ir pasirinkti vieną CTA." },
-      { id: "w1-audit", text: "Pereiti svetainės aiškumo auditą ir pažymėti silpniausią vietą." },
+      { id: "w1-offer", text: "Perrašyti pagrindinį pasiūlymą" },
+      { id: "w1-cta", text: "Patikrinti pagrindinį CTA" },
+      { id: "w1-client", text: "Aprašyti tikslinį klientą" },
     ],
   },
   {
     id: "week-2",
-    label: "2 savaitė",
-    title: "Sustiprinti pasitikėjimą",
-    focus: "Procesas, įrodymai ir saugus sprendimo kelias.",
+    label: "Week 2",
+    title: "Pasiūlymas",
+    focus: "Sustiprink kainodarą, planų skirtumus ir pasitikėjimo pagrindą.",
     actions: [
-      { id: "w2-proof", text: "Pridėti vieną pasitikėjimo signalą prieš pagrindinį CTA." },
-      { id: "w2-pricing", text: "Patikrinti, ar kainos ar planai aiškiai skiriasi pagal rezultatą." },
-      { id: "w2-mobile", text: "Peržiūrėti svarbiausią puslapį telefone ir pašalinti teksto perkrovą." },
+      { id: "w2-pricing", text: "Sutvarkyti kainodarą" },
+      { id: "w2-value", text: "Aiškiai atskirti planų vertę" },
+      { id: "w2-trust", text: "Pridėti pasitikėjimo tekstą" },
     ],
   },
   {
     id: "week-3",
-    label: "3 savaitė",
-    title: "Paruošti pardavimo ritmą",
-    focus: "Žinutė, turinys ir klientui suprantamas kitas žingsnis.",
+    label: "Week 3",
+    title: "Pardavimas",
+    focus: "Paruošk vieną aiškią žinutę, turinio veiksmą ir saugų sprendimo kelią.",
     actions: [
-      { id: "w3-message", text: "Panaudoti sugeneruotą pardavimo žinutę viename laiške ar įraše." },
-      { id: "w3-content", text: "Paruošti vieną turinio idėją, kuri paaiškina problemą prieš pardavimą." },
-      { id: "w3-followup", text: "Užrašyti trumpą follow-up sakinį žmonėms, kurie dar neapsisprendė." },
+      { id: "w3-message", text: "Paruošti vieną pardavimo žinutę" },
+      { id: "w3-content", text: "Sukurti vieną turinio įrašą" },
+      { id: "w3-checkout", text: "Patikrinti checkout / kontaktą" },
     ],
   },
   {
     id: "week-4",
-    label: "4 savaitė",
-    title: "Įvertinti ir pasirinkti kitą svertą",
-    focus: "Kas veikė, kas stringa ir ką verta gerinti kitą mėnesį.",
+    label: "Week 4",
+    title: "Optimizavimas",
+    focus: "Peržiūrėk rezultatus, pašalink trintį ir pasiruošk kitam mėnesiui.",
     actions: [
-      { id: "w4-review", text: "Peržiūrėti, kurie aiškumo audito punktai liko nepažymėti." },
-      { id: "w4-results", text: "Užrašyti vieną kokybinį rezultatą: daugiau užklausų, aiškesni pokalbiai arba mažiau klausimų." },
-      { id: "w4-next", text: "Pasirinkti kitą mėnesio prioritetą sprendimų kambaryje." },
+      { id: "w4-results", text: "Peržiūrėti rezultatus" },
+      { id: "w4-weaknesses", text: "Pašalinti silpnas vietas" },
+      { id: "w4-next-month", text: "Suplanuoti kitą mėnesį" },
     ],
   },
 ];
@@ -1043,23 +1048,28 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
 
       <section id="svetaines-auditas" className="grid gap-6 xl:grid-cols-[0.82fr_1fr]">
         <div className="surface-dark rounded-lg p-6 sm:p-8">
-          <span className="hero-chip">Website Clarity Audit</span>
-          <h2 className="mt-6 font-display text-4xl font-bold leading-tight">Svetainės aiškumo patikra</h2>
+          <span className="hero-chip">Svetainės aiškumo auditas</span>
+          <h2 className="mt-6 font-display text-4xl font-bold leading-tight">Svetainės aiškumo auditas</h2>
           <p className="mt-5 text-sm leading-7 text-white/72">
             Trumpas kontrolinis sąrašas padeda pamatyti, ar verslo pasiūlymas aiškus prieš klientui priimant sprendimą.
           </p>
           <div className="mt-7 rounded-lg border border-white/10 p-5">
-            <p className="text-xs font-semibold uppercase leading-5 text-white/48">audito progresas</p>
-            <p className="mt-3 font-display text-4xl font-bold">
-              {completedAuditItems}/{websiteAuditItems.length}
+            <p className="text-xs font-semibold uppercase leading-5 text-white/48">progresas</p>
+            <p className="mt-3 font-display text-3xl font-bold leading-tight">
+              Audito progresas: {completedAuditItems} iš {websiteAuditItems.length}
             </p>
           </div>
+          {completedAuditItems === websiteAuditItems.length && (
+            <p className="mt-5 rounded-lg border border-white/10 p-4 text-sm font-semibold leading-6 text-white/78">
+              Svetainės aiškumas paruoštas kitam augimo žingsniui.
+            </p>
+          )}
         </div>
 
         <div className="panel p-6 sm:p-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <SectionHeading
-              eyebrow="Svetainės aiškumas"
+              eyebrow="Svetainės aiškumo auditas"
               title="Patikrink svarbiausias konversijos vietas"
               text="Pažymėjimai saugomi tik šiame įrenginyje. Tai nėra automatinis svetainės skenavimas."
             />
@@ -1254,15 +1264,15 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
 
       <section id="veiksmu-planas" className="grid gap-6 xl:grid-cols-[0.85fr_1fr]">
         <div className="surface-dark rounded-lg p-6 sm:p-8">
-          <span className="hero-chip">30 dienų augimo kelias</span>
-          <h2 className="mt-6 font-display text-4xl font-bold leading-tight">Verslo augimo roadmap</h2>
+          <span className="hero-chip">30 dienų verslo augimo planas</span>
+          <h2 className="mt-6 font-display text-4xl font-bold leading-tight">30 dienų verslo augimo planas</h2>
           <p className="mt-5 text-sm leading-7 text-white/72">
             Keturių savaičių struktūra padeda judėti nuo aiškaus pasiūlymo iki pasitikėjimo, pardavimo ritmo ir mėnesio peržiūros.
           </p>
           <div className="mt-7 rounded-lg border border-white/10 p-5">
-            <p className="text-xs font-semibold uppercase leading-5 text-white/48">progresas</p>
-            <p className="mt-3 font-display text-4xl font-bold">
-              {completedRoadmapActions}/{growthRoadmapActionIds.length}
+            <p className="text-xs font-semibold uppercase leading-5 text-white/48">roadmap progresas</p>
+            <p className="mt-3 font-display text-3xl font-bold leading-tight">
+              Atlikta: {completedRoadmapActions} iš {growthRoadmapActionIds.length}
             </p>
           </div>
           <p className="mt-5 text-xs font-semibold uppercase leading-5 text-white/48">
@@ -1273,7 +1283,7 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
         <div className="panel p-6 sm:p-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <SectionHeading
-              eyebrow="30 dienų roadmap"
+              eyebrow="30 dienų verslo augimo planas"
               title="Ką daryti kiekvieną savaitę"
               text="Roadmap yra praktinė peržiūra. Pažymėjimai lieka tik šiame įrenginyje."
             />
