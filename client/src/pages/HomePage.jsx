@@ -16,7 +16,7 @@ import { useLanguage } from "../context/LanguageContext";
 const getPlanPriceLabel = (planId) => {
   const plan = subscriptionPlans.find((item) => item.id === planId);
 
-  return plan ? `${plan.price} €${plan.intervalLabel}` : "";
+  return plan ? `${Number(plan.price || 0).toFixed(2)} €${plan.intervalLabel}` : "";
 };
 
 const homeCopy = {
@@ -27,7 +27,7 @@ const homeCopy = {
       "Pasirink Bazinį startui, Asmeninį pilnai nario programai arba Privatų verslą strateginei verslo erdvei.",
     primaryCta: "Peržiūrėti narystes",
     secondaryCta: "Pamatyti kaip veikia",
-    trustLine: "Saugus apmokėjimas · Atšauk bet kada · Aiškūs narystės lygiai · Jokių paslėptų mokesčių",
+    trustLine: "Saugus apmokėjimas · Atšauk bet kada · Jokių paslėptų mokesčių",
     heroSignals: [
       "Aiški nario erdvė mėnesio planavimui",
       "Skaitmeniniai resursai ir nario naujienos pagal planą",
@@ -154,7 +154,7 @@ const homeCopy = {
       "Choose Bazinis for a simple start, Asmeninis for the full member program, or Privatus verslas for a strategic business space.",
     primaryCta: "View memberships",
     secondaryCta: "See how it works",
-    trustLine: "Secure payment · Cancel anytime · Clear membership levels · No hidden fees",
+    trustLine: "Secure payment · Cancel anytime · No hidden fees",
     heroSignals: [
       "Clear member space for monthly planning",
       "Digital resources and member news by plan",

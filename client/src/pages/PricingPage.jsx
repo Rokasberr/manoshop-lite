@@ -8,12 +8,7 @@ import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import billingService from "../services/billingService";
 
-const formatPlanPrice = (value) =>
-  new Intl.NumberFormat("lt-LT", {
-    style: "currency",
-    currency: "EUR",
-    maximumFractionDigits: 0,
-  }).format(value || 0);
+const formatPlanPrice = (value, intervalLabel) => `${Number(value || 0).toFixed(2)} €${intervalLabel}`;
 
 const planVisuals = {
   free: {
@@ -70,7 +65,7 @@ const pricingCopy = {
       {
         id: "free",
         label: "Bazinis",
-        title: "Ramus startas už 9 €/mėn.",
+        title: "Ramus startas už 5.99 €/mėn.",
         purpose: "Nariui, kuris nori pradėti su aiškia mėnesio kryptimi ir paprastais įrankiais.",
         included: "Pagrindinė nario erdvė, mėnesio apžvalga, riboti resursai ir nario naujienų peržiūros.",
         value: "Padeda pajudėti be didelio įsipareigojimo ir iškart suteikia praktinį pradžios sluoksnį.",
@@ -137,7 +132,7 @@ const pricingCopy = {
       {
         id: "free",
         label: "Bazinis",
-        title: "A calm start for 9 €/mo.",
+        title: "A calm start for 5.99 €/mo.",
         purpose: "For members who want a clear monthly direction and simple starting tools.",
         included: "Basic member area, monthly overview, limited resources, and member-news previews.",
         value: "Helps you begin without a large commitment while still giving useful entry-level value.",
@@ -273,10 +268,9 @@ const PricingPage = () => {
                     {plan.description}
                   </p>
 
-                  <div className="mt-7 flex flex-wrap items-end gap-x-2 gap-y-1">
-                    <span className="break-words font-display text-4xl font-bold sm:text-5xl">{formatPlanPrice(plan.price)}</span>
-                    <span className={`pb-1 text-sm ${isFeatured || isPrivate ? "text-white/58" : "text-muted"}`}>
-                      {plan.intervalLabel}
+                  <div className="mt-7">
+                    <span className="break-words font-display text-4xl font-bold leading-tight sm:text-5xl">
+                      {formatPlanPrice(plan.price, plan.intervalLabel)}
                     </span>
                   </div>
 

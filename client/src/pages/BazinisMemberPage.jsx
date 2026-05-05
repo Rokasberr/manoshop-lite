@@ -343,7 +343,7 @@ const BazinisMemberPage = () => {
           <div className="min-w-0">
             <div className="flex flex-wrap gap-2">
               <span className="signal-pill">Bazinis planas</span>
-              <span className="signal-pill">9 €/mėn.</span>
+              <span className="signal-pill">5.99 €/mėn.</span>
               <span className="signal-pill">Ribota prieiga</span>
               <span className="signal-pill">Galima atnaujinti bet kada</span>
             </div>
@@ -370,7 +370,7 @@ const BazinisMemberPage = () => {
                   suvestinėmis, progreso kortelėmis, archyvu ir premium resursais.
                 </p>
                 <p className="mt-5 text-xs font-semibold uppercase leading-5 text-muted">
-                  Atšauk bet kada · Atnaujink planą bet kuriuo metu · Saugus apmokėjimas
+                  Saugus apmokėjimas · Atšauk bet kada · Jokių paslėptų mokesčių
                 </p>
               </div>
             </div>
@@ -694,7 +694,7 @@ const BazinisMemberPage = () => {
             <ArrowUpRight size={16} />
           </Link>
           <p className="mt-6 text-xs font-semibold uppercase leading-5 text-white/52">
-            Atšauk bet kada · Atnaujink planą bet kuriuo metu · Saugus apmokėjimas
+            Saugus apmokėjimas · Atšauk bet kada · Jokių paslėptų mokesčių
           </p>
         </div>
 

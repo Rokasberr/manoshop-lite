@@ -2,7 +2,7 @@ export const subscriptionPlans = [
   {
     id: "free",
     name: "Bazinis",
-    price: 9,
+    price: 5.99,
     intervalLabel: "/mėn.",
     description: "Ramus pradžios lygis su pagrindine nario erdve, mėnesio apžvalga ir ribotais skaitmeniniais resursais.",
     provider: "internal",
@@ -18,7 +18,7 @@ export const subscriptionPlans = [
   {
     id: "circle",
     name: "Asmeninis",
-    price: 24,
+    price: 15.99,
     intervalLabel: "/mėn.",
     description: "Pilna asmeninė Stilloak narystė mėnesio suvestinėms, tikslų progresui, nario naujienoms ir premium resursams.",
     provider: "stripe",
@@ -35,7 +35,7 @@ export const subscriptionPlans = [
   {
     id: "private",
     name: "Privatus verslas",
-    price: 99,
+    price: 44.99,
     intervalLabel: "/mėn.",
     description: "Aukščiausias lygis verslui ar projektams: prioritetas, verslo šablonai, premium patirtis ir aiškesnė kryptis.",
     provider: "stripe",
