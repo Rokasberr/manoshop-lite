@@ -2,6 +2,7 @@ import {
   ArrowUpRight,
   BarChart3,
   Briefcase,
+  Building2,
   CheckCircle2,
   ChevronDown,
   ClipboardList,
@@ -18,10 +19,19 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
+const BUSINESS_PROFILE_STORAGE_KEY = "stilloak_private_business_profile";
 const STRATEGY_STORAGE_KEY = "stilloak_private_business_strategy";
 const OFFER_STORAGE_KEY = "stilloak_private_business_offer";
 const ACTION_PLAN_STORAGE_KEY = "stilloak_private_business_action_plan";
 const DECISION_STORAGE_KEY = "stilloak_private_business_decision";
+
+const defaultBusinessProfile = {
+  businessName: "",
+  industry: "",
+  targetClient: "",
+  coreOffer: "",
+  monthlyGoal: "",
+};
 
 const defaultStrategy = {
   monthlyGoal: "Aiškiau suformuluoti pagrindinį pasiūlymą ir pirmą kliento žingsnį.",
@@ -31,10 +41,11 @@ const defaultStrategy = {
 };
 
 const defaultOffer = {
-  audience: "Verslams ar projektų savininkams, kurie nori aiškesnio skaitmeninio augimo kelio.",
-  problem: "Pasiūlymas atrodo geras, bet klientui ne visada aišku, kodėl verta rinktis dabar.",
-  value: "Struktūruota erdvė, kuri padeda aiškiau parodyti vertę, pasitikėjimą ir kitą žingsnį.",
-  nextStep: "Pakviesti klientą pasirinkti planą, peržiūrėti resursą arba pradėti aiškų pirmą veiksmą.",
+  audience: "",
+  problem: "",
+  value: "",
+  difference: "",
+  nextStep: "",
 };
 
 const snapshotCards = [
@@ -61,6 +72,36 @@ const snapshotCards = [
     text: "Vienas praktinis judesys svarbiau už dešimt idėjų.",
     detail: "Privati erdvė padeda išsirinkti, ką gerinti toliau.",
     icon: TrendingUp,
+  },
+];
+
+const businessProfileFields = [
+  {
+    key: "businessName",
+    label: "Verslo pavadinimas",
+    placeholder: "Pvz., Stilloak Studio",
+    compact: true,
+  },
+  {
+    key: "industry",
+    label: "Veiklos sritis",
+    placeholder: "Pvz., konsultacijos, narystė, dizainas, el. prekyba",
+    compact: true,
+  },
+  {
+    key: "targetClient",
+    label: "Tikslinis klientas",
+    placeholder: "Aprašyk, kas yra geriausias klientas šiam pasiūlymui.",
+  },
+  {
+    key: "coreOffer",
+    label: "Pagrindinis pasiūlymas",
+    placeholder: "Įvardink svarbiausią paslaugą, produktą, narystę ar programą.",
+  },
+  {
+    key: "monthlyGoal",
+    label: "Pagrindinis tikslas šį mėnesį",
+    placeholder: "Pvz., aiškiau pristatyti pasiūlymą ir gauti daugiau kokybiškų užklausų.",
   },
 ];
 
@@ -100,8 +141,13 @@ const offerFields = [
   },
   {
     key: "value",
-    title: "Kokia pagrindinė vertė?",
+    title: "Kokią vertę suteikia?",
     placeholder: "Aprašyk, ką klientas gauna praktiškai ar strategiškai.",
+  },
+  {
+    key: "difference",
+    title: "Kuo skiriasi nuo kitų?",
+    placeholder: "Įrašyk, kuo pasiūlymas jaučiasi aiškesnis, ramesnis ar vertingesnis.",
   },
   {
     key: "nextStep",
@@ -269,6 +315,30 @@ const readStoredObject = (key, fallback) => {
   }
 };
 
+const readStoredBusinessProfile = () => {
+  const stored = readStoredObject(BUSINESS_PROFILE_STORAGE_KEY, defaultBusinessProfile);
+
+  return {
+    businessName: stored.businessName || "",
+    industry: stored.industry || stored.businessType || "",
+    targetClient: stored.targetClient || stored.audience || "",
+    coreOffer: stored.coreOffer || "",
+    monthlyGoal: stored.monthlyGoal || stored.growthGoal || "",
+  };
+};
+
+const readStoredOffer = () => {
+  const stored = readStoredObject(OFFER_STORAGE_KEY, defaultOffer);
+
+  return {
+    audience: stored.audience || "",
+    problem: stored.problem || "",
+    value: stored.value || "",
+    difference: stored.difference || stored.proof || "",
+    nextStep: stored.nextStep || "",
+  };
+};
+
 const readStoredActionPlan = () => {
   if (typeof window === "undefined") {
     return {};
@@ -355,15 +425,23 @@ const PrivateBusinessPreview = () => (
 );
 
 const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
+  const [businessProfile, setBusinessProfile] = useState(() =>
+    lockedPreview ? defaultBusinessProfile : readStoredBusinessProfile()
+  );
   const [strategy, setStrategy] = useState(() =>
     lockedPreview ? defaultStrategy : readStoredObject(STRATEGY_STORAGE_KEY, defaultStrategy)
   );
-  const [offer, setOffer] = useState(() =>
-    lockedPreview ? defaultOffer : readStoredObject(OFFER_STORAGE_KEY, defaultOffer)
-  );
+  const [offer, setOffer] = useState(() => (lockedPreview ? defaultOffer : readStoredOffer()));
+  const [offerStatusMessage, setOfferStatusMessage] = useState("");
   const [openResourceIds, setOpenResourceIds] = useState(() => new Set(["offer-structure"]));
   const [selectedDecisionId, setSelectedDecisionId] = useState(() => (lockedPreview ? "clarity" : readStoredDecision()));
   const [checkedActions, setCheckedActions] = useState(() => (lockedPreview ? {} : readStoredActionPlan()));
+
+  useEffect(() => {
+    if (!lockedPreview) {
+      window.localStorage.setItem(BUSINESS_PROFILE_STORAGE_KEY, JSON.stringify(businessProfile));
+    }
+  }, [businessProfile, lockedPreview]);
 
   useEffect(() => {
     if (!lockedPreview) {
@@ -394,7 +472,96 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
     [selectedDecisionId]
   );
 
+  const businessProfileSummary = useMemo(
+    () => [
+      {
+        label: "Verslo pavadinimas",
+        value: businessProfile.businessName.trim(),
+        placeholder: "Pavadinimas dar neįrašytas.",
+      },
+      {
+        label: "Veiklos sritis",
+        value: businessProfile.industry.trim(),
+        placeholder: "Veiklos sritis padės tiksliau formuoti pasiūlymą.",
+      },
+      {
+        label: "Tikslinis klientas",
+        value: businessProfile.targetClient.trim(),
+        placeholder: "Aprašyk, kam šis verslas turi būti aiškiausias.",
+      },
+      {
+        label: "Pagrindinis pasiūlymas",
+        value: businessProfile.coreOffer.trim(),
+        placeholder: "Čia atsiras svarbiausias pasiūlymas.",
+      },
+      {
+        label: "Mėnesio tikslas",
+        value: businessProfile.monthlyGoal.trim(),
+        placeholder: "Pasirink vieną šio mėnesio verslo prioritetą.",
+      },
+    ],
+    [businessProfile]
+  );
+
+  const completedBusinessProfileFields = businessProfileSummary.filter((item) => item.value).length;
+  const businessNameForPreview = businessProfile.businessName.trim() || "Tavo verslas";
+  const targetClientForPreview = offer.audience.trim() || businessProfile.targetClient.trim() || "tiksliniam klientui";
+  const problemForPreview = offer.problem.trim() || "aiškiai suprasti, kodėl verta rinktis";
+  const valueForPreview = offer.value.trim() || businessProfile.coreOffer.trim() || "aiškesnį sprendimo kelią";
+  const differenceForPreview = offer.difference.trim() || "ramiu, struktūruotu ir premium procesu";
+  const nextStepForPreview = offer.nextStep.trim() || "žengti aiškų kitą žingsnį";
+
+  const generatedOfferOutputs = useMemo(
+    () => [
+      {
+        title: "Trumpas sakinys svetainei",
+        text: `${businessNameForPreview} padeda ${targetClientForPreview} ${problemForPreview} ir suteikia ${valueForPreview}.`,
+      },
+      {
+        title: "Hero sekcijos tekstas",
+        text: `Aiškesnis kelias ${targetClientForPreview}. Kai reikia ${problemForPreview}, ${businessNameForPreview} suteikia ${valueForPreview} ir išsiskiria ${differenceForPreview}.`,
+      },
+      {
+        title: "CTA pasiūlymas",
+        text: `Pradėti nuo: ${nextStepForPreview}.`,
+      },
+      {
+        title: "Pardavimo žinutė",
+        text: `Jei šiuo metu svarbu ${problemForPreview}, ${businessNameForPreview} gali padėti per ${valueForPreview}. Pasiūlymas skirtas ${targetClientForPreview}, o pagrindinis skirtumas yra ${differenceForPreview}. Kitas žingsnis: ${nextStepForPreview}.`,
+      },
+    ],
+    [businessNameForPreview, differenceForPreview, nextStepForPreview, problemForPreview, targetClientForPreview, valueForPreview]
+  );
+
+  const generatedOfferText = useMemo(
+    () => generatedOfferOutputs.map((output) => `${output.title}\n${output.text}`).join("\n\n"),
+    [generatedOfferOutputs]
+  );
+
+  const offerClaritySignals = useMemo(
+    () => [
+      { label: "Auditorija", complete: Boolean(offer.audience.trim() || businessProfile.targetClient.trim()) },
+      { label: "Problema", complete: Boolean(offer.problem.trim()) },
+      { label: "Vertė", complete: Boolean(offer.value.trim() || businessProfile.coreOffer.trim()) },
+      { label: "Skirtumas", complete: Boolean(offer.difference.trim()) },
+      { label: "Kitas žingsnis", complete: Boolean(offer.nextStep.trim()) },
+    ],
+    [businessProfile.coreOffer, businessProfile.targetClient, offer]
+  );
+
+  const completedOfferSignals = offerClaritySignals.filter((signal) => signal.complete).length;
   const completedActions = Object.values(checkedActions).filter(Boolean).length;
+
+  const handleBusinessProfileChange = (field, value) => {
+    if (lockedPreview) {
+      return;
+    }
+
+    setBusinessProfile((current) => ({
+      ...current,
+      [field]: value,
+    }));
+  };
 
   const handleStrategyChange = (field, value) => {
     if (lockedPreview) {
@@ -416,6 +583,55 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
       ...current,
       [field]: value,
     }));
+    setOfferStatusMessage("");
+  };
+
+  const handleSaveOffer = () => {
+    if (lockedPreview || typeof window === "undefined") {
+      return;
+    }
+
+    window.localStorage.setItem(OFFER_STORAGE_KEY, JSON.stringify(offer));
+    setOfferStatusMessage("Pasiūlymas išsaugotas.");
+  };
+
+  const handleCopyOffer = async () => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    try {
+      if (window.navigator?.clipboard?.writeText) {
+        await window.navigator.clipboard.writeText(generatedOfferText);
+      } else {
+        const textarea = window.document.createElement("textarea");
+        textarea.value = generatedOfferText;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        window.document.body.appendChild(textarea);
+        textarea.select();
+        window.document.execCommand("copy");
+        window.document.body.removeChild(textarea);
+      }
+
+      setOfferStatusMessage("Pasiūlymas nukopijuotas.");
+    } catch (_error) {
+      setOfferStatusMessage("Nepavyko nukopijuoti teksto.");
+    }
+  };
+
+  const handleClearOffer = () => {
+    if (lockedPreview) {
+      return;
+    }
+
+    setOffer(defaultOffer);
+    setOfferStatusMessage("");
+
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(OFFER_STORAGE_KEY);
+    }
   };
 
   const toggleResource = (resourceId) => {
@@ -467,9 +683,13 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
               augimui.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href="#strategijos-lenta" className="button-primary gap-2">
-                Atnaujinti strategijos lentą
-                <ArrowUpRight size={16} />
+              <a href="#verslo-profilis" className="button-primary gap-2">
+                Atnaujinti verslo profilį
+                <Building2 size={16} />
+              </a>
+              <a href="#strategijos-lenta" className="hero-outline-button gap-2">
+                Strategijos lenta
+                <Target size={16} />
               </a>
               <a href="#verslo-resursai" className="hero-outline-button gap-2">
                 Peržiūrėti verslo resursus
@@ -521,6 +741,75 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
         })}
       </section>
 
+      <section id="verslo-profilis" className="grid gap-6 xl:grid-cols-[1fr_0.82fr]">
+        <div className="panel p-6 sm:p-8">
+          <SectionHeading
+            eyebrow="Verslo profilis"
+            title="Trumpas verslo kontekstas prieš sprendimus"
+            text="Užpildyk pagrindinius duomenis, kad ši erdvė jaustųsi susieta su realiu verslu, klientu ir šio mėnesio kryptimi."
+          />
+
+          <div className="mt-7 grid gap-5 sm:grid-cols-2">
+            {businessProfileFields.map((field) => (
+              <label key={field.key} className="block space-y-3">
+                <FieldLabel>{field.label}</FieldLabel>
+                {field.compact ? (
+                  <input
+                    type="text"
+                    value={businessProfile[field.key]}
+                    onChange={(event) => handleBusinessProfileChange(field.key, event.target.value)}
+                    placeholder={field.placeholder}
+                    className="input-field"
+                  />
+                ) : (
+                  <textarea
+                    value={businessProfile[field.key]}
+                    onChange={(event) => handleBusinessProfileChange(field.key, event.target.value)}
+                    placeholder={field.placeholder}
+                    className="textarea-field min-h-[120px]"
+                  />
+                )}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <aside className="surface-dark rounded-lg p-6 sm:p-8">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              <Building2 size={22} className="text-white/72" />
+              <span className="hero-chip">lokalus profilis</span>
+            </div>
+            <span className="hero-chip">
+              {completedBusinessProfileFields}/{businessProfileFields.length}
+            </span>
+          </div>
+          <h2 className="mt-6 break-words font-display text-3xl font-bold leading-tight">
+            {businessProfile.businessName.trim() || "Verslo profilis laukia pirmo įrašo"}
+          </h2>
+          <p className="mt-3 text-sm font-semibold leading-6 text-white/58">
+            {completedBusinessProfileFields === businessProfileFields.length
+              ? "Santrauka paruošta sprendimams."
+              : "Užpildyk laukus ir čia atsiras aiški verslo santrauka."}
+          </p>
+
+          <div className="mt-7 space-y-5">
+            {businessProfileSummary.map((item) => (
+              <div key={item.label}>
+                <p className="text-xs font-semibold uppercase leading-5 text-white/48">{item.label}</p>
+                <p className={`mt-2 break-words text-sm leading-7 ${item.value ? "text-white/74" : "text-white/44"}`}>
+                  {item.value || item.placeholder}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-7 text-xs font-semibold uppercase leading-5 text-white/48">
+            Saugoma šiame įrenginyje · backendas nekeičiamas
+          </p>
+        </aside>
+      </section>
+
       <section id="strategijos-lenta" className="grid gap-6 xl:grid-cols-[1fr_0.82fr]">
         <div className="panel p-6 sm:p-8">
           <SectionHeading
@@ -568,12 +857,12 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
         </aside>
       </section>
 
-      <section className="panel p-6 sm:p-8">
+      <section id="pasiulymo-aiskumas" className="panel p-6 sm:p-8">
         <div className="grid gap-6 lg:grid-cols-[0.75fr_1fr]">
           <SectionHeading
             eyebrow="Pasiūlymo aiškumas"
-            title="Mini rėmas premium pasiūlymui"
-            text="Keturi klausimai padeda patikrinti, ar klientui aišku, kodėl verta rinktis."
+            title="Aiški žinutė svetainei ir pardavimui"
+            text="Užpildyk penkis laukus, o peržiūra iškart parodys trumpą svetainės sakinį, hero tekstą, CTA ir pardavimo žinutę."
           />
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -584,33 +873,72 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
                   value={offer[field.key]}
                   onChange={(event) => handleOfferChange(field.key, event.target.value)}
                   placeholder={field.placeholder}
-                  className="textarea-field min-h-[126px]"
+                  className="textarea-field min-h-[112px]"
                 />
               </label>
             ))}
           </div>
         </div>
 
-        <div className="mt-7 rounded-lg border p-5" style={{ borderColor: "rgb(var(--line) / 0.82)" }}>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold">Pasiūlymo peržiūra</p>
-              <p className="mt-1 text-xs leading-5 text-muted">Lokali santrauka pagal tavo užpildytus laukus.</p>
+        <div className="mt-8 grid gap-6 border-t pt-7 lg:grid-cols-[0.72fr_1fr]" style={{ borderColor: "rgb(var(--line) / 0.72)" }}>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-sm font-semibold">Aiškumo signalai</p>
+              <span className="signal-pill shrink-0">
+                {completedOfferSignals}/{offerClaritySignals.length}
+              </span>
             </div>
-            <span className="signal-pill shrink-0">lokali darbo erdvė</span>
+            {offerClaritySignals.map((signal) => (
+              <div key={signal.label} className="flex items-center gap-3 text-sm leading-6 text-muted">
+                <CheckCircle2
+                  size={16}
+                  className="shrink-0"
+                  style={{ color: signal.complete ? "rgb(var(--accent-strong))" : "rgb(var(--muted) / 0.38)" }}
+                />
+                <span>{signal.label}</span>
+              </div>
+            ))}
+            <p className="text-xs font-semibold uppercase leading-5 text-muted">
+              Peržiūra · automatinis vertinimas nepridėtas
+            </p>
+
+            <div className="flex flex-wrap gap-3 pt-2">
+              <button type="button" onClick={handleSaveOffer} className="button-primary">
+                Išsaugoti pasiūlymą
+              </button>
+              <button type="button" onClick={handleCopyOffer} className="button-secondary">
+                Kopijuoti tekstą
+              </button>
+              <button type="button" onClick={handleClearOffer} className="button-secondary">
+                Išvalyti
+              </button>
+            </div>
+
+            {offerStatusMessage && <p className="text-sm font-semibold accent-text">{offerStatusMessage}</p>}
           </div>
-          <p className="mt-5 text-sm leading-7 text-muted">
-            Šis pasiūlymas skirtas: <span className="font-semibold text-[rgb(var(--text))]">{offer.audience}</span>
-          </p>
-          <p className="mt-3 text-sm leading-7 text-muted">
-            Jis sprendžia: <span className="font-semibold text-[rgb(var(--text))]">{offer.problem}</span>
-          </p>
-          <p className="mt-3 text-sm leading-7 text-muted">
-            Pagrindinė vertė: <span className="font-semibold text-[rgb(var(--text))]">{offer.value}</span>
-          </p>
-          <p className="mt-3 text-sm leading-7 text-muted">
-            Kitas žingsnis klientui: <span className="font-semibold text-[rgb(var(--text))]">{offer.nextStep}</span>
-          </p>
+
+          <div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="text-sm font-semibold">Sugeneruota peržiūra</p>
+                <p className="mt-1 text-xs leading-5 text-muted">Tekstas keičiasi gyvai pagal pasiūlymo laukus ir verslo profilį.</p>
+              </div>
+              <span className="signal-pill shrink-0">lokali darbo erdvė</span>
+            </div>
+
+            <div className="mt-5 grid gap-4 md:grid-cols-2">
+              {generatedOfferOutputs.map((output) => (
+                <article
+                  key={output.title}
+                  className="min-w-0 rounded-lg border p-5"
+                  style={{ borderColor: "rgb(var(--line) / 0.82)" }}
+                >
+                  <p className="text-xs font-semibold uppercase leading-5 text-muted">{output.title}</p>
+                  <p className="mt-3 break-words text-sm leading-7 text-[rgb(var(--text))]">{output.text}</p>
+                </article>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
