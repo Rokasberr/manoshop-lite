@@ -22,8 +22,9 @@ import { Link } from "react-router-dom";
 const BUSINESS_PROFILE_STORAGE_KEY = "stilloak_private_business_profile";
 const STRATEGY_STORAGE_KEY = "stilloak_private_business_strategy";
 const OFFER_STORAGE_KEY = "stilloak_private_business_offer";
-const ACTION_PLAN_STORAGE_KEY = "stilloak_private_business_action_plan";
 const DECISION_STORAGE_KEY = "stilloak_private_business_decision";
+const CLARITY_AUDIT_STORAGE_KEY = "stilloak_private_business_clarity_audit";
+const GROWTH_ROADMAP_STORAGE_KEY = "stilloak_private_business_growth_roadmap";
 
 const defaultBusinessProfile = {
   businessName: "",
@@ -156,6 +157,89 @@ const offerFields = [
   },
 ];
 
+const websiteAuditItems = [
+  {
+    id: "first-screen",
+    title: "Pirmas ekranas pasako, kam skirtas pasiūlymas",
+    text: "Per kelias sekundes aišku, kas čia padedama ir kokį rezultatą žmogus gali tikėtis gauti.",
+  },
+  {
+    id: "main-cta",
+    title: "Pagrindinis CTA yra vienas ir lengvai randamas",
+    text: "Svarbiausias veiksmas nekonkuruoja su keliais kitais mygtukais ar skirtingomis kryptimis.",
+  },
+  {
+    id: "offer-value",
+    title: "Vertė aprašyta prieš funkcijas",
+    text: "Klientas pirmiausia pamato naudą, situaciją ir pokytį, o tik tada detales ar sąrašus.",
+  },
+  {
+    id: "trust-signal",
+    title: "Prieš sprendimą yra pasitikėjimo signalas",
+    text: "Matomas procesas, patirtis, pavyzdys, saugumo sakinys arba aiškus paaiškinimas, kas vyksta toliau.",
+  },
+  {
+    id: "mobile-scan",
+    title: "Mobilus vaizdas lengvai nuskaitomas",
+    text: "Antraštės, mygtukai ir kainos telpa be horizontalaus slinkimo ar tekstų susigrūdimo.",
+  },
+  {
+    id: "pricing-clarity",
+    title: "Kaina arba pasirinkimai turi aiškų skirtumą",
+    text: "Jei yra keli lygiai, žmogus supranta, kodėl verta rinktis aukštesnį variantą.",
+  },
+];
+
+const growthRoadmapPhases = [
+  {
+    id: "week-1",
+    label: "1 savaitė",
+    title: "Sutvarkyti aiškumą",
+    focus: "Pasiūlymas, pirmas ekranas ir vienas pagrindinis veiksmas.",
+    actions: [
+      { id: "w1-profile", text: "Užpildyti verslo profilį ir pagrindinį mėnesio tikslą." },
+      { id: "w1-offer", text: "Pabaigti pasiūlymo aiškumo tekstą ir pasirinkti vieną CTA." },
+      { id: "w1-audit", text: "Pereiti svetainės aiškumo auditą ir pažymėti silpniausią vietą." },
+    ],
+  },
+  {
+    id: "week-2",
+    label: "2 savaitė",
+    title: "Sustiprinti pasitikėjimą",
+    focus: "Procesas, įrodymai ir saugus sprendimo kelias.",
+    actions: [
+      { id: "w2-proof", text: "Pridėti vieną pasitikėjimo signalą prieš pagrindinį CTA." },
+      { id: "w2-pricing", text: "Patikrinti, ar kainos ar planai aiškiai skiriasi pagal rezultatą." },
+      { id: "w2-mobile", text: "Peržiūrėti svarbiausią puslapį telefone ir pašalinti teksto perkrovą." },
+    ],
+  },
+  {
+    id: "week-3",
+    label: "3 savaitė",
+    title: "Paruošti pardavimo ritmą",
+    focus: "Žinutė, turinys ir klientui suprantamas kitas žingsnis.",
+    actions: [
+      { id: "w3-message", text: "Panaudoti sugeneruotą pardavimo žinutę viename laiške ar įraše." },
+      { id: "w3-content", text: "Paruošti vieną turinio idėją, kuri paaiškina problemą prieš pardavimą." },
+      { id: "w3-followup", text: "Užrašyti trumpą follow-up sakinį žmonėms, kurie dar neapsisprendė." },
+    ],
+  },
+  {
+    id: "week-4",
+    label: "4 savaitė",
+    title: "Įvertinti ir pasirinkti kitą svertą",
+    focus: "Kas veikė, kas stringa ir ką verta gerinti kitą mėnesį.",
+    actions: [
+      { id: "w4-review", text: "Peržiūrėti, kurie aiškumo audito punktai liko nepažymėti." },
+      { id: "w4-results", text: "Užrašyti vieną kokybinį rezultatą: daugiau užklausų, aiškesni pokalbiai arba mažiau klausimų." },
+      { id: "w4-next", text: "Pasirinkti kitą mėnesio prioritetą sprendimų kambaryje." },
+    ],
+  },
+];
+
+const websiteAuditItemIds = websiteAuditItems.map((item) => item.id);
+const growthRoadmapActionIds = growthRoadmapPhases.flatMap((phase) => phase.actions.map((action) => action.id));
+
 const journeySteps = [
   {
     title: "Atranda",
@@ -284,14 +368,6 @@ const recommendations = [
   },
 ];
 
-const actionItems = [
-  "Aiškiai perrašyti pagrindinį pasiūlymą",
-  "Sutvarkyti narystės skirtumus",
-  "Patikrinti pagrindinį CTA",
-  "Paruošti vieną naują resursą",
-  "Peržiūrėti klientų kelionę",
-];
-
 const includedItems = [
   "Viskas iš Asmeninio plano",
   "Strateginė verslo erdvė",
@@ -339,17 +415,17 @@ const readStoredOffer = () => {
   };
 };
 
-const readStoredActionPlan = () => {
+const readStoredBooleanMap = (key, ids) => {
   if (typeof window === "undefined") {
     return {};
   }
 
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(ACTION_PLAN_STORAGE_KEY) || "{}");
-    return actionItems.reduce(
-      (state, item) => ({
+    const parsed = JSON.parse(window.localStorage.getItem(key) || "{}");
+    return ids.reduce(
+      (state, id) => ({
         ...state,
-        [item]: Boolean(parsed[item]),
+        [id]: Boolean(parsed[id]),
       }),
       {}
     );
@@ -435,7 +511,12 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
   const [offerStatusMessage, setOfferStatusMessage] = useState("");
   const [openResourceIds, setOpenResourceIds] = useState(() => new Set(["offer-structure"]));
   const [selectedDecisionId, setSelectedDecisionId] = useState(() => (lockedPreview ? "clarity" : readStoredDecision()));
-  const [checkedActions, setCheckedActions] = useState(() => (lockedPreview ? {} : readStoredActionPlan()));
+  const [checkedAuditItems, setCheckedAuditItems] = useState(() =>
+    lockedPreview ? {} : readStoredBooleanMap(CLARITY_AUDIT_STORAGE_KEY, websiteAuditItemIds)
+  );
+  const [checkedRoadmapActions, setCheckedRoadmapActions] = useState(() =>
+    lockedPreview ? {} : readStoredBooleanMap(GROWTH_ROADMAP_STORAGE_KEY, growthRoadmapActionIds)
+  );
 
   useEffect(() => {
     if (!lockedPreview) {
@@ -463,9 +544,15 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
 
   useEffect(() => {
     if (!lockedPreview) {
-      window.localStorage.setItem(ACTION_PLAN_STORAGE_KEY, JSON.stringify(checkedActions));
+      window.localStorage.setItem(CLARITY_AUDIT_STORAGE_KEY, JSON.stringify(checkedAuditItems));
     }
-  }, [checkedActions, lockedPreview]);
+  }, [checkedAuditItems, lockedPreview]);
+
+  useEffect(() => {
+    if (!lockedPreview) {
+      window.localStorage.setItem(GROWTH_ROADMAP_STORAGE_KEY, JSON.stringify(checkedRoadmapActions));
+    }
+  }, [checkedRoadmapActions, lockedPreview]);
 
   const selectedDecision = useMemo(
     () => decisionFocusCards.find((card) => card.id === selectedDecisionId) || decisionFocusCards[0],
@@ -550,7 +637,8 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
   );
 
   const completedOfferSignals = offerClaritySignals.filter((signal) => signal.complete).length;
-  const completedActions = Object.values(checkedActions).filter(Boolean).length;
+  const completedAuditItems = Object.values(checkedAuditItems).filter(Boolean).length;
+  const completedRoadmapActions = Object.values(checkedRoadmapActions).filter(Boolean).length;
 
   const handleBusinessProfileChange = (field, value) => {
     if (lockedPreview) {
@@ -648,14 +736,25 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
     });
   };
 
-  const toggleAction = (item) => {
+  const toggleAuditItem = (itemId) => {
     if (lockedPreview) {
       return;
     }
 
-    setCheckedActions((current) => ({
+    setCheckedAuditItems((current) => ({
       ...current,
-      [item]: !current[item],
+      [itemId]: !current[itemId],
+    }));
+  };
+
+  const toggleRoadmapAction = (actionId) => {
+    if (lockedPreview) {
+      return;
+    }
+
+    setCheckedRoadmapActions((current) => ({
+      ...current,
+      [actionId]: !current[actionId],
     }));
   };
 
@@ -942,6 +1041,58 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
         </div>
       </section>
 
+      <section id="svetaines-auditas" className="grid gap-6 xl:grid-cols-[0.82fr_1fr]">
+        <div className="surface-dark rounded-lg p-6 sm:p-8">
+          <span className="hero-chip">Website Clarity Audit</span>
+          <h2 className="mt-6 font-display text-4xl font-bold leading-tight">Svetainės aiškumo patikra</h2>
+          <p className="mt-5 text-sm leading-7 text-white/72">
+            Trumpas kontrolinis sąrašas padeda pamatyti, ar verslo pasiūlymas aiškus prieš klientui priimant sprendimą.
+          </p>
+          <div className="mt-7 rounded-lg border border-white/10 p-5">
+            <p className="text-xs font-semibold uppercase leading-5 text-white/48">audito progresas</p>
+            <p className="mt-3 font-display text-4xl font-bold">
+              {completedAuditItems}/{websiteAuditItems.length}
+            </p>
+          </div>
+        </div>
+
+        <div className="panel p-6 sm:p-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <SectionHeading
+              eyebrow="Svetainės aiškumas"
+              title="Patikrink svarbiausias konversijos vietas"
+              text="Pažymėjimai saugomi tik šiame įrenginyje. Tai nėra automatinis svetainės skenavimas."
+            />
+            <span className="signal-pill w-fit">lokali patikra</span>
+          </div>
+
+          <div className="mt-7 grid gap-4 md:grid-cols-2">
+            {websiteAuditItems.map((item) => {
+              const isChecked = Boolean(checkedAuditItems[item.id]);
+
+              return (
+                <label
+                  key={item.id}
+                  className="flex min-w-0 cursor-pointer items-start gap-4 rounded-lg border p-5"
+                  style={{ borderColor: isChecked ? "rgb(var(--accent-strong) / 0.42)" : "rgb(var(--line) / 0.82)" }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => toggleAuditItem(item.id)}
+                    className="mt-1 h-4 w-4 shrink-0 accent-[rgb(var(--accent))]"
+                  />
+                  <span className="min-w-0">
+                    <span className="block text-sm font-semibold leading-6 text-[rgb(var(--text))]">{item.title}</span>
+                    <span className="mt-2 block text-sm leading-7 text-muted">{item.text}</span>
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
       <section className="space-y-5">
         <SectionHeading
           eyebrow="Kliento kelionė"
@@ -1103,40 +1254,69 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
 
       <section id="veiksmu-planas" className="grid gap-6 xl:grid-cols-[0.85fr_1fr]">
         <div className="surface-dark rounded-lg p-6 sm:p-8">
-          <span className="hero-chip">30 dienų veiksmų planas</span>
-          <h2 className="mt-6 font-display text-4xl font-bold leading-tight">Penkios kryptys, vienas mėnuo</h2>
+          <span className="hero-chip">30 dienų augimo kelias</span>
+          <h2 className="mt-6 font-display text-4xl font-bold leading-tight">Verslo augimo roadmap</h2>
           <p className="mt-5 text-sm leading-7 text-white/72">
-            Planas pildomas lokaliai. Pažymėjimai lieka šiame įrenginyje ir nekeičia paskyros duomenų.
+            Keturių savaičių struktūra padeda judėti nuo aiškaus pasiūlymo iki pasitikėjimo, pardavimo ritmo ir mėnesio peržiūros.
           </p>
           <div className="mt-7 rounded-lg border border-white/10 p-5">
             <p className="text-xs font-semibold uppercase leading-5 text-white/48">progresas</p>
             <p className="mt-3 font-display text-4xl font-bold">
-              {completedActions}/{actionItems.length}
+              {completedRoadmapActions}/{growthRoadmapActionIds.length}
             </p>
           </div>
+          <p className="mt-5 text-xs font-semibold uppercase leading-5 text-white/48">
+            Saugoma lokaliai · be backend užduočių
+          </p>
         </div>
 
         <div className="panel p-6 sm:p-8">
-          <div className="space-y-3">
-            {actionItems.map((item) => {
-              const isChecked = Boolean(checkedActions[item]);
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <SectionHeading
+              eyebrow="30 dienų roadmap"
+              title="Ką daryti kiekvieną savaitę"
+              text="Roadmap yra praktinė peržiūra. Pažymėjimai lieka tik šiame įrenginyje."
+            />
+            <span className="signal-pill w-fit">peržiūra</span>
+          </div>
 
-              return (
-                <label
-                  key={item}
-                  className="flex cursor-pointer items-start gap-4 rounded-lg border px-4 py-4 text-sm leading-6 text-muted"
-                  style={{ borderColor: "rgb(var(--line) / 0.82)" }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={isChecked}
-                    onChange={() => toggleAction(item)}
-                    className="mt-1 h-4 w-4 shrink-0 accent-[rgb(var(--accent))]"
-                  />
-                  <span className={isChecked ? "line-through opacity-70" : ""}>{item}</span>
-                </label>
-              );
-            })}
+          <div className="mt-7 grid gap-4">
+            {growthRoadmapPhases.map((phase) => (
+              <article key={phase.id} className="rounded-lg border p-5" style={{ borderColor: "rgb(var(--line) / 0.82)" }}>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <span className="signal-pill">{phase.label}</span>
+                    <h3 className="mt-4 font-display text-2xl font-bold leading-tight">{phase.title}</h3>
+                    <p className="mt-2 text-sm leading-7 text-muted">{phase.focus}</p>
+                  </div>
+                  <span className="text-sm font-semibold text-muted">
+                    {phase.actions.filter((action) => checkedRoadmapActions[action.id]).length}/{phase.actions.length}
+                  </span>
+                </div>
+
+                <div className="mt-5 grid gap-3 md:grid-cols-3">
+                  {phase.actions.map((action) => {
+                    const isChecked = Boolean(checkedRoadmapActions[action.id]);
+
+                    return (
+                      <label
+                        key={action.id}
+                        className="flex min-w-0 cursor-pointer items-start gap-3 rounded-lg border px-4 py-4 text-sm leading-6 text-muted"
+                        style={{ borderColor: isChecked ? "rgb(var(--accent-strong) / 0.42)" : "rgb(var(--line) / 0.72)" }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => toggleRoadmapAction(action.id)}
+                          className="mt-1 h-4 w-4 shrink-0 accent-[rgb(var(--accent))]"
+                        />
+                        <span className={isChecked ? "line-through opacity-70" : ""}>{action.text}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </article>
+            ))}
           </div>
         </div>
       </section>
