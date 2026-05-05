@@ -25,9 +25,9 @@ const users = [
 
 const products = [
   {
-    name: "Aurora Desk Lamp",
+    name: "StillOak šiltos šviesos stalo šviestuvas",
     description:
-      "Skulptūriškas stalo šviestuvas su šilta, minkšta šviesa ramesniam darbo kampui.",
+      "Skulptūriškas fizinis šviestuvas darbo stalui, skaitymo kampui ar miegamojo zonai. Klientas gauna švelnaus apšvietimo akcentą, kuris padeda sukurti ramesnę, labiau sutelktą erdvę.",
     price: 89.9,
     category: "Namai",
     images: [
@@ -37,9 +37,9 @@ const products = [
     featured: true,
   },
   {
-    name: "Studio Headphones X2",
+    name: "StillOak Focus belaidės ausinės",
     description:
-      "Belaidės ausinės su aktyviu triukšmo slopinimu ir švariu, giliu garsu.",
+      "Belaidės ausinės darbui, mokymuisi ir tyliam kasdieniam ritmui. Klientas gauna patogų garso aksesuarą su triukšmo slopinimu, kuris padeda lengviau susikaupti namuose ar kelionėje.",
     price: 159,
     category: "Technika",
     images: [
@@ -49,9 +49,9 @@ const products = [
     featured: true,
   },
   {
-    name: "Atlas Carry Backpack",
+    name: "StillOak kasdienė darbo kuprinė",
     description:
-      "Kasdienė kuprinė su paminkštintu kompiuterio skyriumi ir vandeniui atspariu audiniu.",
+      "Fizinė kuprinė darbui, studijoms ir miesto dienoms. Klientas gauna talpų kasdienį aksesuarą su paminkštintu kompiuterio skyriumi ir vandeniui atspariu audiniu, kad svarbiausi daiktai keliautų tvarkingai.",
     price: 74.5,
     category: "Aksesuarai",
     images: [
@@ -61,9 +61,9 @@ const products = [
     featured: false,
   },
   {
-    name: "Linen Relax Set",
+    name: "StillOak lininis namų komplektas",
     description:
-      "Lengvas lininis komplektas namams, sukurtas komfortui ir santūriam stiliui.",
+      "Lengvas lininis komplektas ramiems rytams, darbui iš namų ir lėtesniems vakarams. Klientas gauna santūrų fizinį aprangos rinkinį, kuris sujungia komfortą, natūralią tekstūrą ir tvarkingą namų estetiką.",
     price: 64.9,
     category: "Apranga",
     images: [
@@ -73,9 +73,9 @@ const products = [
     featured: true,
   },
   {
-    name: "Stoneware Brew Kit",
+    name: "StillOak keraminis kavos ritualo rinkinys",
     description:
-      "Keraminis kavos rinkinys ramiam rytui: puodelis, filtras ir matavimo šaukštelis.",
+      "Keraminis kavos rinkinys žmogui, kuris nori ramesnio rytinio ritualo. Klientas gauna puodelį, filtrą ir matavimo šaukštelį, kad kasdienė kava taptų aiškesne, gražesne pauze.",
     price: 54,
     category: "Virtuvė",
     images: [
@@ -85,9 +85,9 @@ const products = [
     featured: false,
   },
   {
-    name: "Motion Sneakers",
+    name: "StillOak lengvi miesto sportbačiai",
     description:
-      "Universalūs sportbačiai su minkštu padu ir kvėpuojančiu viršumi aktyviai dienai.",
+      "Universalūs fiziniai sportbačiai aktyviai miesto dienai, kelionei ar lengvam savaitgalio ritmui. Klientas gauna minkštą padą ir kvėpuojantį viršų, kad judėjimas išliktų patogus ir santūriai stilingas.",
     price: 119,
     category: "Avalynė",
     images: [
@@ -97,9 +97,9 @@ const products = [
     featured: true,
   },
   {
-    name: "Calm Home Poster Bundle",
+    name: "Ramių namų plakatų rinkinys",
     description:
-      "Šiltas spausdinamų sienos darbų rinkinys ramesniems namams, paruoštas keliems rėminimo formatams.",
+      "Skaitmeninis spausdinamų sienos darbų rinkinys namams, darbo kampui ar dovanai. Klientas gauna PDF resursą su ramiomis vizualinėmis kryptimis, kurios padeda greitai atnaujinti erdvę be fizinės siuntos.",
     price: 24,
     category: "Skaitmeniniai produktai",
     productType: "digital",
@@ -116,9 +116,9 @@ const products = [
     },
   },
   {
-    name: "The Atelier Living Room Guide",
+    name: "Svetainės atnaujinimo mini gidas",
     description:
-      "Ramus gidas svetainės išdėstymui, paletei, tekstūroms ir jaukesniems stilistikos sprendimams.",
+      "Skaitmeninis PDF gidas žmogui, kuris nori aiškiau susidėlioti svetainės išdėstymą, paletę ir tekstūras. Klientas gauna praktinę kryptį jaukesniam kambario atnaujinimui be didelio remonto.",
     price: 29,
     category: "Skaitmeniniai produktai",
     productType: "digital",
@@ -135,9 +135,9 @@ const products = [
     },
   },
   {
-    name: "Sunday Reset Ritual Planner",
+    name: "Sekmadienio savaitės peržiūros planuoklis",
     description:
-      "Ramus skaitmeninis planavimo įrankis savaitės peržiūrai, refleksijai ir sąmoningesnėms rutinoms.",
+      "Skaitmeninis planuoklis savaitės peržiūrai, refleksijai ir ramesniam pasiruošimui. Klientas gauna PDF įrankį, kuris padeda užbaigti savaitę aiškiau ir pradėti kitą su mažiau chaoso.",
     price: 16,
     category: "Skaitmeniniai produktai",
     productType: "digital",
@@ -154,9 +154,9 @@ const products = [
     },
   },
   {
-    name: "Home Edit Bundle",
+    name: "Namų atnaujinimo skaitmeninis rinkinys",
     description:
-      "Dviejų dalių skaitmeninis rinkinys su sienos darbais ir svetainės gidu ramiam kambario atnaujinimui.",
+      "Dviejų dalių skaitmeninis rinkinys žmogui, kuris nori greito, ramaus kambario atnaujinimo. Klientas gauna sienos darbų ir svetainės gido paketą, kad interjero sprendimai būtų aiškesni ir lengviau pritaikomi.",
     price: 39,
     category: "Skaitmeniniai produktai",
     productType: "digital",
@@ -173,9 +173,9 @@ const products = [
     },
   },
   {
-    name: "Calm Living Bundle",
+    name: "Calm Living pilnas skaitmeninis paketas",
     description:
-      "Pilnas skaitmeninis rinkinys su spausdinamais sienos darbais, interjero gidu ir Sunday Reset planuokliu.",
+      "Pilnas skaitmeninis paketas namų estetikai ir savaitės ritmui. Klientas gauna plakatų, interjero gido ir savaitės planuoklio rinkinį, kuris padeda vienoje vietoje susijungti erdvei, rutinai ir aiškesniam planui.",
     price: 49,
     category: "Skaitmeniniai produktai",
     productType: "digital",

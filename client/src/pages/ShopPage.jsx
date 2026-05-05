@@ -1,3 +1,4 @@
+import { Clock, FileText, PackageCheck, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import EmptyState from "../components/EmptyState";
@@ -15,6 +16,24 @@ const defaultFilters = {
   page: 1,
   limit: 9,
 };
+
+const catalogSignals = [
+  {
+    title: "Skaitmeniniai resursai",
+    text: "PDF gidai, planuokliai ir rinkiniai, pasiekiami po įsigijimo, jei taikoma.",
+    icon: FileText,
+  },
+  {
+    title: "Fiziniai produktai",
+    text: "Atrinkti objektai namams, darbui ir kasdieniam ritmui su aiškiu pristatymu.",
+    icon: PackageCheck,
+  },
+  {
+    title: "Netrukus",
+    text: "Nauji produktai ir ribotos kolekcijos bus aiškiai pažymėti, kai bus paruošti pardavimui.",
+    icon: Clock,
+  },
+];
 
 const ShopPage = ({ defaultProductType = "all" }) => {
   const [products, setProducts] = useState([]);
@@ -101,57 +120,62 @@ const ShopPage = ({ defaultProductType = "all" }) => {
   return (
     <div className="space-y-8">
       <SectionTitle
-        eyebrow={defaultProductType === "digital" ? "skaitmeninė kolekcija" : "kolekcija"}
+        eyebrow={defaultProductType === "digital" ? "skaitmeniniai resursai" : "StillOak Studio katalogas"}
         title={
           defaultProductType === "digital"
-            ? "Skaitmeniniai produktai ramesnėms rutinoms ir jaukesnėms erdvėms"
-            : "Atrinkta kolekcija ramesnėms, naudingesnėms erdvėms"
+            ? "Skaitmeniniai produktai ramesniam planavimui ir namų ritmui"
+            : "Atrinkti produktai ramesnei erdvei ir aiškesniam kasdieniam ritmui"
         }
         subtitle={
           defaultProductType === "digital"
-            ? "Naršyk PDF gidus, spausdinamus rinkinius ir kitus skaitmeninius produktus, kurie atsiranda paskyroje iškart po apmokėjimo."
-            : "Naršyk atrinktą kolekciją, filtruok pagal nuotaiką ar kategoriją ir išsirink objektus, kurie jaučiasi verti vietos tavo namuose."
+            ? "Naršyk PDF gidus, planuoklius ir skaitmeninius rinkinius. Prieiga pateikiama po įsigijimo, jei taikoma."
+            : "Čia matysi fizinius produktus, skaitmeninius resursus ir aiškiai pažymėtas būsimas kolekcijas, kai jos bus paruoštos."
         }
       />
 
-      <div className="public-section grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+      <div className="public-section grid gap-6 lg:grid-cols-[1fr_1fr]">
         <div>
           <span className="premium-tag">
-            {defaultProductType === "digital" ? "Iškart po apmokėjimo" : "Sezono atranka"}
+            {defaultProductType === "digital" ? "Skaitmeninė kolekcija" : "Atrinkta parduotuvė"}
           </span>
-          <h3 className="mt-5 font-display text-4xl font-bold sm:text-5xl">
+          <h3 className="mt-5 max-w-3xl font-display text-4xl font-bold leading-tight sm:text-5xl">
             {defaultProductType === "digital"
-              ? "Atrakink skaitmeninį turinį nelaukdamas siuntos."
-              : "Rinkis mažiau objektų, bet su daugiau intencijos."}
+              ? "Skaitmeniniai resursai, kurie aiškiai paaiškina, ką gauni."
+              : "Mažiau demo jausmo, daugiau aiškaus produkto ir pasitikėjimo."}
           </h3>
           <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
             {defaultProductType === "digital"
-              ? "Čia rasi spausdinamus plakatus, PDF gidus ir planavimo įrankius, kurie atsiranda paskyroje po apmokėjimo."
-              : "Naršyk atrinktus objektus, filtruok pagal kategoriją ir rinkis tai, kas verta vietos tavo namuose."}
+              ? "Kiekvienas skaitmeninis produktas turi aiškią paskirtį, vertę ir pristatymo lūkestį po pirkimo."
+              : "Katalogas atskiria skaitmeninius resursus, fizinius produktus ir būsimas kryptis, kad pirkėjas suprastų, ką renkasi."}
           </p>
+
+          <div className="mt-6 flex items-start gap-3 rounded-lg border px-4 py-4 text-sm leading-6 text-muted" style={{ borderColor: "rgb(var(--line) / 0.82)" }}>
+            <ShieldCheck size={18} className="mt-0.5 shrink-0" style={{ color: "rgb(var(--accent-strong))" }} />
+            <span>Saugus apmokėjimas · Aiškus pristatymas · Skaitmeniniai resursai pasiekiami po įsigijimo, jei taikoma</span>
+          </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          {(
-            defaultProductType === "digital"
-              ? [
-                  "Iškart pasiekiama prieiga",
-                  "Saugus failų pateikimas",
-                  "Sąskaitų archyvas",
-                  "Rinkinių vertė",
-                ]
-              : [
-                  "Atrinktos kategorijos",
-                  "Saugus apmokėjimas",
-                  "Sąskaitų archyvas",
-                  "Nario kainodara",
-                ]
-          ).map((item) => (
-            <div key={item} className="marketing-mini-card flex items-center justify-between">
-              <span className="font-medium">{item}</span>
-              <span className="accent-text text-sm">•</span>
-            </div>
-          ))}
+        <div className="grid gap-3">
+          {catalogSignals.map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <div key={item.title} className="marketing-mini-card">
+                <div className="flex items-start gap-4">
+                  <div
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
+                    style={{ backgroundColor: "rgb(var(--surface-soft))", color: "rgb(var(--accent-strong))" }}
+                  >
+                    <Icon size={18} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold">{item.title}</p>
+                    <p className="mt-1 text-sm leading-6 text-muted">{item.text}</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -163,7 +187,7 @@ const ShopPage = ({ defaultProductType = "all" }) => {
         onReset={handleReset}
       />
 
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted">
           Rasta: <span className="font-semibold text-current">{pagination.total}</span>
         </p>
@@ -178,16 +202,22 @@ const ShopPage = ({ defaultProductType = "all" }) => {
         <div className="panel p-6 text-red-500">{error}</div>
       ) : products.length === 0 ? (
         <EmptyState
-          title="No pieces matched this edit"
-          description="Pabandyk kitą paieškos frazę arba nuimk dalį filtrų."
+          title="Kolekcija ruošiama. Netrukus čia matysite atrinktus StillOak Studio produktus."
+          description="Jei naudojai filtrus, pabandyk juos išvalyti. Kai nauji produktai bus paruošti pardavimui, jie bus aiškiai pažymėti kataloge."
           actionLabel="Rodyti viską"
           onAction={handleReset}
         />
       ) : (
         <>
           {filters.productType === "digital" && (
-            <div className="rounded-[28px] border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800">
-              Rodomi tik skaitmeniniai produktai: PDF gidai, spausdinami rinkiniai ir iškart pasiekiamos kolekcijos.
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-800">
+              Rodomi skaitmeniniai produktai: PDF gidai, planuokliai ir rinkiniai. Prieiga pateikiama po įsigijimo, jei taikoma.
+            </div>
+          )}
+
+          {filters.productType === "physical" && (
+            <div className="rounded-lg border px-5 py-4 text-sm leading-6 text-muted" style={{ borderColor: "rgb(var(--line) / 0.82)", backgroundColor: "rgb(var(--surface-soft) / 0.58)" }}>
+              Rodomi fiziniai produktai. Pristatymo ir užsakymo informacija pateikiama aiškiai pirkimo eigoje ir po užsakymo.
             </div>
           )}
 
@@ -203,7 +233,7 @@ const ShopPage = ({ defaultProductType = "all" }) => {
                 key={page}
                 type="button"
                 onClick={() => handlePageChange(page)}
-                className={`h-11 min-w-11 rounded-full px-4 text-sm font-semibold transition ${
+                className={`h-11 min-w-11 rounded-lg px-4 text-sm font-semibold transition ${
                   page === pagination.page ? "text-white" : ""
                 }`}
                 style={

@@ -1,10 +1,10 @@
 const ProductFilters = ({ filters, categories, onChange, onSubmit, onReset }) => (
   <form className="panel grid gap-4 p-5 lg:grid-cols-[2fr_1fr_1fr_1fr_auto_auto]" onSubmit={onSubmit}>
     <div>
-      <label className="mb-2 block text-sm font-semibold">Ieškoti kolekcijoje</label>
+      <label className="mb-2 block text-sm font-semibold">Ieškoti produkte</label>
       <input
         className="input-field"
-        placeholder="Ieškok pagal pavadinimą arba nuotaiką"
+        placeholder="Pavadinimas, paskirtis arba kategorija"
         value={filters.search}
         onChange={(event) => onChange("search", event.target.value)}
       />
@@ -41,20 +41,20 @@ const ProductFilters = ({ filters, categories, onChange, onSubmit, onReset }) =>
     </div>
 
     <div>
-      <label className="mb-2 block text-sm font-semibold">Produkto tipas</label>
+      <label className="mb-2 block text-sm font-semibold">Tipas</label>
       <select
         className="select-field"
         value={filters.productType}
         onChange={(event) => onChange("productType", event.target.value)}
       >
         <option value="all">Visi produktai</option>
-        <option value="physical">Fiziniai</option>
-        <option value="digital">Skaitmeniniai</option>
+        <option value="physical">Fiziniai produktai</option>
+        <option value="digital">Skaitmeniniai resursai</option>
       </select>
     </div>
 
     <button type="submit" className="button-primary self-end">
-      Filtruoti
+      Rodyti
     </button>
 
     <button type="button" onClick={onReset} className="button-secondary self-end">

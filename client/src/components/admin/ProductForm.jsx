@@ -120,9 +120,13 @@ const ProductForm = ({
           <label className="mb-2 block text-sm font-semibold">Produkto pavadinimas</label>
           <input
             className="input-field"
+            placeholder="Aiškus, klientui suprantamas produkto pavadinimas"
             value={formData.name}
             onChange={(event) => handleChange("name", event.target.value)}
           />
+          <p className="mt-2 text-xs leading-5 text-slate-500">
+            Naudok pardavimui paruoštą pavadinimą, ne vidinį ar demo tipo kodą.
+          </p>
         </div>
 
         <div>
@@ -153,8 +157,8 @@ const ProductForm = ({
             value={formData.productType}
             onChange={(event) => handleChange("productType", event.target.value)}
           >
-            <option value="physical">Fizinis</option>
-            <option value="digital">Skaitmeninis</option>
+            <option value="physical">Fizinis produktas</option>
+            <option value="digital">Skaitmeninis resursas</option>
           </select>
         </div>
 
@@ -174,7 +178,7 @@ const ProductForm = ({
           <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
             Įkelk tikrą failą į
             <span className="mx-1 font-semibold">server/digital-downloads/</span>
-            ir žemiau nurodyk santykinį kelią.
+            ir žemiau nurodyk santykinį kelią. Jei prieiga dar ruošiama, pažymėk ją kaip netrukus produkto aprašyme.
           </div>
         )}
 
@@ -245,9 +249,14 @@ const ProductForm = ({
           <label className="mb-2 block text-sm font-semibold">Aprašymas</label>
           <textarea
             className="textarea-field"
+            placeholder="Paaiškink: kas tai, kam skirta, ką klientas gauna ir kodėl tai naudinga."
             value={formData.description}
             onChange={(event) => handleChange("description", event.target.value)}
           />
+          <p className="mt-2 text-xs leading-5 text-slate-500">
+            Venk nepatvirtintų pažadų apie momentinį atsisiuntimą. Skaitmeninei prieigai naudok aiškią formuluotę:
+            pasiekiama po įsigijimo, jei taikoma.
+          </p>
         </div>
       </div>
 
