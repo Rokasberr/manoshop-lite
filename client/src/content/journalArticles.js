@@ -1,272 +1,193 @@
 export const journalArticles = [
   {
-    slug: "why-calm-design-converts-better",
-    category: "Prekės ženklo pastabos",
-    date: "2026 m. balandžio 28 d.",
-    readTime: "4 min. skaitymo",
-    title: "Kodėl rami estetika konvertuoja geriau",
+    slug: "bazinio-plano-erdve-atnaujinta",
+    category: "Bazinis planas",
+    date: "2026 m. gegužės 5 d.",
+    readTime: "2 min. skaitymo",
+    title: "Bazinio plano erdvė atnaujinta",
     cover: {
-      issue: "Įrašas 01",
-      heading: "Ramus dizainas parduoda.",
-      lines: ["vizualinė tvarka", "aiškus ritmas", "uždirbtas pasitikėjimas"],
-      background: "linear-gradient(135deg, rgba(23,20,17,0.98) 0%, rgba(74,55,41,0.95) 48%, rgba(194,153,100,0.92) 100%)",
+      issue: "Naujiena 01",
+      heading: "Aiškesnis Bazinio plano startas.",
+      lines: ["mėnesio apžvalga", "pradiniai resursai", "kelias į Asmeninį"],
+      background: "linear-gradient(135deg, rgba(20,27,24,0.98) 0%, rgba(56,78,66,0.95) 48%, rgba(184,166,124,0.92) 100%)",
       panel: "linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03))",
-      blur: "rgba(214,171,118,0.35)",
+      blur: "rgba(189,207,168,0.30)",
       accent: "rgba(255,255,255,0.12)",
     },
     excerpt:
-      "Premium vitrinos pasitikėjimą uždirba greičiau tada, kai pašalina triukšmą dar prieš apmokėjimą.",
+      "Pridėta mėnesio apžvalga, pradiniai resursai ir aiškesnis kelias į Asmeninį planą.",
     intro:
-      "Garsios vitrinos dažnai bando išsireikalauti dėmesio. Ramesnės jį uždirba kitaip: ritmu, saiku ir aiškiu patikimumo jausmu. Kai puslapis atrodo suvaldytas, prekės ženklas tampa įtikinamas dar prieš paaiškinant pirmą privalumą.",
+      "Bazinio plano erdvė atnaujinta taip, kad naujas narys greičiau suprastų, nuo ko pradėti. Ji lieka lengvas startas, bet dabar turi daugiau krypties: mėnesio fokusą, pradines resursų peržiūras ir aiškesnį atnaujinimo kelią.",
     sections: [
       {
-        heading: "Vizualinė ramybė mažina sprendimo nuovargį",
+        heading: "Kas pasikeitė Bazinyje",
         paragraphs: [
-          "Dauguma pirkėjų negalvoja dizaino terminais, bet jie iškart pajunta, kai puslapis triukšmingas. Per daug ženkliukų, spalvų ir vienu metu konkuruojančių akcentų sukuria įtampą.",
-          "Ramesnis išdėstymas padeda suprasti, kur žiūrėti pirmiausia, kas svarbu ir koks turėtų būti kitas žingsnis. Tai sustiprina pasitikėjimą dar prieš mokėjimą.",
+          "Bazinis narys dabar mato paprastą mėnesio apžvalgą, gali pasirinkti vieną fokusą ir pasitikrinti pagrindinius žingsnius be sudėtingos sistemos.",
+          "Pridėti pradiniai resursai padeda pradėti nuo mažų veiksmų: mėnesio sąrašo, biudžeto pasiruošimo ir tikslo planavimo.",
         ],
       },
       {
-        heading: "Premium įspūdis dažniausiai gimsta iš atrankos",
+        heading: "Kaip tai susijungia su Asmeniniu planu",
         paragraphs: [
-          "Puslapis atrodo brangesnis ne tada, kai rodo daugiau, o tada, kai palieka tik tai, kas verta dėmesio. Švari erdvė, tylesnė tipografija ir mažiau akcentų sustiprina likusias detales.",
-          "Todėl premium prekyba dažnai jaučiasi ramesnė, net jei pats apmokėjimo kelias techniškai yra labai greitas.",
-        ],
-      },
-      {
-        heading: "Pasitikėjimas prasideda iki mokėjimo",
-        paragraphs: [
-          "Pirkėjai nusprendžia, ar parduotuvė patikima, gerokai anksčiau nei įveda kortelės duomenis. Jei produkto pateikimas neaiškus, abejonė keliauja iki paskutinio žingsnio.",
-          "Kai vitrina aiški ir santūri, žmogui lengviau tęsti, nes visas prekės ženklas atrodo stabilesnis.",
+          "Bazinis rodo kryptį, o Asmeninis atrakina pilnesnę struktūrą: mėnesio suvestines, tikslų progreso korteles, premium resursus ir pilnas nario naujienas.",
+          "Atnaujinimo kelias dabar paaiškintas ramiau, kad narys suprastų, ką gauna dabar ir kas atsiveria perėjus į pilną planą.",
         ],
       },
     ],
     takeaway:
-      "Ramus dizainas nėra tuštuma. Tai erdvė, kurioje kiekvienas svarbus elementas atrodo patikimas.",
+      "Bazinis planas lieka ribotas, bet jis dabar aiškiau parodo pirmus žingsnius ir natūralų kelią į pilną nario patirtį.",
   },
   {
-    slug: "how-we-think-about-useful-digital-products",
-    category: "Skaitmeninė kolekcija",
-    date: "2026 m. balandžio 28 d.",
-    readTime: "5 min. skaitymo",
-    title: "Kaip galvojame apie naudingus skaitmeninius produktus",
+    slug: "ruosiami-nauji-nario-resursai",
+    category: "Nario resursai",
+    date: "2026 m. gegužės 5 d.",
+    readTime: "2 min. skaitymo",
+    title: "Ruošiami nauji nario resursai",
     cover: {
-      issue: "Įrašas 02",
-      heading: "Naudinga gali atrodyti gražiai.",
-      lines: ["skaitmeniniai rinkiniai", "tyli nauda", "grįžtamoji vertė"],
-      background: "linear-gradient(135deg, rgba(32,27,23,0.98) 0%, rgba(95,76,59,0.94) 45%, rgba(228,211,188,0.92) 100%)",
+      issue: "Naujiena 02",
+      heading: "Nauji resursai ruošiami nariams.",
+      lines: ["šablonai", "mini gidai", "planavimo įrankiai"],
+      background: "linear-gradient(135deg, rgba(26,24,26,0.98) 0%, rgba(72,64,78,0.95) 46%, rgba(188,178,196,0.92) 100%)",
       panel: "linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04))",
-      blur: "rgba(236,215,183,0.30)",
-      accent: "rgba(250,241,227,0.12)",
+      blur: "rgba(203,192,216,0.28)",
+      accent: "rgba(255,255,255,0.11)",
     },
     excerpt:
-      "Spausdinami plakatai, interjero gidai ir planuokliai veikia geriausiai, kai sprendžia aiškų poreikį ir išlieka malonūs sugrįžti.",
+      "StillOak Studio ruošia naujus šablonus, mini gidus ir praktinius planavimo įrankius nariams.",
     intro:
-      "Skaitmeninius produktus lengva paversti bendriniais failais. Tikras iššūkis nėra sukurti daugiau atsisiuntimų, o sukurti tai, prie ko žmogus nori grįžti ir po pirmo atidarymo.",
+      "Nario resursų zona plečiama palaipsniui. Pirmiausia ruošiami tie failai ir praktiniai įrankiai, kurie padeda greičiau susidėlioti mėnesio kryptį, be perteklinio paaiškinimo ar sunkios sistemos.",
     sections: [
       {
-        heading: "Nauda yra pirmas sluoksnis",
+        heading: "Kokie resursai ruošiami",
         paragraphs: [
-          "Skaitmeninis produktas turi spręsti konkretų poreikį: padėti sukurti kambario nuotaiką, susidėlioti savaitę arba atnaujinti vizualinę aplinką.",
-          "Renkamės produktus, kuriuos galima suprasti vienu sakiniu ir pradėti naudoti be ilgo paaiškinimo.",
+          "Planuojami trumpi mini gidai, paprasti planavimo šablonai ir nario darbo lapai, kuriuos bus galima naudoti kartu su Stilloak erdve.",
+          "Prioritetas teikiamas resursams, kurie turi aiškų praktinį rezultatą: lengvesnę mėnesio pradžią, tvarkingesnius tikslus arba ramesnį sprendimų priėmimą.",
         ],
       },
       {
-        heading: "Grožis padeda produktą pasilikti",
+        heading: "Kaip jie bus atrenkami",
         paragraphs: [
-          "Žmonės dažniau grįžta prie skaitmeninių produktų, kai juos gera matyti. Maketas, tipografija ir spalva čia svarbūs taip pat, kaip fiziniame daikte.",
-          "Tai ypač svarbu gidams, planuokliams ir rinkiniams, kurie turi tapti kasdienio ritmo dalimi.",
-        ],
-      },
-      {
-        heading: "Rinkinys turi jaustis kaip sistema",
-        paragraphs: [
-          "Geriausi rinkiniai neatrodo kaip atsitiktiniai failai, sujungti dėl didesnės kainos. Jie jaučiasi kaip maža sistema su aiškiu rezultatu.",
-          "Todėl plakatų rinkinys, kambario gidas ir planuoklis gali veikti kartu, jei visi palaiko tą pačią ramesnio gyvenimo kryptį.",
+          "Kiekvienas resursas bus vertinamas pagal naudą nariui, o ne pagal failų skaičių. Mažiau, bet aiškiau yra svarbiau už didelį archyvą be krypties.",
+          "Bazinis planas gali matyti ribotas peržiūras, o pilni resursai bus jungiami prie Asmeninio ir Privataus verslo planų.",
         ],
       },
     ],
     takeaway:
-      "Geras skaitmeninis produktas nėra tik atsisiuntimas. Jis aiškus, naudingas ir vertas sugrįžimo.",
+      "Nauji resursai bus kuriami kaip praktiška nario patirties dalis: trumpi, tvarkingi ir lengvai pritaikomi.",
   },
   {
-    slug: "what-makes-a-boutique-store-feel-memorable",
-    category: "Prekybos ritmas",
-    date: "2026 m. balandžio 28 d.",
-    readTime: "4 min. skaitymo",
-    title: "Kas boutique parduotuvę paverčia įsimintina",
+    slug: "asmeniniame-plane-pleciama-suvestiniu-sistema",
+    category: "Asmeninis planas",
+    date: "2026 m. gegužės 5 d.",
+    readTime: "3 min. skaitymo",
+    title: "Asmeniniame plane plečiama suvestinių sistema",
     cover: {
-      issue: "Įrašas 03",
-      heading: "Įsimintinos parduotuvės juda vienu ritmu.",
-      lines: ["tonas", "pateikimas", "pirkimo atmintis"],
-      background: "linear-gradient(135deg, rgba(19,18,19,0.98) 0%, rgba(54,61,66,0.95) 48%, rgba(154,160,145,0.92) 100%)",
+      issue: "Naujiena 03",
+      heading: "Suvestinės jungiamos į vieną zoną.",
+      lines: ["mėnesio suvestinės", "tikslų progresas", "premium resursai"],
+      background: "linear-gradient(135deg, rgba(23,23,22,0.98) 0%, rgba(70,71,62,0.95) 48%, rgba(186,178,142,0.92) 100%)",
       panel: "linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03))",
-      blur: "rgba(185,191,176,0.28)",
+      blur: "rgba(210,199,154,0.28)",
       accent: "rgba(255,255,255,0.10)",
     },
     excerpt:
-      "Įsimenama ne viena detalė, o tonas, santūrumas, produkto pateikimas ir ramus pirkimo kelias.",
+      "Pilnos mėnesio suvestinės, tikslų progreso kortelės ir premium resursai bus aiškiau sujungti vienoje nario zonoje.",
     intro:
-      "Daug parduotuvių turi gerų produktų. Mažiau jų turi jausmą, kuris lieka žmogui išėjus. Įsimintinumas atsiranda tada, kai visos patirties dalys juda kartu, o ne kai viena detalė bando atlikti visą darbą.",
+      "Asmeninis planas tampa pagrindine pilnos nario patirties vieta. Atnaujinimų kryptis yra sujungti mėnesio suvestines, tikslų progresą ir premium resursus į vieną ramesnę sistemą.",
     sections: [
       {
-        heading: "Tonas svarbus tiek pat, kiek išdėstymas",
+        heading: "Kas bus sujungta",
         paragraphs: [
-          "Įsimintina parduotuvė skamba kaip ji pati. Produktų aprašymai, mygtukai, pagalbos puslapiai ir apmokėjimo tekstai turi tą pačią laikyseną.",
-          "Kai tekstai suderinti, parduotuvė jaučiasi kaip prekės ženklas, o ne kaip šablonas.",
+          "Pilnos mėnesio suvestinės bus labiau susietos su tikslų progreso kortelėmis, kad narys matytų ne tik skaičius, bet ir kryptį.",
+          "Premium resursai bus pateikiami šalia susijusių veiksmų, kad nereikėtų ieškoti, kuris šablonas ar gidas tinka dabartiniam mėnesio etapui.",
         ],
       },
       {
-        heading: "Produkto pateikimas kuria norą",
+        heading: "Ką tai reiškia Asmeniniam nariui",
         paragraphs: [
-          "Produktai atrodo stipresni, kai turi kontekstą: ką jie išsprendžia, kokią nuotaiką palaiko ir kaip įsikomponuoja į gyvenimo būdą.",
-          "Todėl boutique parduotuvės dažnai parduoda mažiau prekių, bet efektyviau. Kiekvienas produktas gauna geresnę sceną.",
-        ],
-      },
-      {
-        heading: "Paskutinis įspūdis dažnai gimsta perkant",
-        paragraphs: [
-          "Jei pirkimo kelias painus, ankstesnis vizualinis grožis susilpnėja. Įsimintina parduotuvė paskutinį žingsnį išlaiko tokį pat ramų kaip pradžią.",
-          "Tai reiškia aiškias santraukas, nuspėjamas sumas ir tvarkingą paskyros erdvę po pirkimo.",
+          "Asmeninis planas turėtų jaustis kaip pilna, bet ne perkrauta darbo erdvė. Svarbiausia, kad narys greitai suprastų, ką peržiūrėti, ką koreguoti ir prie ko grįžti.",
+          "Pilna nario naujienų prieiga ir ankstyvi pranešimai apie pokyčius liks šio plano dalis.",
         ],
       },
     ],
     takeaway:
-      "Boutique jausmas tampa įsimintinas tada, kai kiekvienas žingsnis palaiko tą patį tylų pasitikėjimą.",
+      "Asmeninio plano kryptis yra viena aiškesnė nario zona, kur suvestinės, tikslai ir resursai palaiko tą patį mėnesio ritmą.",
   },
   {
-    slug: "how-to-price-a-premium-digital-bundle",
-    category: "Kainos logika",
-    date: "2026 m. balandžio 28 d.",
-    readTime: "5 min. skaitymo",
-    title: "Kaip įkainoti premium skaitmeninį rinkinį",
+    slug: "privataus-verslo-planui-ruosiama-projektu-erdve",
+    category: "Privatus verslas",
+    date: "2026 m. gegužės 5 d.",
+    readTime: "3 min. skaitymo",
+    title: "Privataus verslo planui ruošiama projektų erdvė",
     cover: {
-      issue: "Įrašas 04",
-      heading: "Įkainokite sistemą, ne tik failus.",
-      lines: ["rinkinio vertė", "aiškumas", "premium logika"],
-      background: "linear-gradient(135deg, rgba(27,22,22,0.98) 0%, rgba(99,71,62,0.94) 48%, rgba(209,173,133,0.92) 100%)",
+      issue: "Naujiena 04",
+      heading: "Projektų sluoksnis verslo nariams.",
+      lines: ["projektai", "prioritetinė pagalba", "verslo resursai"],
+      background: "linear-gradient(135deg, rgba(18,22,24,0.98) 0%, rgba(49,65,74,0.95) 46%, rgba(151,177,181,0.92) 100%)",
       panel: "linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03))",
-      blur: "rgba(221,184,141,0.30)",
+      blur: "rgba(168,202,207,0.26)",
       accent: "rgba(255,255,255,0.10)",
     },
     excerpt:
-      "Rinkinys atrodo vertingesnis, kai žmogus supranta rezultatą, o ne tik failų skaičių.",
+      "Verslo nariams ruošiami projektų, prioritetinės pagalbos ir verslo resursų blokai.",
     intro:
-      "Skaitmeniniai rinkiniai silpnėja, kai atrodo kaip atsitiktiniai failai už didesnę sumą. Premium rinkinys veikia tada, kai žmogus mato aiškų rezultatą ir supranta, kodėl visuma stipresnė už atskiras dalis.",
+      "Privataus verslo planas plečiamas kaip aukščiausias nario lygis projektams, prioritetui ir praktiškesnei verslo atramai. Pirmieji blokai ruošiami taip, kad narys matytų daugiau tvarkos aplink projektus ir pagalbos poreikius.",
     sections: [
       {
-        heading: "Skaičiuokite rezultatą, ne failus",
+        heading: "Projektų erdvės kryptis",
         paragraphs: [
-          "Pirkėjas retai renkasi rinkinį vien todėl, kad jame daugiau puslapių. Jis renkasi aiškesnį kelią: suvaldytą kambarį, ramesnę savaitę ar pilnesnę priemonių sistemą.",
-          "Kaina turėtų atspindėti bendrą naudą, o ne atrodyti kaip mechaninė atskirų atsisiuntimų suma.",
+          "Ruošiama projektų zona turėtų padėti atskirti svarbiausius darbus, prioritetus ir resursus, kurie reikalingi verslo nario ritmui.",
+          "Ji nebus skirta pertekliniam valdymui. Tikslas yra trumpa, tvarkinga vieta, kurioje matosi, kas svarbu dabar.",
         ],
       },
       {
-        heading: "Pirmiausia įtvirtinkite atskirų produktų vertę",
+        heading: "Kas liks premium sluoksnyje",
         paragraphs: [
-          "Rinkiniai atrodo patikimesni, kai atskiri produktai jau aiškiai pozicionuoti. Tada bendra kaina skamba apgalvotai, o ne savavališkai.",
-          "Premium rinkinys gali jaustis dosnus, jei sutaupymas matomas, bet nėra triukšmingas.",
-        ],
-      },
-      {
-        heading: "Premium kaina reikalauja premium pateikimo",
-        paragraphs: [
-          "Vizualinis rinkinio pateikimas svarbus tiek pat, kiek pati suma. Jei viršelis, tekstai ir naudos atrodo nebaigti, net teisinga kaina gali pasirodyti per aukšta.",
-          "Todėl stipresnės peržiūros, ramesni tekstai ir aiškesnis turinio paaiškinimas dažnai pakelia suvokiamą vertę net nepakeitus kainos.",
+          "Privataus verslo plane toliau išlieka prioritetinė pagalba, verslo resursai ir premium nario patirtis.",
+          "Nario naujienose verslo nariai matys su projektais ir resursais susijusius pranešimus, kai jie bus paruošti naudojimui.",
         ],
       },
     ],
     takeaway:
-      "Rinkinio kaina veikia stipriausiai tada, kai žmogus supranta pokytį, o ne tik atsisiuntimų kiekį.",
+      "Privataus verslo planas juda link aiškesnės projektų atramos, išlaikant ramų ir minimalų Stilloak Studio toną.",
   },
   {
-    slug: "what-to-show-on-a-product-page-first",
-    category: "Produkto puslapiai",
-    date: "2026 m. balandžio 28 d.",
-    readTime: "4 min. skaitymo",
-    title: "Ką produkto puslapyje parodyti pirmiausia",
+    slug: "nauji-produkto-pristatymai-ir-atrinkti-resursai",
+    category: "Produktai ir atranka",
+    date: "2026 m. gegužės 5 d.",
+    readTime: "2 min. skaitymo",
+    title: "Nauji produkto pristatymai ir atrinkti resursai",
     cover: {
-      issue: "Įrašas 05",
-      heading: "Pirma aiškumas, tada detalės.",
-      lines: ["pirmas žvilgsnis", "produkto pasitikėjimas", "švarus prioritetas"],
-      background: "linear-gradient(135deg, rgba(24,19,17,0.98) 0%, rgba(70,58,50,0.95) 46%, rgba(227,220,207,0.92) 100%)",
-      panel: "linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04))",
-      blur: "rgba(238,231,218,0.28)",
-      accent: "rgba(255,255,255,0.10)",
-    },
-    excerpt:
-      "Stiprūs produktų puslapiai veda akį ramia tvarka: identitetas, kaina, vertė ir tik tada gilesnis paaiškinimas.",
-    intro:
-      "Produkto puslapis turi tik kelias sekundes tapti aiškus. Kai viskas konkuruoja vienodai, žmogus pats turi susidėlioti prioritetus. Stipresnis puslapis tą tvarką nusprendžia iš anksto.",
-    sections: [
-      {
-        heading: "Pirmiausia identitetas",
-        paragraphs: [
-          "Pirmas sluoksnis turi atsakyti, kas tai yra ir kodėl tai svarbu. Dažniausiai tai pavadinimas, pagrindinė vertė ir kaina be vizualinio triukšmo.",
-          "Jei šis sluoksnis painus, vėlesnės detalės nebegali visiškai išgelbėti puslapio.",
-        ],
-      },
-      {
-        heading: "Įrodymas prieš perteklių",
-        paragraphs: [
-          "Po pagrindų pirkėjui reikia priežasčių pasitikėti: kas įtraukta, kaip vyksta pristatymas ir ką jis gauna po apmokėjimo.",
-          "Tai ypač svarbu skaitmeniniams produktams, nes jie tampa apčiuopiami tik tada, kai paaiškinimas yra konkretus.",
-        ],
-      },
-      {
-        heading: "Ilgesnę istoriją palikite žemiau",
-        paragraphs: [
-          "Gilesnė istorija vis tiek reikalinga, bet ji neturi stabdyti pirmo sprendimo. Stiprus produkto puslapis leidžia judėti greitai ir palieka vietos skaityti daugiau.",
-          "Toks balansas visą pirkimą paverčia ramesniu ir solidesniu.",
-        ],
-      },
-    ],
-    takeaway:
-      "Žmonės greičiau pasitiki tada, kai puslapis aiškiai parodo, ką suprasti pirmiausia.",
-  },
-  {
-    slug: "building-trust-after-checkout",
-    category: "Po pirkimo",
-    date: "2026 m. balandžio 28 d.",
-    readTime: "4 min. skaitymo",
-    title: "Pasitikėjimas po pirkimo sugrąžina klientus",
-    cover: {
-      issue: "Įrašas 06",
-      heading: "Po pirkimo patirtis svarbesnė, nei atrodo.",
-      lines: ["po apmokėjimo", "sąskaitos", "grįžtantis pasitikėjimas"],
-      background: "linear-gradient(135deg, rgba(18,18,20,0.98) 0%, rgba(54,50,60,0.95) 44%, rgba(174,160,186,0.92) 100%)",
+      issue: "Naujiena 05",
+      heading: "Ankstyvi pristatymai nariams.",
+      lines: ["produktai", "riboti resursai", "naujos kryptys"],
+      background: "linear-gradient(135deg, rgba(28,23,20,0.98) 0%, rgba(86,66,52,0.95) 48%, rgba(204,169,120,0.92) 100%)",
       panel: "linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03))",
-      blur: "rgba(189,175,204,0.28)",
+      blur: "rgba(221,184,132,0.30)",
       accent: "rgba(255,255,255,0.10)",
     },
     excerpt:
-      "Tvarkinga užsakymų istorija, aiškios sąskaitos ir patikimas skaitmeninis pristatymas dažnai kuria daugiau pakartotinio pasitikėjimo nei dar vienas hero blokas.",
+      "Nariai matys ankstyvus produktų pristatymus, ribotus resursus ir naujas StillOak Studio kryptis.",
     intro:
-      "Daug prekės ženklų stengiasi laimėti pirmą pirkimą, bet po apmokėjimo patirtis susilpnėja. Būtent tada žmogus nusprendžia, ar viskas buvo pakankamai tvarkinga, kad norėtų sugrįžti.",
+      "Nario naujienos taps vieta, kur bus ramiai pristatomi nauji produktai, atrinkti resursai ir kitos StillOak Studio kryptys. Tai ne triukšmingas paleidimų srautas, o aiškus nario informacijos sluoksnis.",
     sections: [
       {
-        heading: "Tvarkingas archyvas keičia pirkimo jausmą",
+        heading: "Ką nariai matys pirmiausia",
         paragraphs: [
-          "Kai sąskaitas, užsakymų būsenas ir atsisiuntimus lengva rasti, pirkėjas jaučia, kad prekės ženklas lieka šalia ir po mokėjimo.",
-          "Priešingas jausmas veikia taip pat stipriai. Netvarkinga istorija gali susilpninti visą premium įspūdį atgaline data.",
+          "Asmeninio ir Privataus verslo planų nariai matys ankstyvus produkto pristatymus, naujų resursų paaiškinimus ir svarbiausius platformos pokyčius.",
+          "Bazinis planas gali matyti ribotas peržiūras, kad būtų aišku, kas vyksta, bet pilnas turinys lieka aktyviems mokamiems planams.",
         ],
       },
       {
-        heading: "Skaitmeninis pristatymas yra produkto dalis",
+        heading: "Kaip bus išlaikoma atranka",
         paragraphs: [
-          "Skaitmeniniams produktams pristatymo kelias nėra atskiras nuo produkto patirties. Failų pasiekiamumas, pavadinimai ir patvirtinimo srautas tampa to, ką žmogus nusipirko, dalimi.",
-          "Todėl paskyra, laiškai ir atsisiuntimo etiketės turi atrodyti taip pat apgalvotai kaip pagrindinis puslapis.",
-        ],
-      },
-      {
-        heading: "Sugrįžimą kuria tylūs detalūs sprendimai",
-        paragraphs: [
-          "Klientai dažnai sugrįžta ne todėl, kad prisimena kiekvieną pradžios puslapio eilutę, o todėl, kad visas pirkimas atrodė stabilus. Rami pagalba, aiškūs įrašai ir tvarkingas archyvas pasitikėjimą paverčia įpročiu.",
+          "Naujienos bus skelbiamos tik tada, kai jos padeda nariui suprasti pokytį, naują galimybę arba svarbų praktinį resursą.",
+          "Tikslas yra naudinga, rami informacija: mažiau pažadų, daugiau aiškumo apie tai, kas realiai keičiasi.",
         ],
       },
     ],
     takeaway:
-      "Kartais lengviausias kelias į premium jausmą yra pagerinti tai, kas vyksta po apmokėjimo.",
+      "Nario naujienos bus praktiška vieta sekti Stilloak Studio pokyčius, produktus ir atrinktus nario resursus.",
   },
 ];
 

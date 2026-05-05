@@ -13,7 +13,7 @@ const previewData = {
     { _id: "p1", name: "Aether Hoodie", category: "Apparel", stock: 18 },
     { _id: "p2", name: "Lumen Bottle", category: "Lifestyle", stock: 4 },
     { _id: "p3", name: "North Tote", category: "Accessories", stock: 11 },
-    { _id: "p4", name: "Studio Journal", category: "Stationery", stock: 3 },
+    { _id: "p4", name: "Studio Notes", category: "Stationery", stock: 3 },
     { _id: "p5", name: "Nimbus Tee", category: "Apparel", stock: 26 },
   ],
   orders: [

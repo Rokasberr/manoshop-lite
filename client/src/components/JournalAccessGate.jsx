@@ -6,8 +6,8 @@ import { journalArticles } from "../content/journalArticles";
 
 const JournalAccessGate = ({
   user,
-  title = "Journal atsiveria aktyviems nariams.",
-  description = "Asmeninio ir Privataus verslo nariai gauna pilną redakcinį archyvą savo privačioje Stilloak patirtyje.",
+  title = "Nario naujienos atsiveria aktyviems nariams.",
+  description = "Asmeninio ir Privataus verslo nariai gauna pilną StillOak Studio atnaujinimų, resursų, produktų pristatymų ir programos pokyčių zoną.",
 }) => {
   const previewArticles = journalArticles.slice(0, 3);
 
@@ -41,17 +41,17 @@ const JournalAccessGate = ({
           <div className="rounded-[28px] border border-white/8 bg-white/5 p-6">
             <div className="inline-flex items-center gap-3 rounded-full bg-white/6 px-4 py-2 text-sm text-white/72">
               <LockKeyhole size={16} style={{ color: "rgb(var(--accent-strong))" }} />
-              Asmeninis ir Privatus verslas planai atrakina pilną redakcinį archyvą
+              Asmeninis ir Privatus verslas planai atrakina pilnas nario naujienas
             </div>
             <div className="mt-6 space-y-3 text-sm text-white/68">
               <div className="rounded-[18px] bg-white/4 px-4 py-4">
-                Pilni straipsniai ir susijusios redakcinės pastabos
+                Platformos, narystės ir programos atnaujinimai vienoje vietoje
               </div>
               <div className="rounded-[18px] bg-white/4 px-4 py-4">
-                Ramesnės pastabos apie pinigus, produktus ir nario ritmą
+                Nauji resursai, produktų pristatymai ir praktinės nario pastabos
               </div>
               <div className="rounded-[18px] bg-white/4 px-4 py-4">
-                Prieiga sukurta kaip privačios nario patirties dalis
+                Bazinis mato ribotas peržiūras, pilna prieiga lieka mokamiems planams
               </div>
             </div>
           </div>

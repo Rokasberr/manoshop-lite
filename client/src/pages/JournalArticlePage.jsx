@@ -25,8 +25,8 @@ const JournalArticlePage = () => {
     return (
       <JournalAccessGate
         user={user}
-        title={`“${article.title}” is reserved for active members.`}
-        description="This article becomes fully visible after your Asmeninis or Privatus verslas membership is active. The lock is tied to your paid membership status, not just account creation."
+        title={`„${article.title}“ pilnai atsiveria aktyviems nariams.`}
+        description="Pilnas įrašas matomas, kai aktyvus Asmeninis arba Privatus verslas planas. Užraktas susietas su mokamos narystės būsena, ne vien su paskyros sukūrimu."
       />
     );
   }
@@ -38,7 +38,7 @@ const JournalArticlePage = () => {
       <section className="surface-dark overflow-hidden rounded-[38px] px-6 py-8 sm:px-10 sm:py-10 lg:px-12">
         <Link to="/journal" className="inline-flex items-center gap-2 text-sm text-white/70 transition hover:text-white">
           <ArrowLeft size={16} />
-          Back to journal
+          Grįžti į nario naujienas
         </Link>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
@@ -59,7 +59,7 @@ const JournalArticlePage = () => {
       <section className="public-section grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
         <aside className="space-y-4">
           <div className="marketing-card p-6">
-            <p className="text-xs uppercase tracking-[0.3em] text-muted">Article focus</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-muted">Naujienos santrauka</p>
             <p className="mt-4 text-base leading-7 text-muted">{article.excerpt}</p>
           </div>
 
@@ -97,7 +97,7 @@ const JournalArticlePage = () => {
                 </h2>
                 <p className="mt-4 text-base leading-7 text-muted">{entry.excerpt}</p>
                 <span className="mt-6 inline-flex items-center gap-2 text-sm font-medium accent-text">
-                  Read article
+                  Skaityti naujieną
                   <ArrowRight size={16} />
                 </span>
               </div>

@@ -15,8 +15,8 @@ const launchCardsBase = [
   {
     key: "journal",
     icon: BookOpenText,
-    status: "Laikoma atidarymui",
-    target: "Po skaitmeninės kolekcijos",
+    status: "Atidaryta nariams",
+    target: "Asmeninis ir Privatus verslas",
   },
 ];
 
@@ -25,8 +25,8 @@ const launchCopy = {
     focus: {
       default: {
         eyebrow: "Netrukus",
-        title: "Skaitmeninė kolekcija ir Journal ruošiami tikslesniam atidarymui.",
-        text: "Abi sekcijos laikinai laikomos čia, kad atsidarytų pilnesnės, aiškesnės ir vertos sugrįžimo.",
+        title: "Skaitmeninė kolekcija ruošiama, o nario naujienos jau atvertos aktyviems nariams.",
+        text: "Šis puslapis rodo, kas dar ruošiama ir kas jau veikia nario patirtyje.",
       },
       digital: {
         eyebrow: "Skaitmeninė kolekcija",
@@ -34,14 +34,14 @@ const launchCopy = {
         text: "PDF produktai, rinkiniai ir atsisiuntimo patirtis dar ruošiami prieš pilną atidarymą.",
       },
       journal: {
-        eyebrow: "Journal",
-        title: "Journal ruošiama ramesniam atidarymui.",
-        text: "Užrakintas redakcinis sluoksnis tvarkomas taip, kad nario skaitymo patirtis nuo pirmos dienos būtų verta atrakinti.",
+        eyebrow: "Nario naujienos",
+        title: "Nario naujienos atvertos aktyviems nariams.",
+        text: "Užrakintas nario atnaujinimų sluoksnis renka platformos naujienas, resursų pristatymus ir programos pokyčius vienoje vietoje.",
       },
     },
-    cardsTitle: "Kas ruošiama",
+    cardsTitle: "Kas ruošiama ir kas jau veikia",
     cardsText:
-      "Abi zonos šiuo metu laikomos viename aiškiame laukimo puslapyje, kol patirtis bus paruošta.",
+      "Skaitmeninė kolekcija dar ruošiama, o nario naujienos jau veikia aktyviems mokamiems planams.",
     cards: {
       digital: {
         eyebrow: "Skaitmeninė kolekcija",
@@ -51,11 +51,11 @@ const launchCopy = {
         bullets: ["Spausdinami plakatų rinkiniai", "PDF gidai ir planavimo įrankiai", "Aiškesnė atidarymo seka ir rinkinių logika"],
       },
       journal: {
-        eyebrow: "Journal",
-        title: "Ramesnis redakcinis sluoksnis nariams",
+        eyebrow: "Nario naujienos",
+        title: "Atnaujinimų sluoksnis nariams",
         description:
-          "Journal laikomas atskirai iki stipresnio paleidimo sluoksnio, kad privatūs tekstai jaustųsi pilnai paruošti.",
-        bullets: ["Straipsniai tik nariams", "Aiškesnis redakcinis kalendorius", "Pilnesnė užrakinta skaitymo patirtis"],
+          "Nario naujienų zona renka narystės, resursų, produktų ir programos pokyčius aktyviems nariams.",
+        bullets: ["Narystės atnaujinimai", "Aiškesnis resursų ritmas", "Užrakinta nario patirtis"],
       },
     },
     statusLabel: "Statusas",
@@ -66,7 +66,7 @@ const launchCopy = {
     whileWaitingEyebrow: "Kol lauki",
     whileWaitingTitle: "Gyvas sluoksnis vis dar atidarytas.",
     whileWaitingText:
-      "Kol skaitmeninė kolekcija ir Journal dar ruošiami, gali peržiūrėti pagrindinę kolekciją, narystę ir Stilloak programą.",
+      "Kol skaitmeninė kolekcija dar ruošiama, gali peržiūrėti pagrindinę kolekciją, narystę, Stilloak programą ir nario naujienas.",
     browseCollection: "Peržiūrėti kolekciją",
     viewMembership: "Peržiūrėti narystę",
     launchMap: "Paleidimo planas",
@@ -79,8 +79,8 @@ const launchCopy = {
     focus: {
       default: {
         eyebrow: "Launch soon",
-        title: "Digital Collection and Journal are being prepared for a cleaner launch.",
-        text: "Both sections are temporarily held here so they can open in a fuller, clearer, more useful state.",
+        title: "Digital Collection is being prepared, and member news is open for active members.",
+        text: "This page shows what is still being prepared and what already works inside the member experience.",
       },
       digital: {
         eyebrow: "Digital collection",
@@ -88,14 +88,14 @@ const launchCopy = {
         text: "The collection, product framing, and delivery path are being refined before full release.",
       },
       journal: {
-        eyebrow: "Journal",
-        title: "The Journal is temporarily held in launch-soon mode.",
-        text: "The locked editorial layer is being refined so the member reading experience feels worth unlocking from day one.",
+        eyebrow: "Member news",
+        title: "Member news is open for active members.",
+        text: "The locked updates layer gathers platform news, resource releases, and program changes in one place.",
       },
     },
-    cardsTitle: "What is being prepared",
+    cardsTitle: "What is being prepared and what is live",
     cardsText:
-      "Both areas currently live on one clear waiting page until the experience is ready.",
+      "Digital Collection is still being prepared, while member news is live for active paid plans.",
     cards: {
       digital: {
         eyebrow: "Digital collection",
@@ -105,11 +105,11 @@ const launchCopy = {
         bullets: ["Printable art bundles", "PDF guides and planners", "Cleaner launch sequence and bundle logic"],
       },
       journal: {
-        eyebrow: "Journal",
-        title: "A calmer editorial layer for members",
+        eyebrow: "Member news",
+        title: "An updates layer for members",
         description:
-          "The Journal is being held back until the launch layer is tighter, so the private reading experience feels more considered from day one.",
-        bullets: ["Members-only articles", "Sharper editorial calendar", "A more complete locked reading experience"],
+          "Member news gathers membership, resource, product, and program changes for active members.",
+        bullets: ["Membership updates", "Clearer resource rhythm", "Locked member experience"],
       },
     },
     statusLabel: "Status",
@@ -120,7 +120,7 @@ const launchCopy = {
     whileWaitingEyebrow: "While you wait",
     whileWaitingTitle: "The live layer is still open.",
     whileWaitingText:
-      "While Digital Collection and Journal are still being prepared, you can browse the main collection, view membership, and explore Stilloak.",
+      "While Digital Collection is still being prepared, you can browse the main collection, view membership, explore Stilloak, and open member news.",
     browseCollection: "Browse collection",
     viewMembership: "View membership",
     launchMap: "Launch map",

@@ -40,9 +40,9 @@ const availableModules = [
   },
   {
     title: "Nario naujienos",
-    text: "Sek aiškius narystės atnaujinimus ir kas ruošiama toliau.",
-    label: "Pasiekiama",
-    access: "Įtraukta Bazinyje",
+    text: "Matyk trumpas nario naujienų peržiūras ir aiškiau suprask, kas ruošiama toliau.",
+    label: "Ribota",
+    access: "Ribota peržiūra",
     icon: Newspaper,
   },
 ];
@@ -90,18 +90,18 @@ const checklistItems = [
 const updates = [
   {
     label: "Nauja",
-    title: "Naujas Bazinio plano peržiūros blokas",
-    text: "Bazinyje gali greitai pasižymėti mėnesio fokusą ir pamatyti pradinę kryptį.",
+    title: "Bazinio plano erdvė atnaujinta",
+    text: "Pridėta mėnesio apžvalga, pradiniai resursai ir aiškesnis kelias į Asmeninį planą.",
   },
   {
     label: "Ruošiama",
-    title: "Ruošiami papildomi nario resursai",
-    text: "Pradiniai gidai bus plečiami taip, kad padėtų pradėti be sudėtingos sistemos.",
+    title: "Ruošiami nauji nario resursai",
+    text: "StillOak Studio ruošia naujus šablonus, mini gidus ir praktinius planavimo įrankius nariams.",
   },
   {
     label: "Asmeninis",
-    title: "Asmeniniame plane atsiveria pilna suvestinių sistema",
-    text: "Kai norėsi daugiau struktūros, Asmeninis atrakins suvestines, tikslus ir premium resursus.",
+    title: "Asmeniniame plane plečiama suvestinių sistema",
+    text: "Pilnos mėnesio suvestinės, tikslų progreso kortelės ir premium resursai bus aiškiau sujungti vienoje nario zonoje.",
   },
 ];
 
@@ -115,8 +115,8 @@ const lockedAsmeninisFeatures = [
     text: "Detalesnis tikslų judėjimas, progreso ritmas ir aiškesni kiti žingsniai.",
   },
   {
-    title: "Journal tik nariams",
-    text: "Pilnas redakcinis archyvas ir gilesnės StillOak Studio pastabos.",
+    title: "Pilnos nario naujienos",
+    text: "Pilni narystės atnaujinimai, platformos naujienos, resursų pristatymai ir programos pokyčių paaiškinimai.",
   },
   {
     title: "Premium skaitmeniniai resursai",
@@ -495,7 +495,7 @@ const BazinisMemberPage = () => {
             <h2 className="mt-4 font-display text-3xl font-bold leading-tight">Kas vyksta StillOak Studio</h2>
           </div>
           <p className="max-w-xl text-sm leading-6 text-muted">
-            Trumpi atnaujinimai, kad Bazinis jaustųsi gyvas ir aiškiai rodytų, kur juda narystė.
+            Ribotos peržiūros, kad Bazinis aiškiai rodytų, kur juda narystė. Pilni įrašai atsiveria Asmeniniame ir Privataus verslo planuose.
           </p>
         </div>
 
@@ -517,7 +517,7 @@ const BazinisMemberPage = () => {
             Norisi pilnos programos?
           </h2>
           <p className="mt-5 max-w-2xl text-base leading-7 text-white/72">
-            Asmeninis planas atrakina pilną nario zoną, mėnesio suvestines, tikslų korteles, Journal ir premium resursus.
+            Asmeninis planas atrakina pilną nario zoną, mėnesio suvestines, tikslų korteles, nario naujienas ir premium resursus.
           </p>
           <p className="mt-4 max-w-2xl text-sm leading-6 text-white/58">
             Bazinis lieka pradžios erdve. Asmeninis yra skirtas tada, kai nori pilno mėnesio valdymo ir gilesnės

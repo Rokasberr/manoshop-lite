@@ -41,7 +41,7 @@ const storyCopy = {
       {
         icon: LockKeyhole,
         title: "Užrakintas nario sluoksnis",
-        text: "Journal prieiga, sąskaitų archyvas, atsisiuntimai ir privatesnė nario patirtis visoje svetainėje.",
+        text: "Nario naujienų prieiga, sąskaitų archyvas, atsisiuntimai ir privatesnė nario patirtis visoje svetainėje.",
       },
     ],
     unlockPrimary: "Atrakinti narystę",
@@ -92,7 +92,7 @@ const storyCopy = {
       {
         icon: LockKeyhole,
         title: "Locked member layer",
-        text: "Journal access, invoice archive, downloads, and a more private member experience across the site.",
+        text: "Member news access, invoice archive, downloads, and a more private member experience across the site.",
       },
     ],
     unlockPrimary: "Unlock membership",

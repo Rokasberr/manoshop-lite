@@ -105,12 +105,12 @@ const homeCopy = {
       {
         label: "Bazinis",
         title: "Pagrindinė nario erdvė",
-        description: "Mėnesio apžvalga, riboti skaitmeniniai resursai, nario naujienos ir atšaukimas bet kada.",
+        description: "Mėnesio apžvalga, riboti skaitmeniniai resursai, nario naujienų peržiūros ir atšaukimas bet kada.",
       },
       {
         label: "Asmeninis",
         title: "Pilna asmeninė narystė",
-        description: "Mėnesinės suvestinės, tikslų kortelės, Journal, premium resursai ir ankstyva prieiga.",
+        description: "Mėnesinės suvestinės, tikslų kortelės, nario naujienos, premium resursai ir ankstyva prieiga.",
       },
       {
         label: "Privatus verslas",
@@ -220,12 +220,12 @@ const homeCopy = {
       {
         label: "Bazinis",
         title: "Basic member area",
-        description: "Monthly overview, limited digital resources, member updates, and cancel anytime.",
+        description: "Monthly overview, limited digital resources, member news previews, and cancel anytime.",
       },
       {
         label: "Asmeninis",
         title: "Full personal membership",
-        description: "Monthly summaries, progress cards, Journal, premium resources, and early product access.",
+        description: "Monthly summaries, progress cards, member news, premium resources, and early product access.",
       },
       {
         label: "Privatus verslas",

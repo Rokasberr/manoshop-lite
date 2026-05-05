@@ -179,7 +179,7 @@ const demoCopy = {
       { icon: BadgeEuro, text: "Tikslas aiškus: pamatyti taupymo vietas ir biudžeto ribas." },
     ],
     includedTitle: "Įtraukta į Asmeninį",
-    journalCta: "Peržiūrėti Journal",
+    journalCta: "Peržiūrėti nario naujienas",
   },
   en: {
     chip: "Member program",
@@ -290,7 +290,7 @@ const demoCopy = {
       { icon: BadgeEuro, text: "The goal is clear: spot savings opportunities and budget pressure." },
     ],
     includedTitle: "Included in Asmeninis",
-    journalCta: "View Journal",
+    journalCta: "View member news",
   },
 };
 

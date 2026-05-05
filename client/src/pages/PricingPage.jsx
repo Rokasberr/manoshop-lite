@@ -21,7 +21,7 @@ const pricingCopy = {
       "Pilna nario erdvė",
       "Mėnesinės suvestinės",
       "Tikslų ir progreso kortelės",
-      "Journal tik nariams",
+      "Pilnos nario naujienos",
     ],
     eyebrow: "Narystė",
     title: "Pasirink narystę, kuri ramiai palaiko tavo mėnesį",
@@ -44,7 +44,7 @@ const pricingCopy = {
       {
         label: "Asmeninis",
         title: "Pilna asmeninė patirtis",
-        text: "Pilna nario erdvė, mėnesinės suvestinės, tikslų kortelės, Journal ir premium skaitmeniniai resursai.",
+        text: "Pilna nario erdvė, mėnesinės suvestinės, tikslų kortelės, nario naujienos ir premium skaitmeniniai resursai.",
       },
       {
         label: "Privatus verslas",
@@ -95,12 +95,12 @@ const pricingCopy = {
       {
         label: "Bazinis",
         title: "A calm foundation",
-        text: "Basic member area, monthly overview, limited digital resources, member updates, and cancel anytime.",
+        text: "Basic member area, monthly overview, limited digital resources, member news previews, and cancel anytime.",
       },
       {
         label: "Asmeninis",
         title: "The full personal experience",
-        text: "Full member area, monthly summaries, progress cards, Journal, premium resources, and early product access.",
+        text: "Full member area, monthly summaries, progress cards, member news, premium resources, and early product access.",
       },
       {
         label: "Privatus verslas",

@@ -17,7 +17,7 @@ const footerCopy = {
     },
     links: {
       program: "Programa",
-      journal: "Journal",
+      journal: "Nario naujienos",
       collection: "Kolekcija",
       membership: "Narystė",
       secureCheckout: "Saugus apmokėjimas",
@@ -49,7 +49,7 @@ const footerCopy = {
     },
     links: {
       program: "Program",
-      journal: "Journal",
+      journal: "Member news",
       collection: "Collection",
       membership: "Membership",
       secureCheckout: "Secure payment",
@@ -81,7 +81,7 @@ const footerCopy = {
     },
     links: {
       program: "Program",
-      journal: "Journal",
+      journal: "Aktualnosci czlonka",
       collection: "Kolekcja",
       membership: "Członkostwo",
       secureCheckout: "Bezpieczna płatność",
@@ -113,7 +113,7 @@ const footerCopy = {
     },
     links: {
       program: "Programm",
-      journal: "Journal",
+      journal: "Mitgliedernews",
       collection: "Kollektion",
       membership: "Mitgliedschaft",
       secureCheckout: "Sichere Zahlung",
@@ -145,7 +145,7 @@ const footerCopy = {
     },
     links: {
       program: "Programme",
-      journal: "Journal",
+      journal: "Actus membres",
       collection: "Collection",
       membership: "Abonnement",
       secureCheckout: "Paiement sécurisé",
@@ -177,7 +177,7 @@ const footerCopy = {
     },
     links: {
       program: "Programa",
-      journal: "Journal",
+      journal: "Noticias de miembro",
       collection: "Colección",
       membership: "Membresía",
       secureCheckout: "Pago seguro",

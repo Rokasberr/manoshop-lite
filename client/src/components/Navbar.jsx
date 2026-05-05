@@ -11,7 +11,7 @@ const navbarCopy = {
   lt: {
     nav: {
       program: "Programa",
-      journal: "Journal",
+      journal: "Nario naujienos",
       contact: "Kontaktai",
       memberArea: "Nario zona",
       membership: "Narystė",
@@ -29,7 +29,7 @@ const navbarCopy = {
   en: {
     nav: {
       program: "Program",
-      journal: "Journal",
+      journal: "Member news",
       contact: "Contact",
       memberArea: "Member area",
       membership: "Membership",
@@ -47,7 +47,7 @@ const navbarCopy = {
   pl: {
     nav: {
       program: "Program",
-      journal: "Journal",
+      journal: "Aktualnosci czlonka",
       contact: "Kontakt",
       memberArea: "Strefa członka",
       membership: "Członkostwo",
@@ -65,7 +65,7 @@ const navbarCopy = {
   de: {
     nav: {
       program: "Programm",
-      journal: "Journal",
+      journal: "Mitgliedernews",
       contact: "Kontakt",
       memberArea: "Mitgliederbereich",
       membership: "Mitgliedschaft",
@@ -83,7 +83,7 @@ const navbarCopy = {
   fr: {
     nav: {
       program: "Programme",
-      journal: "Journal",
+      journal: "Actus membres",
       contact: "Contact",
       memberArea: "Espace membre",
       membership: "Abonnement",
@@ -101,7 +101,7 @@ const navbarCopy = {
   es: {
     nav: {
       program: "Programa",
-      journal: "Journal",
+      journal: "Noticias de miembro",
       contact: "Contacto",
       memberArea: "Zona de miembro",
       membership: "Membresía",

@@ -7,6 +7,8 @@ import HomePage from "./pages/HomePage";
 import DigitalLandingPage from "./pages/DigitalLandingPage";
 import StoryPage from "./pages/StoryPage";
 import LaunchSoonPage from "./pages/LaunchSoonPage";
+import JournalPage from "./pages/JournalPage";
+import JournalArticlePage from "./pages/JournalArticlePage";
 import SavingsStudioDemoPage from "./pages/SavingsStudioDemoPage";
 import MemberAreaPage from "./pages/MemberAreaPage";
 import ShopPage from "./pages/ShopPage";
@@ -39,8 +41,8 @@ const App = () => (
       <Route path="/" element={<HomePage />} />
       <Route path="/story" element={<StoryPage />} />
       <Route path="/launch-soon" element={<LaunchSoonPage />} />
-      <Route path="/journal" element={<LaunchSoonPage focus="journal" />} />
-      <Route path="/journal/:slug" element={<LaunchSoonPage focus="journal" />} />
+      <Route path="/journal" element={<JournalPage />} />
+      <Route path="/journal/:slug" element={<JournalArticlePage />} />
       <Route path="/savings-studio" element={<SavingsStudioDemoPage />} />
       <Route path="/shop" element={<ShopPage />} />
       <Route path="/digital" element={<DigitalLandingPage />} />
