@@ -1,7 +1,8 @@
 import {
   ArrowRight,
+  BriefcaseBusiness,
   CheckCircle2,
-  Mail,
+  FileText,
   ShieldCheck,
   Sparkles,
   Target,
@@ -9,238 +10,252 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
+import { subscriptionPlans } from "../constants/subscriptionPlans";
 import { useLanguage } from "../context/LanguageContext";
+
+const getPlanPriceLabel = (planId) => {
+  const plan = subscriptionPlans.find((item) => item.id === planId);
+
+  return plan ? `${plan.price} €${plan.intervalLabel}` : "";
+};
 
 const homeCopy = {
   lt: {
-    chip: "Privati finansų studija",
-    title: "Aiškesnis mėnuo. Ramesni sprendimai. Viena Stilloak erdvė.",
+    chip: "StillOak Studio narystė",
+    title: "StillOak Studio — nario erdvė aiškesniam mėnesiui, skaitmeniniams resursams ir verslo augimui.",
     intro:
-      "Premium narystė žmonėms, kurie nori matyti išlaidas, tikslus ir kitą žingsnį be lentelių chaoso.",
-    primaryCta: "Atrakinti narystę",
-    secondaryCta: "Peržiūrėti programą",
-    highlights: [
-      "Aiškūs biudžetai pagal kategoriją",
-      "Tikslai, pastovios išlaidos ir CSV importas vienoje vietoje",
-      "Trumpi savaitės ir mėnesio signalai be triukšmo",
+      "Pasirink Bazinį startui, Asmeninį pilnai nario programai arba Privatų verslą strateginei verslo erdvei.",
+    primaryCta: "Peržiūrėti narystes",
+    secondaryCta: "Pamatyti kaip veikia",
+    trustLine: "Saugus apmokėjimas · Atšauk bet kada · Aiškūs narystės lygiai · Jokių paslėptų mokesčių",
+    heroSignals: [
+      "Aiški nario erdvė mėnesio planavimui",
+      "Skaitmeniniai resursai ir nario naujienos pagal planą",
+      "Verslo sluoksnis strategijai ir augimo krypčiai",
     ],
-    stats: [
-      { label: "Pagrindas", value: "Biudžetai", hint: "Limitai, likutis ir mėnesio spaudimas viename vaizde." },
-      { label: "Nauda", value: "Aiškumas", hint: "Matai, kur pinigai slysta ir ką verta koreguoti." },
-      { label: "Ritmas", value: "Suvestinės", hint: "Trumpi signalai padeda grįžti prie svarbiausio." },
-    ],
-    previewEyebrow: "Viduje",
-    previewTitle: "Vienas ramus ekranas vietoj penkių padrikų įrankių",
-    previewText:
-      "Savings Studio sujungia mėnesio spaudimą, pastovias išlaidas, taupymo progresą ir aiškų kitą veiksmą iškart po prisijungimo.",
-    previewRows: [
-      ["Šio mėnesio spaudimas", "Maisto kategorija artėja prie limito"],
-      ["Pastovios išlaidos", "312 € / mėn."],
-      ["Kelionės tikslas", "62% pasiekta"],
-      ["Kitas žingsnis", "Pristabdyti smulkias išlaidas šią savaitę"],
-    ],
-    promiseEyebrow: "Pažadas",
-    promiseTitle: "Mažiau spėlionių. Daugiau kontrolės.",
-    promiseText:
-      "Stilloak veda tiesiai į tai, ko reikia: aiškią peržiūrą, paprastą narystę ir privačią erdvę tavo mėnesiui.",
-    unlockEyebrow: "Įtraukta",
-    unlockList: [
-      "Pilna Savings Studio darbo erdvė",
-      "Privatus sąskaitų, laiškų ir suvestinių archyvas",
-      "Tvarkinga nario patirtis nuo prisijungimo iki mėnesio apžvalgos",
-    ],
-    layersEyebrow: "Sluoksniai",
-    layersTitle: "Viskas, ko reikia aiškesniam savaitės ritmui",
-    layersIntro:
-      "Stilloak nesistengia daryti visko. Jis sutelkia mėnesio biudžetą, tikslus ir suvestines į vieną lengvai grįžtamą vietą.",
-    layers: [
+    heroCards: [
       {
+        label: "Startui",
+        title: "Bazinis",
+        text: "Paprastas įėjimas, kai nori mėnesio krypties be sudėtingos sistemos.",
+      },
+      {
+        label: "Rekomenduojama",
+        title: "Asmeninis",
+        text: "Pilna nario programa su suvestinėmis, tikslais ir premium resursais.",
+      },
+      {
+        label: "Aukščiausias lygis",
+        title: "Privatus verslas",
+        text: "Strateginė erdvė verslui, pasiūlymui, auditui ir 30 dienų augimo planui.",
+      },
+    ],
+    explanationEyebrow: "Trys aiškūs lygiai",
+    explanationTitle: "Kiekvienas planas turi savo vaidmenį",
+    explanationIntro:
+      "StillOak Studio nėra vienas neaiškus paketas. Tai narystės laiptai nuo paprasto starto iki pilnos programos ir strateginės verslo erdvės.",
+    simplePlans: [
+      {
+        id: "free",
         icon: WalletCards,
-        title: "Biudžetai su signalu",
-        description: "Kategorijų limitai parodo ne tik išlaidas, bet ir vietas, kur mėnuo pradeda spausti.",
-      },
-      {
-        icon: Target,
-        title: "Tikslai su tempu",
-        description: "Progresas rodo, ar dabartinis ritmas realiai veda iki tikslo.",
-      },
-      {
-        icon: Mail,
-        title: "Suvestinės be triukšmo",
-        description: "Savaitės ir mėnesio laiškai trumpai paaiškina riziką, progresą ir kitą veiksmą.",
-      },
-      {
-        icon: ShieldCheck,
-        title: "Privati nario erdvė",
-        description: "Paskyra, archyvas ir narystė laikomi vienoje saugioje, tvarkingoje vietoje.",
-      },
-    ],
-    workflowEyebrow: "Kaip veikia",
-    workflowTitle: "Nuo pirmų įrašų iki aiškaus kito žingsnio",
-    workflowIntro:
-      "Įkeli arba suvedi duomenis, pamatai kur kaupiasi spaudimas ir grįžti prie vieno veiksmo, kuris dabar svarbiausias.",
-    workflowSteps: [
-      {
-        step: "01",
-        title: "Įsivedi mėnesį",
-        description: "Pridėk išlaidas ranka, naudok pastovius mokėjimus arba importuok CSV, kai nori pradėti greičiau.",
-      },
-      {
-        step: "02",
-        title: "Stilloak sutraukia vaizdą",
-        description: "Biudžetai, tikslai, pastovios išlaidos ir pagrindinė rizika atsiranda viename ekrane.",
-      },
-      {
-        step: "03",
-        title: "Matai kitą veiksmą",
-        description: "Sistema parodo, ką verta pristabdyti, ką palikti ir kaip išlaikyti ritmą iki mėnesio pabaigos.",
-      },
-    ],
-    plansEyebrow: "Narystė",
-    plansTitle: "Pasirink paprastai: Bazinis, Asmeninis arba Privatus verslas",
-    plansIntro:
-      "Bazinis suteikia ramų pagrindą. Asmeninis atveria pilną nario patirtį. Privatus verslas skirtas projektams ir didesniam prioritetui.",
-    includedInPlan: "Įtraukta į Asmeninį",
-    membershipCards: [
-      {
         label: "Bazinis",
-        title: "Pagrindinė nario erdvė",
-        description: "Mėnesio apžvalga, riboti skaitmeniniai resursai, nario naujienų peržiūros ir atšaukimas bet kada.",
+        text: "Paprasta pradžia mėnesio planui, mini biudžeto peržiūrai ir baziniams resursams.",
       },
       {
+        id: "circle",
+        icon: Target,
         label: "Asmeninis",
-        title: "Pilna asmeninė narystė",
-        description: "Mėnesinės suvestinės, tikslų kortelės, nario naujienos, premium resursai ir ankstyva prieiga.",
+        text: "Pilna nario programa su suvestinėmis, tikslais, Nario naujienomis ir premium resursais.",
       },
       {
+        id: "private",
+        icon: BriefcaseBusiness,
         label: "Privatus verslas",
-        title: "Verslo ir projektų sluoksnis",
-        description: "Verslo skydelis, prioritetinė pagalba, šablonai, premium patirtis ir rekomendacijos netrukus.",
+        text: "Aukščiausio lygio verslo erdvė strategijai, pasiūlymo aiškumui, svetainės auditui ir 30 dienų augimo planui.",
       },
     ],
-    membershipPrimary: "Pasirinkti planą",
-    membershipSecondary: "Peržiūrėti programą",
-    closingEyebrow: "Pradėk šiandien",
-    closingTitle: "Peržiūrėk programą arba atrakink Stilloak iškart.",
-    closingText:
-      "Aiškus mėnuo prasideda nuo vieno sprendimo: pamatyti kaip tai veikia arba iškart pradėti su Asmeninis.",
-    closingPrimary: "Atrakinti narystę",
-    closingSecondary: "Peržiūrėti Savings Studio",
+    compareEyebrow: "Planų pasirinkimas",
+    compareTitle: "Kuris planas tinka dabar?",
+    compareIntro:
+      "Jei nori pradėti ramiai, rinkis Bazinį. Jei nori pilnos nario sistemos, rinkis Asmeninį. Jei auga verslas ar projektas, rinkis Privatų verslą.",
+    planCards: [
+      {
+        id: "free",
+        label: "Bazinis",
+        badge: "Entry-level",
+        forWhom: "Tau, jei nori paprasto starto ir aiškesnio mėnesio be didelio įsipareigojimo.",
+        benefits: [
+          "Mėnesio pradžios planas",
+          "Mini biudžeto peržiūra",
+          "Baziniai skaitmeniniai resursai",
+        ],
+        cta: "Pradėti nuo Bazinio",
+      },
+      {
+        id: "circle",
+        label: "Asmeninis",
+        badge: "Rekomenduojama",
+        forWhom: "Tau, jei nori pilnos nario programos asmeniniam mėnesio ritmui ir tikslams.",
+        benefits: [
+          "Pilnos mėnesio suvestinės",
+          "Tikslų progreso kortelės",
+          "Nario naujienos ir premium resursai",
+        ],
+        cta: "Rinktis Asmeninį",
+        featured: true,
+      },
+      {
+        id: "private",
+        label: "Privatus verslas",
+        badge: "Premium",
+        forWhom: "Tau, jei reikia strateginės verslo erdvės pasiūlymui, auditui ir augimo planui.",
+        benefits: [
+          "Strategijos ir pasiūlymo aiškumas",
+          "Svetainės auditas",
+          "30 dienų augimo planas",
+        ],
+        cta: "Rinktis Privatų verslą",
+        premium: true,
+      },
+    ],
+    journeyEyebrow: "Narystės kelias",
+    journeyTitle: "Pradėk nuo Bazinio → Pereik į Asmeninį → Augink su Privatus verslas",
+    journeyText:
+      "Gali pradėti nuo paprasto mėnesio plano, pereiti į pilną nario programą ir vėliau auginti verslo kryptį aukščiausiame lygyje.",
+    journeySteps: [
+      {
+        title: "Pradėk nuo Bazinio",
+        text: "Kai reikia aiškios pradžios, mini biudžeto ir bazinių resursų.",
+      },
+      {
+        title: "Pereik į Asmeninį",
+        text: "Kai nori pilnų suvestinių, tikslų, naujienų ir premium turinio.",
+      },
+      {
+        title: "Augink su Privatus verslas",
+        text: "Kai reikia strategijos, audito ir aiškaus 30 dienų augimo plano.",
+      },
+    ],
+    trustEyebrow: "Pasitikėjimas",
+    trustTitle: "Aiškios narystės be spaudimo",
+    trustText:
+      "Planai atskirti taip, kad lankytojas greitai suprastų, ką gauna dabar ir kada verta pereiti į aukštesnį lygį.",
+    trustItems: [
+      "Saugus apmokėjimas",
+      "Atšauk bet kada",
+      "Aiškūs narystės lygiai",
+      "Jokių paslėptų mokesčių",
+    ],
   },
   en: {
-    chip: "Private finance studio",
-    title: "A clearer month. Calmer decisions. One Stilloak space.",
+    chip: "StillOak Studio membership",
+    title: "StillOak Studio — a member space for a clearer month, digital resources, and business growth.",
     intro:
-      "A premium membership for people who want spending, goals, and the next step without spreadsheet noise.",
-    primaryCta: "Unlock membership",
-    secondaryCta: "View demo",
-    highlights: [
-      "Clear category budgets",
-      "Goals, recurring spend, and CSV import in one place",
-      "Short weekly and monthly signals without noise",
+      "Choose Bazinis for a simple start, Asmeninis for the full member program, or Privatus verslas for a strategic business space.",
+    primaryCta: "View memberships",
+    secondaryCta: "See how it works",
+    trustLine: "Secure payment · Cancel anytime · Clear membership levels · No hidden fees",
+    heroSignals: [
+      "Clear member space for monthly planning",
+      "Digital resources and member news by plan",
+      "Business layer for strategy and growth direction",
     ],
-    stats: [
-      { label: "Foundation", value: "Budgets", hint: "Limits, balance, and monthly pressure in one view." },
-      { label: "Result", value: "Clarity", hint: "See where money slips and what is worth adjusting." },
-      { label: "Rhythm", value: "Summaries", hint: "Short signals bring you back to what matters." },
-    ],
-    previewEyebrow: "Inside",
-    previewTitle: "One calm screen instead of five scattered tools",
-    previewText:
-      "Savings Studio brings monthly pressure, recurring spend, savings progress, and the next best move into one place as soon as a member signs in.",
-    previewRows: [
-      ["Monthly pressure", "Food category is moving close to its limit"],
-      ["Recurring load", "312 € / month"],
-      ["Travel goal", "62% reached"],
-      ["Next move", "Reduce small spending this week"],
-    ],
-    promiseEyebrow: "Promise",
-    promiseTitle: "Less guessing. More control.",
-    promiseText:
-      "Stilloak points directly to what matters: a clear demo, simple membership, and a private space for your month.",
-    unlockEyebrow: "Included",
-    unlockList: [
-      "The full Savings Studio workspace",
-      "A private archive for invoices, emails, and summaries",
-      "A tidy member experience from login to monthly review",
-    ],
-    layersEyebrow: "Layers",
-    layersTitle: "Everything needed for a clearer weekly rhythm",
-    layersIntro:
-      "Stilloak is not trying to do everything. It brings budgets, goals, and summaries into one place that is easy to return to.",
-    layers: [
+    heroCards: [
       {
+        label: "Start",
+        title: "Bazinis",
+        text: "A simple entry point when you want monthly direction without a complex system.",
+      },
+      {
+        label: "Recommended",
+        title: "Asmeninis",
+        text: "The full member program with summaries, goals, and premium resources.",
+      },
+      {
+        label: "Highest tier",
+        title: "Privatus verslas",
+        text: "A strategic business space for offer clarity, audits, and a 30-day growth plan.",
+      },
+    ],
+    explanationEyebrow: "Three clear levels",
+    explanationTitle: "Each plan has a clear role",
+    explanationIntro:
+      "StillOak Studio is not one vague package. It is a membership ladder from a simple start to a full program and a strategic business space.",
+    simplePlans: [
+      {
+        id: "free",
         icon: WalletCards,
-        title: "Budgets with signals",
-        description: "Category limits show what has been spent and where the month starts pressing.",
-      },
-      {
-        icon: Target,
-        title: "Goals with pace",
-        description: "Progress shows whether the current rhythm is actually moving toward the target.",
-      },
-      {
-        icon: Mail,
-        title: "Summaries without noise",
-        description: "Weekly and monthly emails explain risk, progress, and the next best action.",
-      },
-      {
-        icon: ShieldCheck,
-        title: "Private member space",
-        description: "Account, archive, and membership details stay in one secure, considered space.",
-      },
-    ],
-    workflowEyebrow: "How it works",
-    workflowTitle: "From first entries to the next clear move",
-    workflowIntro:
-      "Add or import the data, see where pressure builds, then return to the one action that matters most.",
-    workflowSteps: [
-      {
-        step: "01",
-        title: "Bring the month in",
-        description: "Add expenses manually, track recurring items, or import a CSV when you want a faster start.",
-      },
-      {
-        step: "02",
-        title: "Stilloak condenses the picture",
-        description: "Budgets, goals, recurring spend, and the biggest risk appear together in one place.",
-      },
-      {
-        step: "03",
-        title: "The next move becomes clear",
-        description: "The system shows what to slow down, what to keep, and how to hold the rhythm until month end.",
-      },
-    ],
-    plansEyebrow: "Membership",
-    plansTitle: "Choose simply: Bazinis, Asmeninis, or Privatus verslas",
-    plansIntro:
-      "Bazinis gives the foundation. Asmeninis opens the full member experience. Privatus verslas is for projects and higher priority.",
-    includedInPlan: "Included in Asmeninis",
-    membershipCards: [
-      {
         label: "Bazinis",
-        title: "Basic member area",
-        description: "Monthly overview, limited digital resources, member news previews, and cancel anytime.",
+        text: "A simple start for monthly planning, mini budget review, and basic resources.",
       },
       {
+        id: "circle",
+        icon: Target,
         label: "Asmeninis",
-        title: "Full personal membership",
-        description: "Monthly summaries, progress cards, member news, premium resources, and early product access.",
+        text: "The full member program with summaries, goals, member news, and premium resources.",
       },
       {
+        id: "private",
+        icon: BriefcaseBusiness,
         label: "Privatus verslas",
-        title: "Business and project layer",
-        description: "Business dashboard, priority support, templates, premium experience, and recommendations soon.",
+        text: "The highest-level business space for strategy, offer clarity, website audit, and a 30-day growth plan.",
       },
     ],
-    membershipPrimary: "Choose a plan",
-    membershipSecondary: "View demo",
-    closingEyebrow: "Start today",
-    closingTitle: "View the demo or unlock Stilloak now.",
-    closingText:
-      "A clearer month starts with one choice: see how it works or begin with Asmeninis.",
-    closingPrimary: "Unlock membership",
-    closingSecondary: "View Savings Studio",
+    compareEyebrow: "Plan choice",
+    compareTitle: "Which plan fits now?",
+    compareIntro:
+      "Choose Bazinis to start calmly, Asmeninis for the full member system, and Privatus verslas when a business or project is growing.",
+    planCards: [
+      {
+        id: "free",
+        label: "Bazinis",
+        badge: "Entry-level",
+        forWhom: "For a simple start and a clearer month without a larger commitment.",
+        benefits: ["Monthly starter plan", "Mini budget review", "Basic digital resources"],
+        cta: "Start with Bazinis",
+      },
+      {
+        id: "circle",
+        label: "Asmeninis",
+        badge: "Recommended",
+        forWhom: "For the full member program for your personal monthly rhythm and goals.",
+        benefits: ["Full monthly summaries", "Goal progress cards", "Member news and premium resources"],
+        cta: "Choose Asmeninis",
+        featured: true,
+      },
+      {
+        id: "private",
+        label: "Privatus verslas",
+        badge: "Premium",
+        forWhom: "For a strategic business space with offer clarity, audit, and growth planning.",
+        benefits: ["Strategy and offer clarity", "Website audit", "30-day growth plan"],
+        cta: "Choose Privatus verslas",
+        premium: true,
+      },
+    ],
+    journeyEyebrow: "Membership journey",
+    journeyTitle: "Start with Bazinis → Move into Asmeninis → Grow with Privatus verslas",
+    journeyText:
+      "Start with a simple monthly plan, move into the full member program, then grow the business direction at the highest tier.",
+    journeySteps: [
+      {
+        title: "Start with Bazinis",
+        text: "For a clear beginning, mini budget, and basic resources.",
+      },
+      {
+        title: "Move into Asmeninis",
+        text: "For full summaries, goals, news, and premium content.",
+      },
+      {
+        title: "Grow with Privatus verslas",
+        text: "For strategy, audit, and a clear 30-day growth plan.",
+      },
+    ],
+    trustEyebrow: "Trust",
+    trustTitle: "Clear memberships without pressure",
+    trustText:
+      "The plans are separated so visitors quickly understand what they get now and when it makes sense to move up.",
+    trustItems: ["Secure payment", "Cancel anytime", "Clear membership levels", "No hidden fees"],
   },
 };
 
@@ -253,197 +268,209 @@ const HomePage = () => {
   const copy = homeCopy[language] || homeCopy.lt;
 
   return (
-    <div className="space-y-12 pb-6">
-      <section className="marketing-dark overflow-hidden px-5 py-10 sm:px-8 sm:py-14 lg:px-12 lg:py-16">
-        <div className="grid gap-10 xl:grid-cols-[0.98fr_1.02fr] xl:items-stretch xl:gap-12">
-          <div className="flex flex-col justify-between">
-            <div>
-              <span className="hero-chip">{copy.chip}</span>
-              <h1 className="mt-7 max-w-4xl font-display text-4xl font-bold leading-[1.02] sm:text-6xl lg:text-[4.7rem]">
-                {copy.title}
-              </h1>
-              <p className="mt-6 max-w-2xl text-base leading-7 text-white/72 sm:text-lg">{copy.intro}</p>
+    <div className="space-y-10 pb-8">
+      <section className="marketing-dark overflow-hidden rounded-lg px-5 py-10 sm:px-8 sm:py-14 lg:px-12 lg:py-16">
+        <div className="grid gap-10 xl:grid-cols-[0.9fr_1.1fr] xl:items-stretch xl:gap-12">
+          <div className="min-w-0">
+            <span className="hero-chip">{copy.chip}</span>
+            <h1 className="mt-7 max-w-5xl break-words font-display text-4xl font-bold leading-tight sm:text-6xl lg:text-[4.35rem]">
+              {copy.title}
+            </h1>
+            <p className="mt-6 max-w-2xl text-base leading-7 text-white/74 sm:text-lg">{copy.intro}</p>
 
-              <div className="mt-7 grid gap-3">
-                {copy.highlights.map((item) => (
-                  <div key={item} className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/76">
-                    <CheckCircle2 size={16} className="mt-0.5 shrink-0" style={{ color: "rgb(var(--accent-strong))" }} />
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link to="/pricing" className="button-primary gap-2">
-                  {copy.primaryCta}
-                  <ArrowRight size={16} />
-                </Link>
-                <Link to="/savings-studio" className="hero-outline-button">
-                  {copy.secondaryCta}
-                </Link>
-              </div>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <Link to="/pricing" className="button-primary min-h-[52px] gap-2">
+                {copy.primaryCta}
+                <ArrowRight size={16} className="shrink-0" />
+              </Link>
+              <Link to="/savings-studio" className="hero-outline-button min-h-[52px]">
+                {copy.secondaryCta}
+              </Link>
             </div>
 
-            <div className="mt-10 grid gap-4 sm:grid-cols-3">
-              {copy.stats.map((item) => (
-                <div key={item.label} className="metric-card">
-                  <p className="text-xs uppercase tracking-[0.3em] text-white/42">{item.label}</p>
-                  <p
-                    className={`mt-3 font-display font-bold leading-tight ${
-                      item.value === "Suvestinės" ? "text-[1.55rem] sm:text-[1.65rem]" : "text-3xl"
-                    }`}
-                  >
-                    {item.value}
-                  </p>
-                  <p className="mt-2 text-sm leading-6 text-white/62">{item.hint}</p>
+            <div className="mt-8 grid gap-3">
+              {copy.heroSignals.map((item) => (
+                <div key={item} className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm leading-6 text-white/76">
+                  <CheckCircle2 size={16} className="mt-0.5 shrink-0" style={{ color: "rgb(var(--accent-strong))" }} />
+                  <span>{item}</span>
                 </div>
               ))}
             </div>
+
+            <div className="mt-8 flex items-start gap-3 rounded-lg border border-white/10 bg-white/5 px-4 py-4 text-sm leading-6 text-white/72">
+              <ShieldCheck size={18} className="mt-0.5 shrink-0" style={{ color: "rgb(var(--accent-strong))" }} />
+              <span>{copy.trustLine}</span>
+            </div>
           </div>
 
-          <div className="flex flex-col gap-4">
-            <div className="editorial-dark-card h-full">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.3em] text-white/40">{copy.previewEyebrow}</p>
-                  <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">{copy.previewTitle}</h2>
+          <div className="grid gap-4 lg:grid-cols-3 xl:grid-cols-1">
+            {copy.heroCards.map((card, index) => (
+              <div
+                key={card.title}
+                className={`rounded-lg border p-5 ${
+                  index === 1 ? "bg-white text-[rgb(var(--text))]" : "bg-white/6 text-white"
+                }`}
+                style={{
+                  borderColor: index === 1 ? "rgb(255 255 255 / 0.38)" : "rgb(255 255 255 / 0.12)",
+                }}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <span className={index === 1 ? "signal-pill" : "hero-chip"}>{card.label}</span>
+                  {index === 1 && <Sparkles size={18} style={{ color: "rgb(var(--accent-strong))" }} />}
                 </div>
-                <span className="hero-chip">{copy.includedInPlan}</span>
+                <h2 className="mt-5 font-display text-3xl font-bold leading-tight">{card.title}</h2>
+                <p className={`mt-3 text-sm leading-7 ${index === 1 ? "text-muted" : "text-white/68"}`}>{card.text}</p>
               </div>
-
-              <p className="mt-4 max-w-xl text-sm leading-6 text-white/66">{copy.previewText}</p>
-
-              <div className="mt-6 rounded-lg border border-white/10 bg-white/95 p-3 sm:p-4">
-                <img
-                  src="/story/members-dashboard-preview.svg"
-                  alt="Stilloak member dashboard preview"
-                  className="mx-auto block h-auto w-full rounded-md object-contain"
-                />
-              </div>
-
-              <div className="mt-6 grid gap-3">
-                {copy.previewRows.map(([label, value]) => (
-                  <div
-                    key={label}
-                    className="grid gap-2 rounded-lg border border-white/8 bg-white/4 px-4 py-3 text-sm sm:grid-cols-[0.92fr_1.08fr] sm:items-center"
-                  >
-                    <span className="text-white/54">{label}</span>
-                    <span className="font-semibold text-white sm:text-right">{value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-[0.94fr_1.06fr]">
-              <div className="editorial-dark-card">
-                <p className="text-xs uppercase tracking-[0.3em] text-white/40">{copy.promiseEyebrow}</p>
-                <h3 className="mt-4 font-display text-3xl font-bold">{copy.promiseTitle}</h3>
-                <p className="mt-3 text-sm leading-6 text-white/66">{copy.promiseText}</p>
-              </div>
-
-              <div className="editorial-panel bg-[linear-gradient(180deg,rgba(255,252,248,0.98),rgba(249,243,235,0.9))]">
-                <div className="flex items-center gap-2 text-[rgb(var(--accent-strong))]">
-                  <Sparkles size={16} />
-                  <span className="text-xs font-semibold uppercase tracking-[0.28em]">{copy.unlockEyebrow}</span>
-                </div>
-                <div className="mt-5 space-y-3">
-                  {copy.unlockList.map((item) => (
-                    <div key={item} className="flex items-start gap-3 rounded-lg bg-white px-4 py-3 text-sm text-[rgb(var(--muted))]">
-                      <CheckCircle2 size={16} className="mt-0.5 shrink-0" style={{ color: "rgb(var(--accent-strong))" }} />
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       <section className="public-section">
         <div className="max-w-3xl">
-          <span className="eyebrow">{copy.layersEyebrow}</span>
-          <h2 className="mt-5 font-display text-4xl font-bold sm:text-5xl">{copy.layersTitle}</h2>
-          <p className="mt-4 text-base leading-7 text-muted">{copy.layersIntro}</p>
+          <span className="eyebrow">{copy.explanationEyebrow}</span>
+          <h2 className="mt-5 font-display text-4xl font-bold leading-tight sm:text-5xl">{copy.explanationTitle}</h2>
+          <p className="mt-4 text-base leading-7 text-muted">{copy.explanationIntro}</p>
         </div>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {copy.layers.map((item) => (
-            <div key={item.title} className="marketing-card p-6">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[rgb(var(--accent)/0.12)]">
-                <item.icon size={22} style={{ color: "rgb(var(--accent-strong))" }} />
+        <div className="mt-8 grid gap-4 lg:grid-cols-3">
+          {copy.simplePlans.map((plan) => {
+            const Icon = plan.icon;
+
+            return (
+              <div key={plan.id} className="marketing-card p-6">
+                <div
+                  className="flex h-12 w-12 items-center justify-center rounded-lg"
+                  style={{ backgroundColor: "rgb(var(--surface-soft))", color: "rgb(var(--accent-strong))" }}
+                >
+                  <Icon size={22} />
+                </div>
+                <h3 className="mt-6 font-display text-3xl font-bold leading-tight">{plan.label}</h3>
+                <p className="mt-4 text-sm leading-7 text-muted">{plan.text}</p>
               </div>
-              <h3 className="mt-6 font-display text-2xl font-bold">{item.title}</h3>
-              <p className="mt-4 text-sm leading-7 text-muted">{item.description}</p>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="public-section">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-3xl">
+            <span className="eyebrow">{copy.compareEyebrow}</span>
+            <h2 className="mt-5 font-display text-4xl font-bold leading-tight sm:text-5xl">{copy.compareTitle}</h2>
+            <p className="mt-4 text-base leading-7 text-muted">{copy.compareIntro}</p>
+          </div>
+          <Link to="/pricing" className="button-secondary min-h-[52px] gap-2">
+            {copy.primaryCta}
+            <ArrowRight size={16} className="shrink-0" />
+          </Link>
+        </div>
+
+        <div className="mt-8 grid gap-5 lg:grid-cols-3 lg:items-stretch">
+          {copy.planCards.map((plan) => (
+            <div
+              key={plan.id}
+              className={`flex h-full flex-col overflow-hidden rounded-lg border p-6 ${
+                plan.featured
+                  ? "plan-shell-featured lg:-translate-y-2"
+                  : plan.premium
+                    ? "surface-dark"
+                    : "marketing-card"
+              }`}
+              style={plan.premium ? { borderColor: "rgb(255 255 255 / 0.12)" } : undefined}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                  <span className={plan.featured || plan.premium ? "hero-chip" : "signal-pill"}>{plan.badge}</span>
+                  <h3 className="mt-5 break-words font-display text-3xl font-bold leading-tight">{plan.label}</h3>
+                </div>
+                <p className={`shrink-0 text-right font-display text-2xl font-bold ${plan.featured || plan.premium ? "text-white" : ""}`}>
+                  {getPlanPriceLabel(plan.id)}
+                </p>
+              </div>
+
+              <div className={`mt-5 rounded-lg p-4 ${plan.featured || plan.premium ? "bg-white/6" : "bg-[rgb(var(--surface-soft))]"}`}>
+                <p className={`text-xs font-semibold uppercase ${plan.featured || plan.premium ? "text-white/54" : "text-[rgb(var(--accent-strong))]"}`}>
+                  Kam skirtas?
+                </p>
+                <p className={`mt-2 text-sm leading-7 ${plan.featured || plan.premium ? "text-white/72" : "text-muted"}`}>
+                  {plan.forWhom}
+                </p>
+              </div>
+
+              <div className="mt-5 space-y-3">
+                {plan.benefits.map((benefit) => (
+                  <div key={benefit} className={`flex items-start gap-3 text-sm leading-6 ${plan.featured || plan.premium ? "text-white/76" : "text-muted"}`}>
+                    <CheckCircle2 size={16} className="mt-1 shrink-0" style={{ color: "rgb(var(--accent-strong))" }} />
+                    <span>{benefit}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-auto pt-6">
+                <Link
+                  to="/pricing"
+                  className={`min-h-[52px] w-full ${plan.featured || plan.premium ? "hero-outline-button" : "button-primary"}`}
+                >
+                  {plan.cta}
+                </Link>
+              </div>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-[1.02fr_0.98fr]">
-        <div className="public-section">
-          <span className="eyebrow">{copy.workflowEyebrow}</span>
-          <h2 className="mt-5 font-display text-4xl font-bold sm:text-5xl">{copy.workflowTitle}</h2>
-          <p className="mt-4 text-base leading-7 text-muted">{copy.workflowIntro}</p>
+      <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="surface-dark rounded-lg px-6 py-8 sm:px-8">
+          <span className="hero-chip">{copy.journeyEyebrow}</span>
+          <h2 className="mt-6 font-display text-4xl font-bold leading-tight sm:text-5xl">{copy.journeyTitle}</h2>
+          <p className="mt-5 max-w-2xl text-base leading-7 text-white/70">{copy.journeyText}</p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <Link to="/pricing" className="button-primary min-h-[52px] gap-2">
+              {copy.primaryCta}
+              <ArrowRight size={16} />
+            </Link>
+            <Link to="/savings-studio" className="hero-outline-button min-h-[52px]">
+              {copy.secondaryCta}
+            </Link>
+          </div>
+        </div>
 
-          <div className="mt-8 grid gap-4">
-            {copy.workflowSteps.map((item) => (
-              <div key={item.step} className="soft-card rounded-lg px-5 py-5">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[rgb(var(--accent)/0.12)] text-sm font-semibold text-[rgb(var(--accent-strong))]">
-                    {item.step}
-                  </div>
-                  <div>
-                    <h3 className="font-display text-2xl font-bold">{item.title}</h3>
-                    <p className="mt-3 text-sm leading-6 text-muted">{item.description}</p>
-                  </div>
+        <div className="grid gap-4">
+          {copy.journeySteps.map((step, index) => (
+            <div key={step.title} className="marketing-card p-5">
+              <div className="flex items-start gap-4">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[rgb(var(--accent)/0.12)] text-sm font-bold text-[rgb(var(--accent-strong))]">
+                  {index + 1}
+                </div>
+                <div className="min-w-0">
+                  <h3 className="font-display text-2xl font-bold leading-tight">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted">{step.text}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="public-section">
+        <div className="grid gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-center">
+          <div>
+            <span className="eyebrow">{copy.trustEyebrow}</span>
+            <h2 className="mt-5 font-display text-4xl font-bold leading-tight sm:text-5xl">{copy.trustTitle}</h2>
+            <p className="mt-4 text-base leading-7 text-muted">{copy.trustText}</p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            {copy.trustItems.map((item) => (
+              <div key={item} className="soft-card rounded-lg px-5 py-4">
+                <div className="flex items-start gap-3">
+                  <ShieldCheck size={18} className="mt-0.5 shrink-0" style={{ color: "rgb(var(--accent-strong))" }} />
+                  <span className="text-sm font-semibold leading-6 text-muted">{item}</span>
                 </div>
               </div>
             ))}
           </div>
-        </div>
-
-        <div className="public-section flex flex-col justify-between">
-          <div>
-            <span className="eyebrow">{copy.plansEyebrow}</span>
-            <h2 className="mt-5 font-display text-4xl font-bold sm:text-5xl">{copy.plansTitle}</h2>
-            <p className="mt-4 text-base leading-7 text-muted">{copy.plansIntro}</p>
-          </div>
-
-          <div className="mt-8 space-y-4">
-            {copy.membershipCards.map((item) => (
-              <div key={item.label} className="soft-card rounded-lg px-5 py-5">
-                <p className="text-xs uppercase tracking-[0.3em] text-muted">{item.label}</p>
-                <h3 className="mt-3 font-display text-3xl font-bold">{item.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-muted">{item.description}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/pricing" className="button-primary">
-              {copy.membershipPrimary}
-            </Link>
-            <Link to="/savings-studio" className="button-secondary">
-              {copy.membershipSecondary}
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="public-section text-center">
-        <span className="eyebrow">{copy.closingEyebrow}</span>
-        <h2 className="mt-5 font-display text-4xl font-bold sm:text-5xl">{copy.closingTitle}</h2>
-        <p className="mx-auto mt-4 max-w-3xl text-base leading-7 text-muted">{copy.closingText}</p>
-
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link to="/pricing" className="button-primary gap-2">
-            {copy.closingPrimary}
-            <ArrowRight size={16} />
-          </Link>
-          <Link to="/savings-studio" className="button-secondary">
-            {copy.closingSecondary}
-          </Link>
         </div>
       </section>
     </div>
