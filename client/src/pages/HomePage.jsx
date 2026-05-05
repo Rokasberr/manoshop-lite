@@ -243,6 +243,9 @@ const HomePage = () => {
               </div>
               <Sparkles size={18} className="shrink-0 text-white/54" />
             </div>
+
+            <FinanceHeroVisual />
+
             <div className="mt-5 grid gap-3">
               {copy.planCards.map((plan) => (
                 <HeroPlanStrip key={plan.id} plan={plan} />
@@ -370,6 +373,121 @@ const HeroPlanStrip = ({ plan }) => {
     </div>
   );
 };
+
+const FinanceHeroVisual = () => (
+  <div
+    className="relative mt-6 min-h-[310px] overflow-hidden rounded-lg border border-white/10 bg-[rgb(8_16_14/0.92)] p-4 sm:min-h-[360px] sm:p-5"
+    role="img"
+    aria-label="Artistic premium finance visual showing calm growth lines, planning cards, and structured member dashboard previews"
+  >
+    <div
+      className="absolute inset-0 opacity-70"
+      style={{
+        backgroundImage:
+          "linear-gradient(90deg, rgb(255 255 255 / 0.07) 1px, transparent 1px), linear-gradient(180deg, rgb(255 255 255 / 0.05) 1px, transparent 1px)",
+        backgroundSize: "34px 34px",
+        maskImage: "linear-gradient(180deg, black, transparent 92%)",
+      }}
+    />
+    <div
+      className="absolute inset-x-0 top-0 h-36 opacity-75"
+      style={{
+        background:
+          "linear-gradient(135deg, rgb(164 220 190 / 0.18), transparent 46%), linear-gradient(180deg, rgb(255 236 198 / 0.12), transparent)",
+      }}
+    />
+
+    <div className="relative grid h-full min-h-[278px] gap-4 sm:min-h-[318px]">
+      <div className="grid gap-4 sm:grid-cols-[0.92fr_1.08fr]">
+        <div className="rounded-lg border border-white/10 bg-white/8 p-4 shadow-2xl shadow-black/25 backdrop-blur">
+          <div className="flex items-center justify-between gap-3">
+            <span className="hero-chip">Clarity</span>
+            <BarChart3 size={18} className="text-white/58" />
+          </div>
+          <div className="mt-5 h-32 rounded-lg border border-white/10 bg-black/14 p-3">
+            <div className="flex h-full items-end gap-2">
+              {[42, 58, 49, 68, 76, 88].map((height, index) => (
+                <div key={height} className="flex flex-1 items-end">
+                  <div
+                    className="w-full rounded-t-lg"
+                    style={{
+                      height: `${height}%`,
+                      background:
+                        index === 5
+                          ? "linear-gradient(180deg, rgb(255 230 179 / 0.92), rgb(var(--accent)))"
+                          : "linear-gradient(180deg, rgb(164 220 190 / 0.72), rgb(var(--accent) / 0.62))",
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="mt-4 grid gap-2">
+            <div className="h-2 rounded-full bg-white/18">
+              <div className="h-full w-[72%] rounded-full bg-[rgb(var(--accent-strong))]" />
+            </div>
+            <div className="h-2 w-[58%] rounded-full bg-white/14" />
+          </div>
+        </div>
+
+        <div className="relative rounded-lg border border-white/10 bg-white/10 p-4 shadow-2xl shadow-black/25 backdrop-blur">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase text-white/44">Member layers</p>
+              <p className="mt-2 font-display text-2xl font-bold text-white">Planavimas · tikslai · augimas</p>
+            </div>
+            <Target size={19} style={{ color: "rgb(var(--accent-strong))" }} />
+          </div>
+
+          <div className="mt-5 space-y-3">
+            {[
+              { label: "Bazinis", width: "46%", icon: WalletCards },
+              { label: "Asmeninis", width: "72%", icon: Target },
+              { label: "Privatus", width: "91%", icon: BriefcaseBusiness },
+            ].map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <div key={item.label} className="rounded-lg border border-white/8 bg-black/12 px-3 py-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <Icon size={15} style={{ color: "rgb(var(--accent-strong))" }} />
+                      <span className="text-sm font-semibold text-white/78">{item.label}</span>
+                    </div>
+                    <span className="h-1.5 w-1.5 rounded-full bg-[rgb(255_230_179/0.9)]" />
+                  </div>
+                  <div className="mt-3 h-2 rounded-full bg-white/12">
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: item.width,
+                        background:
+                          "linear-gradient(90deg, rgb(var(--accent-strong)), rgb(255 230 179 / 0.88))",
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-3">
+        {[
+          ["Fokusas", "Mėnuo"],
+          ["Resursai", "Narys"],
+          ["Strategija", "Augimas"],
+        ].map(([label, value]) => (
+          <div key={label} className="rounded-lg border border-white/10 bg-white/7 px-4 py-3 backdrop-blur">
+            <p className="text-[11px] font-semibold uppercase text-white/42">{label}</p>
+            <p className="mt-2 font-display text-xl font-bold text-white">{value}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
 
 const MembershipTeaserCard = ({ plan }) => {
   const Icon = plan.icon;
