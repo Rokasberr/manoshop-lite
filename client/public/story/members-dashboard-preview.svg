@@ -1,98 +1,159 @@
-<svg width="1600" height="980" viewBox="0 0 1600 980" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="1600" height="980" rx="36" fill="#F6EEE3"/>
-  <rect x="32" y="32" width="1536" height="916" rx="28" fill="#FFFDF9" stroke="#E7DCCB"/>
-  <rect x="56" y="56" width="1488" height="64" rx="18" fill="#FBF5EC" stroke="#E7DCCB"/>
-  <rect x="84" y="78" width="178" height="18" rx="9" fill="#C59E67"/>
-  <rect x="1272" y="72" width="110" height="30" rx="15" fill="#F3E8D7"/>
-  <rect x="1398" y="72" width="118" height="30" rx="15" fill="#1D1813"/>
-  <text x="101" y="90" fill="#FFF9F2" font-family="Arial, sans-serif" font-size="12" font-weight="700" letter-spacing="2">STILLOAK STUDIO</text>
-  <text x="1305" y="91" fill="#7A6248" font-family="Arial, sans-serif" font-size="12" font-weight="700">Profile</text>
-  <text x="1437" y="91" fill="#FFF9F2" font-family="Arial, sans-serif" font-size="12" font-weight="700">Members</text>
+<svg width="2400" height="1470" viewBox="0 0 1600 980" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="backdrop" x1="0" y1="0" x2="1600" y2="980" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FBF5ED"/>
+      <stop offset="0.52" stop-color="#F4E6D3"/>
+      <stop offset="1" stop-color="#E4C9A6"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="78" y1="70" x2="1522" y2="910" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFDF8"/>
+      <stop offset="1" stop-color="#F8EFE2"/>
+    </linearGradient>
+    <linearGradient id="ink" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#27211D"/>
+      <stop offset="1" stop-color="#14110F"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#D8B676"/>
+      <stop offset="1" stop-color="#946A38"/>
+    </linearGradient>
+    <linearGradient id="softGold" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#F7EAD6"/>
+      <stop offset="1" stop-color="#E0C49A"/>
+    </linearGradient>
+    <filter id="panelShadow" x="-8%" y="-10%" width="116%" height="124%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#5C452B" flood-opacity="0.14"/>
+    </filter>
+    <filter id="deepShadow" x="-8%" y="-10%" width="116%" height="124%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#20160D" flood-opacity="0.22"/>
+    </filter>
+    <clipPath id="screenClip">
+      <rect width="1600" height="980" rx="44"/>
+    </clipPath>
+  </defs>
 
-  <rect x="56" y="144" width="260" height="772" rx="24" fill="#FFF9F2" stroke="#E7DCCB"/>
-  <text x="88" y="196" fill="#8B6B43" font-family="Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="2.8">MEMBERS AREA</text>
-  <text x="88" y="244" fill="#1D1813" font-family="Georgia, serif" font-size="34" font-weight="700">Savings Studio</text>
-  <text x="88" y="280" fill="#7A6248" font-family="Arial, sans-serif" font-size="16">A calmer private dashboard for</text>
-  <text x="88" y="304" fill="#7A6248" font-family="Arial, sans-serif" font-size="16">budgets, goals, and spending clarity.</text>
+  <rect width="1600" height="980" rx="44" fill="url(#backdrop)"/>
+  <rect x="46" y="42" width="1508" height="896" rx="46" fill="#D9B98B" opacity="0.3"/>
+  <rect x="78" y="70" width="1444" height="840" rx="36" fill="url(#screen)" stroke="#E6D5BD" stroke-width="2" filter="url(#panelShadow)"/>
 
-  <rect x="88" y="346" width="196" height="54" rx="16" fill="#1D1813"/>
-  <text x="118" y="379" fill="#FFF9F2" font-family="Arial, sans-serif" font-size="14" font-weight="700">Monthly summary</text>
+  <g clip-path="url(#screenClip)">
+    <rect x="78" y="70" width="1444" height="78" fill="#FFF9F1"/>
+    <rect x="78" y="148" width="1444" height="1" fill="#E8D9C3"/>
+    <circle cx="120" cy="109" r="8" fill="#D9B57A"/>
+    <circle cx="148" cy="109" r="8" fill="#B58B54"/>
+    <circle cx="176" cy="109" r="8" fill="#2A221D"/>
+    <rect x="218" y="96" width="196" height="26" rx="13" fill="#211B17"/>
+    <text x="242" y="114" fill="#FFF7ED" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" font-weight="800" letter-spacing="2.2">STILLOAK STUDIO</text>
+    <rect x="1238" y="90" width="96" height="38" rx="19" fill="#F4E6D1" stroke="#E0CBAF"/>
+    <text x="1268" y="114" fill="#725537" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="750">Profile</text>
+    <rect x="1352" y="90" width="122" height="38" rx="19" fill="#211B17"/>
+    <text x="1385" y="114" fill="#FFF7ED" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="800">Circle</text>
 
-  <rect x="88" y="420" width="196" height="54" rx="16" fill="#F6EEE3"/>
-  <text x="118" y="453" fill="#7A6248" font-family="Arial, sans-serif" font-size="14" font-weight="700">Recurring spend</text>
+    <rect x="104" y="176" width="256" height="700" rx="30" fill="#FFF8EF" stroke="#E6D5BD"/>
+    <text x="136" y="226" fill="#9B7445" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="11" font-weight="800" letter-spacing="2.8">MEMBER AREA</text>
+    <text x="136" y="274" fill="#201A16" font-family="Georgia, Times New Roman, serif" font-size="34" font-weight="700">Savings Studio</text>
+    <text x="136" y="310" fill="#775D3E" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15">A private workspace for</text>
+    <text x="136" y="334" fill="#775D3E" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15">monthly money decisions.</text>
 
-  <rect x="88" y="494" width="196" height="54" rx="16" fill="#F6EEE3"/>
-  <text x="118" y="527" fill="#7A6248" font-family="Arial, sans-serif" font-size="14" font-weight="700">Savings goals</text>
+    <rect x="136" y="382" width="192" height="56" rx="18" fill="#211B17"/>
+    <circle cx="164" cy="410" r="8" fill="#D8B676"/>
+    <text x="188" y="416" fill="#FFF7ED" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="800">Overview</text>
+    <rect x="136" y="456" width="192" height="56" rx="18" fill="#F1E3CE"/>
+    <circle cx="164" cy="484" r="8" fill="#B98D56"/>
+    <text x="188" y="490" fill="#74573A" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="800">Budgets</text>
+    <rect x="136" y="530" width="192" height="56" rx="18" fill="#F1E3CE"/>
+    <circle cx="164" cy="558" r="8" fill="#B98D56"/>
+    <text x="188" y="564" fill="#74573A" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="800">Goals</text>
+    <rect x="136" y="604" width="192" height="56" rx="18" fill="#F1E3CE"/>
+    <circle cx="164" cy="632" r="8" fill="#B98D56"/>
+    <text x="188" y="638" fill="#74573A" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="800">Journal</text>
 
-  <rect x="88" y="568" width="196" height="54" rx="16" fill="#F6EEE3"/>
-  <text x="118" y="601" fill="#7A6248" font-family="Arial, sans-serif" font-size="14" font-weight="700">CSV import</text>
+    <rect x="136" y="716" width="192" height="110" rx="24" fill="url(#ink)" filter="url(#deepShadow)"/>
+    <text x="160" y="754" fill="#D8B676" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="11" font-weight="800" letter-spacing="2.2">NEXT ACTION</text>
+    <text x="160" y="792" fill="#FFF7ED" font-family="Georgia, Times New Roman, serif" font-size="27" font-weight="700">Hold rhythm</text>
+    <text x="160" y="820" fill="#D7C3A7" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13">Reduce small spend</text>
 
-  <rect x="88" y="650" width="196" height="126" rx="20" fill="#F3E8D7"/>
-  <text x="112" y="690" fill="#8B6B43" font-family="Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="2.4">THIS MONTH</text>
-  <text x="112" y="734" fill="#1D1813" font-family="Georgia, serif" font-size="38" font-weight="700">€1,248</text>
-  <text x="112" y="768" fill="#7A6248" font-family="Arial, sans-serif" font-size="14">Projected after recurring</text>
+    <text x="404" y="212" fill="#9B7445" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" font-weight="800" letter-spacing="3">MINI TOUR OF THE MEMBER ZONE</text>
+    <text x="404" y="262" fill="#201A16" font-family="Georgia, Times New Roman, serif" font-size="45" font-weight="700">What members unlock after joining</text>
+    <text x="404" y="296" fill="#71583B" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16">A quick product walkthrough: overview, budgets, savings goals, and the private member library.</text>
 
-  <text x="344" y="184" fill="#8B6B43" font-family="Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="2.8">PRIVATE DASHBOARD PREVIEW</text>
-  <text x="344" y="226" fill="#1D1813" font-family="Georgia, serif" font-size="42" font-weight="700">A full money view after purchase</text>
-  <text x="344" y="264" fill="#7A6248" font-family="Arial, sans-serif" font-size="16">Members unlock a focused, calmer dashboard instead of a generic expense list.</text>
+    <path d="M582 382C710 326 830 326 958 382" stroke="#D7B77E" stroke-width="4" stroke-linecap="round" stroke-dasharray="10 14"/>
+    <path d="M958 585C828 642 710 642 582 585" stroke="#D7B77E" stroke-width="4" stroke-linecap="round" stroke-dasharray="10 14"/>
+    <path d="M1142 382C1196 428 1204 510 1142 585" stroke="#D7B77E" stroke-width="4" stroke-linecap="round" stroke-dasharray="10 14"/>
 
-  <rect x="344" y="304" width="368" height="172" rx="24" fill="#1D1813"/>
-  <text x="372" y="346" fill="#C7A676" font-family="Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="2.4">SIGNAL OVERVIEW</text>
-  <text x="372" y="396" fill="#FFF9F2" font-family="Georgia, serif" font-size="44" font-weight="700">84 / 100</text>
-  <text x="372" y="430" fill="#F2E8DA" font-family="Arial, sans-serif" font-size="16">Strong control</text>
-  <text x="372" y="456" fill="#CDBCA5" font-family="Arial, sans-serif" font-size="14">Your month is stable, but one category still needs tightening.</text>
+    <rect x="404" y="334" width="348" height="226" rx="30" fill="url(#ink)" filter="url(#deepShadow)"/>
+    <rect x="430" y="360" width="44" height="44" rx="22" fill="#34281E" stroke="#705636"/>
+    <text x="452" y="389" text-anchor="middle" fill="#D8B676" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="850">01</text>
+    <text x="494" y="378" fill="#D8B676" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="11" font-weight="800" letter-spacing="2.4">DASHBOARD</text>
+    <text x="494" y="410" fill="#FFF8EE" font-family="Georgia, Times New Roman, serif" font-size="30" font-weight="700">Monthly overview</text>
+    <text x="430" y="458" fill="#FFF8EE" font-family="Georgia, Times New Roman, serif" font-size="52" font-weight="700">84</text>
+    <text x="502" y="458" fill="#D7C3A7" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="750">clarity score</text>
+    <rect x="430" y="486" width="270" height="12" rx="6" fill="#473826"/>
+    <rect x="430" y="486" width="226" height="12" rx="6" fill="url(#gold)"/>
+    <text x="430" y="526" fill="#D7C3A7" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">Recurring spend, budget risk,</text>
+    <text x="430" y="548" fill="#D7C3A7" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">and next move in one view.</text>
 
-  <rect x="736" y="304" width="256" height="172" rx="24" fill="#FBF5EC" stroke="#E7DCCB"/>
-  <text x="764" y="346" fill="#8B6B43" font-family="Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="2.4">TOP CATEGORY</text>
-  <text x="764" y="392" fill="#1D1813" font-family="Georgia, serif" font-size="34" font-weight="700">Food & home</text>
-  <text x="764" y="428" fill="#7A6248" font-family="Arial, sans-serif" font-size="14">32% of current month</text>
-  <rect x="764" y="446" width="176" height="12" rx="6" fill="#EDE2D2"/>
-  <rect x="764" y="446" width="102" height="12" rx="6" fill="#C59E67"/>
+    <rect x="786" y="334" width="348" height="226" rx="30" fill="#FFF9F1" stroke="#E4D2B8" stroke-width="2" filter="url(#panelShadow)"/>
+    <rect x="812" y="360" width="44" height="44" rx="22" fill="#F0E0C7" stroke="#D9BD8D"/>
+    <text x="834" y="389" text-anchor="middle" fill="#8F6836" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="850">02</text>
+    <text x="876" y="378" fill="#9B7445" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="11" font-weight="800" letter-spacing="2.4">BUDGETS</text>
+    <text x="876" y="410" fill="#201A16" font-family="Georgia, Times New Roman, serif" font-size="30" font-weight="700">Spending summary</text>
+    <text x="812" y="462" fill="#201A16" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="850">Food</text>
+    <rect x="906" y="448" width="170" height="14" rx="7" fill="#E8D8BE"/>
+    <rect x="906" y="448" width="152" height="14" rx="7" fill="#211B17"/>
+    <text x="1090" y="463" fill="#74573A" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="850">92%</text>
+    <text x="812" y="506" fill="#201A16" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="850">Home</text>
+    <rect x="906" y="492" width="170" height="14" rx="7" fill="#E8D8BE"/>
+    <rect x="906" y="492" width="124" height="14" rx="7" fill="#C69B60"/>
+    <text x="1090" y="507" fill="#74573A" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="850">74%</text>
+    <text x="812" y="538" fill="#806548" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">Limits reveal pressure before</text>
+    <text x="812" y="558" fill="#806548" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">it becomes noise.</text>
 
-  <rect x="1016" y="304" width="248" height="172" rx="24" fill="#FBF5EC" stroke="#E7DCCB"/>
-  <text x="1044" y="346" fill="#8B6B43" font-family="Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="2.4">GOAL PACE</text>
-  <text x="1044" y="392" fill="#1D1813" font-family="Georgia, serif" font-size="34" font-weight="700">€280 / month</text>
-  <text x="1044" y="428" fill="#7A6248" font-family="Arial, sans-serif" font-size="14">Vacation fund remains on track</text>
-  <rect x="1044" y="446" width="156" height="12" rx="6" fill="#EDE2D2"/>
-  <rect x="1044" y="446" width="118" height="12" rx="6" fill="#A88455"/>
+    <rect x="1148" y="334" width="282" height="226" rx="30" fill="#FFF9F1" stroke="#E4D2B8" stroke-width="2" filter="url(#panelShadow)"/>
+    <rect x="1174" y="360" width="44" height="44" rx="22" fill="#F0E0C7" stroke="#D9BD8D"/>
+    <text x="1196" y="389" text-anchor="middle" fill="#8F6836" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="850">03</text>
+    <text x="1238" y="378" fill="#9B7445" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="11" font-weight="800" letter-spacing="2.4">GOALS</text>
+    <text x="1174" y="428" fill="#201A16" font-family="Georgia, Times New Roman, serif" font-size="30" font-weight="700">Savings pace</text>
+    <circle cx="1242" cy="488" r="44" fill="#F1E3CE" stroke="#E2CBA6" stroke-width="12"/>
+    <path d="M1242 444a44 44 0 1 1-38.2 65.9" stroke="#A67A45" stroke-width="12" stroke-linecap="round"/>
+    <text x="1242" y="494" text-anchor="middle" fill="#201A16" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" font-weight="850">62%</text>
+    <text x="1310" y="480" fill="#201A16" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17" font-weight="850">Travel</text>
+    <text x="1310" y="506" fill="#74573A" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">on track</text>
+    <text x="1174" y="538" fill="#806548" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">Clear progress and</text>
+    <text x="1174" y="558" fill="#806548" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">monthly pace.</text>
 
-  <rect x="1288" y="304" width="232" height="172" rx="24" fill="#FBF5EC" stroke="#E7DCCB"/>
-  <text x="1316" y="346" fill="#8B6B43" font-family="Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="2.4">AFTER RECURRING</text>
-  <text x="1316" y="392" fill="#1D1813" font-family="Georgia, serif" font-size="34" font-weight="700">€462 left</text>
-  <text x="1316" y="428" fill="#7A6248" font-family="Arial, sans-serif" font-size="14">Healthy room for savings</text>
+    <rect x="404" y="594" width="474" height="222" rx="30" fill="#FFF9F1" stroke="#E4D2B8" stroke-width="2" filter="url(#panelShadow)"/>
+    <rect x="430" y="620" width="44" height="44" rx="22" fill="#F0E0C7" stroke="#D9BD8D"/>
+    <text x="452" y="649" text-anchor="middle" fill="#8F6836" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" font-weight="850">04</text>
+    <text x="494" y="638" fill="#9B7445" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="11" font-weight="800" letter-spacing="2.4">TOOLS</text>
+    <text x="494" y="670" fill="#201A16" font-family="Georgia, Times New Roman, serif" font-size="30" font-weight="700">Member resources</text>
+    <rect x="430" y="704" width="132" height="70" rx="20" fill="#F2E4D0"/>
+    <text x="456" y="734" fill="#201A16" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="850">CSV Import</text>
+    <text x="456" y="756" fill="#74573A" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">fast setup</text>
+    <rect x="578" y="704" width="132" height="70" rx="20" fill="#F2E4D0"/>
+    <text x="604" y="734" fill="#201A16" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="850">Invoices</text>
+    <text x="604" y="756" fill="#74573A" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">private archive</text>
+    <rect x="726" y="704" width="112" height="70" rx="20" fill="#211B17"/>
+    <text x="754" y="734" fill="#FFF7ED" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" font-weight="850">Journal</text>
+    <text x="754" y="756" fill="#D7C3A7" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12">member notes</text>
 
-  <rect x="344" y="500" width="596" height="196" rx="24" fill="#FBF5EC" stroke="#E7DCCB"/>
-  <text x="372" y="538" fill="#8B6B43" font-family="Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="2.4">WEEKLY SPENDING RHYTHM</text>
-  <rect x="392" y="648" width="78" height="16" rx="8" fill="#E9DBC7"/>
-  <rect x="506" y="608" width="78" height="56" rx="8" fill="#C59E67"/>
-  <rect x="620" y="556" width="78" height="108" rx="8" fill="#1D1813"/>
-  <rect x="734" y="592" width="78" height="72" rx="8" fill="#B68C58"/>
-  <rect x="848" y="628" width="78" height="36" rx="8" fill="#DDCCB6"/>
-  <text x="404" y="690" fill="#7A6248" font-family="Arial, sans-serif" font-size="12">Week 1</text>
-  <text x="518" y="690" fill="#7A6248" font-family="Arial, sans-serif" font-size="12">Week 2</text>
-  <text x="632" y="690" fill="#7A6248" font-family="Arial, sans-serif" font-size="12">Week 3</text>
-  <text x="746" y="690" fill="#7A6248" font-family="Arial, sans-serif" font-size="12">Week 4</text>
-  <text x="860" y="690" fill="#7A6248" font-family="Arial, sans-serif" font-size="12">Week 5</text>
+    <rect x="912" y="594" width="518" height="222" rx="30" fill="url(#ink)" filter="url(#deepShadow)"/>
+    <text x="942" y="642" fill="#D8B676" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="11" font-weight="800" letter-spacing="2.8">WHAT THE TOUR EXPLAINS</text>
+    <text x="942" y="686" fill="#FFF7ED" font-family="Georgia, Times New Roman, serif" font-size="32" font-weight="700">A calmer path from data</text>
+    <text x="942" y="724" fill="#FFF7ED" font-family="Georgia, Times New Roman, serif" font-size="32" font-weight="700">to decision.</text>
+    <rect x="942" y="750" width="428" height="14" rx="7" fill="#473826"/>
+    <rect x="942" y="750" width="316" height="14" rx="7" fill="url(#gold)"/>
+    <text x="942" y="788" fill="#D7C3A7" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">Overview, budgets, goals, and tools</text>
+    <text x="942" y="808" fill="#D7C3A7" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14">stay inside one private workspace.</text>
 
-  <rect x="964" y="500" width="556" height="196" rx="24" fill="#FBF5EC" stroke="#E7DCCB"/>
-  <text x="992" y="538" fill="#8B6B43" font-family="Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="2.4">CATEGORY PRESSURE</text>
-  <text x="992" y="584" fill="#1D1813" font-family="Arial, sans-serif" font-size="16" font-weight="700">Food</text>
-  <rect x="1104" y="572" width="360" height="14" rx="7" fill="#E9DBC7"/>
-  <rect x="1104" y="572" width="278" height="14" rx="7" fill="#1D1813"/>
-  <text x="1478" y="585" text-anchor="end" fill="#7A6248" font-family="Arial, sans-serif" font-size="13">92%</text>
-
-  <text x="992" y="630" fill="#1D1813" font-family="Arial, sans-serif" font-size="16" font-weight="700">Home</text>
-  <rect x="1104" y="618" width="360" height="14" rx="7" fill="#E9DBC7"/>
-  <rect x="1104" y="618" width="230" height="14" rx="7" fill="#C59E67"/>
-  <text x="1478" y="631" text-anchor="end" fill="#7A6248" font-family="Arial, sans-serif" font-size="13">74%</text>
-
-  <text x="992" y="676" fill="#1D1813" font-family="Arial, sans-serif" font-size="16" font-weight="700">Transport</text>
-  <rect x="1104" y="664" width="360" height="14" rx="7" fill="#E9DBC7"/>
-  <rect x="1104" y="664" width="172" height="14" rx="7" fill="#D5B287"/>
-  <text x="1478" y="677" text-anchor="end" fill="#7A6248" font-family="Arial, sans-serif" font-size="13">56%</text>
-
-  <rect x="344" y="720" width="1176" height="172" rx="24" fill="#1D1813"/>
-  <text x="372" y="760" fill="#C7A676" font-family="Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="2.4">WHAT MEMBERS ACTUALLY GET</text>
-  <text x="372" y="808" fill="#FFF9F2" font-family="Georgia, serif" font-size="34" font-weight="700">Budgets, recurring control, AI summaries, and a real action plan.</text>
-  <text x="372" y="846" fill="#D6C7B4" font-family="Arial, sans-serif" font-size="15">This is not only a ledger. It is a private decision layer after purchase.</text>
+    <rect x="404" y="844" width="1026" height="40" rx="20" fill="#FFF9F1" stroke="#E4D2B8"/>
+    <circle cx="434" cy="864" r="6" fill="#211B17"/>
+    <text x="454" y="870" fill="#6F5438" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="800">Overview</text>
+    <circle cx="562" cy="864" r="6" fill="#B98D56"/>
+    <text x="582" y="870" fill="#6F5438" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="800">Budget pressure</text>
+    <circle cx="742" cy="864" r="6" fill="#B98D56"/>
+    <text x="762" y="870" fill="#6F5438" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="800">Goals</text>
+    <circle cx="850" cy="864" r="6" fill="#B98D56"/>
+    <text x="870" y="870" fill="#6F5438" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" font-weight="800">Tools and Journal</text>
+  </g>
 </svg>

@@ -13,232 +13,232 @@ import { useLanguage } from "../context/LanguageContext";
 
 const homeCopy = {
   lt: {
-    chip: "Privati mėnesio kontrolė",
-    title: "Stilloak padeda aiškiai matyti mėnesį, apsaugoti biudžetą ir ramiau judėti link tikslų.",
+    chip: "Privati finansų studija",
+    title: "Aiškesnis mėnuo. Ramesni sprendimai. Viena Stilloak erdvė.",
     intro:
-      "Tai narystės produktas žmonėms, kurie nori ne dar vienos išlaidų lentelės, o vienos ramios sistemos: kur spaudžia mėnuo, kiek dar telpa tikslui ir ką verta daryti toliau.",
-    primaryCta: "Peržiūrėti narystę",
-    secondaryCta: "Pamatyti programą",
+      "Premium narystė žmonėms, kurie nori matyti išlaidas, tikslus ir kitą žingsnį be lentelių chaoso.",
+    primaryCta: "Atrakinti narystę",
+    secondaryCta: "Peržiūrėti programą",
     highlights: [
-      "Biudžetai pagal kategoriją su realiu mėnesio spaudimu",
-      "Pastovios išlaidos, CSV importas ir tikslai vienoje darbo erdvėje",
-      "Savaitinės ir mėnesinės suvestinės, kurios pasako ką verta daryti toliau",
+      "Aiškūs biudžetai pagal kategoriją",
+      "Tikslai, pastovios išlaidos ir CSV importas vienoje vietoje",
+      "Trumpi savaitės ir mėnesio signalai be triukšmo",
     ],
     stats: [
-      { label: "Pagrindas", value: "Biudžetai", hint: "Ne tik sumos, o limitai su aiškiu mėnesio vaizdu." },
-      { label: "Svarbiausia nauda", value: "Aiškumas", hint: "Matai, kur realiai dingsta pinigai ir kur verta koreguoti ritmą." },
-      { label: "Automatinis sluoksnis", value: "Suvestinės", hint: "Sistema grąžina prie svarbiausio signalo be papildomo triukšmo." },
+      { label: "Pagrindas", value: "Biudžetai", hint: "Limitai, likutis ir mėnesio spaudimas viename vaizde." },
+      { label: "Nauda", value: "Aiškumas", hint: "Matai, kur pinigai slysta ir ką verta koreguoti." },
+      { label: "Ritmas", value: "Suvestinės", hint: "Trumpi signalai padeda grįžti prie svarbiausio." },
     ],
-    previewEyebrow: "Kas laukia viduje",
-    previewTitle: "Vienas ekranas vietoj penkių padrikų įrankių",
+    previewEyebrow: "Viduje",
+    previewTitle: "Vienas ramus ekranas vietoj penkių padrikų įrankių",
     previewText:
-      "Savings Studio vienoje vietoje sujungia mėnesio spaudimą, pastovias išlaidas, taupymo progresą ir trumpą veiksmų kryptį, kurią gali pamatyti iškart prisijungęs.",
+      "Savings Studio sujungia mėnesio spaudimą, pastovias išlaidas, taupymo progresą ir aiškų kitą veiksmą iškart po prisijungimo.",
     previewRows: [
       ["Šio mėnesio spaudimas", "Maisto kategorija artėja prie limito"],
       ["Pastovios išlaidos", "312 € / mėn."],
       ["Kelionės tikslas", "62% pasiekta"],
       ["Kitas žingsnis", "Pristabdyti smulkias išlaidas šią savaitę"],
     ],
-    promiseEyebrow: "Launch-ready pažadas",
-    promiseTitle: "Viešas puslapis turi aiškiai parduoti produktą, ne jo istoriją.",
+    promiseEyebrow: "Pažadas",
+    promiseTitle: "Mažiau spėlionių. Daugiau kontrolės.",
     promiseText:
-      "Todėl pagrindinis puslapis veda tiesiai į demonstraciją, narystę ir tai, kokią realią kontrolę žmogus įgauna prisijungęs.",
-    unlockEyebrow: "Ką realiai gauni",
+      "Stilloak veda tiesiai į tai, ko reikia: aiškią peržiūrą, paprastą narystę ir privačią erdvę tavo mėnesiui.",
+    unlockEyebrow: "Įtraukta",
     unlockList: [
-      "Pilną Savings Studio darbo zoną",
-      "Privatų sąskaitų, laiškų ir suvestinių archyvą",
-      "Tvarkingą nario patirtį nuo prisijungimo iki mėnesio apžvalgos",
+      "Pilna Savings Studio darbo erdvė",
+      "Privatus sąskaitų, laiškų ir suvestinių archyvas",
+      "Tvarkinga nario patirtis nuo prisijungimo iki mėnesio apžvalgos",
     ],
-    layersEyebrow: "Produkto sluoksniai",
-    layersTitle: "Svarbiausi moduliai, dėl kurių Stilloak tampa naudingu kas savaitę",
+    layersEyebrow: "Sluoksniai",
+    layersTitle: "Viskas, ko reikia aiškesniam savaitės ritmui",
     layersIntro:
-      "Rinkai paruoštas produktas turi aiškiai pasakyti, ką daro gerai. Stilloak nėra bandymas daryti viską apie finansus. Jis skirtas tam, kad mėnuo būtų aiškesnis ir lengviau valdomas.",
+      "Stilloak nesistengia daryti visko. Jis sutelkia mėnesio biudžetą, tikslus ir suvestines į vieną lengvai grįžtamą vietą.",
     layers: [
       {
         icon: WalletCards,
-        title: "Biudžetai su spaudimo vaizdu",
-        description: "Kategorijų limitai rodo ne tik kiek jau išleista, bet ir kur mėnuo pradeda spausti per stipriai.",
+        title: "Biudžetai su signalu",
+        description: "Kategorijų limitai parodo ne tik išlaidas, bet ir vietas, kur mėnuo pradeda spausti.",
       },
       {
         icon: Target,
-        title: "Tikslai su tikru tempu",
-        description: "Tikslų progresas rodo ar dabartinis mėnesio ritmas realiai nuves iki plano, o ne tik kiek liko sukaupti.",
+        title: "Tikslai su tempu",
+        description: "Progresas rodo, ar dabartinis ritmas realiai veda iki tikslo.",
       },
       {
         icon: Mail,
-        title: "Suvestinės, kurios turi vertę",
-        description: "Savaitiniai ir mėnesiniai laiškai paaiškina skaičius paprasta kalba: riziką, progresą ir kitą veiksmą.",
+        title: "Suvestinės be triukšmo",
+        description: "Savaitės ir mėnesio laiškai trumpai paaiškina riziką, progresą ir kitą veiksmą.",
       },
       {
         icon: ShieldCheck,
         title: "Privati nario erdvė",
-        description: "Prisijungęs gauni tvarkingą archyvą, aiškią paskyrą ir vietą, kuri jaučiasi kaip produktas, ne tik panelė.",
+        description: "Paskyra, archyvas ir narystė laikomi vienoje saugioje, tvarkingoje vietoje.",
       },
     ],
-    workflowEyebrow: "Kaip tai veikia",
-    workflowTitle: "Nuo kelių įrašų iki aiškesnio mėnesio sprendimo",
+    workflowEyebrow: "Kaip veikia",
+    workflowTitle: "Nuo pirmų įrašų iki aiškaus kito žingsnio",
     workflowIntro:
-      "Kelias turi būti labai paprastas: suvedi ar importuoji išlaidas, sistema parodo spaudimą, o tada grįžti prie realaus kito žingsnio.",
+      "Įkeli arba suvedi duomenis, pamatai kur kaupiasi spaudimas ir grįžti prie vieno veiksmo, kuris dabar svarbiausias.",
     workflowSteps: [
       {
         step: "01",
-        title: "Sukeli mėnesio duomenis",
-        description: "Gali vesti ranka, naudoti pastovias išlaidas arba įkelti banko CSV, kai nori susitvarkyti mėnesį greičiau.",
+        title: "Įsivedi mėnesį",
+        description: "Pridėk išlaidas ranka, naudok pastovius mokėjimus arba importuok CSV, kai nori pradėti greičiau.",
       },
       {
         step: "02",
         title: "Stilloak sutraukia vaizdą",
-        description: "Vienoje vietoje pamatai biudžetų spaudimą, tikslų tempą, pastovias išlaidas ir svarbiausią riziką.",
+        description: "Biudžetai, tikslai, pastovios išlaidos ir pagrindinė rizika atsiranda viename ekrane.",
       },
       {
         step: "03",
-        title: "Gauni kryptį, ne triukšmą",
-        description: "Sistema parodo ką verta daryti dabar ir palaiko ritmą per suvestines, archyvą ir nuoseklią nario zoną.",
+        title: "Matai kitą veiksmą",
+        description: "Sistema parodo, ką verta pristabdyti, ką palikti ir kaip išlaikyti ritmą iki mėnesio pabaigos.",
       },
     ],
-    plansEyebrow: "Aiškus kelias",
-    plansTitle: "Nuo pirmo apsilankymo iki pilnos narystės",
+    plansEyebrow: "Narystė",
+    plansTitle: "Pasirink paprastai: peržiūra, Circle arba Private",
     plansIntro:
-      "Pagrindiniame puslapyje žmogus turi greitai suprasti, kur yra dabar ir ką atrakina narystė. Be nereikalingų nukrypimų, be papildomo pasakojimo sluoksnio.",
+      "Kiekvienas lygis turi aiškią paskirtį: susipažinti, naudoti kas savaitę arba gauti daugiau prioritetinės priežiūros.",
     membershipCards: [
       {
         label: "Guest",
-        title: "Pamatai demonstraciją prieš pirkimą",
-        description: "Prieš mokėdamas žmogus gali susipažinti su programos logika, dizainu ir tuo, kuo skiriasi narystės planai.",
+        title: "Pamatai patirtį prieš sprendimą",
+        description: "Trumpa peržiūra padeda suprasti Stilloak logiką, vertę ir narystės skirtumus.",
       },
       {
         label: "Circle",
         title: "Pilna Savings Studio prieiga",
-        description: "Tai pagrindinis planas tiems, kurie nori naudoti programą kiekvieną savaitę ir turėti visą aiškumo sluoksnį vienoje vietoje.",
+        description: "Pagrindinis planas kas savaitę naudoti biudžetus, tikslus ir suvestines vienoje vietoje.",
       },
       {
         label: "Private",
-        title: "Aukštesnis santykio sluoksnis",
-        description: "Tiems, kurie nori daugiau premium jausmo, stipresnio nario sluoksnio ir dar brandesnės patirties aplink produktą.",
+        title: "Daugiau prioriteto",
+        description: "Aukštesnis lygis nariams, kuriems svarbu daugiau priežiūros ir ramesnis aptarnavimas.",
       },
     ],
-    membershipPrimary: "Palyginti planus",
-    membershipSecondary: "Atidaryti demonstraciją",
-    closingEyebrow: "Pasiruošęs pradėti?",
-    closingTitle: "Gali pradėti nuo demonstracijos arba iškart atrakinti narystę.",
+    membershipPrimary: "Pasirinkti planą",
+    membershipSecondary: "Peržiūrėti programą",
+    closingEyebrow: "Pradėk šiandien",
+    closingTitle: "Peržiūrėk programą arba atrakink Stilloak iškart.",
     closingText:
-      "Rinkai paruoštas produktas turi duoti aiškų pasirinkimą: pirmiausia pamatyti kaip veikia arba iškart eiti į Circle ir pradėti naudoti sistemą savo mėnesiui.",
-    closingPrimary: "Peržiūrėti planus",
-    closingSecondary: "Atidaryti Savings Studio demo",
+      "Aiškus mėnuo prasideda nuo vieno sprendimo: pamatyti kaip tai veikia arba iškart pradėti su Circle.",
+    closingPrimary: "Atrakinti narystę",
+    closingSecondary: "Peržiūrėti Savings Studio",
   },
   en: {
-    chip: "Private monthly control",
-    title: "Stilloak helps people see the month clearly, protect the budget, and move toward goals with less friction.",
+    chip: "Private finance studio",
+    title: "A clearer month. Calmer decisions. One Stilloak space.",
     intro:
-      "It is a membership product for people who do not need another expense sheet. They need one calm system: where the month is under pressure, what still fits the goal, and what to do next.",
-    primaryCta: "View membership",
-    secondaryCta: "See the product",
+      "A premium membership for people who want spending, goals, and the next step without spreadsheet noise.",
+    primaryCta: "Unlock membership",
+    secondaryCta: "View demo",
     highlights: [
-      "Category budgets with real monthly pressure",
-      "Recurring spending, CSV import, and goals in one working space",
-      "Weekly and monthly summaries that explain what to do next",
+      "Clear category budgets",
+      "Goals, recurring spend, and CSV import in one place",
+      "Short weekly and monthly signals without noise",
     ],
     stats: [
-      { label: "Foundation", value: "Budgets", hint: "Not just totals, but limits with a usable monthly view." },
-      { label: "Main result", value: "Clarity", hint: "See where money is actually leaking and where to correct the pace." },
-      { label: "Automatic layer", value: "Summaries", hint: "The system brings people back to the most useful signal." },
+      { label: "Foundation", value: "Budgets", hint: "Limits, balance, and monthly pressure in one view." },
+      { label: "Result", value: "Clarity", hint: "See where money slips and what is worth adjusting." },
+      { label: "Rhythm", value: "Summaries", hint: "Short signals bring you back to what matters." },
     ],
-    previewEyebrow: "Inside the product",
-    previewTitle: "One focused screen instead of five scattered tools",
+    previewEyebrow: "Inside",
+    previewTitle: "One calm screen instead of five scattered tools",
     previewText:
-      "Savings Studio brings monthly pressure, recurring load, savings progress, and the next best move into one place the moment a member logs in.",
+      "Savings Studio brings monthly pressure, recurring spend, savings progress, and the next best move into one place as soon as a member signs in.",
     previewRows: [
       ["Monthly pressure", "Food category is moving close to its limit"],
       ["Recurring load", "312 € / month"],
       ["Travel goal", "62% reached"],
       ["Next move", "Reduce small spending this week"],
     ],
-    promiseEyebrow: "Launch-ready promise",
-    promiseTitle: "The homepage should sell the product, not its backstory.",
+    promiseEyebrow: "Promise",
+    promiseTitle: "Less guessing. More control.",
     promiseText:
-      "That is why the public page now leads directly into the demo, membership, and the practical control people gain after joining.",
-    unlockEyebrow: "What you actually get",
+      "Stilloak points directly to what matters: a clear demo, simple membership, and a private space for your month.",
+    unlockEyebrow: "Included",
     unlockList: [
-      "The full Savings Studio working area",
+      "The full Savings Studio workspace",
       "A private archive for invoices, emails, and summaries",
-      "A cleaner member experience from login to monthly review",
+      "A tidy member experience from login to monthly review",
     ],
-    layersEyebrow: "Product layers",
-    layersTitle: "The key modules that make Stilloak useful every week",
+    layersEyebrow: "Layers",
+    layersTitle: "Everything needed for a clearer weekly rhythm",
     layersIntro:
-      "A market-ready product should say clearly what it does well. Stilloak is not trying to be everything about personal finance. It exists to make the month clearer and easier to manage.",
+      "Stilloak is not trying to do everything. It brings budgets, goals, and summaries into one place that is easy to return to.",
     layers: [
       {
         icon: WalletCards,
-        title: "Budgets with pressure signals",
-        description: "Category limits show not only what has been spent, but where the month starts pressing too hard.",
+        title: "Budgets with signals",
+        description: "Category limits show what has been spent and where the month starts pressing.",
       },
       {
         icon: Target,
-        title: "Goals with real pace",
-        description: "Goal progress shows whether the current monthly rhythm will actually get someone to the target.",
+        title: "Goals with pace",
+        description: "Progress shows whether the current rhythm is actually moving toward the target.",
       },
       {
         icon: Mail,
-        title: "Summaries that matter",
-        description: "Weekly and monthly emails explain the numbers simply: risk, progress, and the next best action.",
+        title: "Summaries without noise",
+        description: "Weekly and monthly emails explain risk, progress, and the next best action.",
       },
       {
         icon: ShieldCheck,
         title: "Private member space",
-        description: "After login, members get a tidy archive, a clear account, and a space that feels like a product, not just a panel.",
+        description: "Account, archive, and membership details stay in one secure, considered space.",
       },
     ],
     workflowEyebrow: "How it works",
-    workflowTitle: "From a few entries to a clearer monthly decision",
+    workflowTitle: "From first entries to the next clear move",
     workflowIntro:
-      "The path should stay simple: add or import the data, let the system show where pressure builds, then return to the one action that matters most.",
+      "Add or import the data, see where pressure builds, then return to the one action that matters most.",
     workflowSteps: [
       {
         step: "01",
         title: "Bring the month in",
-        description: "People can add expenses manually, track recurring items, or import a bank CSV when they want to clean up the month faster.",
+        description: "Add expenses manually, track recurring items, or import a CSV when you want a faster start.",
       },
       {
         step: "02",
         title: "Stilloak condenses the picture",
-        description: "Budgets, goals, recurring load, and the biggest risk appear together in one place.",
+        description: "Budgets, goals, recurring spend, and the biggest risk appear together in one place.",
       },
       {
         step: "03",
-        title: "The next move becomes obvious",
-        description: "The system points to what to do now and keeps the rhythm going with summaries, archives, and a calmer member flow.",
+        title: "The next move becomes clear",
+        description: "The system shows what to slow down, what to keep, and how to hold the rhythm until month end.",
       },
     ],
-    plansEyebrow: "A clear path",
-    plansTitle: "From the first visit to full membership",
+    plansEyebrow: "Membership",
+    plansTitle: "Choose simply: preview, Circle, or Private",
     plansIntro:
-      "A homepage should help people understand where they are and what membership unlocks without unnecessary detours.",
+      "Each level has a clear role: explore, use weekly, or receive a higher-touch member experience.",
     membershipCards: [
       {
         label: "Guest",
-        title: "See the demo before paying",
-        description: "Before buying, people can understand the product logic, the design, and what the membership tiers actually change.",
+        title: "Preview before deciding",
+        description: "A short preview helps you understand the logic, value, and membership difference.",
       },
       {
         label: "Circle",
         title: "Full Savings Studio access",
-        description: "This is the core plan for people who want to use the program weekly and keep the full clarity layer in one place.",
+        description: "The core plan for using budgets, goals, and summaries every week in one place.",
       },
       {
         label: "Private",
-        title: "A higher-touch member layer",
-        description: "For people who want more premium feel, a stronger member relationship, and a deeper product experience.",
+        title: "More priority",
+        description: "A higher tier for members who want more care, more calm, and priority handling.",
       },
     ],
-    membershipPrimary: "Compare plans",
-    membershipSecondary: "Open the demo",
-    closingEyebrow: "Ready to begin?",
-    closingTitle: "Start with the demo or unlock membership right away.",
+    membershipPrimary: "Choose a plan",
+    membershipSecondary: "View demo",
+    closingEyebrow: "Start today",
+    closingTitle: "View the demo or unlock Stilloak now.",
     closingText:
-      "A market-ready product should offer one clear choice: preview the experience first or go straight into Circle and start using the system for the month.",
-    closingPrimary: "View membership",
-    closingSecondary: "Open Savings Studio demo",
+      "A clearer month starts with one choice: see how it works or begin with Circle.",
+    closingPrimary: "Unlock membership",
+    closingSecondary: "View Savings Studio",
   },
 };
 
@@ -286,7 +286,13 @@ const HomePage = () => {
               {copy.stats.map((item) => (
                 <div key={item.label} className="metric-card">
                   <p className="text-xs uppercase tracking-[0.3em] text-white/42">{item.label}</p>
-                  <p className="mt-3 font-display text-3xl font-bold">{item.value}</p>
+                  <p
+                    className={`mt-3 font-display font-bold leading-tight ${
+                      item.value === "Suvestinės" ? "text-[1.55rem] sm:text-[1.65rem]" : "text-3xl"
+                    }`}
+                  >
+                    {item.value}
+                  </p>
                   <p className="mt-2 text-sm leading-6 text-white/62">{item.hint}</p>
                 </div>
               ))}
@@ -300,16 +306,16 @@ const HomePage = () => {
                   <p className="text-xs uppercase tracking-[0.3em] text-white/40">{copy.previewEyebrow}</p>
                   <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">{copy.previewTitle}</h2>
                 </div>
-                <span className="hero-chip">Circle access</span>
+                <span className="hero-chip">Įtraukta į Circle</span>
               </div>
 
               <p className="mt-4 max-w-xl text-sm leading-6 text-white/66">{copy.previewText}</p>
 
-              <div className="mt-6 overflow-hidden rounded-lg border border-white/10 bg-white/95 p-2">
+              <div className="mt-6 rounded-lg border border-white/10 bg-white/95 p-3 sm:p-4">
                 <img
                   src="/story/members-dashboard-preview.svg"
                   alt="Stilloak member dashboard preview"
-                  className="block w-full rounded-md"
+                  className="mx-auto block h-auto w-full rounded-md object-contain"
                 />
               </div>
 
