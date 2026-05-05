@@ -14,6 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 const FOCUS_STORAGE_KEY = "stilloak_bazinis_monthly_focus";
+const CHECKLIST_STORAGE_KEY = "stilloak_bazinis_monthly_checklist";
 const focusOptions = ["Išlaidos", "Taupymas", "Tikslai", "Įpročiai"];
 const focusMessages = {
   "Išlaidos": "Stebėk vieną pagrindinę išlaidų kryptį ir mėnesio pabaigoje pasižymėk, kas kartojosi dažniausiai.",
@@ -79,6 +80,13 @@ const resources = [
   },
 ];
 
+const checklistItems = [
+  "Peržiūrėti pagrindines mėnesio išlaidas",
+  "Užsirašyti vieną taupymo tikslą",
+  "Pasirinkti savaitės prioritetą",
+  "Patikrinti naujus nario resursus",
+];
+
 const updates = [
   {
     label: "Nauja",
@@ -99,7 +107,7 @@ const updates = [
 
 const lockedAsmeninisFeatures = [
   {
-    title: "Pilnos suvestinės",
+    title: "Pilnos mėnesio suvestinės",
     text: "Automatiškesnė mėnesio analizė, platesnės įžvalgos ir aiškesnė finansų istorija.",
   },
   {
@@ -131,6 +139,25 @@ const readStoredFocus = () => {
   return focusOptions.includes(storedFocus) ? storedFocus : "Taupymas";
 };
 
+const readStoredChecklist = () => {
+  if (typeof window === "undefined") {
+    return {};
+  }
+
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(CHECKLIST_STORAGE_KEY) || "{}");
+    return checklistItems.reduce(
+      (state, item) => ({
+        ...state,
+        [item]: Boolean(parsed[item]),
+      }),
+      {}
+    );
+  } catch (_error) {
+    return {};
+  }
+};
+
 const parseAmount = (value) => {
   const parsed = Number(String(value || "").replace(",", "."));
   return Number.isFinite(parsed) ? parsed : 0;
@@ -140,6 +167,7 @@ const formatAmount = (value) => moneyFormatter.format(Math.max(0, Math.round(val
 
 const BazinisMemberPage = () => {
   const [selectedFocus, setSelectedFocus] = useState(readStoredFocus);
+  const [checkedItems, setCheckedItems] = useState(readStoredChecklist);
   const [budgetForm, setBudgetForm] = useState({
     income: "",
     plannedSpending: "",
@@ -150,6 +178,10 @@ const BazinisMemberPage = () => {
   useEffect(() => {
     window.localStorage.setItem(FOCUS_STORAGE_KEY, selectedFocus);
   }, [selectedFocus]);
+
+  useEffect(() => {
+    window.localStorage.setItem(CHECKLIST_STORAGE_KEY, JSON.stringify(checkedItems));
+  }, [checkedItems]);
 
   const budgetPreview = useMemo(() => {
     const income = parseAmount(budgetForm.income);
@@ -174,17 +206,28 @@ const BazinisMemberPage = () => {
     }));
   };
 
+  const handleChecklistToggle = (item) => {
+    setCheckedItems((current) => ({
+      ...current,
+      [item]: !current[item],
+    }));
+  };
+
   return (
     <div className="space-y-8 pb-6">
       <section className="public-section overflow-hidden">
         <div className="grid gap-8 lg:grid-cols-[1fr_0.78fr] lg:items-end">
           <div className="min-w-0">
-            <span className="signal-pill">Bazinis · pradinis planas</span>
+            <div className="flex flex-wrap gap-2">
+              <span className="signal-pill">Bazinis planas</span>
+              <span className="signal-pill">Ribota prieiga</span>
+              <span className="signal-pill">Galima atnaujinti bet kada</span>
+            </div>
             <h1 className="mt-6 max-w-4xl font-display text-5xl font-bold leading-[0.94] sm:text-6xl">
               Bazinio nario erdvė
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-muted sm:text-lg">
-              Paprasta pradžia mėnesio apžvalgai, pagrindiniams resursams ir StillOak Studio naujienoms.
+              Paprasta pradžia mėnesio krypčiai, pradiniams resursams ir ramesniam planavimui.
             </p>
             <p className="mt-5 max-w-2xl text-sm leading-6 text-muted">
               Bazinis veikia kaip lengvas startas: gali pasirinkti mėnesio fokusą, pasitikrinti paprastą biudžeto
@@ -277,15 +320,48 @@ const BazinisMemberPage = () => {
             <p className="text-sm font-semibold">Šio mėnesio fokusas: {selectedFocus}</p>
             <p className="mt-3 text-sm leading-7 text-muted">{focusMessages[selectedFocus]}</p>
             <p className="mt-4 text-xs font-semibold uppercase leading-5 tracking-[0.18em] text-muted">
-              Bazinis planas rodo pradinę kryptį. Pilna suvestinė atsiveria Asmeniniame plane.
+              Bazinis padeda pasirinkti kryptį. Pilna suvestinė atsiveria Asmeniniame plane.
             </p>
+          </div>
+
+          <div className="mt-6 rounded-[24px] border p-5" style={{ borderColor: "rgb(var(--line) / 0.82)" }}>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-semibold">Mini mėnesio sąrašas</p>
+                <p className="mt-1 text-xs leading-5 text-muted">Paprasti žingsniai Bazinio plano startui.</p>
+              </div>
+              <span className="signal-pill shrink-0">
+                {Object.values(checkedItems).filter(Boolean).length}/{checklistItems.length}
+              </span>
+            </div>
+
+            <div className="mt-4 space-y-2">
+              {checklistItems.map((item) => {
+                const isChecked = Boolean(checkedItems[item]);
+
+                return (
+                  <label
+                    key={item}
+                    className="flex cursor-pointer items-start gap-3 rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3 text-sm leading-6 text-muted"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={() => handleChecklistToggle(item)}
+                      className="mt-1 h-4 w-4 shrink-0 accent-[rgb(var(--accent))]"
+                    />
+                    <span className={isChecked ? "line-through opacity-70" : ""}>{item}</span>
+                  </label>
+                );
+              })}
+            </div>
           </div>
         </div>
 
         <div className="panel p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <span className="signal-pill">Biudžeto ir tikslo peržiūra</span>
+              <span className="signal-pill">Biudžeto peržiūra</span>
               <h2 className="mt-4 font-display text-3xl font-bold leading-tight">Greitas skaičių pasitikrinimas</h2>
             </div>
             <WalletCards className="hidden shrink-0 text-muted sm:block" size={24} />
@@ -293,7 +369,7 @@ const BazinisMemberPage = () => {
 
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
             <label className="block space-y-2">
-              <span className="text-sm font-semibold text-muted">Mėnesio pajamos</span>
+              <span className="text-sm font-semibold text-muted">Planuojamos pajamos</span>
               <input
                 value={budgetForm.income}
                 onChange={(event) => handleBudgetChange("income", event.target.value)}
@@ -313,7 +389,7 @@ const BazinisMemberPage = () => {
               />
             </label>
             <label className="block space-y-2">
-              <span className="text-sm font-semibold text-muted">Tikslo suma</span>
+              <span className="text-sm font-semibold text-muted">Mėnesio tikslas</span>
               <input
                 value={budgetForm.goalAmount}
                 onChange={(event) => handleBudgetChange("goalAmount", event.target.value)}
@@ -328,9 +404,7 @@ const BazinisMemberPage = () => {
             <div className="rounded-[22px] bg-[rgb(var(--surface-soft))] p-5">
               <div className="flex items-center gap-3">
                 <PiggyBank size={18} style={{ color: "rgb(var(--accent-strong))" }} />
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
-                  Likutis po planuojamų išlaidų
-                </p>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">Likutis po išlaidų</p>
               </div>
               <p className="mt-4 font-display text-3xl font-bold">{formatAmount(Math.max(budgetPreview.balance, 0))}</p>
               {budgetPreview.balance < 0 && (
@@ -340,7 +414,9 @@ const BazinisMemberPage = () => {
             <div className="rounded-[22px] bg-[rgb(var(--surface-soft))] p-5">
               <div className="flex items-center gap-3">
                 <Target size={18} style={{ color: "rgb(var(--accent-strong))" }} />
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">Iki tikslo liko</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
+                  Kiek dar trūksta iki tikslo
+                </p>
               </div>
               <p className="mt-4 font-display text-3xl font-bold">{formatAmount(budgetPreview.remainingGoal)}</p>
               {!budgetPreview.hasValues && <p className="mt-2 text-sm leading-6 text-muted">Įvesk skaičius peržiūrai.</p>}
@@ -348,7 +424,7 @@ const BazinisMemberPage = () => {
           </div>
 
           <p className="mt-5 text-xs font-semibold uppercase leading-5 tracking-[0.18em] text-muted">
-            Tai Bazinio plano peržiūra. Detalios suvestinės ir progreso kortelės atsiveria Asmeniniame plane.
+            Tai supaprastinta Bazinio plano peržiūra. Detalesnės suvestinės ir progreso kortelės atsiveria Asmeniniame plane.
           </p>
         </div>
       </section>
@@ -438,10 +514,10 @@ const BazinisMemberPage = () => {
         <div className="surface-dark overflow-hidden rounded-[34px] px-6 py-8 sm:px-8">
           <span className="hero-chip">Atnaujinimas</span>
           <h2 className="mt-6 max-w-2xl font-display text-4xl font-bold leading-tight sm:text-5xl">
-            Norisi pilnos patirties?
+            Norisi pilnos programos?
           </h2>
           <p className="mt-5 max-w-2xl text-base leading-7 text-white/72">
-            Asmeninis planas atrakina pilną nario zoną, suvestines, tikslų korteles, Journal ir premium resursus.
+            Asmeninis planas atrakina pilną nario zoną, mėnesio suvestines, tikslų korteles, Journal ir premium resursus.
           </p>
           <p className="mt-4 max-w-2xl text-sm leading-6 text-white/58">
             Bazinis lieka pradžios erdve. Asmeninis yra skirtas tada, kai nori pilno mėnesio valdymo ir gilesnės
@@ -458,7 +534,7 @@ const BazinisMemberPage = () => {
 
         <div className="panel p-6">
           <span className="signal-pill">Užrakinta Asmeniniame</span>
-          <h2 className="mt-4 font-display text-3xl font-bold leading-tight">Kai norėsis daugiau gylio</h2>
+          <h2 className="mt-4 font-display text-3xl font-bold leading-tight">Kas atsiveria Asmeniniame plane</h2>
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             {lockedAsmeninisFeatures.map((feature) => (
               <div
@@ -468,7 +544,7 @@ const BazinisMemberPage = () => {
               >
                 <div className="flex items-start justify-between gap-3">
                   <LockKeyhole size={18} className="mt-1 shrink-0 text-muted" />
-                  <span className="signal-pill shrink-0">Atrakina Asmeninis</span>
+                  <span className="signal-pill shrink-0">Atrakina Asmeninis planas</span>
                 </div>
                 <h3 className="mt-5 text-xl font-semibold leading-tight">{feature.title}</h3>
                 <p className="mt-3 text-sm leading-7 text-muted">{feature.text}</p>
