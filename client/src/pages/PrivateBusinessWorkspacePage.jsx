@@ -449,30 +449,30 @@ const readStoredDecision = () => {
 };
 
 const FieldLabel = ({ children, detail }) => (
-  <div className="space-y-1">
-    <span className="text-sm font-semibold text-[rgb(var(--text))]">{children}</span>
+  <div className="min-w-0 space-y-1">
+    <span className="block break-words text-sm font-semibold text-[rgb(var(--text))]">{children}</span>
     {detail && <p className="text-xs leading-5 text-muted">{detail}</p>}
   </div>
 );
 
 const SectionHeading = ({ eyebrow, title, text }) => (
-  <div className="max-w-3xl">
+  <div className="min-w-0 max-w-3xl">
     <span className="signal-pill">{eyebrow}</span>
-    <h2 className="mt-4 font-display text-3xl font-bold leading-tight sm:text-4xl">{title}</h2>
+    <h2 className="mt-4 break-words font-display text-2xl font-bold leading-tight sm:text-4xl">{title}</h2>
     {text && <p className="mt-3 text-sm leading-7 text-muted sm:text-base">{text}</p>}
   </div>
 );
 
 const PrivateBusinessPreview = () => (
-  <section className="marketing-dark overflow-hidden rounded-lg p-6 sm:p-8 lg:p-10">
-    <div className="grid gap-8 lg:grid-cols-[1fr_0.8fr] lg:items-end">
+  <section className="marketing-dark overflow-hidden rounded-lg p-5 sm:p-8 lg:p-10">
+    <div className="grid gap-8 lg:grid-cols-[1.05fr_0.78fr] lg:items-end">
       <div className="min-w-0">
         <div className="flex flex-wrap gap-2">
           <span className="hero-chip">Privatus verslas</span>
           <span className="hero-chip">Peržiūra</span>
           <span className="hero-chip">Užrakinta</span>
         </div>
-        <h2 className="mt-6 max-w-3xl font-display text-4xl font-bold leading-tight sm:text-5xl">
+        <h2 className="mt-6 max-w-3xl break-words font-display text-4xl font-bold leading-tight sm:text-5xl">
           Privataus verslo erdvė
         </h2>
         <p className="mt-5 max-w-2xl text-sm leading-7 text-white/72 sm:text-base">
@@ -489,9 +489,9 @@ const PrivateBusinessPreview = () => (
         </div>
       </div>
 
-      <div className="metric-card p-6">
+      <div className="metric-card p-5 sm:p-6">
         <p className="text-xs font-semibold uppercase leading-5 text-white/52">aukščiausias lygis</p>
-        <h3 className="mt-4 font-display text-3xl font-bold leading-tight">Verslo komandos režimas</h3>
+        <h3 className="mt-4 break-words font-display text-3xl font-bold leading-tight">Verslo komandos režimas</h3>
         <p className="mt-4 text-sm leading-7 text-white/66">
           Privatus verslas prideda strateginį sluoksnį virš Asmeninio plano: pasiūlymo aiškumą, kliento kelionės
           peržiūrą ir aukštesnio lygio resursų struktūrą.
@@ -768,9 +768,9 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
   }
 
   return (
-    <div className="space-y-8 pb-8">
-      <section className="marketing-dark overflow-hidden rounded-lg p-6 sm:p-8 lg:p-10">
-        <div className="grid gap-8 xl:grid-cols-[1fr_0.82fr] xl:items-end">
+    <div className="space-y-6 pb-10 sm:space-y-8">
+      <section className="marketing-dark overflow-hidden rounded-lg p-5 sm:p-8 lg:p-12">
+        <div className="grid gap-8 xl:grid-cols-[1.08fr_0.72fr] xl:items-end">
           <div className="min-w-0">
             <div className="flex flex-wrap gap-2">
               {["Privatus verslas", "Aukščiausias planas", "Strateginė erdvė", "Prioritetinė prieiga"].map((chip) => (
@@ -779,39 +779,39 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
                 </span>
               ))}
             </div>
-            <h1 className="mt-7 max-w-4xl font-display text-5xl font-bold leading-[0.94] sm:text-6xl">
+            <h1 className="mt-7 max-w-4xl break-words font-display text-4xl font-bold leading-[0.96] sm:text-6xl lg:text-7xl">
               Privataus verslo erdvė
             </h1>
-            <p className="mt-6 max-w-3xl text-base leading-7 text-white/74 sm:text-lg">
+            <p className="mt-6 max-w-2xl text-base leading-7 text-white/74 sm:text-lg">
               Privati strateginė erdvė projektams, pasiūlymams, prioritetams ir aukštesnio lygio skaitmeniniam
               augimui.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a href="#verslo-profilis" className="button-primary gap-2">
+            <div className="mt-8 grid gap-3 sm:flex sm:flex-wrap">
+              <a href="#verslo-profilis" className="button-primary w-full gap-2 sm:w-auto">
                 Atnaujinti verslo profilį
                 <Building2 size={16} />
               </a>
-              <a href="#strategijos-lenta" className="hero-outline-button gap-2">
+              <a href="#strategijos-lenta" className="hero-outline-button w-full gap-2 sm:w-auto">
                 Strategijos lenta
                 <Target size={16} />
               </a>
-              <a href="#verslo-resursai" className="hero-outline-button gap-2">
+              <a href="#verslo-resursai" className="hero-outline-button w-full gap-2 sm:w-auto">
                 Peržiūrėti verslo resursus
                 <FileText size={16} />
               </a>
-              <a href="#veiksmu-planas" className="hero-outline-button gap-2">
+              <a href="#veiksmu-planas" className="hero-outline-button w-full gap-2 sm:w-auto">
                 Atidaryti 30 dienų planą
                 <ClipboardList size={16} />
               </a>
             </div>
           </div>
 
-          <div className="metric-card p-6">
+          <div className="metric-card p-5 sm:p-6">
             <div className="flex items-start gap-4">
               <ShieldCheck size={22} className="mt-1 shrink-0 text-white/72" />
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase leading-5 text-white/52">lokali darbo erdvė</p>
-                <h2 className="mt-4 font-display text-3xl font-bold leading-tight">Privatus strateginis kambarys</h2>
+                <h2 className="mt-4 break-words font-display text-3xl font-bold leading-tight">Privatus strateginis kambarys</h2>
                 <p className="mt-4 text-sm leading-7 text-white/66">
                   Strategijos, pasiūlymo ir 30 dienų plano įrašai saugomi tik šiame įrenginyje per localStorage.
                   Backend, Stripe ir narystės logika nekeičiama.
@@ -822,12 +822,12 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
         </div>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-4">
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {snapshotCards.map((card) => {
           const Icon = card.icon;
 
           return (
-            <article key={card.title} className="marketing-card flex h-full min-h-[230px] flex-col p-6">
+            <article key={card.title} className="marketing-card flex h-full min-h-[210px] min-w-0 flex-col p-5 transition duration-200 hover:-translate-y-0.5 sm:p-6">
               <div className="flex items-start justify-between gap-4">
                 <div
                   className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg"
@@ -837,7 +837,7 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
                 </div>
                 <span className="signal-pill shrink-0">peržiūra</span>
               </div>
-              <h2 className="mt-6 font-display text-2xl font-bold leading-tight">{card.title}</h2>
+              <h2 className="mt-6 break-words font-display text-2xl font-bold leading-tight">{card.title}</h2>
               <p className="mt-3 text-sm font-semibold leading-6 text-[rgb(var(--text))]">{card.text}</p>
               <p className="mt-3 text-sm leading-7 text-muted">{card.detail}</p>
             </article>
@@ -845,8 +845,8 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
         })}
       </section>
 
-      <section id="verslo-profilis" className="grid gap-6 xl:grid-cols-[1fr_0.82fr]">
-        <div className="panel p-6 sm:p-8">
+      <section id="verslo-profilis" className="grid scroll-mt-24 gap-6 xl:grid-cols-[1fr_0.82fr]">
+        <div className="panel p-5 sm:p-7 lg:p-8">
           <SectionHeading
             eyebrow="Verslo profilis"
             title="Trumpas verslo kontekstas prieš sprendimus"
@@ -863,14 +863,14 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
                     value={businessProfile[field.key]}
                     onChange={(event) => handleBusinessProfileChange(field.key, event.target.value)}
                     placeholder={field.placeholder}
-                    className="input-field"
+                    className="input-field !rounded-lg bg-[rgb(var(--surface))]"
                   />
                 ) : (
                   <textarea
                     value={businessProfile[field.key]}
                     onChange={(event) => handleBusinessProfileChange(field.key, event.target.value)}
                     placeholder={field.placeholder}
-                    className="textarea-field min-h-[120px]"
+                    className="textarea-field min-h-[124px] !rounded-lg bg-[rgb(var(--surface))]"
                   />
                 )}
               </label>
@@ -878,7 +878,7 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
           </div>
         </div>
 
-        <aside className="surface-dark rounded-lg p-6 sm:p-8">
+        <aside className="surface-dark rounded-lg p-5 sm:p-7 lg:p-8">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
               <Building2 size={22} className="text-white/72" />
@@ -914,8 +914,8 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
         </aside>
       </section>
 
-      <section id="strategijos-lenta" className="grid gap-6 xl:grid-cols-[1fr_0.82fr]">
-        <div className="panel p-6 sm:p-8">
+      <section id="strategijos-lenta" className="grid scroll-mt-24 gap-6 xl:grid-cols-[1fr_0.82fr]">
+        <div className="panel p-5 sm:p-7 lg:p-8">
           <SectionHeading
             eyebrow="Strategijos lenta"
             title="Mėnesio kryptis vienoje vietoje"
@@ -930,14 +930,14 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
                   value={strategy[field.key]}
                   onChange={(event) => handleStrategyChange(field.key, event.target.value)}
                   placeholder={field.placeholder}
-                  className="textarea-field min-h-[130px]"
+                  className="textarea-field min-h-[132px] !rounded-lg bg-[rgb(var(--surface))]"
                 />
               </label>
             ))}
           </div>
         </div>
 
-        <aside className="surface-dark rounded-lg p-6 sm:p-8">
+        <aside className="surface-dark rounded-lg p-5 sm:p-7 lg:p-8">
           <span className="hero-chip">Šio mėnesio strateginė kryptis</span>
           <h2 className="mt-6 font-display text-3xl font-bold leading-tight">Aiškus vykdymo rėmas</h2>
           <div className="mt-6 space-y-5">
@@ -961,7 +961,7 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
         </aside>
       </section>
 
-      <section id="pasiulymo-aiskumas" className="panel p-6 sm:p-8">
+      <section id="pasiulymo-aiskumas" className="panel scroll-mt-24 p-5 sm:p-7 lg:p-8">
         <div className="grid gap-6 lg:grid-cols-[0.75fr_1fr]">
           <SectionHeading
             eyebrow="Pasiūlymo aiškumas"
@@ -977,7 +977,7 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
                   value={offer[field.key]}
                   onChange={(event) => handleOfferChange(field.key, event.target.value)}
                   placeholder={field.placeholder}
-                  className="textarea-field min-h-[112px]"
+                  className="textarea-field min-h-[116px] !rounded-lg bg-[rgb(var(--surface))]"
                 />
               </label>
             ))}
@@ -1006,14 +1006,14 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
               Peržiūra · automatinis vertinimas nepridėtas
             </p>
 
-            <div className="flex flex-wrap gap-3 pt-2">
-              <button type="button" onClick={handleSaveOffer} className="button-primary">
+            <div className="grid gap-3 pt-2 sm:flex sm:flex-wrap">
+              <button type="button" onClick={handleSaveOffer} className="button-primary w-full sm:w-auto">
                 Išsaugoti pasiūlymą
               </button>
-              <button type="button" onClick={handleCopyOffer} className="button-secondary">
+              <button type="button" onClick={handleCopyOffer} className="button-secondary w-full sm:w-auto">
                 Kopijuoti tekstą
               </button>
-              <button type="button" onClick={handleClearOffer} className="button-secondary">
+              <button type="button" onClick={handleClearOffer} className="button-secondary w-full sm:w-auto">
                 Išvalyti
               </button>
             </div>
@@ -1034,7 +1034,7 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
               {generatedOfferOutputs.map((output) => (
                 <article
                   key={output.title}
-                  className="min-w-0 rounded-lg border p-5"
+                  className="min-w-0 rounded-lg border bg-[rgb(var(--surface-soft))] p-5"
                   style={{ borderColor: "rgb(var(--line) / 0.82)" }}
                 >
                   <p className="text-xs font-semibold uppercase leading-5 text-muted">{output.title}</p>
@@ -1046,10 +1046,10 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
         </div>
       </section>
 
-      <section id="svetaines-auditas" className="grid gap-6 xl:grid-cols-[0.82fr_1fr]">
-        <div className="surface-dark rounded-lg p-6 sm:p-8">
+      <section id="svetaines-auditas" className="grid scroll-mt-24 gap-6 xl:grid-cols-[0.82fr_1fr]">
+        <div className="surface-dark rounded-lg p-5 sm:p-7 lg:p-8">
           <span className="hero-chip">Svetainės aiškumo auditas</span>
-          <h2 className="mt-6 font-display text-4xl font-bold leading-tight">Svetainės aiškumo auditas</h2>
+          <h2 className="mt-6 break-words font-display text-3xl font-bold leading-tight sm:text-4xl">Svetainės aiškumo auditas</h2>
           <p className="mt-5 text-sm leading-7 text-white/72">
             Trumpas kontrolinis sąrašas padeda pamatyti, ar verslo pasiūlymas aiškus prieš klientui priimant sprendimą.
           </p>
@@ -1066,7 +1066,7 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
           )}
         </div>
 
-        <div className="panel p-6 sm:p-8">
+        <div className="panel p-5 sm:p-7 lg:p-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <SectionHeading
               eyebrow="Svetainės aiškumo auditas"
@@ -1083,7 +1083,7 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
               return (
                 <label
                   key={item.id}
-                  className="flex min-w-0 cursor-pointer items-start gap-4 rounded-lg border p-5"
+                  className="flex min-w-0 cursor-pointer items-start gap-4 rounded-lg border bg-[rgb(var(--surface))] p-5 transition duration-200 hover:-translate-y-0.5"
                   style={{ borderColor: isChecked ? "rgb(var(--accent-strong) / 0.42)" : "rgb(var(--line) / 0.82)" }}
                 >
                   <input
@@ -1112,7 +1112,7 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
 
         <div className="grid gap-4 lg:grid-cols-4">
           {journeySteps.map((step, index) => (
-            <article key={step.title} className="marketing-card p-6">
+            <article key={step.title} className="marketing-card min-w-0 p-5 sm:p-6">
               <div className="flex items-center justify-between gap-3">
                 <div
                   className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white"
@@ -1122,7 +1122,7 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
                 </div>
                 <Route size={18} className="text-muted" />
               </div>
-              <h3 className="mt-6 font-display text-2xl font-bold leading-tight">{step.title}</h3>
+              <h3 className="mt-6 break-words font-display text-2xl font-bold leading-tight">{step.title}</h3>
               <p className="mt-3 text-sm leading-7 text-muted">{step.text}</p>
               <div className="mt-5 border-t pt-4" style={{ borderColor: "rgb(var(--line) / 0.72)" }}>
                 <p className="text-xs font-semibold uppercase leading-5 text-muted">praktinis patobulinimas</p>
@@ -1133,7 +1133,7 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
         </div>
       </section>
 
-      <section id="verslo-resursai" className="panel p-6 sm:p-8">
+      <section id="verslo-resursai" className="panel scroll-mt-24 p-5 sm:p-7 lg:p-8">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <SectionHeading
             eyebrow="Premium verslo resursai"
@@ -1148,14 +1148,18 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
             const isOpen = openResourceIds.has(resource.id);
 
             return (
-              <article key={resource.id} className="rounded-lg border p-5" style={{ borderColor: "rgb(var(--line) / 0.82)" }}>
+              <article
+                key={resource.id}
+                className="min-w-0 rounded-lg border bg-[rgb(var(--surface))] p-5"
+                style={{ borderColor: "rgb(var(--line) / 0.82)" }}
+              >
                 <button
                   type="button"
                   onClick={() => toggleResource(resource.id)}
                   className="flex w-full items-start justify-between gap-4 text-left"
                 >
                   <span className="min-w-0">
-                    <span className="block font-display text-2xl font-bold leading-tight">{resource.title}</span>
+                    <span className="block break-words font-display text-2xl font-bold leading-tight">{resource.title}</span>
                     <span className="mt-2 block text-sm leading-6 text-muted">Atidaryk praktiniams patikros punktams.</span>
                   </span>
                   <ChevronDown
@@ -1182,7 +1186,7 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[1fr_0.78fr]">
-        <div className="panel p-6 sm:p-8">
+        <div className="panel p-5 sm:p-7 lg:p-8">
           <SectionHeading
             eyebrow="Sprendimų kambarys"
             title="Pasirink, ką gerinti toliau"
@@ -1198,14 +1202,14 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
                   key={card.id}
                   type="button"
                   onClick={() => setSelectedDecisionId(card.id)}
-                  className={`rounded-lg border p-5 text-left transition ${
+                  className={`min-w-0 rounded-lg border p-5 text-left transition duration-200 hover:-translate-y-0.5 ${
                     isSelected ? "bg-[rgb(var(--surface-soft))]" : "bg-[rgb(var(--surface))]"
                   }`}
                   style={{
                     borderColor: isSelected ? "rgb(var(--accent-strong) / 0.42)" : "rgb(var(--line) / 0.82)",
                   }}
                 >
-                  <span className="block text-lg font-semibold leading-tight">{card.title}</span>
+                  <span className="block break-words text-lg font-semibold leading-tight">{card.title}</span>
                   <span className="mt-3 block text-sm leading-6 text-muted">{card.text}</span>
                 </button>
               );
@@ -1213,9 +1217,9 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
           </div>
         </div>
 
-        <aside className="surface-dark rounded-lg p-6 sm:p-8">
+        <aside className="surface-dark rounded-lg p-5 sm:p-7 lg:p-8">
           <span className="hero-chip">Rekomenduojamas kitas žingsnis</span>
-          <h2 className="mt-6 font-display text-3xl font-bold leading-tight">{selectedDecision.title}</h2>
+          <h2 className="mt-6 break-words font-display text-3xl font-bold leading-tight">{selectedDecision.title}</h2>
           <p className="mt-4 text-sm leading-7 text-white/72">{selectedDecision.recommendation}</p>
           <p className="mt-6 text-xs font-semibold uppercase leading-5 text-white/48">
             Lokali darbo erdvė · automatinis backend vertinimas nepridėtas
@@ -1224,12 +1228,12 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[0.82fr_1fr]">
-        <div className="marketing-card p-6 sm:p-8">
+        <div className="marketing-card min-w-0 p-5 sm:p-7 lg:p-8">
           <div className="flex items-start gap-4">
             <Sparkles size={22} className="mt-1 shrink-0" style={{ color: "rgb(var(--accent-strong))" }} />
             <div className="min-w-0">
               <span className="signal-pill">Prioritetinė pagalba</span>
-              <h2 className="mt-5 font-display text-3xl font-bold leading-tight">Prioritetinės pagalbos užklausos — netrukus</h2>
+              <h2 className="mt-5 break-words font-display text-3xl font-bold leading-tight">Prioritetinės pagalbos užklausos — netrukus</h2>
               <p className="mt-4 text-sm leading-7 text-muted">
                 Ši erdvė skirta aiškesniems klausimams, greitesniems sprendimams ir struktūruotai verslo krypčiai.
               </p>
@@ -1240,7 +1244,7 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
           </div>
         </div>
 
-        <div className="panel p-6 sm:p-8">
+        <div className="panel p-5 sm:p-7 lg:p-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <SectionHeading
               eyebrow="Privačios rekomendacijos"
@@ -1252,9 +1256,13 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
 
           <div className="mt-7 grid gap-4 md:grid-cols-3">
             {recommendations.map((recommendation) => (
-              <article key={recommendation.title} className="rounded-lg border p-5" style={{ borderColor: "rgb(var(--line) / 0.82)" }}>
+              <article
+                key={recommendation.title}
+                className="min-w-0 rounded-lg border bg-[rgb(var(--surface))] p-5"
+                style={{ borderColor: "rgb(var(--line) / 0.82)" }}
+              >
                 <BarChart3 size={18} style={{ color: "rgb(var(--accent-strong))" }} />
-                <h3 className="mt-5 text-lg font-semibold leading-tight">{recommendation.title}</h3>
+                <h3 className="mt-5 break-words text-lg font-semibold leading-tight">{recommendation.title}</h3>
                 <p className="mt-3 text-sm leading-7 text-muted">{recommendation.text}</p>
               </article>
             ))}
@@ -1262,10 +1270,10 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
         </div>
       </section>
 
-      <section id="veiksmu-planas" className="grid gap-6 xl:grid-cols-[0.85fr_1fr]">
-        <div className="surface-dark rounded-lg p-6 sm:p-8">
+      <section id="veiksmu-planas" className="grid scroll-mt-24 gap-6 xl:grid-cols-[0.85fr_1fr]">
+        <div className="surface-dark rounded-lg p-5 sm:p-7 lg:p-8">
           <span className="hero-chip">30 dienų verslo augimo planas</span>
-          <h2 className="mt-6 font-display text-4xl font-bold leading-tight">30 dienų verslo augimo planas</h2>
+          <h2 className="mt-6 break-words font-display text-3xl font-bold leading-tight sm:text-4xl">30 dienų verslo augimo planas</h2>
           <p className="mt-5 text-sm leading-7 text-white/72">
             Keturių savaičių struktūra padeda judėti nuo aiškaus pasiūlymo iki pasitikėjimo, pardavimo ritmo ir mėnesio peržiūros.
           </p>
@@ -1280,7 +1288,7 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
           </p>
         </div>
 
-        <div className="panel p-6 sm:p-8">
+        <div className="panel p-5 sm:p-7 lg:p-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <SectionHeading
               eyebrow="30 dienų verslo augimo planas"
@@ -1292,11 +1300,15 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
 
           <div className="mt-7 grid gap-4">
             {growthRoadmapPhases.map((phase) => (
-              <article key={phase.id} className="rounded-lg border p-5" style={{ borderColor: "rgb(var(--line) / 0.82)" }}>
+              <article
+                key={phase.id}
+                className="min-w-0 rounded-lg border bg-[rgb(var(--surface))] p-5"
+                style={{ borderColor: "rgb(var(--line) / 0.82)" }}
+              >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
                     <span className="signal-pill">{phase.label}</span>
-                    <h3 className="mt-4 font-display text-2xl font-bold leading-tight">{phase.title}</h3>
+                    <h3 className="mt-4 break-words font-display text-2xl font-bold leading-tight">{phase.title}</h3>
                     <p className="mt-2 text-sm leading-7 text-muted">{phase.focus}</p>
                   </div>
                   <span className="text-sm font-semibold text-muted">
@@ -1311,7 +1323,7 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
                     return (
                       <label
                         key={action.id}
-                        className="flex min-w-0 cursor-pointer items-start gap-3 rounded-lg border px-4 py-4 text-sm leading-6 text-muted"
+                        className="flex min-w-0 cursor-pointer items-start gap-3 rounded-lg border bg-[rgb(var(--surface-soft))] px-4 py-4 text-sm leading-6 text-muted"
                         style={{ borderColor: isChecked ? "rgb(var(--accent-strong) / 0.42)" : "rgb(var(--line) / 0.72)" }}
                       >
                         <input
@@ -1332,7 +1344,7 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[1fr_0.76fr]">
-        <div className="panel p-6 sm:p-8">
+        <div className="panel p-5 sm:p-7 lg:p-8">
           <SectionHeading
             eyebrow="Įtraukta į Privatus verslas"
             title="Aukščiausias StillOak Studio nario sluoksnis"
@@ -1341,7 +1353,11 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
 
           <div className="mt-7 grid gap-3 sm:grid-cols-2">
             {includedItems.map((item) => (
-              <div key={item} className="flex items-start gap-3 rounded-lg border p-4" style={{ borderColor: "rgb(var(--line) / 0.82)" }}>
+              <div
+                key={item}
+                className="flex min-w-0 items-start gap-3 rounded-lg border bg-[rgb(var(--surface))] p-4"
+                style={{ borderColor: "rgb(var(--line) / 0.82)" }}
+              >
                 <CheckCircle2 size={16} className="mt-1 shrink-0" style={{ color: "rgb(var(--accent-strong))" }} />
                 <span className="text-sm leading-6 text-muted">{item}</span>
               </div>
@@ -1349,26 +1365,26 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
           </div>
         </div>
 
-        <aside className="marketing-dark rounded-lg p-6 sm:p-8">
+        <aside className="marketing-dark rounded-lg p-5 sm:p-7 lg:p-8">
           <div className="flex items-center gap-3">
             <Briefcase size={22} className="text-white/72" />
             <span className="hero-chip">aukščiausias planas</span>
           </div>
-          <h2 className="mt-6 font-display text-4xl font-bold leading-tight">Tęsk kaip privačioje strategijos studijoje</h2>
+          <h2 className="mt-6 break-words font-display text-3xl font-bold leading-tight sm:text-4xl">Tęsk kaip privačioje strategijos studijoje</h2>
           <p className="mt-5 text-sm leading-7 text-white/70">
             Čia nėra atnaujinimo kalbos, nes tai jau aukščiausias planas. Naudok veiksmus kaip trumpus kelius į svarbiausias
             darbo zonas.
           </p>
           <div className="mt-7 grid gap-3">
-            <a href="#strategijos-lenta" className="button-primary gap-2">
+            <a href="#strategijos-lenta" className="button-primary w-full gap-2">
               Atnaujinti strategijos lentą
               <Target size={16} />
             </a>
-            <a href="#verslo-resursai" className="hero-outline-button gap-2">
+            <a href="#verslo-resursai" className="hero-outline-button w-full gap-2">
               Peržiūrėti verslo resursus
               <Users size={16} />
             </a>
-            <a href="#veiksmu-planas" className="hero-outline-button gap-2">
+            <a href="#veiksmu-planas" className="hero-outline-button w-full gap-2">
               Atidaryti 30 dienų planą
               <ClipboardList size={16} />
             </a>
