@@ -376,9 +376,9 @@ const HeroPlanStrip = ({ plan }) => {
 
 const FinanceHeroVisual = () => (
   <div
-    className="relative mt-6 min-h-[310px] overflow-hidden rounded-lg border border-white/10 bg-[rgb(8_16_14/0.92)] p-4 sm:min-h-[360px] sm:p-5"
+    className="relative mt-6 overflow-hidden rounded-lg border border-white/10 bg-[rgb(8_16_14/0.92)] p-4 sm:p-5"
     role="img"
-    aria-label="Artistic premium finance visual showing calm growth lines, planning cards, and structured member dashboard previews"
+    aria-label="Premium StillOak Studio dashboard teaser with finance planning, goals, member news, and strategy board preview cards"
   >
     <div
       className="absolute inset-0 opacity-70"
@@ -390,100 +390,103 @@ const FinanceHeroVisual = () => (
       }}
     />
     <div
-      className="absolute inset-x-0 top-0 h-36 opacity-75"
+      className="absolute inset-x-0 top-0 h-48 opacity-80"
       style={{
         background:
-          "linear-gradient(135deg, rgb(164 220 190 / 0.18), transparent 46%), linear-gradient(180deg, rgb(255 236 198 / 0.12), transparent)",
+          "radial-gradient(circle at 18% 0%, rgb(255 230 179 / 0.2), transparent 34%), linear-gradient(135deg, rgb(164 220 190 / 0.2), transparent 48%), linear-gradient(180deg, rgb(255 236 198 / 0.12), transparent)",
       }}
     />
 
-    <div className="relative grid h-full min-h-[278px] gap-4 sm:min-h-[318px]">
-      <div className="grid gap-4 sm:grid-cols-[0.92fr_1.08fr]">
-        <div className="rounded-lg border border-white/10 bg-white/8 p-4 shadow-2xl shadow-black/25 backdrop-blur">
-          <div className="flex items-center justify-between gap-3">
-            <span className="hero-chip">Clarity</span>
-            <BarChart3 size={18} className="text-white/58" />
+    <div className="relative">
+      <div className="rounded-lg border border-white/12 bg-white/10 p-3 shadow-2xl shadow-black/30 backdrop-blur">
+        <div className="rounded-lg border border-white/10 bg-[rgb(248_250_246/0.96)] p-3 text-[rgb(var(--text))] sm:p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold uppercase text-muted">StillOak dashboard</p>
+              <h3 className="mt-1 font-display text-2xl font-bold leading-tight">Aiškesnis mėnesio vaizdas</h3>
+            </div>
+            <span className="signal-pill w-fit shrink-0">Member preview</span>
           </div>
-          <div className="mt-5 h-32 rounded-lg border border-white/10 bg-black/14 p-3">
-            <div className="flex h-full items-end gap-2">
-              {[42, 58, 49, 68, 76, 88].map((height, index) => (
-                <div key={height} className="flex flex-1 items-end">
-                  <div
-                    className="w-full rounded-t-lg"
-                    style={{
-                      height: `${height}%`,
-                      background:
-                        index === 5
-                          ? "linear-gradient(180deg, rgb(255 230 179 / 0.92), rgb(var(--accent)))"
-                          : "linear-gradient(180deg, rgb(164 220 190 / 0.72), rgb(var(--accent) / 0.62))",
-                    }}
+
+          <div className="mt-5 grid gap-3 lg:grid-cols-[0.94fr_1.06fr]">
+            <div className="rounded-lg bg-[rgb(var(--surface-soft))] p-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase text-muted">Mėnesio apžvalga</p>
+                  <p className="mt-2 font-display text-3xl font-bold">72%</p>
+                </div>
+                <BarChart3 size={20} style={{ color: "rgb(var(--accent-strong))" }} />
+              </div>
+
+              <div className="mt-5 h-32 rounded-lg bg-white p-3">
+                <svg viewBox="0 0 240 110" className="h-full w-full" aria-hidden="true">
+                  <path
+                    d="M8 88 C 44 70, 54 78, 82 56 S 128 32, 158 46 S 194 72, 232 22"
+                    fill="none"
+                    stroke="rgb(29 84 67)"
+                    strokeWidth="4"
+                    strokeLinecap="round"
                   />
+                  <path
+                    d="M8 88 C 44 70, 54 78, 82 56 S 128 32, 158 46 S 194 72, 232 22 L232 104 L8 104 Z"
+                    fill="rgb(55 118 94 / 0.12)"
+                  />
+                  {[28, 82, 132, 188, 232].map((x) => (
+                    <circle key={x} cx={x} cy={x === 232 ? 22 : x === 188 ? 64 : x === 132 ? 38 : x === 82 ? 56 : 78} r="4" fill="rgb(164 220 190)" />
+                  ))}
+                </svg>
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                { title: "Mini biudžeto peržiūra", value: "Likutis", icon: WalletCards },
+                { title: "Tikslai ir progresas", value: "3 tikslai", icon: Target },
+                { title: "Nario naujienos", value: "Preview", icon: FileText },
+                { title: "Strategijos lenta", value: "30 dienų", icon: BriefcaseBusiness },
+              ].map((card) => {
+                const Icon = card.icon;
+
+                return (
+                  <div key={card.title} className="rounded-lg border border-[rgb(var(--line)/0.74)] bg-white p-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold leading-5 text-muted">{card.title}</p>
+                        <p className="mt-2 font-display text-xl font-bold leading-tight">{card.value}</p>
+                      </div>
+                      <Icon size={17} className="shrink-0" style={{ color: "rgb(var(--accent-strong))" }} />
+                    </div>
+                    <div className="mt-3 h-2 rounded-full bg-[rgb(var(--surface-soft))]">
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          width: card.title === "Strategijos lenta" ? "86%" : card.title === "Nario naujienos" ? "62%" : "74%",
+                          background:
+                            "linear-gradient(90deg, rgb(var(--accent-strong)), rgb(202 165 98 / 0.82))",
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mt-3 rounded-lg border border-[rgb(var(--line)/0.74)] bg-white p-3">
+            <div className="grid gap-3 sm:grid-cols-3">
+              {[
+                ["Bazinis", "Mėnesio fokusas"],
+                ["Asmeninis", "Pilna nario zona"],
+                ["Privatus", "Strateginis augimas"],
+              ].map(([tier, label]) => (
+                <div key={tier} className="rounded-lg bg-[rgb(var(--surface-soft))] px-3 py-3">
+                  <p className="text-[11px] font-semibold uppercase text-muted">{tier}</p>
+                  <p className="mt-1 truncate text-sm font-semibold">{label}</p>
                 </div>
               ))}
             </div>
           </div>
-          <div className="mt-4 grid gap-2">
-            <div className="h-2 rounded-full bg-white/18">
-              <div className="h-full w-[72%] rounded-full bg-[rgb(var(--accent-strong))]" />
-            </div>
-            <div className="h-2 w-[58%] rounded-full bg-white/14" />
-          </div>
         </div>
-
-        <div className="relative rounded-lg border border-white/10 bg-white/10 p-4 shadow-2xl shadow-black/25 backdrop-blur">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <p className="text-xs font-semibold uppercase text-white/44">Member layers</p>
-              <p className="mt-2 font-display text-2xl font-bold text-white">Planavimas · tikslai · augimas</p>
-            </div>
-            <Target size={19} style={{ color: "rgb(var(--accent-strong))" }} />
-          </div>
-
-          <div className="mt-5 space-y-3">
-            {[
-              { label: "Bazinis", width: "46%", icon: WalletCards },
-              { label: "Asmeninis", width: "72%", icon: Target },
-              { label: "Privatus", width: "91%", icon: BriefcaseBusiness },
-            ].map((item) => {
-              const Icon = item.icon;
-
-              return (
-                <div key={item.label} className="rounded-lg border border-white/8 bg-black/12 px-3 py-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <Icon size={15} style={{ color: "rgb(var(--accent-strong))" }} />
-                      <span className="text-sm font-semibold text-white/78">{item.label}</span>
-                    </div>
-                    <span className="h-1.5 w-1.5 rounded-full bg-[rgb(255_230_179/0.9)]" />
-                  </div>
-                  <div className="mt-3 h-2 rounded-full bg-white/12">
-                    <div
-                      className="h-full rounded-full"
-                      style={{
-                        width: item.width,
-                        background:
-                          "linear-gradient(90deg, rgb(var(--accent-strong)), rgb(255 230 179 / 0.88))",
-                      }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-3">
-        {[
-          ["Fokusas", "Mėnuo"],
-          ["Resursai", "Narys"],
-          ["Strategija", "Augimas"],
-        ].map(([label, value]) => (
-          <div key={label} className="rounded-lg border border-white/10 bg-white/7 px-4 py-3 backdrop-blur">
-            <p className="text-[11px] font-semibold uppercase text-white/42">{label}</p>
-            <p className="mt-2 font-display text-xl font-bold text-white">{value}</p>
-          </div>
-        ))}
       </div>
     </div>
   </div>
