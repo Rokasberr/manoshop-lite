@@ -145,6 +145,16 @@ const formatDate = (value) => {
 
 const getScoreWidth = (score) => `${Math.max(8, Math.min(100, Number(score || 0) * 10))}%`;
 
+const getIdeaMvpDisplay = (idea) => {
+  const mvpValue = idea?.firstVersionMvp || idea?.mvp;
+
+  if (typeof mvpValue !== "string") {
+    return "MVP nepateiktas";
+  }
+
+  return mvpValue.trim() || "MVP nepateiktas";
+};
+
 const FieldLabel = ({ htmlFor, label, helper }) => (
   <label htmlFor={htmlFor} className="block space-y-2">
     <span className="block text-sm font-semibold text-white">{label}</span>
@@ -182,7 +192,10 @@ const LockedState = () => (
   </div>
 );
 
-const ProductIdeaCard = ({ idea, isBest = false, onSave }) => (
+const ProductIdeaCard = ({ idea, isBest = false, onSave }) => {
+  const mvpText = getIdeaMvpDisplay(idea);
+
+  return (
   <article className={`digital-result-card min-w-0 ${isBest ? "digital-result-card-best" : ""}`}>
     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0">
@@ -259,7 +272,7 @@ const ProductIdeaCard = ({ idea, isBest = false, onSave }) => (
         </div>
         <div>
           <p className="digital-detail-label">First version MVP</p>
-          <p className="digital-detail-text">{idea.firstVersionMvp}</p>
+          <p className="digital-detail-text">{mvpText}</p>
         </div>
         <div>
           <p className="digital-detail-label">Why this could sell</p>
@@ -286,7 +299,8 @@ const ProductIdeaCard = ({ idea, isBest = false, onSave }) => (
       ))}
     </div>
   </article>
-);
+  );
+};
 
 const DigitalProductGeneratorPage = () => {
   const { user } = useAuth();

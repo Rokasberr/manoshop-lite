@@ -574,11 +574,35 @@ const computeScores = ({ category, form }) => {
   };
 };
 
+const resolveTemplateMvp = (mvpValue, profile, form) => {
+  const resolvedValue = typeof mvpValue === "function" ? mvpValue(profile, form) : mvpValue;
+  const normalizedValue = String(resolvedValue || "")
+    .replace(/[<>]/g, "")
+    .trim();
+
+  return normalizedValue || "MVP nepateiktas";
+};
+
+const getIdeaMvpText = (idea) => {
+  const mvpValue = idea?.firstVersionMvp || idea?.mvp;
+
+  if (typeof mvpValue === "function") {
+    return "MVP nepateiktas";
+  }
+
+  const normalizedValue = String(mvpValue || "")
+    .replace(/[<>]/g, "")
+    .trim();
+
+  return normalizedValue || "MVP nepateiktas";
+};
+
 const buildIdea = ({ blueprint, template, templateIndex, form, profile }) => {
   const niche = pluralNiche(form.niche);
   const scores = computeScores({ category: blueprint.category, form });
   const productName = template.name(niche, profile, form);
   const toneLabel = getToneLabel(form.tone);
+  const firstVersionMvp = resolveTemplateMvp(template.mvp, profile, form);
 
   return {
     id: `${blueprint.category}-${templateIndex}-${productName}`.toLowerCase().replace(/[^a-z0-9ąčęėįšųūž]+/gi, "-"),
@@ -593,36 +617,41 @@ const buildIdea = ({ blueprint, template, templateIndex, form, profile }) => {
     difficultyLevel: getDifficultyForSkill(blueprint.difficulty, form.skillLevel),
     estimatedCreationTime: blueprint.creationTime,
     monetizationAngle: template.monetization,
-    firstVersionMvp: template.mvp(profile, form),
+    mvp: firstVersionMvp,
+    firstVersionMvp,
     whyThisCouldSell: `Aiškus pažadas, konkretus rezultatas ir ${toneLabel} pozicionavimas leidžia greitai parodyti vertę pasirinktai auditorijai.`,
     launchChannelSuggestion: profile.channel,
     scores,
   };
 };
 
-const buildActionPlan = (idea, form) => ({
-  title: `48 val. paleidimo planas: ${idea.productName}`,
-  day1: [
-    `Apibrėžk pasiūlymą vienu sakiniu: kam skirta, kokį rezultatą duoda ir kodėl verta pirkti dabar.`,
-    `Surašyk produkto struktūrą: ${idea.included.slice(0, 3).join(", ")}.`,
-    `Sukurk pirmą MVP versiją: ${idea.firstVersionMvp}`,
-    "Paruošk paprastą landing puslapį, Stripe payment link arba aiškų pirkimo CTA.",
-    `Paruošk pirmą Instagram įrašą su problema, rezultatu ir kaina ${idea.suggestedPrice}.`,
-  ],
-  day2: [
-    "Publikuok produkto puslapį ir patikrink pirkimo kelią telefone.",
-    `Parašyk 10 potencialių pirkėjų iš segmento: ${form.audience}.`,
-    `Paskelbk turinį per kanalą: ${idea.launchChannelSuggestion}.`,
-    "Ištestuok paleidimo kainą ir pasiūlyk ankstyvą bonusą pirmiems pirkėjams.",
-    "Surink 3 atsiliepimus arba klausimus ir pagal juos patobulink produkto aprašymą.",
-  ],
-});
+const buildActionPlan = (idea, form) => {
+  const mvpText = getIdeaMvpText(idea);
+
+  return {
+    title: `48 val. paleidimo planas: ${idea.productName}`,
+    day1: [
+      `Apibrėžk pasiūlymą vienu sakiniu: kam skirta, kokį rezultatą duoda ir kodėl verta pirkti dabar.`,
+      `Surašyk produkto struktūrą: ${idea.included.slice(0, 3).join(", ")}.`,
+      `Sukurk pirmą MVP versiją: ${mvpText}`,
+      "Paruošk paprastą landing puslapį, Stripe payment link arba aiškų pirkimo CTA.",
+      `Paruošk pirmą Instagram įrašą su problema, rezultatu ir kaina ${idea.suggestedPrice}.`,
+    ],
+    day2: [
+      "Publikuok produkto puslapį ir patikrink pirkimo kelią telefone.",
+      `Parašyk 10 potencialių pirkėjų iš segmento: ${form.audience}.`,
+      `Paskelbk turinį per kanalą: ${idea.launchChannelSuggestion}.`,
+      "Ištestuok paleidimo kainą ir pasiūlyk ankstyvą bonusą pirmiems pirkėjams.",
+      "Surink 3 atsiliepimus arba klausimus ir pagal juos patobulink produkto aprašymą.",
+    ],
+  };
+};
 
 const buildRecommendation = (bestIdea, form) => ({
   title: `Rekomenduojama pradėti nuo: ${bestIdea.productName}`,
   whyBest: `${bestIdea.productName} turi geriausią bendrą potencialo, kūrimo paprastumo ir paleidimo greičio balansą.`,
   fit: `Tai gerai dera su tavo niša (${form.niche}), auditorija (${form.audience}), tikslu („${form.productGoal}“) ir biudžetu (${form.budget}).`,
-  buildFirst: `Pirmiausia kurk MVP: ${bestIdea.firstVersionMvp}`,
+  buildFirst: `Pirmiausia kurk MVP: ${getIdeaMvpText(bestIdea)}`,
   sellIn48Hours: `Per pirmas 48 val. parduok per ${bestIdea.launchChannelSuggestion}, pradėdamas nuo aiškaus rezultato ir riboto starto pasiūlymo.`,
 });
 
@@ -686,7 +715,7 @@ export const generateInstagramPostText = (idea, form) => {
     "",
     "Kodėl verta:",
     `1. Sprendžia: ${idea.problemSolved}`,
-    `2. MVP galima sukurti taip: ${idea.firstVersionMvp}`,
+    `2. MVP galima sukurti taip: ${getIdeaMvpText(idea)}`,
     `3. Starto kaina: ${idea.suggestedPrice}`,
     "",
     "CTA: Parašyk „IDĖJA“, jei nori gauti pirmą produkto struktūrą.",
@@ -746,7 +775,7 @@ export const formatResultsForCopy = (result) => {
       `Problema: ${idea.problemSolved}`,
       `Įtraukta: ${idea.included.join(", ")}`,
       `Kaina: ${idea.suggestedPrice}`,
-      `MVP: ${idea.firstVersionMvp}`,
+      `MVP: ${getIdeaMvpText(idea)}`,
       `Launch: ${idea.launchChannelSuggestion}`,
       ""
     );
