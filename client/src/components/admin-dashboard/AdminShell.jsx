@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  Instagram,
   LogOut,
   Menu,
   Package,
@@ -29,6 +30,11 @@ const adminNavigation = [
     label: "Užsakymai",
     to: "/admin/orders",
     icon: ShoppingCart,
+  },
+  {
+    label: "Instagram",
+    to: "/admin/instagram-generator",
+    icon: Instagram,
   },
 ];
 

@@ -28,6 +28,7 @@ import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminDashboardPreviewPage from "./pages/admin/AdminDashboardPreviewPage";
 import ProductManagerPage from "./pages/admin/ProductManagerPage";
 import OrdersManagerPage from "./pages/admin/OrdersManagerPage";
+import InstagramGeneratorPage from "./pages/admin/InstagramGeneratorPage";
 import AdminShell from "./components/admin-dashboard/AdminShell";
 import { infoPages } from "./content/infoPages";
 
@@ -81,6 +82,7 @@ const App = () => (
           <Route index element={<AdminDashboardPage />} />
           <Route path="products" element={<ProductManagerPage />} />
           <Route path="orders" element={<OrdersManagerPage />} />
+          <Route path="instagram-generator" element={<InstagramGeneratorPage />} />
         </Route>
       </Route>
 

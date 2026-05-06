@@ -3,6 +3,7 @@ const express = require("express");
 const asyncHandler = require("../middleware/asyncHandler");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
 const { validateObjectId } = require("../middleware/requestValidation");
+const { createWindowRateLimiter } = require("../middleware/rateLimit");
 const {
   cancelSubscription,
   getAdminOrders,
@@ -10,8 +11,19 @@ const {
   getAdminSubscriptions,
   refundPayment,
 } = require("../controllers/adminPaymentController");
+const {
+  downloadAdminInstagramPost,
+  generateAdminInstagramPost,
+  getRecentAdminInstagramPosts,
+} = require("../controllers/instagramPostController");
 
 const router = express.Router();
+const instagramGenerationRateLimiter = createWindowRateLimiter({
+  keyPrefix: "admin-instagram-generator",
+  max: 8,
+  windowMs: 60 * 1000,
+  message: "Per daug Instagram generatoriaus užklausų. Bandyk dar kartą po minutės.",
+});
 
 router.use(protect, adminOnly);
 
@@ -20,5 +32,12 @@ router.get("/payments", asyncHandler(getAdminPayments));
 router.get("/subscriptions", asyncHandler(getAdminSubscriptions));
 router.post("/payments/:id/refund", validateObjectId("id"), asyncHandler(refundPayment));
 router.post("/subscriptions/:id/cancel", validateObjectId("id"), asyncHandler(cancelSubscription));
+router.post(
+  "/instagram-posts/generate",
+  instagramGenerationRateLimiter,
+  asyncHandler(generateAdminInstagramPost)
+);
+router.get("/instagram-posts/recent", asyncHandler(getRecentAdminInstagramPosts));
+router.get("/instagram-posts/download/:filename", asyncHandler(downloadAdminInstagramPost));
 
 module.exports = router;
