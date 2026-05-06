@@ -9,6 +9,8 @@
   "scripts": {
     "dev": "node scripts/dev.js",
     "setup:start": "node scripts/setup-and-start.js",
+    "client": "npm --workspace client run dev",
+    "server": "npm --workspace server run dev",
     "dev:client": "npm --workspace client run dev",
     "dev:server": "npm --workspace server run dev",
     "lint": "node scripts/lint-server.js",

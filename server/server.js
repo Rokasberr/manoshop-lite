@@ -20,11 +20,38 @@ const securityHeaders = require("./middleware/securityHeaders");
 const { handleStripeWebhook } = require("./controllers/billingController");
 const { getConfiguredOrigins, isAllowedOrigin } = require("./utils/originMatcher");
 
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, ".env") });
 validateEnvironment();
 
 const app = express();
-const port = process.env.PORT || 5000;
+const defaultPort = 5000;
+const normalizePort = (value) => {
+  if (!value) {
+    return defaultPort;
+  }
+
+  const trimmedValue = String(value).trim();
+
+  if (!/^\d+$/.test(trimmedValue)) {
+    console.warn(
+      `[server] Netinkama PORT reikšmė "${value}". Naudojamas atsarginis portas ${defaultPort}.`
+    );
+    return defaultPort;
+  }
+
+  const parsedPort = Number.parseInt(trimmedValue, 10);
+
+  if (parsedPort < 1 || parsedPort > 65535) {
+    console.warn(
+      `[server] PORT turi būti tarp 1 ir 65535. Naudojamas atsarginis portas ${defaultPort}.`
+    );
+    return defaultPort;
+  }
+
+  return parsedPort;
+};
+
+const port = normalizePort(process.env.PORT);
 const allowedOrigins = getConfiguredOrigins();
 
 if (process.env.NODE_ENV === "production" || process.env.TRUST_PROXY === "true") {
@@ -82,15 +109,50 @@ app.use("/api/launch-soon", launchSoonRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
+const printPortInUseHelp = (busyPort) => {
+  console.error(
+    [
+      `[server] Portas ${busyPort} jau užimtas (EADDRINUSE).`,
+      "",
+      "Windows PowerShell komandos procesui rasti ir sustabdyti:",
+      `  Get-NetTCPConnection -LocalPort ${busyPort} -State Listen | Select-Object LocalAddress,LocalPort,OwningProcess`,
+      "  Stop-Process -Id <PID> -Force",
+      "",
+      "Windows CMD alternatyva:",
+      `  netstat -ano | findstr :${busyPort}`,
+      "  taskkill /PID <PID> /F",
+      "",
+      "Kitas variantas: pakeisk server/.env į PORT=5001 ir client/.env į VITE_API_URL=http://localhost:5001/api.",
+    ].join("\n")
+  );
+};
+
+const listen = () =>
+  new Promise((resolve, reject) => {
+    const httpServer = app.listen(port, () => {
+      console.log(`Serveris paleistas: http://localhost:${port}`);
+      resolve(httpServer);
+    });
+
+    httpServer.once("error", (error) => {
+      if (error.code === "EADDRINUSE") {
+        printPortInUseHelp(port);
+      }
+
+      reject(error);
+    });
+  });
+
 const startServer = async () => {
   try {
     await connectDatabase();
+    await listen();
     startSavingsStudioSummaryScheduler();
-    app.listen(port, () => {
-      console.log(`Serveris paleistas: http://localhost:${port}`);
-    });
   } catch (error) {
-    console.error("Nepavyko paleisti serverio:", error.message);
+    if (error.code !== "EADDRINUSE") {
+      console.error("Nepavyko paleisti serverio:", error.message);
+    }
+
     process.exit(1);
   }
 };
