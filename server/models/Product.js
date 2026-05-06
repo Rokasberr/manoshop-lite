@@ -75,4 +75,8 @@ const productSchema = new mongoose.Schema(
   }
 );
 
+productSchema.index({ category: 1, productType: 1, featured: 1 });
+productSchema.index({ createdAt: -1 });
+productSchema.index({ name: "text", description: "text" });
+
 module.exports = mongoose.model("Product", productSchema);

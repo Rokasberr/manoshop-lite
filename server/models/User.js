@@ -10,7 +10,17 @@ const subscriptionSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["inactive", "active", "trialing", "past_due", "canceled", "incomplete"],
+      enum: [
+        "inactive",
+        "active",
+        "trialing",
+        "past_due",
+        "canceled",
+        "incomplete",
+        "incomplete_expired",
+        "unpaid",
+        "paused",
+      ],
       default: "active",
     },
     provider: {
@@ -27,6 +37,18 @@ const subscriptionSchema = new mongoose.Schema(
       default: "",
     },
     currentPeriodEnd: {
+      type: Date,
+      default: null,
+    },
+    stripePriceId: {
+      type: String,
+      default: "",
+    },
+    cancelAtPeriodEnd: {
+      type: Boolean,
+      default: false,
+    },
+    lastSyncedAt: {
       type: Date,
       default: null,
     },
@@ -71,6 +93,10 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+userSchema.index({ role: 1 });
+userSchema.index({ "subscription.stripeCustomerId": 1 }, { sparse: true });
+userSchema.index({ "subscription.stripeSubscriptionId": 1 }, { sparse: true });
 
 userSchema.pre("save", async function save(next) {
   if (!this.isModified("password")) {

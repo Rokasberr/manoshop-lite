@@ -148,6 +148,11 @@ const orderSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    stripeCustomerId: {
+      type: String,
+      default: "",
+      index: true,
+    },
     stripeRefundId: {
       type: String,
       default: "",
@@ -206,5 +211,11 @@ const orderSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+orderSchema.index({ user: 1, createdAt: -1 });
+orderSchema.index({ paymentStatus: 1, createdAt: -1 });
+orderSchema.index({ status: 1, createdAt: -1 });
+orderSchema.index({ stripeCheckoutSessionId: 1 }, { unique: true, sparse: true });
+orderSchema.index({ stripePaymentIntentId: 1 }, { unique: true, sparse: true });
 
 module.exports = mongoose.model("Order", orderSchema);
