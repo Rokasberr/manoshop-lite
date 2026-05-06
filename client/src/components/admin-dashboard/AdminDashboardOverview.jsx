@@ -1,6 +1,7 @@
-import { DollarSign, Package, ShoppingCart, Users } from "lucide-react";
+import { ArrowRight, DollarSign, Instagram, Package, ShoppingCart, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 
+import { useAuth } from "../../context/AuthContext";
 import AdminPageHeader from "./AdminPageHeader";
 import DashboardMetricCard from "./DashboardMetricCard";
 import DashboardOrdersTable from "./DashboardOrdersTable";
@@ -36,6 +37,7 @@ const getDailyRevenueSeries = (orders) => {
 };
 
 const AdminDashboardOverview = ({ dashboardData, previewMode = false }) => {
+  const { user } = useAuth();
   const totalRevenue = dashboardData.orders.reduce((sum, order) => sum + order.totalPrice, 0);
   const averageOrderValue = dashboardData.orders.length ? totalRevenue / dashboardData.orders.length : 0;
   const pendingOrders = dashboardData.orders.filter((order) => order.status === "pending").length;
@@ -56,6 +58,7 @@ const AdminDashboardOverview = ({ dashboardData, previewMode = false }) => {
     status: order.status,
     total: order.totalPrice,
   }));
+  const showInstagramGeneratorShortcut = !previewMode && user?.role === "admin";
 
   const statCards = [
     {
@@ -112,6 +115,37 @@ const AdminDashboardOverview = ({ dashboardData, previewMode = false }) => {
           />
         ))}
       </div>
+
+      {showInstagramGeneratorShortcut ? (
+        <div className="dashboard-panel overflow-hidden p-0">
+          <div className="grid gap-0 lg:grid-cols-[1fr_auto]">
+            <div className="relative overflow-hidden bg-[#061f18] p-6 text-white sm:p-7">
+              <div className="pointer-events-none absolute right-8 top-0 h-32 w-32 rounded-full bg-[#b9823a]/20 blur-3xl" />
+              <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[#b9823a]/40 bg-[#b9823a]/15 text-[#f7d8ac] shadow-[0_18px_40px_rgba(185,130,58,0.18)]">
+                    <Instagram size={22} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#b9823a]">Admin content tool</p>
+                    <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-white">Instagram generator</h2>
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-[#d8e1dc]">
+                      Generate branded Stilloak Studio Instagram posts
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  to="/admin/instagram-generator"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#b9823a]/45 bg-[#b9823a]/20 px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5"
+                >
+                  <span>Open generator</span>
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
         <DashboardRevenueChart points={chartPoints} />

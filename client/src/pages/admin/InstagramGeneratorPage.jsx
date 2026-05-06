@@ -6,9 +6,11 @@ import {
   Image,
   Instagram,
   Loader2,
+  Maximize2,
   RefreshCw,
   Sparkles,
   Wand2,
+  X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
@@ -152,6 +154,7 @@ const InstagramGeneratorPage = () => {
   const [generated, setGenerated] = useState(null);
   const [recentPosts, setRecentPosts] = useState([]);
   const [previewUrl, setPreviewUrl] = useState("");
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [loadingRecent, setLoadingRecent] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -219,6 +222,27 @@ const InstagramGeneratorPage = () => {
     };
   }, [generated?.previewFilename]);
 
+  useEffect(() => {
+    if (!isPreviewOpen) {
+      return undefined;
+    }
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setIsPreviewOpen(false);
+      }
+    };
+    const originalOverflow = document.body.style.overflow;
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isPreviewOpen]);
+
   const updateField = (field, value) => {
     setForm((current) => ({
       ...current,
@@ -276,6 +300,12 @@ const InstagramGeneratorPage = () => {
       toast.success("Caption nukopijuotas.");
     } catch (_error) {
       toast.error("Nepavyko nukopijuoti caption.");
+    }
+  };
+
+  const openFullScreenPreview = () => {
+    if (previewUrl) {
+      setIsPreviewOpen(true);
     }
   };
 
@@ -474,15 +504,30 @@ const InstagramGeneratorPage = () => {
                 </span>
               </div>
 
-              <div className="mt-5 flex justify-center rounded-[24px] border border-[#b9823a]/25 bg-black/[0.18] p-4">
+              <div className="mt-5 rounded-[24px] border border-[#b9823a]/25 bg-black/[0.18] p-3 sm:p-5">
                 <div
-                  className="grid w-full max-w-[420px] place-items-center overflow-hidden rounded-[22px] border border-white/10 bg-[#0b2a20]"
+                  className="mx-auto grid w-full max-w-[460px] place-items-center overflow-hidden rounded-[24px] border border-white/10 bg-[#0b2a20] shadow-[0_22px_60px_rgba(0,0,0,0.24)]"
                   style={{ aspectRatio: generatedFormat.ratio }}
                 >
                   {previewLoading ? (
                     <Loader2 size={34} className="animate-spin text-[#b9823a]" />
                   ) : previewUrl ? (
-                    <img src={previewUrl} alt="Sugeneruotas Stilloak Instagram įrašas" className="h-full w-full object-contain" />
+                    <button
+                      type="button"
+                      onClick={openFullScreenPreview}
+                      className="group relative h-full w-full cursor-zoom-in"
+                      aria-label="Open full screen preview"
+                    >
+                      <img
+                        src={previewUrl}
+                        alt="Sugeneruotas Stilloak Instagram įrašas"
+                        className="h-full w-full object-contain"
+                      />
+                      <span className="absolute inset-x-4 bottom-4 inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-[#061f18]/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-white opacity-0 shadow-2xl shadow-black/30 backdrop-blur transition group-hover:opacity-100 group-focus-visible:opacity-100">
+                        <Maximize2 size={14} />
+                        Open full screen
+                      </span>
+                    </button>
                   ) : (
                     <div className="flex flex-col items-center gap-3 text-center text-[#d8e1dc]">
                       <Instagram size={42} className="text-[#b9823a]" />
@@ -494,6 +539,16 @@ const InstagramGeneratorPage = () => {
 
               {generated ? (
                 <div className="mt-5 flex flex-wrap gap-3">
+                  {previewUrl ? (
+                    <button
+                      type="button"
+                      onClick={openFullScreenPreview}
+                      className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.08] px-4 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5"
+                    >
+                      <Maximize2 size={16} />
+                      <span>Open full screen</span>
+                    </button>
+                  ) : null}
                   {generated.files?.jpg ? (
                     <button
                       type="button"
@@ -550,6 +605,62 @@ const InstagramGeneratorPage = () => {
           </aside>
         </div>
       </section>
+
+      {isPreviewOpen && previewUrl && generated ? (
+        <div className="fixed inset-0 z-[80] bg-[#020806]/90 p-3 text-white backdrop-blur-xl sm:p-6">
+          <button
+            type="button"
+            className="absolute inset-0 cursor-zoom-out"
+            onClick={() => setIsPreviewOpen(false)}
+            aria-label="Close full screen preview backdrop"
+          />
+
+          <div className="relative z-10 flex h-full flex-col">
+            <div className="mb-3 flex items-center justify-between gap-3 rounded-[22px] border border-white/10 bg-white/[0.08] px-3 py-3 shadow-2xl shadow-black/30 backdrop-blur-xl sm:px-4">
+              <div className="min-w-0">
+                <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#b9823a]">Full screen preview</p>
+                <p className="mt-1 truncate text-sm font-semibold text-[#d8e1dc]">
+                  {generated.previewFilename} · {generated.width}x{generated.height}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                {generated.files?.jpg ? (
+                  <button
+                    type="button"
+                    onClick={() => handleDownload(generated.files.jpg)}
+                    className="hidden items-center gap-2 rounded-2xl border border-[#b9823a]/40 bg-[#b9823a]/[0.18] px-4 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5 sm:inline-flex"
+                  >
+                    <Download size={16} />
+                    <span>Download JPG</span>
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => setIsPreviewOpen(false)}
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.08] text-white transition hover:-translate-y-0.5"
+                  aria-label="Close full screen preview"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+
+            <div
+              className="relative min-h-0 flex-1 overflow-auto rounded-[26px] border border-white/10 bg-black/25 p-3 sm:p-5"
+              onClick={() => setIsPreviewOpen(false)}
+            >
+              <div className="flex min-h-full items-center justify-center">
+                <img
+                  src={previewUrl}
+                  alt="Full screen Stilloak Instagram preview"
+                  className="max-h-[calc(100vh-148px)] max-w-full rounded-[22px] object-contain shadow-[0_30px_90px_rgba(0,0,0,0.45)]"
+                  onClick={(event) => event.stopPropagation()}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <section className="dashboard-panel p-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
