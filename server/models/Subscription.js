@@ -10,9 +10,14 @@ const subscriptionRecordSchema = new mongoose.Schema(
     },
     plan: {
       type: String,
-      enum: ["free", "circle", "private", "pro", "business"],
+      enum: ["free", "bazinis", "asmeninis", "privatus_verslas"],
       default: "free",
       index: true,
+    },
+    planName: {
+      type: String,
+      default: "",
+      trim: true,
     },
     status: {
       type: String,

@@ -21,21 +21,21 @@ const sectionNav = [
 ];
 
 const planPresentation = {
-  free: {
+  bazinis: {
     eyebrow: "Įėjimo planas",
     cta: "Pradėti nuo Bazinio",
     comparison: "Pradžiai ir aiškesniam mėnesio startui.",
     icon: WalletCards,
     accent: "rgb(164 220 190)",
   },
-  circle: {
+  asmeninis: {
     eyebrow: "Rekomenduojama",
     cta: "Rinktis Asmeninį",
     comparison: "Pilnai nario erdvei ir asmeniniam progresui.",
     icon: Target,
     accent: "rgb(194 239 211)",
   },
-  private: {
+  privatus_verslas: {
     eyebrow: "Strateginis lygis",
     cta: "Rinktis Privatų verslą",
     comparison: "Verslo strategijai, pasiūlymui ir augimui.",
@@ -132,7 +132,7 @@ const MembershipPricingShowcase = ({
 
         <div className="grid gap-3 sm:grid-cols-3">
           {subscriptionPlans.map((plan) => {
-            const meta = planPresentation[plan.id] || planPresentation.free;
+            const meta = planPresentation[plan.id] || planPresentation.bazinis;
             const Icon = meta.icon;
 
             return (
@@ -170,7 +170,7 @@ const MembershipPricingShowcase = ({
 
       <div className="mt-5 grid gap-3 lg:grid-cols-3">
         {subscriptionPlans.map((plan) => {
-          const meta = planPresentation[plan.id] || planPresentation.free;
+          const meta = planPresentation[plan.id] || planPresentation.bazinis;
 
           return (
             <div key={plan.id} className="rounded-lg border border-white/10 bg-white/5 p-4">
@@ -336,10 +336,10 @@ const MembershipPlanCard = ({
   joinLoadingLabel,
   currentPlanLabel,
 }) => {
-  const meta = planPresentation[plan.id] || planPresentation.free;
+  const meta = planPresentation[plan.id] || planPresentation.bazinis;
   const Icon = meta.icon;
-  const isFeatured = plan.id === "circle";
-  const isPrivate = plan.id === "private";
+  const isFeatured = plan.id === "asmeninis";
+  const isPrivate = plan.id === "privatus_verslas";
   const isCurrentPlan = currentPlanId === plan.id;
   const ActionIcon = plan.provider === "stripe" ? CreditCard : ArrowRight;
 

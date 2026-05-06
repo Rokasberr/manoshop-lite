@@ -1,11 +1,11 @@
 export const subscriptionPlans = [
   {
-    id: "free",
+    id: "bazinis",
     name: "Bazinis",
     price: 5.99,
     intervalLabel: "/mėn.",
     description: "Paprasta pradžia mėnesio planui ir baziniams resursams.",
-    provider: "internal",
+    provider: "stripe",
     badge: "Pradžia",
     features: [
       "Mėnesio fokusas",
@@ -15,7 +15,7 @@ export const subscriptionPlans = [
     ],
   },
   {
-    id: "circle",
+    id: "asmeninis",
     name: "Asmeninis",
     price: 15.99,
     intervalLabel: "/mėn.",
@@ -31,7 +31,7 @@ export const subscriptionPlans = [
     ],
   },
   {
-    id: "private",
+    id: "privatus_verslas",
     name: "Privatus verslas",
     price: 44.99,
     intervalLabel: "/mėn.",

@@ -33,27 +33,9 @@ const getPlanPriceId = (plan) => {
 const buildSubscriptionLineItem = (plan) => {
   const priceId = getPlanPriceId(plan);
 
-  if (priceId) {
-    return {
-      price: priceId,
-      quantity: 1,
-    };
-  }
-
   return {
+    price: priceId,
     quantity: 1,
-    price_data: {
-      currency: plan.currency,
-      recurring: {
-        interval: plan.interval,
-      },
-      product_data: {
-        name: `${plan.name} plan`,
-        description: plan.description,
-      },
-      unit_amount: Math.round(plan.price * 100),
-      tax_behavior: process.env.STRIPE_DYNAMIC_TAX_BEHAVIOR || "exclusive",
-    },
   };
 };
 

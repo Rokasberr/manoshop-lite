@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 
+const { getPlanById } = require("../config/subscriptionPlans");
 const { createHttpError } = require("../utils/httpError");
 
 const validateObjectId = (fieldName) => (req, _res, next) => {
@@ -20,11 +21,17 @@ const validateBillingSessionPayload = (req, _res, next) => {
     return next(createHttpError("Pasirink planą.", 400));
   }
 
+  const plan = getPlanById(planId);
+
+  if (!plan || plan.provider !== "stripe" || plan.id !== planId) {
+    return next(createHttpError("Pasirinktas planas negalioja Stripe checkout srautui.", 400));
+  }
+
   if (provider !== "stripe") {
     return next(createHttpError("Šiuo metu palaikomas tik Stripe apmokėjimas.", 400));
   }
 
-  req.body.planId = planId;
+  req.body.planId = plan.id;
   req.body.provider = provider;
   next();
 };

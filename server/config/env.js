@@ -3,8 +3,9 @@ const requiredInProduction = [
   "CLIENT_URL",
   "STRIPE_SECRET_KEY",
   "STRIPE_WEBHOOK_SECRET",
-  "STRIPE_PRICE_CIRCLE",
-  "STRIPE_PRICE_PRIVATE",
+  "STRIPE_PRICE_BAZINIS",
+  "STRIPE_PRICE_ASMENINIS",
+  "STRIPE_PRICE_PRIVATUS_VERSLAS",
 ];
 
 const getMissingKeys = (keys) => keys.filter((key) => !process.env[key]);

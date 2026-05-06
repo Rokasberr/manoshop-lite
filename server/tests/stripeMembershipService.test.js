@@ -9,29 +9,29 @@ const {
 test("infers plan from subscription metadata first", () => {
   assert.equal(
     inferPlanIdFromStripeSubscription({
-      metadata: { planId: "private" },
+      metadata: { plan: "privatus_verslas" },
       items: { data: [] },
     }),
-    "private"
+    "privatus_verslas"
   );
 });
 
 test("infers plan from configured Stripe price ID", () => {
-  const originalValue = process.env.STRIPE_PRICE_CIRCLE;
-  process.env.STRIPE_PRICE_CIRCLE = "price_circle_real";
+  const originalValue = process.env.STRIPE_PRICE_ASMENINIS;
+  process.env.STRIPE_PRICE_ASMENINIS = "price_asmeninis_real";
 
   assert.equal(
     inferPlanIdFromStripeSubscription({
       metadata: {},
-      items: { data: [{ price: { id: "price_circle_real", currency: "eur", recurring: { interval: "month" } } }] },
+      items: { data: [{ price: { id: "price_asmeninis_real", currency: "eur", recurring: { interval: "month" } } }] },
     }),
-    "circle"
+    "asmeninis"
   );
 
   if (originalValue === undefined) {
-    delete process.env.STRIPE_PRICE_CIRCLE;
+    delete process.env.STRIPE_PRICE_ASMENINIS;
   } else {
-    process.env.STRIPE_PRICE_CIRCLE = originalValue;
+    process.env.STRIPE_PRICE_ASMENINIS = originalValue;
   }
 });
 

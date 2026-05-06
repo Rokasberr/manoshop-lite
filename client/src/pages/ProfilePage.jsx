@@ -27,8 +27,9 @@ const subscriptionStatusLabels = {
 
 const subscriptionPlanLabels = {
   free: "Bazinis",
-  circle: "Asmeninis",
-  private: "Privatus verslas",
+  bazinis: "Bazinis",
+  asmeninis: "Asmeninis",
+  privatus_verslas: "Privatus verslas",
 };
 
 const subscriptionProviderLabels = {

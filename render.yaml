@@ -34,7 +34,9 @@ services:
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
         sync: false
-      - key: STRIPE_PRICE_CIRCLE
+      - key: STRIPE_PRICE_BAZINIS
         sync: false
-      - key: STRIPE_PRICE_PRIVATE
+      - key: STRIPE_PRICE_ASMENINIS
+        sync: false
+      - key: STRIPE_PRICE_PRIVATUS_VERSLAS
         sync: false

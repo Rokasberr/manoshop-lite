@@ -18,12 +18,6 @@ const PricingPage = () => {
       return;
     }
 
-    if (plan.id === "free") {
-      toast.success("Bazinis planas jau aktyvus tavo paskyrai.");
-      navigate("/profile");
-      return;
-    }
-
     try {
       setLoadingPlanId(plan.id);
       const session = await billingService.createPaymentSession({

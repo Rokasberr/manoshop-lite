@@ -8,46 +8,45 @@ const {
 } = require("../services/stripeCheckoutService");
 
 test("subscription checkout uses configured Stripe price IDs", () => {
-  const originalValue = process.env.STRIPE_PRICE_CIRCLE;
-  process.env.STRIPE_PRICE_CIRCLE = "price_test_circle";
+  const originalValue = process.env.STRIPE_PRICE_BAZINIS;
+  process.env.STRIPE_PRICE_BAZINIS = "price_test_bazinis";
 
   const lineItem = buildSubscriptionLineItem({
-    id: "circle",
-    name: "Asmeninis",
-    price: 15.99,
+    id: "bazinis",
+    name: "Bazinis",
+    price: 5.99,
     currency: "eur",
     interval: "month",
-    stripePriceEnv: "STRIPE_PRICE_CIRCLE",
+    stripePriceEnv: "STRIPE_PRICE_BAZINIS",
   });
 
-  assert.deepEqual(lineItem, { price: "price_test_circle", quantity: 1 });
+  assert.deepEqual(lineItem, { price: "price_test_bazinis", quantity: 1 });
   if (originalValue === undefined) {
-    delete process.env.STRIPE_PRICE_CIRCLE;
+    delete process.env.STRIPE_PRICE_BAZINIS;
   } else {
-    process.env.STRIPE_PRICE_CIRCLE = originalValue;
+    process.env.STRIPE_PRICE_BAZINIS = originalValue;
   }
 });
 
-test("subscription checkout can build development dynamic prices", () => {
-  const originalValue = process.env.STRIPE_PRICE_PRIVATE;
-  delete process.env.STRIPE_PRICE_PRIVATE;
+test("subscription checkout uses selected plan Stripe price ID", () => {
+  const originalValue = process.env.STRIPE_PRICE_PRIVATUS_VERSLAS;
+  process.env.STRIPE_PRICE_PRIVATUS_VERSLAS = "price_test_privatus_verslas";
 
   const lineItem = buildSubscriptionLineItem({
-    id: "private",
+    id: "privatus_verslas",
     name: "Privatus verslas",
     price: 44.99,
     currency: "eur",
     interval: "month",
     description: "Plan",
-    stripePriceEnv: "STRIPE_PRICE_PRIVATE",
+    stripePriceEnv: "STRIPE_PRICE_PRIVATUS_VERSLAS",
   });
 
-  assert.equal(lineItem.price_data.unit_amount, 4499);
-  assert.equal(lineItem.price_data.recurring.interval, "month");
+  assert.deepEqual(lineItem, { price: "price_test_privatus_verslas", quantity: 1 });
   if (originalValue === undefined) {
-    delete process.env.STRIPE_PRICE_PRIVATE;
+    delete process.env.STRIPE_PRICE_PRIVATUS_VERSLAS;
   } else {
-    process.env.STRIPE_PRICE_PRIVATE = originalValue;
+    process.env.STRIPE_PRICE_PRIVATUS_VERSLAS = originalValue;
   }
 });
 

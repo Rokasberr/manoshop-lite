@@ -8,7 +8,6 @@
 - Added indexes for common user, order, payment, subscription, and product lookups.
 - Updated Stripe Checkout to create or reuse Stripe Customers.
 - Updated subscription checkout to use configured Stripe Price IDs in production.
-- Kept development fallback dynamic Stripe prices for local testing only.
 - Added idempotency keys for Checkout and admin refund requests.
 - Moved order, payment, and subscription state changes behind verified Stripe webhooks.
 - Added Stripe webhook event de-duplication using stored Stripe event IDs.
@@ -31,8 +30,8 @@
 
 1. Authenticated customer chooses a paid plan and calls `POST /api/billing/create-payment-session`.
 2. Backend validates the plan, creates/reuses the Stripe Customer, and creates Checkout in `subscription` mode.
-3. Production uses `STRIPE_PRICE_CIRCLE` and `STRIPE_PRICE_PRIVATE`.
-4. Checkout Session and Subscription metadata include `userId` and `planId`.
+3. Production uses `STRIPE_PRICE_BAZINIS`, `STRIPE_PRICE_ASMENINIS`, and `STRIPE_PRICE_PRIVATUS_VERSLAS`.
+4. Checkout Session and Subscription metadata include `userId`, `plan`, and `planName`.
 5. Success/profile polling only verifies ownership and returns local DB state.
 6. Verified webhooks update the embedded user subscription and the `Subscription` collection.
 
@@ -62,18 +61,19 @@ Each Stripe event ID is stored in `WebhookEvent` to avoid duplicate processing.
 - `COMPANY_NAME`
 - `STRIPE_SECRET_KEY`
 - `STRIPE_WEBHOOK_SECRET`
-- `STRIPE_PRICE_CIRCLE`
-- `STRIPE_PRICE_PRIVATE`
+- `STRIPE_PRICE_BAZINIS`
+- `STRIPE_PRICE_ASMENINIS`
+- `STRIPE_PRICE_PRIVATUS_VERSLAS`
 - `STRIPE_WEBHOOK_TOLERANCE_SECONDS`
 - `STRIPE_DYNAMIC_TAX_BEHAVIOR`
 - Email/Brevo/SMTP variables from `server/.env.example` when email delivery is enabled.
 
-Production startup requires `MONGO_URI`, `JWT_SECRET`, `CLIENT_URL`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_CIRCLE`, and `STRIPE_PRICE_PRIVATE`.
+Production startup requires `MONGO_URI`, `JWT_SECRET`, `CLIENT_URL`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_BAZINIS`, `STRIPE_PRICE_ASMENINIS`, and `STRIPE_PRICE_PRIVATUS_VERSLAS`.
 
 ## Deployment Checklist
 
-1. Create real Stripe Products and recurring Prices for `Asmeninis` and `Privatus verslas`.
-2. Set `STRIPE_PRICE_CIRCLE` and `STRIPE_PRICE_PRIVATE` to the real live `price_...` IDs.
+1. Create real Stripe Products and recurring Prices for `Bazinis`, `Asmeninis`, and `Privatus verslas`.
+2. Set `STRIPE_PRICE_BAZINIS`, `STRIPE_PRICE_ASMENINIS`, and `STRIPE_PRICE_PRIVATUS_VERSLAS` to the real live `price_...` IDs.
 3. Set `STRIPE_SECRET_KEY` to the live secret key only on the backend host.
 4. Configure Stripe webhook endpoint: `https://<api-domain>/api/billing/webhook`.
 5. Subscribe webhook endpoint to all events listed above.
@@ -85,7 +85,6 @@ Production startup requires `MONGO_URI`, `JWT_SECRET`, `CLIENT_URL`, `STRIPE_SEC
 
 ## Remaining Risks
 
-- Existing frontend still displays `Bazinis` as a visible 5.99 plan but treats it as internal/free checkout. Decide whether Bazinis should become a real paid Stripe subscription.
 - Existing admin UI does not yet display the new `/api/admin/payments` and `/api/admin/subscriptions` endpoints.
 - Client bundle has an existing Vite chunk-size warning; build succeeds, but code splitting could improve load performance.
 - Webhook delivery must be monitored in Stripe Dashboard after deployment.
@@ -96,10 +95,11 @@ Production startup requires `MONGO_URI`, `JWT_SECRET`, `CLIENT_URL`, `STRIPE_SEC
 1. Create a test customer account and buy a one-time product with Stripe test card `4242 4242 4242 4242`.
 2. Confirm order remains pending immediately after redirect until webhook arrives.
 3. Confirm webhook marks order paid and digital downloads unlock for digital products.
-4. Buy `Asmeninis` subscription and confirm user subscription becomes `circle` and `active`.
-5. Buy or switch to `Privatus verslas` and confirm plan becomes `private`.
-6. Trigger `invoice.payment_failed` with Stripe test tools and confirm membership moves to non-active/past-due state.
-7. Cancel subscription in Stripe Dashboard and confirm webhook updates local subscription.
-8. Refund a product payment from admin API and confirm refund webhook updates local payment/order state.
-9. Replay a webhook event from Stripe Dashboard and confirm it is treated as duplicate.
-10. Confirm no `sk_` or `whsec_` values are present in client build output or frontend env.
+4. Buy `Bazinis` subscription and confirm user subscription becomes `bazinis` and `active`.
+5. Buy `Asmeninis` subscription and confirm user subscription becomes `asmeninis` and `active`.
+6. Buy or switch to `Privatus verslas` and confirm plan becomes `privatus_verslas`.
+7. Trigger `invoice.payment_failed` with Stripe test tools and confirm membership moves to non-active/past-due state.
+8. Cancel subscription in Stripe Dashboard and confirm webhook updates local subscription.
+9. Refund a product payment from admin API and confirm refund webhook updates local payment/order state.
+10. Replay a webhook event from Stripe Dashboard and confirm it is treated as duplicate.
+11. Confirm no `sk_` or `whsec_` values are present in client build output or frontend env.

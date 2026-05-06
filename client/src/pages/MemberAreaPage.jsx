@@ -6,45 +6,29 @@ import PrivateBusinessWorkspacePage from "./PrivateBusinessWorkspacePage";
 import SavingsStudioPage from "./SavingsStudioPage";
 
 const basicPlanIds = new Set(["free", "guest", "basic", "bazinis"]);
-const personalPlanIds = new Set([
-  "circle",
-  "asmeninis",
-  "personal",
-  "pro",
-]);
-const privatePlanIds = new Set([
-  "private",
-  "privatus",
-  "privatus-verslas",
-  "business",
-]);
+const personalPlanIds = new Set(["asmeninis"]);
+const privatePlanIds = new Set(["privatus_verslas"]);
 const previewOptions = [
   { id: "current", label: "Dabartinis planas", helper: "Rodo pagal tikrą paskyros planą." },
-  { id: "free", label: "Bazinis", helper: "Pradinis nario sluoksnis." },
-  { id: "circle", label: "Asmeninis", helper: "Pilna nario zona." },
-  { id: "private", label: "Privatus verslas", helper: "Aukščiausia nario patirtis." },
+  { id: "bazinis", label: "Bazinis", helper: "Pradinis nario sluoksnis." },
+  { id: "asmeninis", label: "Asmeninis", helper: "Pilna nario zona." },
+  { id: "privatus_verslas", label: "Privatus verslas", helper: "Aukščiausia nario patirtis." },
 ];
 const planLabels = {
   free: "Bazinis",
   guest: "Bazinis",
   basic: "Bazinis",
   bazinis: "Bazinis",
-  circle: "Asmeninis",
   asmeninis: "Asmeninis",
-  personal: "Asmeninis",
-  pro: "Asmeninis",
-  private: "Privatus verslas",
-  privatus: "Privatus verslas",
-  "privatus-verslas": "Privatus verslas",
-  business: "Privatus verslas",
+  privatus_verslas: "Privatus verslas",
 };
 
 const normalizePlanId = (planId = "") =>
   String(planId || "free")
     .trim()
     .toLowerCase()
-    .replaceAll("_", "-")
-    .replaceAll(" ", "-");
+    .replaceAll("-", "_")
+    .replaceAll(" ", "_");
 
 const PreviewSwitch = ({ currentPlanId, selectedPlanId, onChange }) => (
   <section className="soft-card p-5 sm:p-6">

@@ -1,22 +1,38 @@
 const subscriptionPlans = {
   free: {
     id: "free",
-    name: "Guest",
+    name: "Be aktyvios prenumeratos",
     price: 0,
     currency: "eur",
     interval: "month",
-    description: "Trumpa įžanga į Stilloak pasaulį prieš pasirenkant pilną narystę.",
-    features: ["Privati paskyra", "Atidarymo peržiūros", "Privati užsakymų istorija"],
+    description: "Vidinė būsena paskyroms be aktyvios Stripe prenumeratos.",
+    features: ["Privati paskyra", "Užsakymų istorija"],
     provider: "internal",
   },
-  circle: {
-    id: "circle",
+  bazinis: {
+    id: "bazinis",
+    name: "Bazinis",
+    price: 5.99,
+    currency: "eur",
+    interval: "month",
+    description: "Paprasta pradžia mėnesio planui ir baziniams resursams.",
+    stripePriceEnv: "STRIPE_PRICE_BAZINIS",
+    features: [
+      "Mėnesio fokusas",
+      "Mini biudžeto peržiūra",
+      "Baziniai resursai",
+      "Šios savaitės veiksmas",
+    ],
+    provider: "stripe",
+  },
+  asmeninis: {
+    id: "asmeninis",
     name: "Asmeninis",
     price: 15.99,
     currency: "eur",
     interval: "month",
     description: "Pagrindinė narystė pilnai Stilloak patirčiai: aiškesniems mėnesiams, tikslams ir privačiam archyvui.",
-    stripePriceEnv: "STRIPE_PRICE_CIRCLE",
+    stripePriceEnv: "STRIPE_PRICE_ASMENINIS",
     features: [
       "Pilna Stilloak darbo erdvė",
       "Biudžetai, tikslai ir pastovios išlaidos",
@@ -27,16 +43,16 @@ const subscriptionPlans = {
     ],
     provider: "stripe",
   },
-  private: {
-    id: "private",
+  privatus_verslas: {
+    id: "privatus_verslas",
     name: "Privatus verslas",
     price: 44.99,
     currency: "eur",
     interval: "month",
     description: "Aukštesnis narystės lygis tiems, kurie nori daugiau priežiūros, ramybės ir prioriteto.",
-    stripePriceEnv: "STRIPE_PRICE_PRIVATE",
+    stripePriceEnv: "STRIPE_PRICE_PRIVATUS_VERSLAS",
     features: [
-      "Viskas iš Circle",
+      "Viskas iš Asmeninio plano",
       "Prioritetinė nario priežiūra",
       "Aiškesnė sąskaitų pagalba",
       "Nario naujienos tik nariams",
@@ -49,17 +65,32 @@ const subscriptionPlans = {
 
 const planAliases = {
   guest: "free",
-  pro: "circle",
-  business: "private",
+  "be-aktyvios-prenumeratos": "free",
+  "privatus-verslas": "privatus_verslas",
 };
 
 const normalizePlanId = (planId = "") => {
-  const normalizedValue = String(planId || "").trim().toLowerCase();
+  const normalizedValue = String(planId || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_")
+    .replace(/-/g, "_");
 
   return planAliases[normalizedValue] || normalizedValue;
 };
 
-const getPlanById = (planId) => subscriptionPlans[normalizePlanId(planId)] || null;
+const getPlanById = (planId) => {
+  const plan = subscriptionPlans[normalizePlanId(planId)] || null;
+
+  if (!plan) {
+    return null;
+  }
+
+  return {
+    ...plan,
+    priceId: plan.stripePriceEnv ? process.env[plan.stripePriceEnv] || "" : "",
+  };
+};
 
 module.exports = {
   subscriptionPlans,

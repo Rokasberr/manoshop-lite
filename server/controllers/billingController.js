@@ -7,7 +7,7 @@ const {
   syncStripeRefundFromPayment,
 } = require("../services/orderCheckoutService");
 const { ensureStripeCustomerForUser } = require("../services/stripeCustomerService");
-const { buildIdempotencyKey, buildSubscriptionLineItem } = require("../services/stripeCheckoutService");
+const { buildIdempotencyKey } = require("../services/stripeCheckoutService");
 const {
   beginStripeWebhookEvent,
   markStripeWebhookEventFailed,
@@ -22,17 +22,23 @@ const { getStripeClient, resolveClientUrl } = require("../utils/stripeClient");
 
 const createPaymentSession = async (req, res) => {
   const { planId, provider = "stripe" } = req.body;
+  const requestedPlanId = String(planId || "").trim().toLowerCase();
 
   if (provider !== "stripe") {
     res.status(501);
     throw new Error("Šiame MVP šiuo metu įgyvendintas tik Stripe checkout.");
   }
 
-  const plan = getPlanById(planId);
+  const plan = getPlanById(requestedPlanId);
 
-  if (!plan || plan.provider !== "stripe") {
+  if (!plan || plan.provider !== "stripe" || plan.id !== requestedPlanId) {
     res.status(400);
     throw new Error("Pasirinktas planas negalioja Stripe checkout srautui.");
+  }
+
+  if (!plan.priceId) {
+    res.status(500);
+    throw new Error(`Stripe kainos ID nesukonfigūruotas planui: ${plan.id}.`);
   }
 
   const stripe = getStripeClient();
@@ -48,18 +54,18 @@ const createPaymentSession = async (req, res) => {
     cancel_url: cancelUrl,
     metadata: {
       userId: req.user._id.toString(),
-      planId: plan.id,
+      plan: plan.id,
+      planName: plan.name,
       provider: "stripe",
     },
     subscription_data: {
       metadata: {
         userId: req.user._id.toString(),
-        planId: plan.id,
+        plan: plan.id,
+        planName: plan.name,
       },
     },
-    line_items: [
-      buildSubscriptionLineItem(plan),
-    ],
+    line_items: [{ price: plan.priceId, quantity: 1 }],
   };
 
   const session = await stripe.checkout.sessions.create(sessionPayload, {

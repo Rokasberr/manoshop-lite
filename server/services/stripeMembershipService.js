@@ -7,6 +7,7 @@ const stripePlans = Object.values(subscriptionPlans).filter((plan) => plan.provi
 
 const serializeSubscription = (subscription) => ({
   plan: normalizePlanId(subscription?.plan || "free"),
+  planName: subscription?.planName || getPlanById(subscription?.plan || "free")?.name || "",
   status: subscription?.status || "active",
   provider: subscription?.provider || "internal",
   currentPeriodEnd: subscription?.currentPeriodEnd || null,
@@ -35,6 +36,7 @@ const updateUserSubscription = async ({
   user.subscription = {
     ...user.subscription,
     plan: plan.id,
+    planName: plan.name,
     status,
     provider: plan.provider === "stripe" ? "stripe" : "internal",
     stripeCustomerId: stripeCustomerId || user.subscription?.stripeCustomerId || "",
@@ -54,6 +56,7 @@ const updateUserSubscription = async ({
         $set: {
           user: user._id,
           plan: plan.id,
+          planName: plan.name,
           status,
           provider: "stripe",
           stripeCustomerId: stripeCustomerId || user.subscription?.stripeCustomerId || "",
@@ -75,7 +78,7 @@ const updateUserSubscription = async ({
 };
 
 const inferPlanIdFromStripeSubscription = (subscription) => {
-  const metadataPlanId = subscription?.metadata?.planId;
+  const metadataPlanId = subscription?.metadata?.plan;
 
   if (getPlanById(metadataPlanId)) {
     return metadataPlanId;
