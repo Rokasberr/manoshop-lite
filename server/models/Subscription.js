@@ -88,7 +88,7 @@ const subscriptionRecordSchema = new mongoose.Schema(
   }
 );
 
-subscriptionRecordSchema.index({ stripeSubscriptionId: 1 }, { unique: true, sparse: true });
+subscriptionRecordSchema.index({ stripeSubscriptionId: 1 });
 subscriptionRecordSchema.index({ user: 1, provider: 1, status: 1 });
 subscriptionRecordSchema.index({ createdAt: -1 });
 

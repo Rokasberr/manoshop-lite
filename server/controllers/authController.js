@@ -1,35 +1,13 @@
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
-const { findLatestStripeSubscriptionForUser, serializeSubscription } = require("../services/stripeMembershipService");
-const { getStripeClient } = require("../utils/stripeClient");
+const { serializeSubscription } = require("../services/stripeMembershipService");
 const { createHttpError } = require("../utils/httpError");
 
 const signToken = (userId) =>
   jwt.sign({ id: userId }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN || "7d",
   });
-
-const shouldAttemptStripeRefresh = (user) => {
-  if (!user || user.role === "admin") {
-    return false;
-  }
-
-  return Boolean(user.email);
-};
-
-const refreshMembershipFromStripeIfNeeded = async (user) => {
-  if (!shouldAttemptStripeRefresh(user)) {
-    return user;
-  }
-
-  try {
-    const stripe = getStripeClient();
-    return (await findLatestStripeSubscriptionForUser(stripe, user)) || user;
-  } catch (_error) {
-    return user;
-  }
-};
 
 const formatAuthResponse = (user) => ({
   token: signToken(user._id),
@@ -70,9 +48,7 @@ const loginUser = async (req, res) => {
     throw createHttpError("Neteisingi prisijungimo duomenys.", 401);
   }
 
-  const refreshedUser = await refreshMembershipFromStripeIfNeeded(user);
-
-  res.json(formatAuthResponse(refreshedUser));
+  res.json(formatAuthResponse(user));
 };
 
 const getCurrentUser = async (req, res) => {
@@ -82,15 +58,13 @@ const getCurrentUser = async (req, res) => {
     throw createHttpError("Vartotojas nerastas.", 404);
   }
 
-  const refreshedUser = await refreshMembershipFromStripeIfNeeded(user);
-
   res.json({
-    id: refreshedUser._id,
-    name: refreshedUser.name,
-    email: refreshedUser.email,
-    role: refreshedUser.role,
-    createdAt: refreshedUser.createdAt,
-    subscription: serializeSubscription(refreshedUser.subscription),
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    createdAt: user.createdAt,
+    subscription: serializeSubscription(user.subscription),
   });
 };
 

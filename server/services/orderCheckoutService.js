@@ -1,4 +1,5 @@
 const Order = require("../models/Order");
+const Payment = require("../models/Payment");
 const Product = require("../models/Product");
 const { ensureDigitalDeliveryEmail } = require("./digitalDeliveryEmailService");
 
@@ -263,6 +264,9 @@ const finalizeStripeOrderPayment = async (order, session) => {
   order.paymentStatus = "paid";
   order.paidAt = new Date();
   order.stripeCheckoutSessionId = session.id || order.stripeCheckoutSessionId;
+  order.stripeCustomerId =
+    (typeof session.customer === "string" ? session.customer : session.customer?.id) ||
+    order.stripeCustomerId;
   order.stripePaymentIntentId =
     (typeof session.payment_intent === "string" ? session.payment_intent : session.payment_intent?.id) ||
     order.stripePaymentIntentId;
@@ -275,6 +279,24 @@ const finalizeStripeOrderPayment = async (order, session) => {
   if (order.containsDigitalProducts) {
     await ensureDigitalDeliveryEmail(order);
   }
+  await Payment.findOneAndUpdate(
+    { stripeCheckoutSessionId: session.id },
+    {
+      $set: {
+        user: order.user,
+        order: order._id,
+        provider: "stripe",
+        type: "one_time",
+        status: "succeeded",
+        amount: order.totalPrice,
+        currency: "eur",
+        stripeCustomerId: order.stripeCustomerId || "",
+        stripeCheckoutSessionId: session.id || order.stripeCheckoutSessionId,
+        stripePaymentIntentId: order.stripePaymentIntentId || "",
+      },
+    },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  );
   return order;
 };
 
@@ -311,7 +333,67 @@ const failStripeOrder = async (order, reason = "Stripe checkout expired.") => {
   order.checkoutExpiresAt = null;
 
   await order.save();
+  await Payment.findOneAndUpdate(
+    { stripeCheckoutSessionId: order.stripeCheckoutSessionId },
+    {
+      $set: {
+        user: order.user,
+        order: order._id,
+        provider: "stripe",
+        type: "one_time",
+        status: "failed",
+        amount: order.totalPrice,
+        currency: "eur",
+        stripeCustomerId: order.stripeCustomerId || "",
+        stripeCheckoutSessionId: order.stripeCheckoutSessionId || "",
+      },
+    },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  );
   return order;
+};
+
+const syncStripeRefundFromPayment = async ({ paymentIntentId = "", chargeId = "", refundId = "", amountRefunded = 0, amount = 0 }) => {
+  const lookup = paymentIntentId
+    ? { stripePaymentIntentId: paymentIntentId }
+    : chargeId
+      ? { stripeChargeId: chargeId }
+      : null;
+
+  if (!lookup) {
+    return null;
+  }
+
+  const payment = await Payment.findOne(lookup);
+
+  if (!payment) {
+    return null;
+  }
+
+  const refundedAmount = Number((amountRefunded / 100).toFixed(2));
+  const originalAmount = amount ? Number((amount / 100).toFixed(2)) : payment.amount;
+  const status = refundedAmount >= originalAmount ? "refunded" : "partially_refunded";
+
+  payment.status = status;
+  payment.refundedAmount = refundedAmount;
+  payment.stripeRefundId = refundId || payment.stripeRefundId;
+  if (chargeId) {
+    payment.stripeChargeId = chargeId;
+  }
+  await payment.save();
+
+  if (payment.order) {
+    const order = await Order.findById(payment.order);
+
+    if (order) {
+      order.paymentStatus = status === "refunded" ? "refunded" : order.paymentStatus;
+      order.refundedAt = status === "refunded" ? new Date() : order.refundedAt;
+      order.stripeRefundId = refundId || order.stripeRefundId;
+      await order.save();
+    }
+  }
+
+  return payment;
 };
 
 const syncStripeOrderFromSession = async (session) => {
@@ -343,5 +425,6 @@ module.exports = {
   finalizeStripeOrderPayment,
   cancelStripeOrder,
   failStripeOrder,
+  syncStripeRefundFromPayment,
   syncStripeOrderFromSession,
 };

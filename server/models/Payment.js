@@ -99,9 +99,9 @@ const paymentSchema = new mongoose.Schema(
   }
 );
 
-paymentSchema.index({ stripePaymentIntentId: 1 }, { unique: true, sparse: true });
-paymentSchema.index({ stripeChargeId: 1 }, { unique: true, sparse: true });
-paymentSchema.index({ stripeInvoiceId: 1, type: 1 }, { unique: true, sparse: true });
+paymentSchema.index({ stripePaymentIntentId: 1 });
+paymentSchema.index({ stripeChargeId: 1 });
+paymentSchema.index({ stripeInvoiceId: 1, type: 1 });
 paymentSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model("Payment", paymentSchema);

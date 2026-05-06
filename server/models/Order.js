@@ -215,7 +215,7 @@ const orderSchema = new mongoose.Schema(
 orderSchema.index({ user: 1, createdAt: -1 });
 orderSchema.index({ paymentStatus: 1, createdAt: -1 });
 orderSchema.index({ status: 1, createdAt: -1 });
-orderSchema.index({ stripeCheckoutSessionId: 1 }, { unique: true, sparse: true });
-orderSchema.index({ stripePaymentIntentId: 1 }, { unique: true, sparse: true });
+orderSchema.index({ stripeCheckoutSessionId: 1 });
+orderSchema.index({ stripePaymentIntentId: 1 });
 
 module.exports = mongoose.model("Order", orderSchema);

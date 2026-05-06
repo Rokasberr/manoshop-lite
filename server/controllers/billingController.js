@@ -1,13 +1,22 @@
 const User = require("../models/User");
+const Payment = require("../models/Payment");
+const Subscription = require("../models/Subscription");
 const { getPlanById } = require("../config/subscriptionPlans");
-const { syncStripeOrderFromSession } = require("../services/orderCheckoutService");
+const {
+  syncStripeOrderFromSession,
+  syncStripeRefundFromPayment,
+} = require("../services/orderCheckoutService");
 const { ensureStripeCustomerForUser } = require("../services/stripeCustomerService");
 const { buildIdempotencyKey, buildSubscriptionLineItem } = require("../services/stripeCheckoutService");
 const {
+  beginStripeWebhookEvent,
+  markStripeWebhookEventFailed,
+  markStripeWebhookEventProcessed,
+} = require("../services/webhookEventService");
+const {
   serializeSubscription,
-  syncUserSubscriptionFromCheckoutSession,
   syncUserSubscriptionFromStripeSubscription,
-  findLatestStripeSubscriptionForUser,
+  syncUserSubscriptionFromCheckoutSession,
 } = require("../services/stripeMembershipService");
 const { getStripeClient, resolveClientUrl } = require("../utils/stripeClient");
 
@@ -96,12 +105,10 @@ const syncStripeMembership = async (req, res) => {
   }
 
   const { sessionId = "" } = req.body || {};
-  let syncedUser = null;
+  let sessionVerified = false;
 
   if (sessionId) {
-    const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ["subscription"],
-    });
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
     const expectedUserId = req.user._id.toString();
     const sessionUserId = session.metadata?.userId || session.client_reference_id || "";
 
@@ -110,23 +117,103 @@ const syncStripeMembership = async (req, res) => {
       throw new Error("Ši Stripe sesija nepriklauso dabartinei paskyrai.");
     }
 
-    syncedUser = await syncUserSubscriptionFromCheckoutSession({
-      stripe,
-      session,
-      fallbackUserId: expectedUserId,
-    });
+    sessionVerified = true;
   }
 
-  if (!syncedUser) {
-    syncedUser = await findLatestStripeSubscriptionForUser(stripe, user);
-  }
-
-  const resultUser = syncedUser || user;
+  const currentUser = await User.findById(req.user._id).select("-password");
 
   res.json({
-    synced: Boolean(syncedUser),
-    subscription: serializeSubscription(resultUser.subscription),
+    synced: false,
+    pendingWebhook: sessionVerified,
+    subscription: serializeSubscription(currentUser?.subscription || user.subscription),
   });
+};
+
+const getStripeId = (value) => (typeof value === "string" ? value : value?.id || "");
+
+const resolveUserIdForStripeSubscription = async (subscription) => {
+  const metadataUserId = subscription?.metadata?.userId;
+
+  if (metadataUserId) {
+    return metadataUserId;
+  }
+
+  const subscriptionRecord = subscription?.id
+    ? await Subscription.findOne({ stripeSubscriptionId: subscription.id })
+    : null;
+
+  if (subscriptionRecord?.user) {
+    return subscriptionRecord.user.toString();
+  }
+
+  const stripeCustomerId = getStripeId(subscription?.customer);
+  const user = stripeCustomerId
+    ? await User.findOne({ "subscription.stripeCustomerId": stripeCustomerId })
+    : null;
+
+  return user?._id?.toString() || "";
+};
+
+const syncInvoicePayment = async ({ stripe, invoice, status }) => {
+  const stripeSubscriptionId = getStripeId(invoice.subscription);
+  let subscription = null;
+  let userId = "";
+
+  if (stripeSubscriptionId) {
+    subscription = await stripe.subscriptions.retrieve(stripeSubscriptionId, {
+      expand: ["latest_invoice.payment_intent"],
+    });
+    userId = await resolveUserIdForStripeSubscription(subscription);
+
+    if (userId) {
+      await syncUserSubscriptionFromStripeSubscription({
+        userId,
+        stripeCustomerId: getStripeId(invoice.customer) || getStripeId(subscription.customer),
+        subscription,
+        sessionPaymentStatus: status === "succeeded" ? "paid" : "",
+      });
+    }
+  }
+
+  if (!userId) {
+    const stripeCustomerId = getStripeId(invoice.customer);
+    const user = stripeCustomerId
+      ? await User.findOne({ "subscription.stripeCustomerId": stripeCustomerId })
+      : null;
+    userId = user?._id?.toString() || "";
+  }
+
+  if (!userId || !invoice.id) {
+    return null;
+  }
+
+  const subscriptionRecord = stripeSubscriptionId
+    ? await Subscription.findOne({ stripeSubscriptionId })
+    : null;
+  const amount = Number(((invoice.amount_paid || invoice.amount_due || invoice.total || 0) / 100).toFixed(2));
+
+  return Payment.findOneAndUpdate(
+    { stripeInvoiceId: invoice.id, type: "subscription_invoice" },
+    {
+      $set: {
+        user: userId,
+        subscription: subscriptionRecord?._id || null,
+        provider: "stripe",
+        type: "subscription_invoice",
+        status,
+        amount,
+        currency: invoice.currency || "eur",
+        stripeCustomerId: getStripeId(invoice.customer),
+        stripeInvoiceId: invoice.id,
+        stripePaymentIntentId: getStripeId(invoice.payment_intent),
+        metadata: {
+          stripeSubscriptionId,
+          invoiceStatus: invoice.status || "",
+        },
+      },
+    },
+    { upsert: true, new: true, setDefaultsOnInsert: true }
+  );
 };
 
 const handleStripeWebhook = async (req, res) => {
@@ -136,19 +223,28 @@ const handleStripeWebhook = async (req, res) => {
     const stripe = getStripeClient();
     const signature = req.headers["stripe-signature"];
     const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    const tolerance = Number(process.env.STRIPE_WEBHOOK_TOLERANCE_SECONDS || 300);
 
     if (!endpointSecret) {
       res.status(500);
       throw new Error("STRIPE_WEBHOOK_SECRET nerastas.");
     }
 
-    event = stripe.webhooks.constructEvent(req.body, signature, endpointSecret);
+    event = stripe.webhooks.constructEvent(req.body, signature, endpointSecret, tolerance);
   } catch (error) {
     return res.status(400).send(`Webhook Error: ${error.message}`);
   }
 
+  let webhookRecord = null;
+
   try {
     const stripe = getStripeClient();
+    const webhookState = await beginStripeWebhookEvent(event);
+    webhookRecord = webhookState.record;
+
+    if (!webhookState.shouldProcess) {
+      return res.json({ received: true, duplicate: true });
+    }
 
     switch (event.type) {
       case "checkout.session.completed": {
@@ -190,34 +286,54 @@ const handleStripeWebhook = async (req, res) => {
       case "customer.subscription.updated":
       case "customer.subscription.deleted": {
         const subscription = event.data.object;
-        const userId = subscription.metadata?.userId;
+        const userId = await resolveUserIdForStripeSubscription(subscription);
 
         if (userId) {
           await syncUserSubscriptionFromStripeSubscription({
             userId,
-            stripeCustomerId: subscription.customer || "",
+            stripeCustomerId: getStripeId(subscription.customer),
             subscription,
           });
         }
         break;
       }
+      case "invoice.paid":
+      case "invoice.payment_succeeded": {
+        const invoice = event.data.object;
+        await syncInvoicePayment({ stripe, invoice, status: "succeeded" });
+        break;
+      }
       case "invoice.payment_failed": {
         const invoice = event.data.object;
-        const stripeSubscriptionId =
-          typeof invoice.subscription === "string" ? invoice.subscription : invoice.subscription?.id || "";
+        await syncInvoicePayment({ stripe, invoice, status: "failed" });
+        break;
+      }
+      case "charge.refunded": {
+        const charge = event.data.object;
+        const refundId = charge.refunds?.data?.[0]?.id || "";
 
-        if (stripeSubscriptionId) {
-          const user = await User.findOne({
-            "subscription.stripeSubscriptionId": stripeSubscriptionId,
+        await syncStripeRefundFromPayment({
+          paymentIntentId: getStripeId(charge.payment_intent),
+          chargeId: charge.id,
+          refundId,
+          amountRefunded: charge.amount_refunded || 0,
+          amount: charge.amount || 0,
+        });
+        break;
+      }
+      case "refund.updated": {
+        const refund = event.data.object;
+
+        if (refund.status === "succeeded" && refund.charge) {
+          const charge = await stripe.charges.retrieve(getStripeId(refund.charge));
+
+          await syncStripeRefundFromPayment({
+            paymentIntentId: getStripeId(refund.payment_intent) || getStripeId(charge.payment_intent),
+            chargeId: charge.id,
+            refundId: refund.id,
+            amountRefunded: charge.amount_refunded || refund.amount || 0,
+            amount: charge.amount || 0,
           });
-
-          if (user) {
-            user.subscription = {
-              ...user.subscription,
-              status: "past_due",
-            };
-            await user.save();
-          }
         }
         break;
       }
@@ -225,8 +341,10 @@ const handleStripeWebhook = async (req, res) => {
         break;
     }
 
+    await markStripeWebhookEventProcessed(webhookRecord);
     return res.json({ received: true });
   } catch (error) {
+    await markStripeWebhookEventFailed(webhookRecord, error);
     return res.status(500).json({ message: error.message });
   }
 };

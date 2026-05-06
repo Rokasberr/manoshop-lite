@@ -1,5 +1,7 @@
 const User = require("../models/User");
+const Subscription = require("../models/Subscription");
 const { getPlanById, normalizePlanId, subscriptionPlans } = require("../config/subscriptionPlans");
+const { getPlanPriceId } = require("./stripeCheckoutService");
 
 const stripePlans = Object.values(subscriptionPlans).filter((plan) => plan.provider === "stripe");
 
@@ -16,7 +18,12 @@ const updateUserSubscription = async ({
   status,
   stripeCustomerId,
   stripeSubscriptionId,
+  stripePriceId,
+  currentPeriodStart,
   currentPeriodEnd,
+  cancelAtPeriodEnd,
+  canceledAt,
+  latestInvoiceId,
 }) => {
   const plan = getPlanById(planId) || getPlanById("free");
   const user = await User.findById(userId);
@@ -32,10 +39,38 @@ const updateUserSubscription = async ({
     provider: plan.provider === "stripe" ? "stripe" : "internal",
     stripeCustomerId: stripeCustomerId || user.subscription?.stripeCustomerId || "",
     stripeSubscriptionId: stripeSubscriptionId || user.subscription?.stripeSubscriptionId || "",
+    stripePriceId: stripePriceId || user.subscription?.stripePriceId || "",
     currentPeriodEnd: currentPeriodEnd || null,
+    cancelAtPeriodEnd: Boolean(cancelAtPeriodEnd),
+    lastSyncedAt: new Date(),
   };
 
   await user.save();
+
+  if (stripeSubscriptionId) {
+    await Subscription.findOneAndUpdate(
+      { stripeSubscriptionId },
+      {
+        $set: {
+          user: user._id,
+          plan: plan.id,
+          status,
+          provider: "stripe",
+          stripeCustomerId: stripeCustomerId || user.subscription?.stripeCustomerId || "",
+          stripeSubscriptionId,
+          stripePriceId: stripePriceId || "",
+          latestInvoiceId: latestInvoiceId || "",
+          currentPeriodStart: currentPeriodStart || null,
+          currentPeriodEnd: currentPeriodEnd || null,
+          cancelAtPeriodEnd: Boolean(cancelAtPeriodEnd),
+          canceledAt: canceledAt || null,
+          lastSyncedAt: new Date(),
+        },
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+  }
+
   return user;
 };
 
@@ -50,6 +85,12 @@ const inferPlanIdFromStripeSubscription = (subscription) => {
 
   if (!price) {
     return "free";
+  }
+
+  const matchedByPriceId = stripePlans.find((plan) => getPlanPriceId(plan) && getPlanPriceId(plan) === price.id);
+
+  if (matchedByPriceId) {
+    return matchedByPriceId.id;
   }
 
   const matchedPlan = stripePlans.find(
@@ -97,9 +138,19 @@ const syncUserSubscriptionFromStripeSubscription = async ({
     status: normalizeStripeSubscriptionStatus(subscription, { sessionPaymentStatus }),
     stripeCustomerId: stripeCustomerId || subscription?.customer || "",
     stripeSubscriptionId: subscription?.id || "",
+    stripePriceId: subscription?.items?.data?.[0]?.price?.id || "",
+    currentPeriodStart: subscription?.current_period_start
+      ? new Date(subscription.current_period_start * 1000)
+      : null,
     currentPeriodEnd: subscription?.current_period_end
       ? new Date(subscription.current_period_end * 1000)
       : null,
+    cancelAtPeriodEnd: Boolean(subscription?.cancel_at_period_end),
+    canceledAt: subscription?.canceled_at ? new Date(subscription.canceled_at * 1000) : null,
+    latestInvoiceId:
+      typeof subscription?.latest_invoice === "string"
+        ? subscription.latest_invoice
+        : subscription?.latest_invoice?.id || "",
   });
 
 const syncUserSubscriptionFromCheckoutSession = async ({
