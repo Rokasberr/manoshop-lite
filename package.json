@@ -11,9 +11,12 @@
     "setup:start": "node scripts/setup-and-start.js",
     "dev:client": "npm --workspace client run dev",
     "dev:server": "npm --workspace server run dev",
+    "lint": "node scripts/lint-server.js",
+    "typecheck": "node scripts/typecheck-server.js",
     "build": "npm --workspace client run build",
     "start": "npm --workspace server run start",
     "seed": "npm --workspace server run seed",
+    "test": "node scripts/run-tests.js",
     "seed:digital": "node .\\database\\seed-digital-products.js",
     "import:savings": "node .\\scripts\\import-ledger-lane-data.js",
     "test:admin-flow": "powershell -ExecutionPolicy Bypass -File .\\scripts\\test-admin-flow.ps1"
