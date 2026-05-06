@@ -7,6 +7,7 @@ import {
   FileText,
   LayoutDashboard,
   ShieldCheck,
+  Sparkles,
   Target,
   WalletCards,
 } from "lucide-react";
@@ -17,6 +18,7 @@ import { subscriptionPlans } from "../constants/subscriptionPlans";
 const sectionNav = [
   { label: "Funkcijos", href: "#funkcijos" },
   { label: "Narystės", href: "#narystes" },
+  { label: "Rinkiniai", href: "#rinkiniai" },
   { label: "Atsiliepimai", href: "#atsiliepimai" },
 ];
 
@@ -25,6 +27,7 @@ const planPresentation = {
     eyebrow: "Įėjimo planas",
     cta: "Pradėti nuo Bazinio",
     comparison: "Pradžiai ir aiškesniam mėnesio startui.",
+    kitName: "Stilloak Start Kit",
     icon: WalletCards,
     accent: "rgb(164 220 190)",
   },
@@ -32,6 +35,7 @@ const planPresentation = {
     eyebrow: "Rekomenduojama",
     cta: "Rinktis Asmeninį",
     comparison: "Pilnai nario erdvei ir asmeniniam progresui.",
+    kitName: "Stilloak Growth Kit",
     icon: Target,
     accent: "rgb(194 239 211)",
   },
@@ -39,10 +43,53 @@ const planPresentation = {
     eyebrow: "Strateginis lygis",
     cta: "Rinktis Privatų verslą",
     comparison: "Verslo strategijai, pasiūlymui ir augimui.",
+    kitName: "Stilloak Business Kit",
     icon: BriefcaseBusiness,
     accent: "rgb(226 202 145)",
   },
 };
+
+const membershipKits = [
+  {
+    title: "Stilloak Start Kit",
+    subtitle: "Pradžiai skirtas rinkinys su checklistais ir paprastais planavimo šablonais.",
+    included: [
+      "Projekto pradžios checklistas",
+      "Biudžeto planavimo šablonas",
+      "Tikslų planavimo mini šablonas",
+      "7 dienų veiksmų planas",
+    ],
+    planLabel: "Įeina į Bazinį planą",
+    icon: WalletCards,
+  },
+  {
+    title: "Stilloak Growth Kit",
+    subtitle: "Daugiau įrankių aktyviam naudojimui, turinio planavimui ir projekto augimui.",
+    included: [
+      "Viskas iš Start Kit",
+      "Instagram postų idėjų rinkinys",
+      "Turinio planavimo šablonas",
+      "Produkto/paslaugos aprašymo šablonas",
+      "Mėnesio veiksmų planas",
+    ],
+    planLabel: "Įeina į Asmeninį planą",
+    icon: Target,
+  },
+  {
+    title: "Stilloak Business Kit",
+    subtitle: "Premium rinkinys verslui su pasiūlymų, klientų ir kainodaros šablonais.",
+    included: [
+      "Viskas iš Growth Kit",
+      "Verslo pasiūlymo šablonas",
+      "Kliento onboarding checklistas",
+      "Premium kainodaros šablonas",
+      "Reklamos kampanijos planavimo šablonas",
+      "Prioritetiniai atnaujinimai",
+    ],
+    planLabel: "Įeina į Privatus verslas planą",
+    icon: BriefcaseBusiness,
+  },
+];
 
 const dashboardCards = [
   {
@@ -93,7 +140,7 @@ const MembershipPricingShowcase = ({
       <div className="flex justify-center">
         <nav
           aria-label="StillOak Studio narystės navigacija"
-          className="inline-flex w-full max-w-xl items-center justify-between gap-1 rounded-full border border-white/10 bg-white/6 p-1 text-sm text-white/72 shadow-2xl shadow-black/18 backdrop-blur sm:w-auto sm:justify-center"
+          className="inline-flex w-full max-w-2xl items-center justify-between gap-1 rounded-full border border-white/10 bg-white/6 p-1 text-sm text-white/72 shadow-2xl shadow-black/18 backdrop-blur sm:w-auto sm:justify-center"
         >
           {sectionNav.map((item) => (
             <a
@@ -167,6 +214,8 @@ const MembershipPricingShowcase = ({
           ))}
         </div>
       </div>
+
+      <MembershipKitsSection />
 
       <div className="mt-5 grid gap-3 lg:grid-cols-3">
         {subscriptionPlans.map((plan) => {
@@ -327,6 +376,73 @@ const DashboardPreview = () => (
   </div>
 );
 
+const MembershipKitsSection = () => (
+  <div id="rinkiniai" className="mt-10 scroll-mt-28">
+    <div className="mx-auto max-w-4xl text-center">
+      <span className="hero-chip">Skaitmeniniai rinkiniai</span>
+      <h2 className="mt-5 break-words font-display text-3xl font-bold leading-tight text-white sm:text-5xl">
+        Kas įeina į narystę?
+      </h2>
+      <p className="mx-auto mt-5 max-w-3xl text-base leading-7 text-white/70 sm:text-lg">
+        Kiekvienas Stilloak Studio planas suteikia prieigą prie skaitmeninių rinkinių, kurie padeda aiškiau
+        planuoti, kurti turinį ir auginti savo projektą.
+      </p>
+    </div>
+
+    <div className="mt-8 grid gap-4 lg:grid-cols-3">
+      {membershipKits.map((kit, index) => {
+        const Icon = kit.icon;
+        const isBusiness = index === 2;
+
+        return (
+          <article
+            key={kit.title}
+            className="relative flex h-full flex-col overflow-hidden rounded-lg border border-white/10 bg-white/[0.055] p-5 text-white shadow-2xl shadow-black/18"
+          >
+            <div
+              className="pointer-events-none absolute inset-x-0 top-0 h-36 opacity-80"
+              style={{
+                background: isBusiness
+                  ? "radial-gradient(circle at 72% 0%, rgb(226 202 145 / 0.22), transparent 55%)"
+                  : "radial-gradient(circle at 72% 0%, rgb(185 130 58 / 0.18), transparent 55%)",
+              }}
+            />
+            <div className="relative">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-[rgb(226_202_145/0.28)] bg-[rgb(226_202_145/0.11)] text-[rgb(226_202_145)]">
+                  <Icon size={22} />
+                </div>
+                <span className="rounded-full border border-[rgb(226_202_145/0.24)] bg-[rgb(226_202_145/0.1)] px-3 py-1 text-right text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgb(244_224_174)]">
+                  {kit.planLabel}
+                </span>
+              </div>
+
+              <h3 className="mt-5 break-words font-display text-2xl font-bold leading-tight text-white">{kit.title}</h3>
+              <p className="mt-3 text-sm leading-6 text-white/66">{kit.subtitle}</p>
+
+              <div className="mt-5 grid gap-2">
+                {kit.included.map((item) => (
+                  <div key={item} className="flex items-start gap-3 rounded-lg border border-white/8 bg-black/10 px-3 py-2.5">
+                    <Sparkles size={15} className="mt-0.5 shrink-0 text-[rgb(226_202_145)]" />
+                    <span className="text-sm leading-6 text-white/76">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+
+    <div className="mt-7 flex justify-center">
+      <a href="#narystes" className="button-primary min-h-[52px] gap-2">
+        Pasirink planą
+        <ArrowRight size={16} className="shrink-0" />
+      </a>
+    </div>
+  </div>
+);
+
 const MembershipPlanCard = ({
   plan,
   onChoosePlan,
@@ -406,6 +522,11 @@ const MembershipPlanCard = ({
       </div>
 
       <p className="mt-4 text-sm leading-6 text-white/66">{plan.description}</p>
+
+      <div className="mt-4 flex items-center gap-3 rounded-lg border border-[rgb(226_202_145/0.22)] bg-[rgb(226_202_145/0.09)] px-3 py-2.5">
+        <Sparkles size={16} className="shrink-0 text-[rgb(226_202_145)]" />
+        <span className="text-sm font-semibold leading-6 text-[rgb(244_224_174)]">Įtraukta: {meta.kitName}</span>
+      </div>
 
       <div className="mt-5 flex items-end gap-2">
         <span className="font-display text-4xl font-bold leading-none sm:text-5xl">
