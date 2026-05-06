@@ -126,6 +126,72 @@ const trustLine = "Saugus apmokėjimas · Atšauk bet kada · Aiškūs planų sk
 
 const formatPlanPrice = (value, intervalLabel) => `${Number(value || 0).toFixed(2)} €${intervalLabel}`;
 
+const lossNumberStreams = [
+  { value: "-18", x: "7%", size: "0.82rem", duration: "18s", delay: "-2s", opacity: 0.34, blur: "0px" },
+  { value: "-42", x: "16%", size: "1.12rem", duration: "24s", delay: "-12s", opacity: 0.24, blur: "0.4px" },
+  { value: "-7", x: "26%", size: "0.72rem", duration: "16s", delay: "-7s", opacity: 0.3, blur: "0px" },
+  { value: "-128", x: "35%", size: "1.42rem", duration: "29s", delay: "-18s", opacity: 0.18, blur: "1.2px" },
+  { value: "-64", x: "48%", size: "0.92rem", duration: "21s", delay: "-5s", opacity: 0.28, blur: "0.2px" },
+  { value: "-215", x: "58%", size: "1.08rem", duration: "26s", delay: "-22s", opacity: 0.2, blur: "0.7px" },
+  { value: "-9", x: "69%", size: "0.78rem", duration: "19s", delay: "-14s", opacity: 0.32, blur: "0px" },
+  { value: "-83", x: "78%", size: "1.28rem", duration: "31s", delay: "-9s", opacity: 0.16, blur: "1px" },
+  { value: "-31", x: "88%", size: "0.88rem", duration: "23s", delay: "-26s", opacity: 0.24, blur: "0.5px" },
+];
+
+const gainNumberStreams = [
+  { value: "+24", x: "10%", size: "0.8rem", duration: "20s", delay: "-10s", opacity: 0.3, blur: "0px" },
+  { value: "+118", x: "20%", size: "1.34rem", duration: "30s", delay: "-4s", opacity: 0.17, blur: "1px" },
+  { value: "+6", x: "31%", size: "0.74rem", duration: "17s", delay: "-15s", opacity: 0.34, blur: "0px" },
+  { value: "+72", x: "43%", size: "1rem", duration: "23s", delay: "-8s", opacity: 0.26, blur: "0.4px" },
+  { value: "+305", x: "55%", size: "1.48rem", duration: "34s", delay: "-24s", opacity: 0.15, blur: "1.3px" },
+  { value: "+41", x: "66%", size: "0.9rem", duration: "21s", delay: "-3s", opacity: 0.3, blur: "0.2px" },
+  { value: "+156", x: "76%", size: "1.12rem", duration: "28s", delay: "-19s", opacity: 0.19, blur: "0.8px" },
+  { value: "+12", x: "86%", size: "0.78rem", duration: "18s", delay: "-11s", opacity: 0.32, blur: "0px" },
+  { value: "+89", x: "94%", size: "1.22rem", duration: "25s", delay: "-27s", opacity: 0.2, blur: "0.7px" },
+];
+
+const HeroNumberAtmosphere = () => (
+  <div className="hero-number-atmosphere" aria-hidden="true">
+    <div className="hero-number-field hero-number-field-loss">
+      {lossNumberStreams.map((stream) => (
+        <span
+          key={`loss-${stream.value}-${stream.x}`}
+          className="hero-number-particle"
+          style={{
+            "--number-x": stream.x,
+            "--number-size": stream.size,
+            "--number-duration": stream.duration,
+            "--number-delay": stream.delay,
+            "--number-opacity": stream.opacity,
+            "--number-blur": stream.blur,
+          }}
+        >
+          {stream.value}
+        </span>
+      ))}
+    </div>
+
+    <div className="hero-number-field hero-number-field-gain">
+      {gainNumberStreams.map((stream) => (
+        <span
+          key={`gain-${stream.value}-${stream.x}`}
+          className="hero-number-particle"
+          style={{
+            "--number-x": stream.x,
+            "--number-size": stream.size,
+            "--number-duration": stream.duration,
+            "--number-delay": stream.delay,
+            "--number-opacity": stream.opacity,
+            "--number-blur": stream.blur,
+          }}
+        >
+          {stream.value}
+        </span>
+      ))}
+    </div>
+  </div>
+);
+
 const MembershipPricingShowcase = ({
   onChoosePlan,
   loadingPlanId = "",
@@ -136,8 +202,10 @@ const MembershipPricingShowcase = ({
   const canChoosePlan = typeof onChoosePlan === "function";
 
   return (
-    <section className="marketing-dark overflow-hidden rounded-lg px-4 py-5 sm:px-6 sm:py-7 lg:px-8 lg:py-8">
-      <div className="flex justify-center">
+    <section className="marketing-dark relative isolate overflow-hidden rounded-lg px-4 py-5 sm:px-6 sm:py-7 lg:px-8 lg:py-8">
+      <HeroNumberAtmosphere />
+
+      <div className="relative z-10 flex justify-center">
         <nav
           aria-label="StillOak Studio narystės navigacija"
           className="inline-flex w-full max-w-2xl items-center justify-between gap-1 rounded-full border border-white/10 bg-white/6 p-1 text-sm text-white/72 shadow-2xl shadow-black/18 backdrop-blur sm:w-auto sm:justify-center"
@@ -154,7 +222,7 @@ const MembershipPricingShowcase = ({
         </nav>
       </div>
 
-      <div className="mt-10 grid gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-end xl:gap-12">
+      <div className="relative z-10 mt-10 grid gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-end xl:gap-12">
         <div className="min-w-0">
           <span className="hero-chip">StillOak Studio narystė</span>
           <h1 className="mt-6 max-w-4xl break-words font-display text-4xl font-bold leading-tight sm:text-6xl lg:text-[4.45rem]">
