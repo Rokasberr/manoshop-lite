@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const { getPlanById } = require("../config/subscriptionPlans");
 const { syncStripeOrderFromSession } = require("../services/orderCheckoutService");
+const { ensureStripeCustomerForUser } = require("../services/stripeCustomerService");
+const { buildIdempotencyKey, buildSubscriptionLineItem } = require("../services/stripeCheckoutService");
 const {
   serializeSubscription,
   syncUserSubscriptionFromCheckoutSession,
@@ -26,10 +28,12 @@ const createPaymentSession = async (req, res) => {
 
   const stripe = getStripeClient();
   const clientUrl = resolveClientUrl(req.headers.origin);
-  const successUrl = `${clientUrl}/members/savings-studio?welcome=membership&session_id={CHECKOUT_SESSION_ID}`;
+  const successUrl = `${clientUrl}/billing/success?session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = `${clientUrl}/billing/cancel?plan=${plan.id}`;
+  const stripeCustomerId = await ensureStripeCustomerForUser(stripe, req.user);
   const sessionPayload = {
     mode: "subscription",
+    customer: stripeCustomerId,
     client_reference_id: req.user._id.toString(),
     success_url: successUrl,
     cancel_url: cancelUrl,
@@ -45,30 +49,17 @@ const createPaymentSession = async (req, res) => {
       },
     },
     line_items: [
-      {
-        quantity: 1,
-        price_data: {
-          currency: plan.currency,
-          recurring: {
-            interval: plan.interval,
-          },
-          product_data: {
-            name: `${plan.name} plan`,
-            description: plan.description,
-          },
-          unit_amount: Math.round(plan.price * 100),
-        },
-      },
+      buildSubscriptionLineItem(plan),
     ],
   };
 
-  if (req.user.subscription?.stripeCustomerId) {
-    sessionPayload.customer = req.user.subscription.stripeCustomerId;
-  } else {
-    sessionPayload.customer_email = req.user.email;
-  }
-
-  const session = await stripe.checkout.sessions.create(sessionPayload);
+  const session = await stripe.checkout.sessions.create(sessionPayload, {
+    idempotencyKey: buildIdempotencyKey(
+      "subscription-checkout",
+      [req.user._id, plan.id, req.headers["idempotency-key"] || Date.now()],
+      req.headers["idempotency-key"]
+    ),
+  });
 
   res.status(201).json({
     url: session.url,

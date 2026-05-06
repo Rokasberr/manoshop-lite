@@ -1,6 +1,9 @@
 const Order = require("../models/Order");
+const Payment = require("../models/Payment");
 const { createInvoicePdfBuffer } = require("../utils/invoicePdf");
 const { getStripeClient, resolveClientUrl } = require("../utils/stripeClient");
+const { ensureStripeCustomerForUser } = require("../services/stripeCustomerService");
+const { buildIdempotencyKey, buildOrderLineItems } = require("../services/stripeCheckoutService");
 const {
   resolveDigitalAssetPath,
   resolveDigitalAssetMimeType,
@@ -32,6 +35,7 @@ const createStripeCheckoutSession = async (req, res) => {
   const { items, shippingAddress } = req.body;
   const stripe = getStripeClient();
   const clientUrl = resolveClientUrl(req.headers.origin);
+  const stripeCustomerId = await ensureStripeCustomerForUser(stripe, req.user);
 
   const order = await createReservedOrder({
     user: req.user,
@@ -46,7 +50,7 @@ const createStripeCheckoutSession = async (req, res) => {
       mode: "payment",
       success_url: `${clientUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}&order_id=${order._id}`,
       cancel_url: `${clientUrl}/checkout/cancel?session_id={CHECKOUT_SESSION_ID}&order_id=${order._id}`,
-      customer_email: req.user.email,
+      customer: stripeCustomerId,
       client_reference_id: req.user._id.toString(),
       metadata: {
         checkoutType: "order",
@@ -60,24 +64,38 @@ const createStripeCheckoutSession = async (req, res) => {
           userId: req.user._id.toString(),
         },
       },
-      line_items: order.items.map((item) => ({
-        quantity: item.quantity,
-        price_data: {
-          currency: "eur",
-          unit_amount: Math.round(item.price * 100),
-          product_data: {
-            name: item.name,
-            ...(item.image ? { images: [item.image] } : {}),
-          },
-        },
-      })),
+      line_items: buildOrderLineItems(order),
+    }, {
+      idempotencyKey: buildIdempotencyKey(
+        "order-checkout",
+        [order._id, req.user._id],
+        req.headers["idempotency-key"]
+      ),
     });
 
     order.stripeCheckoutSessionId = session.id;
+    order.stripeCustomerId = stripeCustomerId;
     order.checkoutExpiresAt = session.expires_at
       ? new Date(session.expires_at * 1000)
       : null;
     await order.save();
+    await Payment.findOneAndUpdate(
+      { stripeCheckoutSessionId: session.id },
+      {
+        $set: {
+          user: req.user._id,
+          order: order._id,
+          provider: "stripe",
+          type: "one_time",
+          status: "pending",
+          amount: order.totalPrice,
+          currency: "eur",
+          stripeCustomerId,
+          stripeCheckoutSessionId: session.id,
+        },
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
 
     res.status(201).json({
       url: session.url,
@@ -109,13 +127,11 @@ const getStripeCheckoutSessionStatus = async (req, res) => {
     throw new Error("Neturi teisės matyti šio užsakymo.");
   }
 
-  const syncedOrder = await syncStripeOrderFromSession(session);
-
   res.json({
     sessionId: session.id,
     checkoutStatus: session.status,
     paymentStatus: session.payment_status,
-    order: syncedOrder || order,
+    order,
   });
 };
 

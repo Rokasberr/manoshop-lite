@@ -11,11 +11,12 @@ const subscriptionPlans = {
   },
   circle: {
     id: "circle",
-    name: "Circle",
-    price: 10,
+    name: "Asmeninis",
+    price: 15.99,
     currency: "eur",
     interval: "month",
     description: "Pagrindinė narystė pilnai Stilloak patirčiai: aiškesniems mėnesiams, tikslams ir privačiam archyvui.",
+    stripePriceEnv: "STRIPE_PRICE_CIRCLE",
     features: [
       "Pilna Stilloak darbo erdvė",
       "Biudžetai, tikslai ir pastovios išlaidos",
@@ -28,11 +29,12 @@ const subscriptionPlans = {
   },
   private: {
     id: "private",
-    name: "Private",
-    price: 20,
+    name: "Privatus verslas",
+    price: 44.99,
     currency: "eur",
     interval: "month",
     description: "Aukštesnis narystės lygis tiems, kurie nori daugiau priežiūros, ramybės ir prioriteto.",
+    stripePriceEnv: "STRIPE_PRICE_PRIVATE",
     features: [
       "Viskas iš Circle",
       "Prioritetinė nario priežiūra",
