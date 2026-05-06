@@ -136,6 +136,7 @@ const AdminDashboardOverview = ({ dashboardData, previewMode = false }) => {
                 </div>
                 <Link
                   to="/admin/instagram-generator"
+                  aria-label="Open Instagram generator"
                   className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#b9823a]/45 bg-[#b9823a]/20 px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5"
                 >
                   <span>Open generator</span>

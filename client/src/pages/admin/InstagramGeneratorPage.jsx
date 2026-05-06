@@ -12,7 +12,7 @@ import {
   Wand2,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 import AdminPageHeader from "../../components/admin-dashboard/AdminPageHeader";
@@ -158,6 +158,9 @@ const InstagramGeneratorPage = () => {
   const [loadingRecent, setLoadingRecent] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
+  const [isPreviewZoomed, setIsPreviewZoomed] = useState(false);
+  const modalCloseButtonRef = useRef(null);
+  const lastFocusedElementRef = useRef(null);
   const selectedFormat = useMemo(
     () => formatOptions.find((format) => format.value === form.format) || formatOptions[0],
     [form.format]
@@ -236,10 +239,14 @@ const InstagramGeneratorPage = () => {
 
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", handleKeyDown);
+    window.setTimeout(() => {
+      modalCloseButtonRef.current?.focus();
+    }, 0);
 
     return () => {
       document.body.style.overflow = originalOverflow;
       window.removeEventListener("keydown", handleKeyDown);
+      lastFocusedElementRef.current?.focus?.();
     };
   }, [isPreviewOpen]);
 
@@ -305,8 +312,15 @@ const InstagramGeneratorPage = () => {
 
   const openFullScreenPreview = () => {
     if (previewUrl) {
+      lastFocusedElementRef.current = document.activeElement;
+      setIsPreviewZoomed(false);
       setIsPreviewOpen(true);
     }
+  };
+
+  const closeFullScreenPreview = () => {
+    setIsPreviewOpen(false);
+    setIsPreviewZoomed(false);
   };
 
   return (
@@ -468,7 +482,7 @@ const InstagramGeneratorPage = () => {
                         key={option.value}
                         type="button"
                         onClick={() => updateField("outputType", option.value)}
-                    className={`h-12 rounded-2xl border text-sm font-semibold transition ${
+                        className={`h-12 rounded-2xl border text-sm font-semibold transition ${
                           form.outputType === option.value
                             ? "border-[#b9823a] bg-[#b9823a]/20 text-white"
                             : "border-white/10 bg-white/[0.045] text-[#d8e1dc] hover:border-[#b9823a]/50"
@@ -515,7 +529,7 @@ const InstagramGeneratorPage = () => {
                     <button
                       type="button"
                       onClick={openFullScreenPreview}
-                      className="group relative h-full w-full cursor-zoom-in"
+                      className="group relative h-full w-full cursor-zoom-in transition duration-300 hover:scale-[1.01] focus-visible:ring-2 focus-visible:ring-[#b9823a]"
                       aria-label="Open full screen preview"
                     >
                       <img
@@ -607,16 +621,21 @@ const InstagramGeneratorPage = () => {
       </section>
 
       {isPreviewOpen && previewUrl && generated ? (
-        <div className="fixed inset-0 z-[80] bg-[#020806]/90 p-3 text-white backdrop-blur-xl sm:p-6">
+        <div
+          className="fixed inset-0 z-[80] flex h-[100dvh] w-screen flex-col bg-[#020806]/[0.92] p-3 text-white backdrop-blur-xl sm:p-5 lg:p-7"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Full screen Instagram image preview"
+        >
           <button
             type="button"
             className="absolute inset-0 cursor-zoom-out"
-            onClick={() => setIsPreviewOpen(false)}
+            onClick={closeFullScreenPreview}
             aria-label="Close full screen preview backdrop"
           />
 
-          <div className="relative z-10 flex h-full flex-col">
-            <div className="mb-3 flex items-center justify-between gap-3 rounded-[22px] border border-white/10 bg-white/[0.08] px-3 py-3 shadow-2xl shadow-black/30 backdrop-blur-xl sm:px-4">
+          <div className="relative z-10 flex min-h-0 flex-1 flex-col">
+            <div className="mb-3 flex shrink-0 items-center justify-between gap-3 rounded-[22px] border border-white/10 bg-white/[0.08] px-3 py-3 shadow-2xl shadow-black/30 backdrop-blur-xl sm:px-4">
               <div className="min-w-0">
                 <p className="text-xs font-bold uppercase tracking-[0.24em] text-[#b9823a]">Full screen preview</p>
                 <p className="mt-1 truncate text-sm font-semibold text-[#d8e1dc]">
@@ -635,9 +654,10 @@ const InstagramGeneratorPage = () => {
                   </button>
                 ) : null}
                 <button
+                  ref={modalCloseButtonRef}
                   type="button"
-                  onClick={() => setIsPreviewOpen(false)}
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.08] text-white transition hover:-translate-y-0.5"
+                  onClick={closeFullScreenPreview}
+                  className="inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.08] text-white transition hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[#b9823a]"
                   aria-label="Close full screen preview"
                 >
                   <X size={20} />
@@ -646,17 +666,53 @@ const InstagramGeneratorPage = () => {
             </div>
 
             <div
-              className="relative min-h-0 flex-1 overflow-auto rounded-[26px] border border-white/10 bg-black/25 p-3 sm:p-5"
-              onClick={() => setIsPreviewOpen(false)}
+              className="relative min-h-0 flex-1 overflow-auto rounded-[26px] border border-white/10 bg-black/25 p-2 sm:p-5"
+              onClick={closeFullScreenPreview}
             >
-              <div className="flex min-h-full items-center justify-center">
-                <img
-                  src={previewUrl}
-                  alt="Full screen Stilloak Instagram preview"
-                  className="max-h-[calc(100vh-148px)] max-w-full rounded-[22px] object-contain shadow-[0_30px_90px_rgba(0,0,0,0.45)]"
-                  onClick={(event) => event.stopPropagation()}
-                />
+              <div className="flex min-h-full items-center justify-center p-1 sm:p-2">
+                <button
+                  type="button"
+                  className={`cursor-zoom-in touch-manipulation transition duration-300 ${
+                    isPreviewZoomed ? "max-w-none cursor-zoom-out" : "max-w-full"
+                  }`}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setIsPreviewZoomed((current) => !current);
+                  }}
+                  aria-label={isPreviewZoomed ? "Zoom out generated image" : "Zoom in generated image"}
+                >
+                  <img
+                    src={previewUrl}
+                    alt="Full screen Stilloak Instagram preview"
+                    className={`rounded-[22px] object-contain shadow-[0_30px_90px_rgba(0,0,0,0.45)] transition duration-300 ${
+                      isPreviewZoomed
+                        ? "h-auto max-h-none w-[128vw] max-w-none sm:w-[118vw] lg:w-[92vw]"
+                        : "max-h-[calc(100dvh-174px)] max-w-full"
+                    }`}
+                  />
+                </button>
               </div>
+            </div>
+
+            <div className="mt-3 grid shrink-0 grid-cols-2 gap-2 sm:hidden">
+              <button
+                type="button"
+                onClick={() => setIsPreviewZoomed((current) => !current)}
+                className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.08] px-4 py-3 text-sm font-bold text-white"
+              >
+                <Maximize2 size={16} />
+                <span>{isPreviewZoomed ? "Fit screen" : "Zoom"}</span>
+              </button>
+              {generated.files?.jpg ? (
+                <button
+                  type="button"
+                  onClick={() => handleDownload(generated.files.jpg)}
+                  className="inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl border border-[#b9823a]/40 bg-[#b9823a]/[0.18] px-4 py-3 text-sm font-bold text-white"
+                >
+                  <Download size={16} />
+                  <span>Download</span>
+                </button>
+              ) : null}
             </div>
           </div>
         </div>
