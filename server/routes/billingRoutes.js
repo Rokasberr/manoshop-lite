@@ -2,6 +2,7 @@ const express = require("express");
 
 const asyncHandler = require("../middleware/asyncHandler");
 const { protect } = require("../middleware/authMiddleware");
+const { validateBillingSessionPayload } = require("../middleware/requestValidation");
 const {
   createPaymentSession,
   getBillingProfile,
@@ -10,7 +11,7 @@ const {
 
 const router = express.Router();
 
-router.post("/create-payment-session", protect, asyncHandler(createPaymentSession));
+router.post("/create-payment-session", protect, validateBillingSessionPayload, asyncHandler(createPaymentSession));
 router.post("/sync-stripe-membership", protect, asyncHandler(syncStripeMembership));
 router.get("/me", protect, asyncHandler(getBillingProfile));
 

@@ -13,16 +13,23 @@ const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const savingsStudioRoutes = require("./routes/savingsStudioRoutes");
 const launchSoonRoutes = require("./routes/launchSoonRoutes");
+const { validateEnvironment } = require("./config/env");
 const { startSavingsStudioSummaryScheduler } = require("./services/savingsStudioScheduler");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
+const securityHeaders = require("./middleware/securityHeaders");
 const { handleStripeWebhook } = require("./controllers/billingController");
 const { getConfiguredOrigins, isAllowedOrigin } = require("./utils/originMatcher");
 
 dotenv.config();
+validateEnvironment();
 
 const app = express();
 const port = process.env.PORT || 5000;
 const allowedOrigins = getConfiguredOrigins();
+
+if (process.env.NODE_ENV === "production" || process.env.TRUST_PROXY === "true") {
+  app.set("trust proxy", 1);
+}
 
 app.post(
   "/api/billing/webhook",
@@ -42,6 +49,7 @@ app.use(
     credentials: true,
   })
 );
+app.use(securityHeaders);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
