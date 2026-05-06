@@ -157,17 +157,19 @@
     color: white;
   }
 
+  .floating-market-numbers,
   .hero-number-atmosphere {
     pointer-events: none;
     position: absolute;
-    inset: 0 0 auto;
+    inset: 0;
     z-index: 0;
-    height: min(680px, 78vh);
+    height: 100%;
     overflow: hidden;
     opacity: 0.92;
     contain: layout paint;
   }
 
+  .floating-market-numbers::before,
   .hero-number-atmosphere::before {
     content: "";
     position: absolute;
@@ -186,6 +188,7 @@
       linear-gradient(180deg, rgb(8 13 12 / 0.16), transparent 34%, rgb(8 13 12 / 0.28));
   }
 
+  .floating-market-numbers::after,
   .hero-number-atmosphere::after {
     content: "";
     position: absolute;
@@ -197,6 +200,7 @@
     mix-blend-mode: screen;
   }
 
+  .floating-market-field,
   .hero-number-field {
     position: absolute;
     top: -18%;
@@ -209,10 +213,12 @@
     mask-composite: intersect;
   }
 
+  .floating-market-field-loss,
   .hero-number-field-loss {
     left: 0;
   }
 
+  .floating-market-field-gain,
   .hero-number-field-gain {
     right: 0;
     mask-image:
@@ -221,6 +227,7 @@
     mask-composite: intersect;
   }
 
+  .floating-market-number,
   .hero-number-particle {
     position: absolute;
     left: var(--number-x);
@@ -243,11 +250,13 @@
     will-change: transform, opacity;
   }
 
+  .floating-market-field-loss .floating-market-number,
   .hero-number-field-loss .hero-number-particle {
     color: rgb(255 116 116);
     animation-name: hero-number-fall;
   }
 
+  .floating-market-field-gain .floating-market-number,
   .hero-number-field-gain .hero-number-particle {
     color: rgb(132 236 177);
     animation-name: hero-number-rise;
@@ -296,11 +305,12 @@
   }
 
   @media (max-width: 767px) {
+    .floating-market-numbers,
     .hero-number-atmosphere {
-      height: 560px;
       opacity: 0.74;
     }
 
+    .floating-market-numbers::before,
     .hero-number-atmosphere::before {
       background:
         linear-gradient(
@@ -315,16 +325,19 @@
         linear-gradient(180deg, rgb(8 13 12 / 0.18), transparent 36%, rgb(8 13 12 / 0.32));
     }
 
+    .floating-market-field,
     .hero-number-field {
       width: 42%;
     }
 
+    .floating-market-number,
     .hero-number-particle {
       font-size: clamp(0.62rem, var(--number-size), 1.12rem);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .floating-market-number,
     .hero-number-particle {
       animation: none;
       opacity: var(--number-opacity);
