@@ -435,6 +435,109 @@
     background: white;
     box-shadow: 0 16px 40px rgb(33 26 18 / 0.08);
   }
+
+  .member-workspace {
+    --member-shadow: 0 24px 70px rgb(17 31 26 / 0.08);
+    --member-shadow-deep: 0 34px 100px rgb(7 13 12 / 0.28);
+  }
+
+  .member-workspace .panel,
+  .member-workspace .public-section,
+  .member-workspace .marketing-card,
+  .member-workspace .soft-card,
+  .member-workspace .soft-card-strong {
+    border-radius: 8px;
+    border-color: rgb(var(--line) / 0.74);
+    box-shadow:
+      var(--member-shadow),
+      inset 0 1px 0 rgb(255 255 255 / 0.72);
+  }
+
+  .member-workspace .panel,
+  .member-workspace .public-section {
+    background:
+      linear-gradient(180deg, rgb(var(--surface) / 0.98), rgb(var(--surface-soft) / 0.58)),
+      radial-gradient(circle at 0% 0%, rgb(var(--accent) / 0.08), transparent 34%);
+  }
+
+  .member-workspace .marketing-card,
+  .member-workspace .soft-card,
+  .member-workspace .soft-card-strong {
+    background:
+      linear-gradient(180deg, rgb(var(--surface) / 0.98), rgb(var(--surface-soft) / 0.66));
+  }
+
+  .member-workspace .input-field,
+  .member-workspace .select-field,
+  .member-workspace .textarea-field {
+    border-radius: 8px;
+    border-color: rgb(var(--line) / 0.82);
+    background:
+      linear-gradient(180deg, rgb(var(--surface) / 0.98), rgb(var(--surface-soft) / 0.44));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.66);
+  }
+
+  .member-workspace .surface-dark,
+  .member-workspace .marketing-dark {
+    border-radius: 8px;
+    box-shadow:
+      var(--member-shadow-deep),
+      inset 0 1px 0 rgb(255 255 255 / 0.08);
+  }
+
+  .member-hero-basic {
+    background:
+      radial-gradient(circle at 15% 0%, rgb(164 220 190 / 0.18), transparent 32%),
+      linear-gradient(135deg, rgb(8 16 14), rgb(22 43 35) 58%, rgb(10 15 14));
+    border: 1px solid rgb(255 255 255 / 0.1);
+    box-shadow:
+      var(--member-shadow-deep),
+      inset 0 1px 0 rgb(255 255 255 / 0.08);
+    color: white;
+  }
+
+  .member-hero-basic .signal-pill {
+    border-color: rgb(255 255 255 / 0.12);
+    background-color: rgb(255 255 255 / 0.08);
+    color: rgb(255 255 255 / 0.78);
+  }
+
+  .member-hero-basic .text-muted {
+    color: rgb(255 255 255 / 0.68);
+  }
+
+  .member-hero-basic .soft-card {
+    border-color: rgb(255 255 255 / 0.1);
+    background: rgb(255 255 255 / 0.06);
+    box-shadow: none;
+  }
+
+  .member-value-card {
+    border: 1px solid rgb(var(--line) / 0.76);
+    background:
+      linear-gradient(180deg, rgb(var(--surface) / 0.98), rgb(var(--surface-soft) / 0.68));
+    box-shadow:
+      0 20px 60px rgb(17 31 26 / 0.07),
+      inset 0 1px 0 rgb(255 255 255 / 0.7);
+  }
+
+  .member-empty-state {
+    border: 1px dashed rgb(var(--line) / 0.9);
+    background:
+      linear-gradient(180deg, rgb(var(--surface) / 0.88), rgb(var(--surface-soft) / 0.62));
+    color: rgb(var(--muted));
+  }
+
+  .member-executive-surface {
+    border: 1px solid rgb(226 202 145 / 0.22);
+    background:
+      radial-gradient(circle at 14% 0%, rgb(226 202 145 / 0.16), transparent 30%),
+      linear-gradient(135deg, rgb(8 14 13), rgb(31 34 27) 58%, rgb(9 14 13));
+    color: white;
+    box-shadow:
+      0 36px 100px rgb(0 0 0 / 0.32),
+      inset 0 1px 0 rgb(255 255 255 / 0.08);
+  }
 }
 
 html.dark body {

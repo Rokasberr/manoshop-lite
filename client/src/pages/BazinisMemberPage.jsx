@@ -337,8 +337,8 @@ const BazinisMemberPage = () => {
   };
 
   return (
-    <div className="space-y-8 pb-6">
-      <section className="public-section overflow-hidden">
+    <div className="member-workspace member-workspace-basic space-y-8 pb-6">
+      <section className="member-hero-basic overflow-hidden rounded-lg px-5 py-7 sm:px-8 sm:py-9 lg:px-10">
         <div className="grid gap-8 lg:grid-cols-[1fr_0.78fr] lg:items-end">
           <div className="min-w-0">
             <div className="flex flex-wrap gap-2">
@@ -360,7 +360,7 @@ const BazinisMemberPage = () => {
             </p>
           </div>
 
-          <div className="soft-card rounded-lg p-6">
+          <div className="soft-card p-6">
             <div className="flex items-start gap-4">
               <ShieldCheck size={20} className="mt-1 shrink-0" style={{ color: "rgb(var(--accent-strong))" }} />
               <div className="min-w-0">
@@ -383,7 +383,7 @@ const BazinisMemberPage = () => {
           const Icon = card.icon;
 
           return (
-            <div key={card.title} className="marketing-card flex h-full min-h-[220px] flex-col p-6">
+            <div key={card.title} className="member-value-card flex h-full min-h-[220px] flex-col rounded-lg p-6 transition duration-200 hover:-translate-y-0.5">
               <div className="flex items-start justify-between gap-4">
                 <div
                   className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg"
@@ -408,7 +408,7 @@ const BazinisMemberPage = () => {
       </section>
 
       <section className="grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">
-        <div className="panel p-6">
+        <div className="panel p-5 sm:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <span className="signal-pill">Mėnesio pradžios planas</span>
@@ -441,7 +441,7 @@ const BazinisMemberPage = () => {
             })}
           </div>
 
-          <div className="mt-6 rounded-lg bg-[rgb(var(--surface-soft))] p-5">
+          <div className="mt-6 rounded-lg border bg-[rgb(var(--surface-soft))] p-5" style={{ borderColor: "rgb(var(--line) / 0.62)" }}>
             <p className="text-sm font-semibold">Šio mėnesio fokusas: {selectedFocus}</p>
             <p className="mt-3 text-sm leading-7 text-muted">{focusMessages[selectedFocus]}</p>
           </div>
@@ -490,7 +490,7 @@ const BazinisMemberPage = () => {
           </div>
         </div>
 
-        <div className="panel p-6">
+        <div className="panel p-5 sm:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <span className="signal-pill">Mini biudžeto peržiūra</span>
@@ -562,7 +562,7 @@ const BazinisMemberPage = () => {
       </section>
 
       <section className="grid gap-5 xl:grid-cols-[1.08fr_0.92fr]">
-        <div className="panel p-6">
+        <div className="panel p-5 sm:p-6">
           <span className="signal-pill">Bazinių resursų biblioteka</span>
           <h2 className="mt-4 font-display text-3xl font-bold leading-tight">5 pradiniai resursai</h2>
           <p className="mt-3 text-sm leading-7 text-muted">
@@ -614,7 +614,7 @@ const BazinisMemberPage = () => {
         </div>
 
         <div className="space-y-5">
-          <div className="panel p-6">
+          <div className="panel p-5 sm:p-6">
             <span className="signal-pill">Šios savaitės veiksmas</span>
             <h2 className="mt-4 font-display text-3xl font-bold leading-tight">Vienas konkretus žingsnis</h2>
             <label className="mt-6 flex cursor-pointer items-start gap-4 rounded-lg bg-[rgb(var(--surface-soft))] p-5">
@@ -635,7 +635,7 @@ const BazinisMemberPage = () => {
             </label>
           </div>
 
-          <div className="marketing-card p-6">
+          <div className="marketing-card p-5 sm:p-6">
             <span className="signal-pill">Bazinio riba</span>
             <h3 className="mt-4 font-display text-2xl font-bold leading-tight">Paprasta nauda be premium atrakinimo</h3>
             <p className="mt-4 text-sm leading-7 text-muted">
@@ -666,7 +666,7 @@ const BazinisMemberPage = () => {
 
         <div className="grid gap-4 lg:grid-cols-3">
           {updates.map((update) => (
-            <div key={update.title} className="marketing-card p-6">
+            <div key={update.title} className="marketing-card p-5 sm:p-6">
               <span className="signal-pill">{update.label}</span>
               <h3 className="mt-5 font-display text-2xl font-bold leading-tight">{update.title}</h3>
               <p className="mt-4 text-sm leading-7 text-muted">{update.text}</p>
@@ -676,7 +676,7 @@ const BazinisMemberPage = () => {
       </section>
 
       <section className="grid gap-5 xl:grid-cols-[0.92fr_1.08fr]">
-        <div className="surface-dark overflow-hidden rounded-lg px-6 py-8 sm:px-8">
+        <div className="surface-dark overflow-hidden rounded-lg px-5 py-7 sm:px-8 sm:py-8">
           <span className="hero-chip">Užrakinta Asmeniniame</span>
           <h2 className="mt-6 max-w-2xl font-display text-4xl font-bold leading-tight sm:text-5xl">
             Norisi pilnos nario erdvės?
@@ -698,7 +698,7 @@ const BazinisMemberPage = () => {
           </p>
         </div>
 
-        <div className="panel p-6">
+        <div className="panel p-5 sm:p-6">
           <span className="signal-pill">Kas atsiveria Asmeniniame</span>
           <h2 className="mt-4 font-display text-3xl font-bold leading-tight">Aiškiai daugiau nei Bazinis</h2>
           <div className="mt-6 grid gap-3 sm:grid-cols-2">

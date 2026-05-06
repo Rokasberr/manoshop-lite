@@ -464,7 +464,7 @@ const SectionHeading = ({ eyebrow, title, text }) => (
 );
 
 const PrivateBusinessPreview = () => (
-  <section className="marketing-dark overflow-hidden rounded-lg p-5 sm:p-8 lg:p-10">
+  <section className="member-workspace member-executive-surface overflow-hidden rounded-lg p-5 sm:p-8 lg:p-10">
     <div className="grid gap-8 lg:grid-cols-[1.05fr_0.78fr] lg:items-end">
       <div className="min-w-0">
         <div className="flex flex-wrap gap-2">
@@ -768,8 +768,8 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
   }
 
   return (
-    <div className="space-y-6 pb-10 sm:space-y-8">
-      <section className="marketing-dark overflow-hidden rounded-lg p-5 sm:p-8 lg:p-12">
+    <div className="member-workspace member-workspace-private space-y-6 pb-10 sm:space-y-8">
+      <section className="member-executive-surface overflow-hidden rounded-lg p-5 sm:p-8 lg:p-12">
         <div className="grid gap-8 xl:grid-cols-[1.08fr_0.72fr] xl:items-end">
           <div className="min-w-0">
             <div className="flex flex-wrap gap-2">
@@ -779,7 +779,7 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
                 </span>
               ))}
             </div>
-            <h1 className="mt-7 max-w-4xl break-words font-display text-4xl font-bold leading-[0.96] sm:text-6xl lg:text-7xl">
+            <h1 className="mt-7 max-w-4xl break-words font-display text-4xl font-bold leading-tight sm:text-6xl lg:text-7xl">
               Privataus verslo erdvė
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-white/74 sm:text-lg">
@@ -827,7 +827,7 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
           const Icon = card.icon;
 
           return (
-            <article key={card.title} className="marketing-card flex h-full min-h-[210px] min-w-0 flex-col p-5 transition duration-200 hover:-translate-y-0.5 sm:p-6">
+            <article key={card.title} className="member-value-card flex h-full min-h-[210px] min-w-0 flex-col rounded-lg p-5 transition duration-200 hover:-translate-y-0.5 sm:p-6">
               <div className="flex items-start justify-between gap-4">
                 <div
                   className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg"
@@ -1365,7 +1365,7 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
           </div>
         </div>
 
-        <aside className="marketing-dark rounded-lg p-5 sm:p-7 lg:p-8">
+        <aside className="member-executive-surface rounded-lg p-5 sm:p-7 lg:p-8">
           <div className="flex items-center gap-3">
             <Briefcase size={22} className="text-white/72" />
             <span className="hero-chip">aukščiausias planas</span>

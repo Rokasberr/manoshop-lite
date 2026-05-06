@@ -47,7 +47,7 @@ const normalizePlanId = (planId = "") =>
     .replaceAll(" ", "-");
 
 const PreviewSwitch = ({ currentPlanId, selectedPlanId, onChange }) => (
-  <section className="soft-card rounded-[28px] p-5 sm:p-6">
+  <section className="soft-card p-5 sm:p-6">
     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
       <div className="min-w-0">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted">admin preview</p>
@@ -69,8 +69,8 @@ const PreviewSwitch = ({ currentPlanId, selectedPlanId, onChange }) => (
               key={option.id}
               type="button"
               onClick={() => onChange(option.id)}
-              className={`rounded-[18px] border px-4 py-3 text-left transition ${
-                isSelected ? "bg-[rgb(var(--accent))] text-[rgb(var(--accent-contrast))]" : "bg-white text-[rgb(var(--text))]"
+              className={`rounded-lg border px-4 py-3 text-left transition duration-200 hover:-translate-y-0.5 ${
+                isSelected ? "bg-[rgb(var(--accent-strong))] text-white" : "bg-white text-[rgb(var(--text))]"
               }`}
               style={{
                 borderColor: isSelected ? "rgb(var(--accent))" : "rgb(var(--line) / 0.82)",
@@ -98,7 +98,7 @@ const MemberAreaPage = () => {
   const shouldRenderPersonalArea = personalPlanIds.has(effectivePlanId);
 
   return (
-    <div className="space-y-6">
+    <div className="member-workspace space-y-6">
       {canUsePreview && (
         <PreviewSwitch currentPlanId={realPlanId} selectedPlanId={previewPlanId} onChange={setPreviewPlanId} />
       )}

@@ -24,7 +24,6 @@ import toast from "react-hot-toast";
 import { useSearchParams } from "react-router-dom";
 
 import LoadingSpinner from "../components/LoadingSpinner";
-import SectionTitle from "../components/SectionTitle";
 import { useAuth } from "../context/AuthContext";
 import savingsStudioService from "../services/savingsStudioService";
 import {
@@ -1968,14 +1967,77 @@ const SavingsStudioPage = () => {
   };
 
   return (
-    <div className="space-y-8">
-      <SectionTitle
-        eyebrow="members tool"
-            title="Stilloak"
-        subtitle="Privati nario darbo zona, kur matai, kur išeina pinigai, kaip keičiasi mėnesiai ir kur gali susigrąžinti finansinį aiškumą."
-      />
+    <div className="member-workspace member-workspace-personal space-y-8">
+      <section className="marketing-dark overflow-hidden rounded-lg px-5 py-7 sm:px-8 sm:py-9 lg:px-10">
+        <div className="grid gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-end">
+          <div className="min-w-0">
+            <div className="flex flex-wrap gap-2">
+              <span className="hero-chip">Asmeninis planas</span>
+              <span className="hero-chip">Pilna nario zona</span>
+              <span className="hero-chip">15.99 €/mėn.</span>
+            </div>
+            <h1 className="mt-7 max-w-4xl break-words font-display text-4xl font-bold leading-tight sm:text-6xl lg:text-7xl">
+              Stilloak asmeninė darbo erdvė
+            </h1>
+            <p className="mt-6 max-w-3xl text-base leading-7 text-white/74 sm:text-lg">
+              Pagrindinis nario planas mėnesio suvestinėms, biudžetams, tikslams, pasikartojančioms išlaidoms ir
+              aiškesniam finansiniam ritmui.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <button type="button" className="button-primary min-h-[52px] gap-2" onClick={() => scrollToSection("savings-ledger")}>
+                Pridėti išlaidą
+                <Plus size={16} />
+              </button>
+              <button type="button" className="hero-outline-button min-h-[52px] gap-2" onClick={() => scrollToSection("savings-budgets")}>
+                Peržiūrėti biudžetus
+                <Target size={16} />
+              </button>
+              <button type="button" className="hero-outline-button min-h-[52px] gap-2" onClick={() => scrollToSection("savings-automation")}>
+                Suvestinės
+                <Mail size={16} />
+              </button>
+            </div>
+          </div>
 
-      <section className="soft-card rounded-[28px] px-6 py-6 sm:px-7">
+          <div className="rounded-lg border border-white/10 bg-white/6 p-4 sm:p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase text-white/46">Mėnesio valdymas</p>
+                <h2 className="mt-3 font-display text-3xl font-bold leading-tight">Tavo aiškumo panelė</h2>
+              </div>
+              <ShieldCheck size={20} style={{ color: "rgb(var(--accent-strong))" }} />
+            </div>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              <InsightTile
+                icon={WalletCards}
+                label="Šis mėnuo"
+                value={money.format(summary?.monthTotal || 0)}
+                hint={formatChange(summary?.change)}
+              />
+              <InsightTile
+                icon={Target}
+                label="Tikslai"
+                value={String(activeGoalsCount)}
+                hint={goalPace ? goalPaceStatusLabel(goalPace.status) : "Aktyvūs taupymo tikslai"}
+              />
+              <InsightTile
+                icon={Repeat}
+                label="Pastovios"
+                value={money.format(recurringMonthlyTotal)}
+                hint={`${recurringExpenses.length} aktyvūs įrašai`}
+              />
+              <InsightTile
+                icon={TrendingUp}
+                label="Laisva suma"
+                value={availableToSave !== null && availableToSave !== undefined ? money.format(availableToSave) : "—"}
+                hint="Po faktinių išlaidų"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="soft-card px-5 py-5 sm:px-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted">usage guide</p>
@@ -2009,13 +2071,13 @@ const SavingsStudioPage = () => {
           <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
             <div>
               <span className="eyebrow">membership unlocked</span>
-              <h2 className="mt-5 text-5xl font-bold">Narystė aktyvi. Dabar pradėk nuo pirmo taupymo setup.</h2>
+              <h2 className="mt-5 break-words font-display text-4xl font-bold leading-tight sm:text-5xl">Narystė aktyvi. Dabar pradėk nuo pirmo taupymo setup.</h2>
               <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
             Stilloak jau atrakinta tavo paskyrai. Jei dar nebaigei pirmo setup, pradėk nuo pajamų,
                 mėnesio taupymo tikslo ir trijų svarbiausių biudžetų.
               </p>
             </div>
-            <div className="soft-card rounded-[28px] p-6">
+            <div className="soft-card p-6">
               <p className="text-xs uppercase tracking-[0.24em] text-muted">What opens now</p>
               <div className="mt-4 space-y-3 text-sm leading-6 text-muted">
                 <p>1. Nustatai pirmą mėnesio planą.</p>
@@ -2032,7 +2094,7 @@ const SavingsStudioPage = () => {
           <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
             <div>
               <span className="eyebrow">first setup</span>
-              <h2 className="mt-5 text-5xl font-bold">{ONBOARDING_STEPS[onboardingStep].title}</h2>
+              <h2 className="mt-5 break-words font-display text-4xl font-bold leading-tight sm:text-5xl">{ONBOARDING_STEPS[onboardingStep].title}</h2>
               <p className="mt-4 max-w-2xl text-base leading-7 text-muted">
                 {ONBOARDING_STEPS[onboardingStep].description}
               </p>
@@ -2373,7 +2435,7 @@ const SavingsStudioPage = () => {
         </div>
       </section>
 
-      <section className="soft-card rounded-[28px] px-5 py-5 sm:px-6">
+      <section className="soft-card rounded-lg px-5 py-5 sm:px-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="eyebrow">greita navigacija</p>
@@ -2464,7 +2526,7 @@ const SavingsStudioPage = () => {
                 </div>
               ))
             ) : (
-              <div className="soft-card rounded-[24px] p-8 text-center text-muted">
+              <div className="member-empty-state rounded-lg p-8 text-center text-muted">
                 Pridėk bent vieną pastovią išlaidą, ir čia iškart matysi kur ši dalis labiausiai spaudžia
                 tavo mėnesį.
               </div>
@@ -2489,7 +2551,7 @@ const SavingsStudioPage = () => {
             {goalScenarios.length ? (
               goalScenarios.map((scenario) => <GoalScenarioCard key={scenario.key} scenario={scenario} />)
             ) : (
-              <div className="soft-card rounded-[24px] p-8 text-center text-muted">
+              <div className="member-empty-state rounded-lg p-8 text-center text-muted">
                 Kai turėsi aktyvų taupymo tikslą su aiškesniu tempu, čia galėsi palyginti kelis mėnesio scenarijus
                 ir pasirinkti realesnį ritmą.
               </div>
@@ -2557,7 +2619,7 @@ const SavingsStudioPage = () => {
                 />
               ))
             ) : (
-              <div className="soft-card rounded-[24px] p-8 text-center text-muted md:col-span-2">
+              <div className="member-empty-state rounded-lg p-8 text-center text-muted md:col-span-2">
                 Kai turėsi bent dviejų mėnesių išlaidų istoriją, čia iškart pradės matytis, kurios kategorijos auga,
                 kurios rimsta ir kur iš tikro keičiasi tavo mėnesio ritmas.
               </div>
@@ -2584,7 +2646,7 @@ const SavingsStudioPage = () => {
                 <ActivityTimelineItem key={item.id} item={item} onOpen={handleActionFocus} />
               ))
             ) : (
-              <div className="soft-card rounded-[24px] p-8 text-center text-muted">
+              <div className="member-empty-state rounded-lg p-8 text-center text-muted">
                 Kai pradėsi aktyviau naudotis Savings Studio, čia matysi savo finansinės darbo eigos istoriją vienoje
                 vietoje.
               </div>
@@ -2784,7 +2846,7 @@ const SavingsStudioPage = () => {
                 </article>
               ))
             ) : (
-              <div className="soft-card rounded-[24px] p-8 text-center text-muted">
+              <div className="member-empty-state rounded-lg p-8 text-center text-muted">
                 Kol kas pagal filtrus nėra įrašų. Pradėk nuo pirmos išlaidos ir pamatysi, kur pradeda ryškėti
                 taupymo galimybės.
               </div>
@@ -3063,7 +3125,7 @@ const SavingsStudioPage = () => {
                 </div>
               ))
             ) : (
-              <div className="soft-card rounded-[24px] p-8 text-center text-muted">
+              <div className="member-empty-state rounded-lg p-8 text-center text-muted">
                 Kai susikaups daugiau biudžetų ir išlaidų, čia matysi aiškiausią mėnesio spaudimą.
               </div>
             )}
@@ -3198,7 +3260,7 @@ const SavingsStudioPage = () => {
                 </div>
               ))
             ) : (
-              <div className="soft-card rounded-[24px] p-8 text-center text-muted">
+              <div className="member-empty-state rounded-lg p-8 text-center text-muted">
                 Kai susikursi pirmą tikslą, čia matysi progresą, likutį ir ar artėji prie savo sumos.
               </div>
             )}
@@ -3377,7 +3439,7 @@ const SavingsStudioPage = () => {
                 </div>
               ))
             ) : (
-              <div className="soft-card rounded-[24px] p-8 text-center text-muted">
+              <div className="member-empty-state rounded-lg p-8 text-center text-muted">
                 Įtrauk pasikartojančias išlaidas ir pamatysi, kiek tavo mėnesį jau “suvalgo” vien pastovūs mokėjimai.
               </div>
             )}
@@ -3425,7 +3487,7 @@ const SavingsStudioPage = () => {
                 <GoalStrategyCard key={goal._id} goal={goal} onOpen={() => scrollToSection("savings-goals")} />
               ))
             ) : (
-              <div className="soft-card rounded-[24px] p-8 text-center text-muted">
+              <div className="member-empty-state rounded-lg p-8 text-center text-muted">
                 Kai turėsi bent vieną aktyvų tikslą, čia galėsi matyti kuriam verta duoti pirmumą ir kokio mėnesio
                 tempo iš tikro jam reikia.
               </div>
@@ -3484,7 +3546,7 @@ const SavingsStudioPage = () => {
                 />
               ))
             ) : (
-              <div className="soft-card rounded-[24px] p-8 text-center text-muted">
+              <div className="member-empty-state rounded-lg p-8 text-center text-muted">
                 Kai turėsi bent kelias pastovias išlaidas, čia iškart matysi kur review duotų didžiausią naudą.
               </div>
             )}
@@ -3585,7 +3647,7 @@ const SavingsStudioPage = () => {
                 <AutomationTriggerCard key={trigger.key} trigger={trigger} onRun={() => handleAutomationTrigger(trigger)} />
               ))
             ) : (
-              <div className="soft-card rounded-[24px] p-8 text-center text-muted">
+              <div className="member-empty-state rounded-lg p-8 text-center text-muted">
                 Šiuo metu automatikos ritmas atrodo sveikas: suvestinės, kopijos ir pastovių išlaidų dalis nešaukia papildomo
                 veiksmo.
               </div>
@@ -4474,7 +4536,7 @@ const UsageWizardModal = ({
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="soft-card rounded-[28px] p-6">
+        <div className="soft-card rounded-lg p-6">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted">Ką padaryti šiame žingsnyje</p>
           <div className="mt-4 space-y-4">
             {currentStep.bullets.map((bullet, index) => (
@@ -4488,7 +4550,7 @@ const UsageWizardModal = ({
           </div>
         </div>
 
-        <div className="soft-card rounded-[28px] p-6">
+        <div className="soft-card rounded-lg p-6">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted">Progresas</p>
           <div className="mt-4 h-2 overflow-hidden rounded-full bg-[rgb(var(--surface-soft))]">
             <div
