@@ -13,6 +13,7 @@ const navbarCopy = {
       journal: "Nario naujienos",
       contact: "Kontaktai",
       memberArea: "Nario zona",
+      productIdeas: "Produktų idėjos",
       membership: "Narystės",
       admin: "Admin",
     },
@@ -30,6 +31,7 @@ const navbarCopy = {
       journal: "Member news",
       contact: "Contact",
       memberArea: "Member area",
+      productIdeas: "Product ideas",
       membership: "Memberships",
       admin: "Admin",
     },
@@ -47,6 +49,7 @@ const navbarCopy = {
       journal: "Aktualnosci czlonka",
       contact: "Kontakt",
       memberArea: "Strefa członka",
+      productIdeas: "Pomysły produktów",
       membership: "Członkostwo",
       admin: "Admin",
     },
@@ -64,6 +67,7 @@ const navbarCopy = {
       journal: "Mitgliedernews",
       contact: "Kontakt",
       memberArea: "Mitgliederbereich",
+      productIdeas: "Produktideen",
       membership: "Mitgliedschaft",
       admin: "Admin",
     },
@@ -81,6 +85,7 @@ const navbarCopy = {
       journal: "Actus membres",
       contact: "Contact",
       memberArea: "Espace membre",
+      productIdeas: "Idées produits",
       membership: "Abonnement",
       admin: "Admin",
     },
@@ -98,6 +103,7 @@ const navbarCopy = {
       journal: "Noticias de miembro",
       contact: "Contacto",
       memberArea: "Zona de miembro",
+      productIdeas: "Ideas de producto",
       membership: "Membresía",
       admin: "Admin",
     },
@@ -180,14 +186,24 @@ const Navbar = () => {
             </Link>
           ))}
           {isMember && (
-            <Link
-              to="/members/savings-studio"
-              className={`nav-link-public ${
-                location.pathname.startsWith("/members/savings-studio") ? "nav-link-public-active" : ""
-              }`}
-            >
-              {copy.nav.memberArea}
-            </Link>
+            <>
+              <Link
+                to="/members/savings-studio"
+                className={`nav-link-public ${
+                  location.pathname.startsWith("/members/savings-studio") ? "nav-link-public-active" : ""
+                }`}
+              >
+                {copy.nav.memberArea}
+              </Link>
+              <Link
+                to="/member/digital-product-generator"
+                className={`nav-link-public ${
+                  location.pathname.startsWith("/member/digital-product-generator") ? "nav-link-public-active" : ""
+                }`}
+              >
+                {copy.nav.productIdeas}
+              </Link>
+            </>
           )}
           {user?.role === "admin" && (
             <Link

@@ -11,6 +11,7 @@ import JournalPage from "./pages/JournalPage";
 import JournalArticlePage from "./pages/JournalArticlePage";
 import SavingsStudioDemoPage from "./pages/SavingsStudioDemoPage";
 import MemberAreaPage from "./pages/MemberAreaPage";
+import DigitalProductGeneratorPage from "./pages/DigitalProductGeneratorPage";
 import ShopPage from "./pages/ShopPage";
 import ProductPage from "./pages/ProductPage";
 import CartPage from "./pages/CartPage";
@@ -75,6 +76,7 @@ const App = () => (
 
       <Route element={<ProtectedRoute />}>
         <Route path="/members/savings-studio" element={<MemberAreaPage />} />
+        <Route path="/member/digital-product-generator" element={<DigitalProductGeneratorPage />} />
       </Route>
 
       <Route element={<ProtectedRoute requireAdmin />}>

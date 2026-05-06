@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { ArrowUpRight, Briefcase, Lightbulb } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
 import BazinisMemberPage from "./BazinisMemberPage";
@@ -72,6 +74,45 @@ const PreviewSwitch = ({ currentPlanId, selectedPlanId, onChange }) => (
   </section>
 );
 
+const DigitalProductGeneratorDashboardCard = () => (
+  <section className="member-value-card overflow-hidden rounded-lg p-5 sm:p-6">
+    <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+      <div className="flex min-w-0 items-start gap-4">
+        <div
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg"
+          style={{
+            border: "1px solid rgb(226 202 145 / 0.28)",
+            backgroundColor: "rgb(226 202 145 / 0.12)",
+            color: "rgb(126 88 33)",
+          }}
+        >
+          <Lightbulb size={22} />
+        </div>
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="premium-tag">Premium įrankis</span>
+            <span className="soft-pill inline-flex items-center gap-2 rounded-lg px-3 py-1 text-xs font-semibold text-muted">
+              <Briefcase size={14} />
+              Produktų idėjos
+            </span>
+          </div>
+          <h2 className="mt-3 font-display text-2xl font-bold leading-tight">
+            Skaitmeninio produkto idėjų generatorius
+          </h2>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
+            Sugeneruok parduodamų PDF, šablonų, checklistų, kursų, narystės ir mini SaaS idėjų pagal savo nišą.
+          </p>
+        </div>
+      </div>
+
+      <Link to="/member/digital-product-generator" className="button-primary shrink-0 gap-2">
+        Atidaryti generatorių
+        <ArrowUpRight size={16} />
+      </Link>
+    </div>
+  </section>
+);
+
 const MemberAreaPage = () => {
   const { user } = useAuth();
   const [previewPlanId, setPreviewPlanId] = useState("current");
@@ -86,6 +127,8 @@ const MemberAreaPage = () => {
       {canUsePreview && (
         <PreviewSwitch currentPlanId={realPlanId} selectedPlanId={previewPlanId} onChange={setPreviewPlanId} />
       )}
+
+      <DigitalProductGeneratorDashboardCard />
 
       {shouldRenderPrivateArea ? (
         <PrivateBusinessWorkspacePage />
