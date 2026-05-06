@@ -251,15 +251,10 @@ const refundStripeOrderPayment = async (req, res) => {
     },
   });
 
-  order.paymentStatus = "refunded";
-  order.refundedAt = new Date();
-  order.stripeRefundId = refund.id || "";
-
-  const updatedOrder = await order.save();
-  const populatedOrder = await updatedOrder.populate("user", "name email");
+  const populatedOrder = await order.populate("user", "name email");
 
   res.json({
-    message: "Stripe refund sukurtas sėkmingai.",
+    message: "Stripe refund sukurtas. Vietinė būsena atsinaujins per webhook.",
     refundId: refund.id,
     order: populatedOrder,
   });

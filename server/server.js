@@ -10,6 +10,7 @@ const billingRoutes = require("./routes/billingRoutes");
 const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const userRoutes = require("./routes/userRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 const savingsStudioRoutes = require("./routes/savingsStudioRoutes");
 const launchSoonRoutes = require("./routes/launchSoonRoutes");
 const { startSavingsStudioSummaryScheduler } = require("./services/savingsStudioScheduler");
@@ -66,6 +67,7 @@ app.use("/api/billing", billingRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/admin", adminRoutes);
 app.use("/api/savings-studio", savingsStudioRoutes);
 app.use("/api/launch-soon", launchSoonRoutes);
 
