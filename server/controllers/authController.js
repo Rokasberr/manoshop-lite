@@ -3,9 +3,12 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { findLatestStripeSubscriptionForUser, serializeSubscription } = require("../services/stripeMembershipService");
 const { getStripeClient } = require("../utils/stripeClient");
+const { createHttpError } = require("../utils/httpError");
 
 const signToken = (userId) =>
-  jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
+  jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN || "7d",
+  });
 
 const shouldAttemptStripeRefresh = (user) => {
   if (!user || user.role === "admin") {
@@ -42,27 +45,17 @@ const formatAuthResponse = (user) => ({
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
 
-  if (!name || !email || !password) {
-    res.status(400);
-    throw new Error("Užpildyk vardą, el. paštą ir slaptažodį.");
-  }
-
-  if (password.length < 6) {
-    res.status(400);
-    throw new Error("Slaptažodis turi būti bent 6 simbolių.");
-  }
-
-  const existingUser = await User.findOne({ email: email.toLowerCase() });
+  const existingUser = await User.findOne({ email });
 
   if (existingUser) {
-    res.status(409);
-    throw new Error("Toks vartotojas jau egzistuoja.");
+    throw createHttpError("Toks vartotojas jau egzistuoja.", 409);
   }
 
   const user = await User.create({
     name,
     email,
     password,
+    role: "customer",
   });
 
   res.status(201).json(formatAuthResponse(user));
@@ -71,16 +64,10 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    res.status(400);
-    throw new Error("Įvesk el. paštą ir slaptažodį.");
-  }
-
-  const user = await User.findOne({ email: email.toLowerCase() });
+  const user = await User.findOne({ email });
 
   if (!user || !(await user.comparePassword(password))) {
-    res.status(401);
-    throw new Error("Neteisingi prisijungimo duomenys.");
+    throw createHttpError("Neteisingi prisijungimo duomenys.", 401);
   }
 
   const refreshedUser = await refreshMembershipFromStripeIfNeeded(user);
@@ -92,8 +79,7 @@ const getCurrentUser = async (req, res) => {
   const user = await User.findById(req.user._id).select("-password");
 
   if (!user) {
-    res.status(404);
-    throw new Error("Vartotojas nerastas.");
+    throw createHttpError("Vartotojas nerastas.", 404);
   }
 
   const refreshedUser = await refreshMembershipFromStripeIfNeeded(user);
@@ -108,8 +94,13 @@ const getCurrentUser = async (req, res) => {
   });
 };
 
+const logoutUser = async (_req, res) => {
+  res.json({ message: "Atsijungta." });
+};
+
 module.exports = {
   registerUser,
   loginUser,
+  logoutUser,
   getCurrentUser,
 };

@@ -1,13 +1,13 @@
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
+const { createHttpError } = require("../utils/httpError");
 
 const protect = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    res.status(401);
-    return next(new Error("Reikalinga autentifikacija."));
+    return next(createHttpError("Reikalinga autentifikacija.", 401));
   }
 
   const token = authHeader.split(" ")[1];
@@ -17,22 +17,19 @@ const protect = async (req, res, next) => {
     const user = await User.findById(decoded.id).select("-password");
 
     if (!user) {
-      res.status(401);
-      return next(new Error("Vartotojas nebegalioja."));
+      return next(createHttpError("Vartotojas nebegalioja.", 401));
     }
 
     req.user = user;
     next();
   } catch (error) {
-    res.status(401);
-    next(new Error("Neteisingas arba pasibaigęs tokenas."));
+    next(createHttpError("Neteisingas arba pasibaigęs tokenas.", 401));
   }
 };
 
 const adminOnly = (req, res, next) => {
   if (req.user?.role !== "admin") {
-    res.status(403);
-    return next(new Error("Tik admin gali atlikti šį veiksmą."));
+    return next(createHttpError("Tik admin gali atlikti šį veiksmą.", 403));
   }
 
   next();
@@ -55,8 +52,7 @@ const hasActiveMembership = (user) => {
 
 const memberOnly = (req, res, next) => {
   if (!hasActiveMembership(req.user)) {
-    res.status(403);
-    return next(new Error("Ši sritis prieinama tik aktyviems nariams."));
+    return next(createHttpError("Ši sritis prieinama tik aktyviems nariams.", 403));
   }
 
   next();
