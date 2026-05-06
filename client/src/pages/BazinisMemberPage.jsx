@@ -148,7 +148,7 @@ const lockedAsmeninisFeatures = [
   },
   {
     title: "Pilnas Nario naujienų archyvas",
-    text: "Visi narystės atnaujinimai, resursų pristatymai ir programos pokyčių paaiškinimai.",
+    text: "Visi narystės atnaujinimai, resursų pristatymai ir nario erdvės pokyčių paaiškinimai.",
   },
   {
     title: "Premium skaitmeniniai resursai",
@@ -679,7 +679,7 @@ const BazinisMemberPage = () => {
         <div className="surface-dark overflow-hidden rounded-lg px-6 py-8 sm:px-8">
           <span className="hero-chip">Užrakinta Asmeniniame</span>
           <h2 className="mt-6 max-w-2xl font-display text-4xl font-bold leading-tight sm:text-5xl">
-            Norisi pilnos programos?
+            Norisi pilnos nario erdvės?
           </h2>
           <p className="mt-5 max-w-2xl text-base leading-7 text-white/72">
             Asmeninis planas atrakina pilną nario zoną, mėnesio suvestines, tikslų korteles, nario naujienų archyvą ir

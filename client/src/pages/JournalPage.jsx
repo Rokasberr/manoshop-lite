@@ -9,7 +9,7 @@ import { useAuth } from "../context/AuthContext";
 import { hasActiveMembership } from "../utils/membership";
 
 const newsPoints = [
-  "narystės, planų ir programos pokyčiai",
+  "narystės, planų ir nario erdvių pokyčiai",
   "nauji nario resursai ir praktiniai įrankiai",
   "produktų pristatymai, atranka ir ankstyvos kryptys",
 ];
@@ -27,7 +27,7 @@ const JournalPage = () => {
       <JournalAccessGate
         user={user}
         title="Nario naujienos pilnai atsiveria Asmeniniam ir Privataus verslo planui."
-        description="Bazinis gali matyti ribotas peržiūras, tačiau pilni įrašai, resursų pristatymai ir programos pokyčiai lieka aktyviems mokamiems planams."
+        description="Bazinis gali matyti ribotas peržiūras, tačiau pilni įrašai, resursų pristatymai ir nario erdvių pokyčiai lieka aktyviems mokamiems planams."
       />
     );
   }
@@ -43,7 +43,7 @@ const JournalPage = () => {
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-white/72 sm:text-lg">
               Čia renkamos svarbios narystės naujienos: platformos atnaujinimai, nauji resursai, produktų
-              pristatymai, programos pokyčiai ir trumpos pastabos, kurios padeda aiškiau naudotis nario zona.
+              pristatymai, nario erdvių pokyčiai ir trumpos pastabos, kurios padeda aiškiau naudotis nario zona.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/members/savings-studio" className="button-primary gap-2">
@@ -114,7 +114,7 @@ const JournalPage = () => {
             <p className="text-xs uppercase tracking-[0.3em] text-muted">Asmeninis ir Privatus verslas</p>
             <h3 className="mt-4 font-display text-3xl font-bold">Pilna prieiga</h3>
             <p className="mt-4 text-sm leading-7 text-muted">
-              Mokami planai atveria visus įrašus, resursų pristatymus ir programos pokyčių paaiškinimus.
+              Mokami planai atveria visus įrašus, resursų pristatymus ir nario erdvių pokyčių paaiškinimus.
             </p>
           </div>
         </div>

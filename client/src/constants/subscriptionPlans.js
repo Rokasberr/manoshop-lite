@@ -19,7 +19,7 @@ export const subscriptionPlans = [
     name: "Asmeninis",
     price: 15.99,
     intervalLabel: "/mėn.",
-    description: "Pilna nario programa su suvestinėmis, tikslais ir premium resursais.",
+    description: "Pilna nario erdvė su suvestinėmis, tikslais ir premium resursais.",
     provider: "stripe",
     badge: "Populiariausias",
     features: [

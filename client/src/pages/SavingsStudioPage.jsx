@@ -88,7 +88,7 @@ const USAGE_WIZARD_STEPS = [
     eyebrow: "step 2",
     title: "Pradėk nuo realių išlaidų įrašymo",
     description:
-      "Kai pradedi pildyti realius pirkinius, programa pradeda rodyti ne teoriją, o tavo tikrą išlaidų vaizdą.",
+      "Kai pradedi pildyti realius pirkinius, nario erdvė pradeda rodyti ne teoriją, o tavo tikrą išlaidų vaizdą.",
     bullets: [
       "Pridėk bent 5–10 paskutinių išlaidų.",
       "Naudok kategorijas nuosekliai.",
@@ -127,7 +127,7 @@ const USAGE_WIZARD_STEPS = [
     eyebrow: "step 5",
     title: "Įsijunk automatizaciją ir atsarginę kopiją",
     description:
-      "Kai bazė jau sukurta, verta įjungti automatiką, kad programa pati dirbtų tavo naudai ir turėtum atsarginę duomenų kopiją.",
+      "Kai bazė jau sukurta, verta įjungti automatiką, kad nario erdvė pati dirbtų tavo naudai ir turėtum atsarginę duomenų kopiją.",
     bullets: [
       "Įjunk savaitines arba mėnesines email suvestines.",
       "Prieš didesnius importus pasidaryk CSV peržiūrą.",
@@ -381,7 +381,7 @@ const describeSavingsActivity = (log, recurringFrequencies) => {
     },
     "summary-email-manual-skipped": {
       title: "Suvestinės laiškas buvo praleistas",
-      body: metadata.reason || "Programa šį kartą neišsiuntė laiško.",
+      body: metadata.reason || "Nario erdvė šį kartą neišsiuntė laiško.",
       tone: "warning",
       targetId: "savings-automation",
       ctaLabel: "Peržiūrėti nustatymus",
@@ -2083,7 +2083,7 @@ const SavingsStudioPage = () => {
                   </div>
 
                   <div className="soft-card rounded-[24px] p-5 text-sm text-muted">
-                    Čia susikuri bazę, nuo kurios programa galės skaičiuoti, kiek realiai dar telpa taupymui.
+                    Čia susikuri bazę, nuo kurios nario erdvė galės skaičiuoti, kiek realiai dar telpa taupymui.
                   </div>
                 </div>
               ) : null}
@@ -3728,7 +3728,7 @@ const SavingsStudioPage = () => {
               <p className="eyebrow">el. pašto suvestinės</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Savaitinės ir mėnesinės suvestinės</h2>
               <p className="mt-3 text-sm leading-6 text-muted">
-                Įsijunk el. pašto suvestines, kad programa pati primintų, kur išteka pinigai ir kiek dar telpa
+                Įsijunk el. pašto suvestines, kad nario erdvė pati primintų, kur išteka pinigai ir kiek dar telpa
                 taupymui.
               </p>
             </div>
@@ -3865,7 +3865,7 @@ const SavingsStudioPage = () => {
               <p className="eyebrow">banko importas</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Banko išrašo importas</h2>
               <p className="mt-3 text-sm leading-6 text-muted">
-                Jei turi CSV iš banko ar kitos programos, gali greitai sukelti išlaidas ir pamatyti visą mėnesio
+                Jei turi CSV iš banko ar kitos sistemos, gali greitai sukelti išlaidas ir pamatyti visą mėnesio
                 vaizdą be rankinio suvedimo.
               </p>
             </div>

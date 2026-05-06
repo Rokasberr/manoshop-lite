@@ -71,7 +71,7 @@ const demoEntries = [
 
 const demoCopy = {
   lt: {
-    chip: "Nario programa",
+    chip: "Nario erdvės",
     title: "Stilloak parodo, kur pinigai slysta ir ką verta keisti pirmiausia.",
     intro:
       "Stilloak yra privati nario erdvė išlaidoms, biudžetams, tikslams ir mėnesio signalams. Ji padeda priimti mažiau sprendimų iš nuojautos ir daugiau iš aiškaus vaizdo.",
@@ -128,7 +128,7 @@ const demoCopy = {
       {
         step: "02",
         title: "Matai kur pinigai dingsta greičiausiai",
-        text: "Programa pati išryškina, kuri kategorija brangsta, kur limitas jau arti ir kokia suma dar telpa taupymui.",
+        text: "Nario erdvė išryškina, kuri kategorija brangsta, kur limitas jau arti ir kokia suma dar telpa taupymui.",
       },
       {
         step: "03",
@@ -166,7 +166,7 @@ const demoCopy = {
     publicLabel: "Peržiūra",
     memberLabel: "Narystė",
     whatMemberSees: "Ką mato narys",
-    memberTitle: "Programa ne tik seka išlaidas. Ji parodo kryptį.",
+    memberTitle: "Nario erdvė ne tik seka išlaidas. Ji parodo kryptį.",
     memberText:
       "Tikras narys savo paskyroje mato gyvą darbo erdvę: gali pridėti išlaidas, jas redaguoti, filtruoti pagal kategoriją, stebėti mėnesio pokytį ir iškart matyti, ar telpa į nusistatytus biudžetus.",
     accessChip: "Prieiga",
@@ -182,7 +182,7 @@ const demoCopy = {
     journalCta: "Peržiūrėti nario naujienas",
   },
   en: {
-    chip: "Member program",
+    chip: "Member areas",
     title: "Stilloak shows where money slips and what to change first.",
     intro:
       "`Stilloak` is a private member space for spending, budgets, goals, and monthly signals. It helps you make fewer decisions from instinct and more from a clear picture.",
@@ -239,7 +239,7 @@ const demoCopy = {
       {
         step: "02",
         title: "See where money disappears fastest",
-        text: "The program highlights which category is rising, where a limit is close, and how much still fits savings.",
+        text: "The member space highlights which category is rising, where a limit is close, and how much still fits savings.",
       },
       {
         step: "03",
@@ -277,7 +277,7 @@ const demoCopy = {
     publicLabel: "Demo",
     memberLabel: "Membership",
     whatMemberSees: "What the member sees",
-    memberTitle: "The program does more than track expenses. It gives direction.",
+    memberTitle: "The member space does more than track expenses. It gives direction.",
     memberText:
       "A real member sees a living dashboard inside the account: they can add expenses, edit them, filter by category, track monthly change, and instantly see whether spending still fits their budgets.",
     accessChip: "Access",

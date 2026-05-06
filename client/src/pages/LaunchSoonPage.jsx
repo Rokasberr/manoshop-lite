@@ -36,7 +36,7 @@ const launchCopy = {
       journal: {
         eyebrow: "Nario naujienos",
         title: "Nario naujienos atvertos aktyviems nariams.",
-        text: "Užrakintas nario atnaujinimų sluoksnis renka platformos naujienas, resursų pristatymus ir programos pokyčius vienoje vietoje.",
+        text: "Užrakintas nario atnaujinimų sluoksnis renka platformos naujienas, resursų pristatymus ir nario erdvių pokyčius vienoje vietoje.",
       },
     },
     cardsTitle: "Kas ruošiama ir kas jau veikia",
@@ -54,7 +54,7 @@ const launchCopy = {
         eyebrow: "Nario naujienos",
         title: "Atnaujinimų sluoksnis nariams",
         description:
-          "Nario naujienų zona renka narystės, resursų, produktų ir programos pokyčius aktyviems nariams.",
+          "Nario naujienų zona renka narystės, resursų, produktų ir nario erdvių pokyčius aktyviems nariams.",
         bullets: ["Narystės atnaujinimai", "Aiškesnis resursų ritmas", "Užrakinta nario patirtis"],
       },
     },
@@ -66,7 +66,7 @@ const launchCopy = {
     whileWaitingEyebrow: "Kol lauki",
     whileWaitingTitle: "Gyvas sluoksnis vis dar atidarytas.",
     whileWaitingText:
-      "Kol skaitmeninė kolekcija dar ruošiama, gali peržiūrėti pagrindinę kolekciją, narystę, Stilloak programą ir nario naujienas.",
+      "Kol skaitmeninė kolekcija dar ruošiama, gali peržiūrėti pagrindinę kolekciją, narystę, Stilloak nario erdves ir nario naujienas.",
     browseCollection: "Peržiūrėti kolekciją",
     viewMembership: "Peržiūrėti narystę",
     launchMap: "Paleidimo planas",
@@ -90,7 +90,7 @@ const launchCopy = {
       journal: {
         eyebrow: "Member news",
         title: "Member news is open for active members.",
-        text: "The locked updates layer gathers platform news, resource releases, and program changes in one place.",
+        text: "The locked updates layer gathers platform news, resource releases, and member-space changes in one place.",
       },
     },
     cardsTitle: "What is being prepared and what is live",
@@ -108,7 +108,7 @@ const launchCopy = {
         eyebrow: "Member news",
         title: "An updates layer for members",
         description:
-          "Member news gathers membership, resource, product, and program changes for active members.",
+          "Member news gathers membership, resource, product, and member-space changes for active members.",
         bullets: ["Membership updates", "Clearer resource rhythm", "Locked member experience"],
       },
     },

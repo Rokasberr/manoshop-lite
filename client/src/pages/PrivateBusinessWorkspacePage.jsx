@@ -97,7 +97,7 @@ const businessProfileFields = [
   {
     key: "coreOffer",
     label: "Pagrindinis pasiūlymas",
-    placeholder: "Įvardink svarbiausią paslaugą, produktą, narystę ar programą.",
+    placeholder: "Įvardink svarbiausią paslaugą, produktą, narystę ar nario erdvę.",
   },
   {
     key: "monthlyGoal",
@@ -115,7 +115,7 @@ const strategyFields = [
   {
     key: "keyOffer",
     label: "Svarbiausias pasiūlymas",
-    placeholder: "Pvz., premium narystė, konsultacija, programa ar skaitmeninis produktas",
+    placeholder: "Pvz., premium narystė, konsultacija, nario erdvė ar skaitmeninis produktas",
   },
   {
     key: "clientSegment",
@@ -314,7 +314,7 @@ const resources = [
   },
   {
     id: "membership-optimization",
-    title: "Narystės programos optimizavimas",
+    title: "Narystės erdvės optimizavimas",
     bullets: [
       "Aiškiai parodyk, kuo skiriasi kiekvienas narystės lygis.",
       "Aukščiausią planą pristatyk kaip strateginę erdvę, ne kaip funkcijų priedą.",

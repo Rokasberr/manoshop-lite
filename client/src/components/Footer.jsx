@@ -16,10 +16,10 @@ const footerCopy = {
       contact: "Kontaktai",
     },
     links: {
-      program: "Programa",
+      memberAreas: "Nario erdvės",
       journal: "Nario naujienos",
       collection: "Kolekcija",
-      membership: "Narystė",
+      membership: "Narystės",
       secureCheckout: "Saugus apmokėjimas",
       receiptArchive: "Sąskaitų archyvas",
       memberPricing: "Nario kainodara",
@@ -48,10 +48,10 @@ const footerCopy = {
       contact: "Contact",
     },
     links: {
-      program: "Program",
+      memberAreas: "Member areas",
       journal: "Member news",
       collection: "Collection",
-      membership: "Membership",
+      membership: "Memberships",
       secureCheckout: "Secure payment",
       receiptArchive: "Receipt archive",
       memberPricing: "Member pricing",
@@ -80,7 +80,7 @@ const footerCopy = {
       contact: "Kontakt",
     },
     links: {
-      program: "Program",
+      memberAreas: "Strefy członka",
       journal: "Aktualnosci czlonka",
       collection: "Kolekcja",
       membership: "Członkostwo",
@@ -112,7 +112,7 @@ const footerCopy = {
       contact: "Kontakt",
     },
     links: {
-      program: "Programm",
+      memberAreas: "Mitgliederbereiche",
       journal: "Mitgliedernews",
       collection: "Kollektion",
       membership: "Mitgliedschaft",
@@ -144,7 +144,7 @@ const footerCopy = {
       contact: "Contact",
     },
     links: {
-      program: "Programme",
+      memberAreas: "Espaces membres",
       journal: "Actus membres",
       collection: "Collection",
       membership: "Abonnement",
@@ -176,7 +176,7 @@ const footerCopy = {
       contact: "Contacto",
     },
     links: {
-      program: "Programa",
+      memberAreas: "Zonas de miembro",
       journal: "Noticias de miembro",
       collection: "Colección",
       membership: "Membresía",
@@ -203,7 +203,7 @@ const Footer = () => {
     {
       title: copy.columns.house,
       items: [
-        { label: copy.links.program, to: "/savings-studio" },
+        { label: copy.links.memberAreas, to: "/pricing#funkcijos" },
         { label: copy.links.membership, to: "/pricing" },
         { label: copy.links.journal, to: "/journal" },
         { label: copy.links.collection, to: "/shop" },

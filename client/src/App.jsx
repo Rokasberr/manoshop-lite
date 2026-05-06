@@ -52,6 +52,7 @@ const App = () => (
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/pricing" element={<PricingPage />} />
+      <Route path="/programa" element={<Navigate to="/pricing" replace />} />
       <Route path="/secure-checkout" element={<InfoPage page={infoPages.secureCheckout} />} />
       <Route path="/receipt-archive" element={<InfoPage page={infoPages.receiptArchive} />} />
       <Route path="/member-pricing" element={<InfoPage page={infoPages.memberPricing} />} />

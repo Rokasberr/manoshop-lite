@@ -10,11 +10,10 @@ import { hasActiveMembership } from "../utils/membership";
 const navbarCopy = {
   lt: {
     nav: {
-      program: "Programa",
       journal: "Nario naujienos",
       contact: "Kontaktai",
       memberArea: "Nario zona",
-      membership: "Narystė",
+      membership: "Narystės",
       admin: "Admin",
     },
     tagline: "aiškesnis mėnuo",
@@ -28,11 +27,10 @@ const navbarCopy = {
   },
   en: {
     nav: {
-      program: "Program",
       journal: "Member news",
       contact: "Contact",
       memberArea: "Member area",
-      membership: "Membership",
+      membership: "Memberships",
       admin: "Admin",
     },
     tagline: "clearer months",
@@ -46,7 +44,6 @@ const navbarCopy = {
   },
   pl: {
     nav: {
-      program: "Program",
       journal: "Aktualnosci czlonka",
       contact: "Kontakt",
       memberArea: "Strefa członka",
@@ -64,7 +61,6 @@ const navbarCopy = {
   },
   de: {
     nav: {
-      program: "Programm",
       journal: "Mitgliedernews",
       contact: "Kontakt",
       memberArea: "Mitgliederbereich",
@@ -82,7 +78,6 @@ const navbarCopy = {
   },
   fr: {
     nav: {
-      program: "Programme",
       journal: "Actus membres",
       contact: "Contact",
       memberArea: "Espace membre",
@@ -100,7 +95,6 @@ const navbarCopy = {
   },
   es: {
     nav: {
-      program: "Programa",
       journal: "Noticias de miembro",
       contact: "Contacto",
       memberArea: "Zona de miembro",
@@ -130,7 +124,6 @@ const Navbar = () => {
   const currentLanguageOption =
     languageOptions.find((option) => option.code === language) || languageOptions[0];
   const publicLinks = [
-    { label: copy.nav.program, to: isMember ? "/members/savings-studio" : "/savings-studio" },
     { label: copy.nav.membership, to: "/pricing" },
     { label: copy.nav.journal, to: "/journal" },
     { label: copy.nav.contact, to: "/contact" },

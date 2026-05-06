@@ -31,7 +31,7 @@ const planPresentation = {
   circle: {
     eyebrow: "Rekomenduojama",
     cta: "Rinktis Asmeninį",
-    comparison: "Pilnai nario programai ir asmeniniam progresui.",
+    comparison: "Pilnai nario erdvei ir asmeniniam progresui.",
     icon: Target,
     accent: "rgb(194 239 211)",
   },
@@ -114,7 +114,7 @@ const MembershipPricingShowcase = ({
             Pasirink nario erdvę pagal savo etapą.
           </h1>
           <p className="mt-6 max-w-3xl text-base leading-7 text-white/72 sm:text-lg">
-            Bazinis padeda pradėti paprastai, Asmeninis atrakina pilną nario programą, o Privatus verslas suteikia
+            Bazinis padeda pradėti paprastai, Asmeninis atrakina pilną nario erdvę, o Privatus verslas suteikia
             strateginę verslo erdvę augimui.
           </p>
 

@@ -17,7 +17,7 @@ const storyCopy = {
     heroText:
       "Norėjome privačios erdvės, kuri sujungia aiškų finansų vaizdą, narystę ir tvarkingą paskyros istoriją be perteklinio triukšmo.",
     heroPrimary: "Atrakinti narystę",
-    heroSecondary: "Peržiūrėti programą",
+    heroSecondary: "Pamatyti nario zonas",
     pillars: [
       { title: "Mažiau triukšmo", text: "Renkamės mažiau, bet aiškesnių sluoksnių, kad vertė būtų suprantama greitai." },
       { title: "Naudinga estetika", text: "Visa patirtis turi būti ir graži, ir praktiška: nuo pirmo ekrano iki savaitinio laiško." },
@@ -68,7 +68,7 @@ const storyCopy = {
     heroText:
       "We wanted a private space that brings financial clarity, membership, and a tidy account history together without unnecessary noise.",
     heroPrimary: "Unlock membership",
-    heroSecondary: "Preview the program",
+    heroSecondary: "See member areas",
     pillars: [
       { title: "Less noise", text: "We prefer fewer, clearer layers so people understand the value quickly." },
       { title: "Useful beauty", text: "The whole experience should feel both beautiful and practical, from the first hero to the weekly email." },
@@ -138,7 +138,7 @@ const StoryPage = () => {
                 {copy.heroPrimary}
                 <ArrowRight size={16} />
               </Link>
-              <Link to="/savings-studio" className="hero-outline-button">
+              <Link to="/pricing#funkcijos" className="hero-outline-button">
                 {copy.heroSecondary}
               </Link>
             </div>
