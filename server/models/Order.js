@@ -99,7 +99,62 @@ const orderSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      default: null,
+      index: true,
+    },
+    buyer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    buyerEmail: {
+      type: String,
+      default: "",
+      trim: true,
+      lowercase: true,
+    },
+    store: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Store",
+      default: null,
+      index: true,
+    },
+    storeOwner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+      index: true,
+    },
+    product: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+      default: null,
+    },
+    price: {
+      type: Number,
+      default: 0,
+    },
+    currency: {
+      type: String,
+      default: "eur",
+      trim: true,
+      lowercase: true,
+    },
+    platformCommission: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    sellerEarnings: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    commissionRate: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 100,
     },
     items: {
       type: [orderItemSchema],
@@ -192,6 +247,11 @@ const orderSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["pending", "shipped", "delivered"],
+      default: "pending",
+    },
+    orderStatus: {
+      type: String,
+      enum: ["pending", "processing", "fulfilled", "canceled"],
       default: "pending",
     },
     invoice: {

@@ -7,6 +7,7 @@ import DashboardMetricCard from "./DashboardMetricCard";
 import DashboardOrdersTable from "./DashboardOrdersTable";
 import DashboardRevenueChart from "./DashboardRevenueChart";
 import { formatCurrency } from "../../utils/currency";
+import { isAdminUser } from "../../utils/membership";
 
 const getDailyRevenueSeries = (orders) => {
   const days = 7;
@@ -42,7 +43,7 @@ const AdminDashboardOverview = ({ dashboardData, previewMode = false }) => {
   const averageOrderValue = dashboardData.orders.length ? totalRevenue / dashboardData.orders.length : 0;
   const pendingOrders = dashboardData.orders.filter((order) => order.status === "pending").length;
   const lowStock = dashboardData.products.filter((product) => product.stock <= 5).length;
-  const customerCount = dashboardData.users.filter((user) => user.role !== "admin").length;
+  const customerCount = dashboardData.users.filter((entry) => !isAdminUser(entry)).length;
   const chartPoints = getDailyRevenueSeries(dashboardData.orders);
   const tableRows = dashboardData.orders.slice(0, 8).map((order) => ({
     id: order._id,
@@ -58,7 +59,7 @@ const AdminDashboardOverview = ({ dashboardData, previewMode = false }) => {
     status: order.status,
     total: order.totalPrice,
   }));
-  const showInstagramGeneratorShortcut = !previewMode && user?.role === "admin";
+  const showInstagramGeneratorShortcut = !previewMode && isAdminUser(user);
 
   const statCards = [
     {

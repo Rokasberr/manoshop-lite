@@ -2,6 +2,7 @@ const Order = require("../models/Order");
 const Payment = require("../models/Payment");
 const Product = require("../models/Product");
 const { ensureDigitalDeliveryEmail } = require("./digitalDeliveryEmailService");
+const { isAdminUser } = require("../utils/userRole");
 
 const buildInvoiceNumber = () => {
   const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, "");
@@ -10,8 +11,16 @@ const buildInvoiceNumber = () => {
 };
 
 const canAccessOrder = (order, user) => {
-  if (user.role === "admin") {
+  if (isAdminUser(user)) {
     return true;
+  }
+
+  if (order.storeOwner?.toString?.() === user._id.toString()) {
+    return true;
+  }
+
+  if (!order.user) {
+    return false;
   }
 
   const orderUserId =

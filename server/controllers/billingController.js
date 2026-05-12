@@ -31,7 +31,7 @@ const createPaymentSession = async (req, res) => {
 
   const plan = getPlanById(requestedPlanId);
 
-  if (!plan || plan.provider !== "stripe" || plan.id !== requestedPlanId) {
+  if (!plan || plan.provider !== "stripe") {
     res.status(400);
     throw new Error("Pasirinktas planas negalioja Stripe checkout srautui.");
   }

@@ -25,6 +25,11 @@ import PricingPage from "./pages/PricingPage";
 import InfoPage from "./pages/InfoPage";
 import BillingSuccessPage from "./pages/BillingSuccessPage";
 import BillingCancelPage from "./pages/BillingCancelPage";
+import BusinessDashboardPage from "./pages/BusinessDashboardPage";
+import BusinessOrdersPage from "./pages/BusinessOrdersPage";
+import BusinessProductsPage from "./pages/BusinessProductsPage";
+import PublicStorePage from "./pages/PublicStorePage";
+import SiteBuilderPage from "./pages/SiteBuilderPage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminDashboardPreviewPage from "./pages/admin/AdminDashboardPreviewPage";
 import ProductManagerPage from "./pages/admin/ProductManagerPage";
@@ -50,6 +55,7 @@ const App = () => (
       <Route path="/digital" element={<DigitalLandingPage />} />
       <Route path="/digital/collection" element={<LaunchSoonPage focus="digital" />} />
       <Route path="/products/:id" element={<ProductPage />} />
+      <Route path="/stores/:slug" element={<PublicStorePage />} />
       <Route path="/cart" element={<CartPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
@@ -76,7 +82,18 @@ const App = () => (
 
       <Route element={<ProtectedRoute />}>
         <Route path="/members/savings-studio" element={<MemberAreaPage />} />
+      </Route>
+
+      <Route element={<ProtectedRoute requireBusinessPlan />}>
         <Route path="/member/digital-product-generator" element={<DigitalProductGeneratorPage />} />
+        <Route path="/business" element={<BusinessDashboardPage />} />
+        <Route path="/business/site-builder" element={<SiteBuilderPage />} />
+        <Route path="/business/digital-products" element={<BusinessProductsPage />} />
+        <Route path="/business/my-products" element={<BusinessProductsPage mode="selected" />} />
+        <Route path="/business/my-store" element={<SiteBuilderPage />} />
+        <Route path="/business/orders" element={<BusinessOrdersPage />} />
+        <Route path="/business/earnings" element={<BusinessOrdersPage mode="earnings" />} />
+        <Route path="/business/settings" element={<SiteBuilderPage />} />
       </Route>
 
       <Route element={<ProtectedRoute requireAdmin />}>

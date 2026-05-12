@@ -24,7 +24,7 @@ const sectionNav = [
 ];
 
 const planPresentation = {
-  bazinis: {
+  basic: {
     eyebrow: "Įėjimo planas",
     cta: "Pradėti nuo Bazinio",
     comparison: "Pradžiai ir aiškesniam mėnesio startui.",
@@ -32,7 +32,7 @@ const planPresentation = {
     icon: WalletCards,
     accent: "rgb(164 220 190)",
   },
-  asmeninis: {
+  personal: {
     eyebrow: "Rekomenduojama",
     cta: "Rinktis Asmeninį",
     comparison: "Pilnai nario erdvei ir asmeniniam progresui.",
@@ -40,7 +40,7 @@ const planPresentation = {
     icon: Target,
     accent: "rgb(194 239 211)",
   },
-  privatus_verslas: {
+  private_business: {
     eyebrow: "Strateginis lygis",
     cta: "Rinktis Privatų verslą",
     comparison: "Verslo strategijai, pasiūlymui ir augimui.",
@@ -183,7 +183,7 @@ const MembershipPricingShowcase = ({
 
         <div className="grid gap-3 sm:grid-cols-3">
           {subscriptionPlans.map((plan) => {
-            const meta = planPresentation[plan.id] || planPresentation.bazinis;
+            const meta = planPresentation[plan.id] || planPresentation.basic;
             const Icon = meta.icon;
 
             return (
@@ -223,7 +223,7 @@ const MembershipPricingShowcase = ({
 
       <div className="mt-5 grid gap-3 lg:grid-cols-3">
         {subscriptionPlans.map((plan) => {
-          const meta = planPresentation[plan.id] || planPresentation.bazinis;
+          const meta = planPresentation[plan.id] || planPresentation.basic;
 
           return (
             <div key={plan.id} className="rounded-lg border border-white/10 bg-white/5 p-4">
@@ -457,10 +457,10 @@ const MembershipPlanCard = ({
   joinLoadingLabel,
   currentPlanLabel,
 }) => {
-  const meta = planPresentation[plan.id] || planPresentation.bazinis;
+  const meta = planPresentation[plan.id] || planPresentation.basic;
   const Icon = meta.icon;
-  const isFeatured = plan.id === "asmeninis";
-  const isPrivate = plan.id === "privatus_verslas";
+  const isFeatured = plan.id === "personal";
+  const isPrivate = plan.id === "private_business";
   const isCurrentPlan = currentPlanId === plan.id;
   const ActionIcon = plan.provider === "stripe" ? CreditCard : ArrowRight;
 

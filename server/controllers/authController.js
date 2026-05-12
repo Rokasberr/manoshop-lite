@@ -3,19 +3,20 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { serializeSubscription } = require("../services/stripeMembershipService");
 const { createHttpError } = require("../utils/httpError");
+const { normalizeUserRole } = require("../utils/userRole");
 
-const signToken = (userId) =>
-  jwt.sign({ id: userId }, process.env.JWT_SECRET, {
+const signToken = (user) =>
+  jwt.sign({ id: user._id, role: normalizeUserRole(user) }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN || "7d",
   });
 
 const formatAuthResponse = (user) => ({
-  token: signToken(user._id),
+  token: signToken(user),
   user: {
     id: user._id,
     name: user.name,
     email: user.email,
-    role: user.role,
+    role: normalizeUserRole(user),
     subscription: serializeSubscription(user.subscription),
   },
 });
@@ -62,7 +63,7 @@ const getCurrentUser = async (req, res) => {
     id: user._id,
     name: user.name,
     email: user.email,
-    role: user.role,
+    role: normalizeUserRole(user),
     createdAt: user.createdAt,
     subscription: serializeSubscription(user.subscription),
   });

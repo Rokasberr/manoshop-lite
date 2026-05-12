@@ -12,7 +12,7 @@ test("infers plan from subscription metadata first", () => {
       metadata: { plan: "privatus_verslas" },
       items: { data: [] },
     }),
-    "privatus_verslas"
+    "private_business"
   );
 });
 
@@ -25,7 +25,7 @@ test("infers plan from configured Stripe price ID", () => {
       metadata: {},
       items: { data: [{ price: { id: "price_asmeninis_real", currency: "eur", recurring: { interval: "month" } } }] },
     }),
-    "asmeninis"
+    "personal"
   );
 
   if (originalValue === undefined) {

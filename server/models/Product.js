@@ -33,6 +33,11 @@ const productSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    title: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     description: {
       type: String,
       required: true,
@@ -41,6 +46,12 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 0,
+    },
+    currency: {
+      type: String,
+      default: "eur",
+      trim: true,
+      lowercase: true,
     },
     category: {
       type: String,
@@ -52,9 +63,19 @@ const productSchema = new mongoose.Schema(
       enum: ["physical", "digital"],
       default: "physical",
     },
+    type: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     images: {
       type: [String],
       default: [],
+    },
+    previewImage: {
+      type: String,
+      trim: true,
+      default: "",
     },
     stock: {
       type: Number,
@@ -68,6 +89,27 @@ const productSchema = new mongoose.Schema(
     digitalAsset: {
       type: digitalAssetSchema,
       default: () => ({}),
+    },
+    allowedForResale: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    commissionRate: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 100,
+    },
+    fileUrl: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+      index: true,
     },
   },
   {

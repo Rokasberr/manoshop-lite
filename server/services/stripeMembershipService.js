@@ -80,8 +80,8 @@ const updateUserSubscription = async ({
 const inferPlanIdFromStripeSubscription = (subscription) => {
   const metadataPlanId = subscription?.metadata?.plan;
 
-  if (getPlanById(metadataPlanId)) {
-    return metadataPlanId;
+  if (metadataPlanId && getPlanById(metadataPlanId)) {
+    return normalizePlanId(metadataPlanId);
   }
 
   const price = subscription?.items?.data?.[0]?.price;
@@ -94,6 +94,17 @@ const inferPlanIdFromStripeSubscription = (subscription) => {
 
   if (matchedByPriceId) {
     return matchedByPriceId.id;
+  }
+
+  const lowerPriceId = String(price.id || "").toLowerCase();
+  const matchedByPriceIdHint = stripePlans.find(
+    (plan) =>
+      lowerPriceId.includes(plan.id) ||
+      (plan.legacyId && lowerPriceId.includes(plan.legacyId))
+  );
+
+  if (matchedByPriceIdHint) {
+    return matchedByPriceIdHint.id;
   }
 
   const matchedPlan = stripePlans.find(

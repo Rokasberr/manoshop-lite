@@ -10,6 +10,9 @@ const getAdminOrders = async (req, res) => {
   const limit = parseListLimit(req.query.limit);
   const orders = await Order.find()
     .populate("user", "name email role")
+    .populate("store", "name slug")
+    .populate("storeOwner", "name email role")
+    .populate("product")
     .sort({ createdAt: -1 })
     .limit(limit);
 

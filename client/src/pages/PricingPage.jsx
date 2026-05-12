@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import MembershipPricingShowcase from "../components/MembershipPricingShowcase";
 import { useAuth } from "../context/AuthContext";
 import billingService from "../services/billingService";
+import { normalizePlan } from "../utils/membership";
 
 const PricingPage = () => {
   const navigate = useNavigate();
@@ -38,7 +39,7 @@ const PricingPage = () => {
       <MembershipPricingShowcase
         onChoosePlan={handleChoosePlan}
         loadingPlanId={loadingPlanId}
-        currentPlanId={user?.subscription?.plan || ""}
+        currentPlanId={normalizePlan(user?.subscription?.plan || "")}
       />
     </div>
   );

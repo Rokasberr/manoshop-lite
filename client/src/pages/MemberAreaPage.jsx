@@ -3,34 +3,26 @@ import { ArrowUpRight, Briefcase, Lightbulb } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
+import { isAdminUser, normalizePlan } from "../utils/membership";
 import BazinisMemberPage from "./BazinisMemberPage";
 import PrivateBusinessWorkspacePage from "./PrivateBusinessWorkspacePage";
 import SavingsStudioPage from "./SavingsStudioPage";
 
-const basicPlanIds = new Set(["free", "guest", "basic", "bazinis"]);
-const personalPlanIds = new Set(["asmeninis"]);
-const privatePlanIds = new Set(["privatus_verslas"]);
+const personalPlanIds = new Set(["personal"]);
+const privatePlanIds = new Set(["private_business"]);
 const previewOptions = [
   { id: "current", label: "Dabartinis planas", helper: "Rodo pagal tikrą paskyros planą." },
-  { id: "bazinis", label: "Bazinis", helper: "Pradinis nario sluoksnis." },
-  { id: "asmeninis", label: "Asmeninis", helper: "Pilna nario zona." },
-  { id: "privatus_verslas", label: "Privatus verslas", helper: "Aukščiausia nario patirtis." },
+  { id: "basic", label: "Bazinis", helper: "Pradinis nario sluoksnis." },
+  { id: "personal", label: "Asmeninis", helper: "Pilna nario zona." },
+  { id: "private_business", label: "Privatus verslas", helper: "Aukščiausia nario patirtis." },
 ];
 const planLabels = {
   free: "Bazinis",
   guest: "Bazinis",
   basic: "Bazinis",
-  bazinis: "Bazinis",
-  asmeninis: "Asmeninis",
-  privatus_verslas: "Privatus verslas",
+  personal: "Asmeninis",
+  private_business: "Privatus verslas",
 };
-
-const normalizePlanId = (planId = "") =>
-  String(planId || "free")
-    .trim()
-    .toLowerCase()
-    .replaceAll("-", "_")
-    .replaceAll(" ", "_");
 
 const PreviewSwitch = ({ currentPlanId, selectedPlanId, onChange }) => (
   <section className="soft-card p-5 sm:p-6">
@@ -116,8 +108,8 @@ const DigitalProductGeneratorDashboardCard = () => (
 const MemberAreaPage = () => {
   const { user } = useAuth();
   const [previewPlanId, setPreviewPlanId] = useState("current");
-  const realPlanId = normalizePlanId(user?.subscription?.plan);
-  const canUsePreview = user?.role === "admin" || import.meta.env.DEV;
+  const realPlanId = normalizePlan(user?.subscription?.plan);
+  const canUsePreview = isAdminUser(user) || import.meta.env.DEV;
   const effectivePlanId = canUsePreview && previewPlanId !== "current" ? previewPlanId : realPlanId;
   const shouldRenderPrivateArea = privatePlanIds.has(effectivePlanId);
   const shouldRenderPersonalArea = personalPlanIds.has(effectivePlanId);
@@ -128,7 +120,7 @@ const MemberAreaPage = () => {
         <PreviewSwitch currentPlanId={realPlanId} selectedPlanId={previewPlanId} onChange={setPreviewPlanId} />
       )}
 
-      <DigitalProductGeneratorDashboardCard />
+      {shouldRenderPrivateArea && <DigitalProductGeneratorDashboardCard />}
 
       {shouldRenderPrivateArea ? (
         <PrivateBusinessWorkspacePage />

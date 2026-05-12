@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
-import { hasActiveMembership } from "../utils/membership";
+import { hasActiveMembership, isAdminUser } from "../utils/membership";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ const LoginPage = () => {
       return;
     }
 
-    if (user.role === "admin") {
+    if (isAdminUser(user)) {
       navigate("/admin", { replace: true });
       return;
     }
@@ -51,7 +51,7 @@ const LoginPage = () => {
     try {
       setLoading(true);
       setError("");
-      const payload = await login({
+      await login({
         email: formData.email.trim(),
         password: formData.password,
       });

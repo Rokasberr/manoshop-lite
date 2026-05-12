@@ -4,6 +4,7 @@ const { isEmailTransportConfigured } = require("../utils/emailTransport");
 const { sendSavingsSummaryEmail } = require("./savingsStudioSummaryEmailService");
 const { logSavingsAuditSafe } = require("./savingsStudioAuditService");
 const { buildSavingsSummaryPayload } = require("../controllers/savingsStudioController");
+const { isAdminUser } = require("../utils/userRole");
 
 const DEFAULT_INTERVAL_MINUTES = 15;
 let schedulerHandle = null;
@@ -13,7 +14,7 @@ const hasActiveMembership = (user) => {
     return false;
   }
 
-  if (user.role === "admin") {
+  if (isAdminUser(user)) {
     return true;
   }
 

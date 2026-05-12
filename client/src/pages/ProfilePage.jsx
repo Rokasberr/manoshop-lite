@@ -10,12 +10,18 @@ import StatusBadge from "../components/admin/StatusBadge";
 import { useAuth } from "../context/AuthContext";
 import billingService from "../services/billingService";
 import orderService from "../services/orderService";
-import { hasActiveMembership } from "../utils/membership";
+import {
+  canAccessBusinessStudio,
+  hasActiveMembership,
+  isAdminUser,
+  normalizeUserRole,
+} from "../utils/membership";
 import { formatCurrency } from "../utils/currency";
 
 const roleLabels = {
-  admin: "Administratorius",
-  customer: "Narys",
+  admin: "Admin",
+  customer: "Customer",
+  seller: "Seller",
 };
 
 const subscriptionStatusLabels = {
@@ -51,6 +57,16 @@ const ProfilePage = () => {
   const [downloadingInvoiceId, setDownloadingInvoiceId] = useState("");
   const [downloadingDigitalKey, setDownloadingDigitalKey] = useState("");
   const [syncingMembership, setSyncingMembership] = useState(false);
+  const normalizedRole = normalizeUserRole(user);
+  const profileRole = isAdminUser(user)
+    ? "admin"
+    : canAccessBusinessStudio(user?.subscription?.plan)
+      ? "seller"
+      : normalizedRole;
+
+  useEffect(() => {
+    refreshProfile();
+  }, []);
 
   useEffect(() => {
     const loadOrders = async () => {
@@ -139,8 +155,17 @@ const ProfilePage = () => {
             <div className="soft-card mt-6 rounded-[24px] p-5">
               <p className="text-xs uppercase tracking-[0.3em] text-muted">rolė</p>
               <p className="mt-2 font-display text-2xl font-bold">
-                {roleLabels[user?.role] || user?.role || "Narys"}
+                {roleLabels[profileRole] || "Customer"}
               </p>
+              <span
+                className="mt-4 inline-flex rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em]"
+                style={{
+                  borderColor: "rgb(var(--line) / 0.82)",
+                  color: "rgb(var(--accent-strong))",
+                }}
+              >
+                Backend role: {normalizedRole}
+              </span>
             </div>
           </div>
 

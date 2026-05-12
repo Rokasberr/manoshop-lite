@@ -1,18 +1,25 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 import authService from "../services/authService";
+import { normalizeUserRole } from "../utils/membership";
 
 const AuthContext = createContext(null);
 const tokenKey = "manoshop_token";
 const userKey = "manoshop_user";
+const initialToken = localStorage.getItem(tokenKey);
+
+const normalizeAuthUser = (user) =>
+  user
+    ? {
+        ...user,
+        role: normalizeUserRole(user),
+      }
+    : null;
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(() => localStorage.getItem(tokenKey));
-  const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem(userKey);
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
-  const [isCheckingAuth, setIsCheckingAuth] = useState(Boolean(localStorage.getItem(tokenKey)));
+  const [token, setToken] = useState(initialToken);
+  const [user, setUser] = useState(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(Boolean(initialToken));
 
   useEffect(() => {
     const restoreAuth = async () => {
@@ -23,8 +30,9 @@ export const AuthProvider = ({ children }) => {
 
       try {
         const profile = await authService.profile();
-        setUser(profile);
-        localStorage.setItem(userKey, JSON.stringify(profile));
+        const normalizedProfile = normalizeAuthUser(profile);
+        setUser(normalizedProfile);
+        localStorage.setItem(userKey, JSON.stringify(normalizedProfile));
       } catch (_error) {
         localStorage.removeItem(tokenKey);
         localStorage.removeItem(userKey);
@@ -38,42 +46,45 @@ export const AuthProvider = ({ children }) => {
     restoreAuth();
   }, [token]);
 
-  const persistAuth = (payload) => {
-    setToken(payload.token);
-    setUser(payload.user);
-    localStorage.setItem(tokenKey, payload.token);
-    localStorage.setItem(userKey, JSON.stringify(payload.user));
-  };
+  const persistAuth = useCallback((payload) => {
+    const normalizedUser = normalizeAuthUser(payload.user);
 
-  const refreshProfile = async () => {
+    setToken(payload.token);
+    setUser(normalizedUser);
+    localStorage.setItem(tokenKey, payload.token);
+    localStorage.setItem(userKey, JSON.stringify(normalizedUser));
+  }, []);
+
+  const refreshProfile = useCallback(async () => {
     if (!token) {
       return null;
     }
 
     const profile = await authService.profile();
-    setUser(profile);
-    localStorage.setItem(userKey, JSON.stringify(profile));
-    return profile;
-  };
+    const normalizedProfile = normalizeAuthUser(profile);
+    setUser(normalizedProfile);
+    localStorage.setItem(userKey, JSON.stringify(normalizedProfile));
+    return normalizedProfile;
+  }, [token]);
 
-  const login = async (credentials) => {
+  const login = useCallback(async (credentials) => {
     const payload = await authService.login(credentials);
     persistAuth(payload);
     return payload;
-  };
+  }, [persistAuth]);
 
-  const register = async (formData) => {
+  const register = useCallback(async (formData) => {
     const payload = await authService.register(formData);
     persistAuth(payload);
     return payload;
-  };
+  }, [persistAuth]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setToken(null);
     setUser(null);
     localStorage.removeItem(tokenKey);
     localStorage.removeItem(userKey);
-  };
+  }, []);
 
   const value = {
     user,

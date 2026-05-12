@@ -1,4 +1,5 @@
 const Product = require("../models/Product");
+const { isAdminUser } = require("../utils/userRole");
 
 const normalizeUploadImagePath = (image) => {
   const normalizedImage = String(image || "").trim().replace(/\\/g, "/");
@@ -51,6 +52,16 @@ const serializeProduct = (product) => {
   return {
     ...productObject,
     images: parseImages(productObject?.images || []),
+    title: productObject?.title || productObject?.name || "",
+    previewImage:
+      productObject?.previewImage ||
+      parseImages(productObject?.images || [])[0] ||
+      "",
+    type: productObject?.type || productObject?.productType || "physical",
+    currency: productObject?.currency || "eur",
+    allowedForResale: Boolean(productObject?.allowedForResale),
+    commissionRate: Number(productObject?.commissionRate || 0),
+    isActive: productObject?.isActive !== false,
   };
 };
 
@@ -105,6 +116,10 @@ const getProducts = async (req, res) => {
     filters.featured = true;
   }
 
+  if (!isAdminUser(req.user)) {
+    filters.isActive = { $ne: false };
+  }
+
   const sortMap = {
     latest: { createdAt: -1 },
     "price-asc": { price: 1 },
@@ -146,10 +161,30 @@ const getProductCategories = async (_req, res) => {
 };
 
 const createProduct = async (req, res) => {
-  const { name, description, price, category, stock, featured, images, productType, digitalAsset } =
+  const {
+    name,
+    title,
+    description,
+    price,
+    currency,
+    category,
+    stock,
+    featured,
+    images,
+    previewImage,
+    productType,
+    type,
+    digitalAsset,
+    allowedForResale,
+    commissionRate,
+    fileUrl,
+    isActive,
+  } =
     req.body;
 
-  if (!name || !description || !price || !category) {
+  const productName = name || title;
+
+  if (!productName || !description || !price || !category) {
     res.status(400);
     throw new Error("Pavadinimas, aprašymas, kaina ir kategorija yra privalomi.");
   }
@@ -163,15 +198,23 @@ const createProduct = async (req, res) => {
   }
 
   const product = await Product.create({
-    name,
+    name: productName,
+    title: title || productName,
     description,
     price: Number(price),
+    currency: currency || "eur",
     category,
     productType: normalizedProductType,
+    type: type || normalizedProductType,
     stock: Number(stock) || 0,
     featured: Boolean(featured),
     images: parseImages(images),
+    previewImage: normalizeUploadImagePath(previewImage),
     digitalAsset: normalizedProductType === "digital" ? normalizedDigitalAsset : undefined,
+    allowedForResale: Boolean(allowedForResale),
+    commissionRate: Math.min(Math.max(Number(commissionRate) || 0, 0), 100),
+    fileUrl: fileUrl?.trim() || normalizedDigitalAsset.storagePath || "",
+    isActive: isActive !== false,
   });
 
   res.status(201).json(serializeProduct(product));
@@ -185,7 +228,25 @@ const updateProduct = async (req, res) => {
     throw new Error("Produktas nerastas.");
   }
 
-  const { name, description, price, category, stock, featured, images, productType, digitalAsset } =
+  const {
+    name,
+    title,
+    description,
+    price,
+    currency,
+    category,
+    stock,
+    featured,
+    images,
+    previewImage,
+    productType,
+    type,
+    digitalAsset,
+    allowedForResale,
+    commissionRate,
+    fileUrl,
+    isActive,
+  } =
     req.body;
   const normalizedProductType = normalizeProductType(productType ?? product.productType);
   const normalizedDigitalAsset = parseDigitalAsset(
@@ -197,14 +258,28 @@ const updateProduct = async (req, res) => {
     throw new Error("Skaitmeniniam produktui būtina nurodyti failo kelią.");
   }
 
-  product.name = name ?? product.name;
+  product.name = name ?? title ?? product.name;
+  product.title = title ?? product.title ?? product.name;
   product.description = description ?? product.description;
   product.price = price !== undefined ? Number(price) : product.price;
+  product.currency = currency ?? product.currency ?? "eur";
   product.category = category ?? product.category;
   product.productType = normalizedProductType;
+  product.type = type ?? product.type ?? normalizedProductType;
   product.stock = stock !== undefined ? Number(stock) : product.stock;
   product.featured = featured !== undefined ? Boolean(featured) : product.featured;
   product.images = images !== undefined ? parseImages(images) : product.images;
+  product.previewImage =
+    previewImage !== undefined ? normalizeUploadImagePath(previewImage) : product.previewImage;
+  product.allowedForResale =
+    allowedForResale !== undefined ? Boolean(allowedForResale) : product.allowedForResale;
+  product.commissionRate =
+    commissionRate !== undefined
+      ? Math.min(Math.max(Number(commissionRate) || 0, 0), 100)
+      : product.commissionRate;
+  product.fileUrl =
+    fileUrl !== undefined ? fileUrl?.trim() || normalizedDigitalAsset.storagePath || "" : product.fileUrl;
+  product.isActive = isActive !== undefined ? Boolean(isActive) : product.isActive;
   product.digitalAsset =
     normalizedProductType === "digital"
       ? normalizedDigitalAsset

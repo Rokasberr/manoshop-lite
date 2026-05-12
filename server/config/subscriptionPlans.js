@@ -1,3 +1,5 @@
+const { normalizePlan } = require("./planAccess");
+
 const subscriptionPlans = {
   free: {
     id: "free",
@@ -5,79 +7,68 @@ const subscriptionPlans = {
     price: 0,
     currency: "eur",
     interval: "month",
-    description: "Vidinė būsena paskyroms be aktyvios Stripe prenumeratos.",
-    features: ["Privati paskyra", "Užsakymų istorija"],
+    description: "Vidine busena paskyroms be aktyvios Stripe prenumeratos.",
+    features: ["Privati paskyra", "Uzsakymu istorija"],
     provider: "internal",
   },
-  bazinis: {
-    id: "bazinis",
+  basic: {
+    id: "basic",
+    legacyId: "bazinis",
     name: "Bazinis",
     price: 5.99,
     currency: "eur",
     interval: "month",
-    description: "Paprasta pradžia mėnesio planui ir baziniams resursams.",
+    description: "Paprasta pradzia menesio planui ir baziniams resursams.",
     stripePriceEnv: "STRIPE_PRICE_BAZINIS",
     features: [
-      "Mėnesio fokusas",
-      "Mini biudžeto peržiūra",
+      "Menesio fokusas",
+      "Mini biudzeto perziura",
       "Baziniai resursai",
-      "Šios savaitės veiksmas",
+      "Sios savaites veiksmas",
     ],
     provider: "stripe",
   },
-  asmeninis: {
-    id: "asmeninis",
+  personal: {
+    id: "personal",
+    legacyId: "asmeninis",
     name: "Asmeninis",
     price: 15.99,
     currency: "eur",
     interval: "month",
-    description: "Pagrindinė narystė pilnai Stilloak patirčiai: aiškesniems mėnesiams, tikslams ir privačiam archyvui.",
+    description: "Pilna Stilloak patirtis aiskesniems menesiams, tikslams ir privaciam archyvui.",
     stripePriceEnv: "STRIPE_PRICE_ASMENINIS",
     features: [
-      "Pilna Stilloak darbo erdvė",
-      "Biudžetai, tikslai ir pastovios išlaidos",
-      "CSV importas ir mėnesio apžvalga",
-      "Savaitinės ir mėnesinės suvestinės",
+      "Pilna Stilloak darbo erdve",
+      "Biudzetai, tikslai ir pastovios islaidos",
+      "CSV importas ir menesio apzvalga",
+      "Savaitines ir menesines suvestines",
       "Nario naujienos tik nariams",
-      "Prioritetinė paskyros priežiūra",
+      "Prioritetine paskyros prieziura",
     ],
     provider: "stripe",
   },
-  privatus_verslas: {
-    id: "privatus_verslas",
+  private_business: {
+    id: "private_business",
+    legacyId: "privatus_verslas",
     name: "Privatus verslas",
     price: 44.99,
     currency: "eur",
     interval: "month",
-    description: "Aukštesnis narystės lygis tiems, kurie nori daugiau priežiūros, ramybės ir prioriteto.",
+    description: "Saving Studio Pro ir papildoma Business Studio zona verslo augimui.",
     stripePriceEnv: "STRIPE_PRICE_PRIVATUS_VERSLAS",
     features: [
-      "Viskas iš Asmeninio plano",
-      "Prioritetinė nario priežiūra",
-      "Aiškesnė sąskaitų pagalba",
-      "Nario naujienos tik nariams",
-      "Ankstyva prieiga prie atidarymų",
-      "Tinka gilesniam nuolatiniam naudojimui",
+      "Viskas is Asmeninio plano",
+      "Business Studio",
+      "Site Builder",
+      "Skaitmeniniu produktu perpardavimas",
+      "Uzsakymu ir pajamu apzvalga",
+      "Prioritetine nario prieziura",
     ],
     provider: "stripe",
   },
 };
 
-const planAliases = {
-  guest: "free",
-  "be-aktyvios-prenumeratos": "free",
-  "privatus-verslas": "privatus_verslas",
-};
-
-const normalizePlanId = (planId = "") => {
-  const normalizedValue = String(planId || "")
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, "_")
-    .replace(/-/g, "_");
-
-  return planAliases[normalizedValue] || normalizedValue;
-};
+const normalizePlanId = normalizePlan;
 
 const getPlanById = (planId) => {
   const plan = subscriptionPlans[normalizePlanId(planId)] || null;

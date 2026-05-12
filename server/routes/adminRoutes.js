@@ -5,6 +5,9 @@ const { protect, adminOnly } = require("../middleware/authMiddleware");
 const { validateObjectId } = require("../middleware/requestValidation");
 const { createWindowRateLimiter } = require("../middleware/rateLimit");
 const {
+  getAdminBusinessAnalytics,
+} = require("../controllers/businessController");
+const {
   cancelSubscription,
   getAdminOrders,
   getAdminPayments,
@@ -28,6 +31,7 @@ const instagramGenerationRateLimiter = createWindowRateLimiter({
 router.use(protect, adminOnly);
 
 router.get("/orders", asyncHandler(getAdminOrders));
+router.get("/business/orders", asyncHandler(getAdminBusinessAnalytics));
 router.get("/payments", asyncHandler(getAdminPayments));
 router.get("/subscriptions", asyncHandler(getAdminSubscriptions));
 router.post("/payments/:id/refund", validateObjectId("id"), asyncHandler(refundPayment));

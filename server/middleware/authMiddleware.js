@@ -1,7 +1,13 @@
 const jwt = require("jsonwebtoken");
 
+const {
+  canUserAccessBusinessStudio,
+  hasActivePlanStatus,
+  normalizePlan,
+} = require("../config/planAccess");
 const User = require("../models/User");
 const { createHttpError } = require("../utils/httpError");
+const { isAdminUser, normalizeUserRole } = require("../utils/userRole");
 
 const protect = async (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -21,14 +27,17 @@ const protect = async (req, res, next) => {
     }
 
     req.user = user;
+    req.userRole = normalizeUserRole(user);
     next();
   } catch (error) {
     next(createHttpError("Neteisingas arba pasibaigęs tokenas.", 401));
   }
 };
 
+const requireAuth = protect;
+
 const adminOnly = (req, res, next) => {
-  if (req.user?.role !== "admin") {
+  if (!isAdminUser(req.user)) {
     return next(createHttpError("Tik admin gali atlikti šį veiksmą.", 403));
   }
 
@@ -36,18 +45,11 @@ const adminOnly = (req, res, next) => {
 };
 
 const hasActiveMembership = (user) => {
-  if (!user) {
-    return false;
-  }
-
-  if (user.role === "admin") {
+  if (isAdminUser(user)) {
     return true;
   }
 
-  const plan = user.subscription?.plan || "free";
-  const status = user.subscription?.status || "inactive";
-
-  return plan !== "free" && ["active", "trialing"].includes(status);
+  return Boolean(user) && hasActivePlanStatus(user) && normalizePlan(user.subscription?.plan) !== "free";
 };
 
 const memberOnly = (req, res, next) => {
@@ -58,9 +60,39 @@ const memberOnly = (req, res, next) => {
   next();
 };
 
+const requirePlan = (...allowedPlans) => (req, res, next) => {
+  if (isAdminUser(req.user)) {
+    return next();
+  }
+
+  if (!hasActivePlanStatus(req.user)) {
+    return next(createHttpError("Reikalinga aktyvi naryste.", 403));
+  }
+
+  const normalizedPlan = normalizePlan(req.user?.subscription?.plan);
+  const normalizedAllowedPlans = allowedPlans.map(normalizePlan);
+
+  if (!normalizedAllowedPlans.includes(normalizedPlan)) {
+    return next(createHttpError("Siam planui si zona neprieinama.", 403));
+  }
+
+  return next();
+};
+
+const requireBusinessPlan = (req, res, next) => {
+  if (!canUserAccessBusinessStudio(req.user)) {
+    return next(createHttpError("Business plan required.", 403));
+  }
+
+  return next();
+};
+
 module.exports = {
+  requireAuth,
   protect,
   adminOnly,
   memberOnly,
   hasActiveMembership,
+  requirePlan,
+  requireBusinessPlan,
 };

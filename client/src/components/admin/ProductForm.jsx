@@ -8,6 +8,9 @@ const emptyForm = {
   productType: "physical",
   stock: "",
   featured: false,
+  allowedForResale: false,
+  commissionRate: "",
+  isActive: true,
   imagesText: "",
   digitalStoragePath: "",
   digitalFileName: "",
@@ -25,6 +28,9 @@ const mapProductToForm = (product) =>
         productType: product.productType || "physical",
         stock: product.stock ?? "",
         featured: Boolean(product.featured),
+        allowedForResale: Boolean(product.allowedForResale),
+        commissionRate: product.commissionRate ?? "",
+        isActive: product.isActive !== false,
         imagesText: Array.isArray(product.images) ? product.images.join("\n") : "",
         digitalStoragePath: product.digitalAsset?.storagePath || "",
         digitalFileName: product.digitalAsset?.fileName || "",
@@ -79,6 +85,9 @@ const ProductForm = ({
       productType: formData.productType,
       stock: formData.productType === "digital" ? 0 : Number(formData.stock) || 0,
       featured: formData.featured,
+      allowedForResale: formData.productType === "digital" ? formData.allowedForResale : false,
+      commissionRate: Number(formData.commissionRate) || 0,
+      isActive: formData.isActive,
       images: formData.imagesText,
       digitalAsset:
         formData.productType === "digital"
@@ -116,6 +125,15 @@ const ProductForm = ({
       )}
 
       <div className="grid gap-4 sm:grid-cols-2">
+        <label className="mt-8 flex items-center gap-3 text-sm font-semibold">
+          <input
+            type="checkbox"
+            checked={formData.isActive}
+            onChange={(event) => handleChange("isActive", event.target.checked)}
+          />
+          Produktas aktyvus
+        </label>
+
         <div className="sm:col-span-2">
           <label className="mb-2 block text-sm font-semibold">Produkto pavadinimas</label>
           <input
@@ -203,6 +221,28 @@ const ProductForm = ({
 
         {formData.productType === "digital" && (
           <>
+            <label className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold sm:col-span-2">
+              <input
+                type="checkbox"
+                checked={formData.allowedForResale}
+                onChange={(event) => handleChange("allowedForResale", event.target.checked)}
+              />
+              Leisti Privatus verslas nariams prideti i savo store perpardavimui
+            </label>
+
+            <div>
+              <label className="mb-2 block text-sm font-semibold">Commission rate (%)</label>
+              <input
+                className="input-field"
+                type="number"
+                min="0"
+                max="100"
+                step="1"
+                value={formData.commissionRate}
+                onChange={(event) => handleChange("commissionRate", event.target.value)}
+              />
+            </div>
+
             <div className="sm:col-span-2">
               <label className="mb-2 block text-sm font-semibold">Failo kelias</label>
               <input

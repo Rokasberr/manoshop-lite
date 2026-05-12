@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { useLanguage } from "../context/LanguageContext";
 import { useTheme } from "../context/ThemeContext";
-import { hasActiveMembership } from "../utils/membership";
+import { hasActiveMembership, isAdminUser, userCanAccessBusinessStudio } from "../utils/membership";
 
 const navbarCopy = {
   lt: {
@@ -14,6 +14,7 @@ const navbarCopy = {
       contact: "Kontaktai",
       memberArea: "Nario zona",
       productIdeas: "Produktų idėjos",
+      business: "Business Studio",
       membership: "Narystės",
       admin: "Admin",
     },
@@ -32,6 +33,7 @@ const navbarCopy = {
       contact: "Contact",
       memberArea: "Member area",
       productIdeas: "Product ideas",
+      business: "Business Studio",
       membership: "Memberships",
       admin: "Admin",
     },
@@ -50,6 +52,7 @@ const navbarCopy = {
       contact: "Kontakt",
       memberArea: "Strefa członka",
       productIdeas: "Pomysły produktów",
+      business: "Business Studio",
       membership: "Członkostwo",
       admin: "Admin",
     },
@@ -68,6 +71,7 @@ const navbarCopy = {
       contact: "Kontakt",
       memberArea: "Mitgliederbereich",
       productIdeas: "Produktideen",
+      business: "Business Studio",
       membership: "Mitgliedschaft",
       admin: "Admin",
     },
@@ -86,6 +90,7 @@ const navbarCopy = {
       contact: "Contact",
       memberArea: "Espace membre",
       productIdeas: "Idées produits",
+      business: "Business Studio",
       membership: "Abonnement",
       admin: "Admin",
     },
@@ -104,6 +109,7 @@ const navbarCopy = {
       contact: "Contacto",
       memberArea: "Zona de miembro",
       productIdeas: "Ideas de producto",
+      business: "Business Studio",
       membership: "Membresía",
       admin: "Admin",
     },
@@ -127,6 +133,7 @@ const Navbar = () => {
   const { language, languageOptions, setLanguage } = useLanguage();
   const copy = navbarCopy[language] || navbarCopy.lt;
   const isMember = hasActiveMembership(user);
+  const isBusinessMember = userCanAccessBusinessStudio(user);
   const currentLanguageOption =
     languageOptions.find((option) => option.code === language) || languageOptions[0];
   const publicLinks = [
@@ -195,17 +202,19 @@ const Navbar = () => {
               >
                 {copy.nav.memberArea}
               </Link>
-              <Link
-                to="/member/digital-product-generator"
-                className={`nav-link-public ${
-                  location.pathname.startsWith("/member/digital-product-generator") ? "nav-link-public-active" : ""
-                }`}
-              >
-                {copy.nav.productIdeas}
-              </Link>
             </>
           )}
-          {user?.role === "admin" && (
+          {isBusinessMember && (
+            <Link
+              to="/business"
+              className={`nav-link-public ${
+                location.pathname.startsWith("/business") ? "nav-link-public-active" : ""
+              }`}
+            >
+              {copy.nav.business}
+            </Link>
+          )}
+          {isAdminUser(user) && (
             <Link
               to="/admin"
               className={`nav-link-public ${
@@ -271,7 +280,7 @@ const Navbar = () => {
 
           {user ? (
             <>
-              <Link to={user.role === "admin" ? "/admin" : "/profile"} className="button-secondary h-10 gap-2 px-3 sm:px-4">
+              <Link to={isAdminUser(user) ? "/admin" : "/profile"} className="button-secondary h-10 gap-2 px-3 sm:px-4">
                 <User2 size={18} />
                 <span className="hidden sm:inline">{user.name.split(" ")[0]}</span>
               </Link>
@@ -285,7 +294,7 @@ const Navbar = () => {
             </Link>
           )}
 
-          <Link to={isMember ? "/members/savings-studio" : "/pricing"} className="button-primary h-10 gap-2 px-3 sm:px-4">
+          <Link to={isBusinessMember ? "/business" : isMember ? "/members/savings-studio" : "/pricing"} className="button-primary h-10 gap-2 px-3 sm:px-4">
             <span className="hidden lg:inline">{isMember ? copy.openStudio : copy.join}</span>
             <ArrowRight size={16} />
           </Link>

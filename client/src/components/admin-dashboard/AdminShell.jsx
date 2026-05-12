@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
+import { isAdminUser } from "../../utils/membership";
 
 const adminNavigation = [
   {
@@ -130,7 +131,7 @@ const AdminShell = ({ previewMode = false }) => {
           <div className="hidden rounded-2xl border border-slate-200 bg-white px-4 py-3 text-right shadow-sm sm:block">
               <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Erdvė</p>
               <p className="mt-1 text-sm font-medium text-slate-700">
-                {previewMode ? "Peržiūros režimas" : user?.role === "admin" ? "Administratorius" : "Narys"}
+                {previewMode ? "Peržiūros režimas" : isAdminUser(user) ? "Administratorius" : "Narys"}
               </p>
             </div>
 

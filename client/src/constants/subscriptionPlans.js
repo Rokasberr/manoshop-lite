@@ -1,6 +1,6 @@
 export const subscriptionPlans = [
   {
-    id: "bazinis",
+    id: "basic",
     name: "Bazinis",
     price: 5.99,
     intervalLabel: "/mėn.",
@@ -16,7 +16,7 @@ export const subscriptionPlans = [
     ],
   },
   {
-    id: "asmeninis",
+    id: "personal",
     name: "Asmeninis",
     price: 15.99,
     intervalLabel: "/mėn.",
@@ -33,7 +33,7 @@ export const subscriptionPlans = [
     ],
   },
   {
-    id: "privatus_verslas",
+    id: "private_business",
     name: "Privatus verslas",
     price: 44.99,
     intervalLabel: "/mėn.",

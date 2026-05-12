@@ -5,7 +5,7 @@ const subscriptionSchema = new mongoose.Schema(
   {
     plan: {
       type: String,
-      enum: ["free", "bazinis", "asmeninis", "privatus_verslas"],
+      enum: ["free", "basic", "personal", "private_business", "bazinis", "asmeninis", "privatus_verslas"],
       default: "free",
     },
     planName: {
@@ -82,8 +82,13 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["customer", "admin"],
+      enum: ["customer", "admin", "Customer", "Admin"],
       default: "customer",
+    },
+    isAdmin: {
+      type: Boolean,
+      default: false,
+      select: true,
     },
     subscription: {
       type: subscriptionSchema,

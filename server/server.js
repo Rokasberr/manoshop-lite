@@ -13,6 +13,8 @@ const userRoutes = require("./routes/userRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const savingsStudioRoutes = require("./routes/savingsStudioRoutes");
 const launchSoonRoutes = require("./routes/launchSoonRoutes");
+const businessRoutes = require("./routes/businessRoutes");
+const storeRoutes = require("./routes/storeRoutes");
 const { validateEnvironment } = require("./config/env");
 const { startSavingsStudioSummaryScheduler } = require("./services/savingsStudioScheduler");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
@@ -98,6 +100,7 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.use("/api", authRoutes);
+app.use("/api/auth", authRoutes);
 app.use("/api/billing", billingRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
@@ -105,6 +108,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/savings-studio", savingsStudioRoutes);
 app.use("/api/launch-soon", launchSoonRoutes);
+app.use("/api/business", businessRoutes);
+app.use("/api/stores", storeRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

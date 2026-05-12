@@ -11,6 +11,8 @@ const runGuard = (middleware, user) =>
 
 test("adminOnly allows admins and rejects customers", async () => {
   assert.equal(await runGuard(adminOnly, { role: "admin" }), undefined);
+  assert.equal(await runGuard(adminOnly, { role: "Admin" }), undefined);
+  assert.equal(await runGuard(adminOnly, { role: "customer", isAdmin: true }), undefined);
 
   const error = await runGuard(adminOnly, { role: "customer" });
   assert.equal(error.statusCode, 403);
@@ -21,6 +23,13 @@ test("memberOnly requires paid active or trialing membership", async () => {
     hasActiveMembership({
       role: "customer",
       subscription: { plan: "circle", status: "active" },
+    }),
+    true
+  );
+  assert.equal(
+    hasActiveMembership({
+      role: "Admin",
+      subscription: { plan: "free", status: "inactive" },
     }),
     true
   );

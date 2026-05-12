@@ -282,6 +282,9 @@ const getUserOrders = async (req, res) => {
 const getAdminOrders = async (_req, res) => {
   const orders = await Order.find()
     .populate("user", "name email")
+    .populate("store", "name slug")
+    .populate("storeOwner", "name email")
+    .populate("product")
     .sort({ createdAt: -1 });
 
   res.json(orders);

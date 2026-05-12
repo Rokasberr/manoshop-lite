@@ -14,16 +14,16 @@ const validateObjectId = (fieldName) => (req, _res, next) => {
 };
 
 const validateBillingSessionPayload = (req, _res, next) => {
-  const planId = String(req.body?.planId || "").trim().toLowerCase();
+  const requestedPlanId = String(req.body?.planId || "").trim().toLowerCase();
   const provider = String(req.body?.provider || "stripe").trim().toLowerCase();
 
-  if (!planId) {
+  if (!requestedPlanId) {
     return next(createHttpError("Pasirink planą.", 400));
   }
 
-  const plan = getPlanById(planId);
+  const plan = getPlanById(requestedPlanId);
 
-  if (!plan || plan.provider !== "stripe" || plan.id !== planId) {
+  if (!plan || plan.provider !== "stripe") {
     return next(createHttpError("Pasirinktas planas negalioja Stripe checkout srautui.", 400));
   }
 
