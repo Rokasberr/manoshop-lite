@@ -6,6 +6,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import HomePage from "./pages/HomePage";
 import DigitalLandingPage from "./pages/DigitalLandingPage";
 import DigitalProductsPage from "./pages/DigitalProductsPage";
+import ProductivityPage from "./pages/ProductivityPage";
 import StoryPage from "./pages/StoryPage";
 import LaunchSoonPage from "./pages/LaunchSoonPage";
 import JournalPage from "./pages/JournalPage";
@@ -55,6 +56,7 @@ const App = () => (
       <Route path="/shop" element={<ShopPage />} />
       <Route path="/digital" element={<DigitalLandingPage />} />
       <Route path="/digital-products" element={<DigitalProductsPage />} />
+      <Route path="/productivity" element={<ProductivityPage />} />
       <Route path="/digital/collection" element={<LaunchSoonPage focus="digital" />} />
       <Route path="/products/:id" element={<ProductPage />} />
       <Route path="/stores/:slug" element={<PublicStorePage />} />
