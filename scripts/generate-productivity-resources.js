@@ -50,6 +50,16 @@ const pdfResources = [
         table: table(["Užduotis", "Svarbu?", "Skubu?", "Sprendimas"], [["", "Taip / ne", "Taip / ne", ""], ["", "Taip / ne", "Taip / ne", ""], ["", "Taip / ne", "Taip / ne", ""], ["", "Taip / ne", "Taip / ne", ""]]),
       },
       {
+        title: "Tikslų išskaidymas",
+        intro: "Didelis tikslas tampa lengviau valdomas, kai jis išskaidomas į savaitės rezultatą ir pirmą mažą veiksmą.",
+        worksheet: worksheet(["30 dienų tikslas", "Kodėl svarbu?", "Savaitės rezultatas", "Pirmas 20 minučių veiksmas", "Kas gali sutrukdyti?"]),
+      },
+      {
+        title: "Įpročių ritmas",
+        intro: "Pasirink vieną įprotį, kuris palaiko produktyvumą. Ritmas turi būti toks mažas, kad jį galėtum kartoti ir užimtesnę dieną.",
+        table: table(["Įprotis", "Dažnumas", "Minimalus variantas", "Kaip žymėsiu"], [["Planavimas", "Kasdien", "3 minutės", ""], ["Pertrauka", "Kasdien", "10 minučių", ""], ["Savaitės peržiūra", "1 kartą per savaitę", "15 minučių", ""]]),
+      },
+      {
         title: "30 dienų veiksmų planas",
         intro: "Produktyvumas stiprėja, kai mažas veiksmas kartojamas pakankamai ilgai.",
         table: table(["Laikas", "Fokusas", "Veiksmas", "Pažyma"], [["1 savaitė", "Aiškumas", "Išsirinkti vieną ritmą", ""], ["2 savaitė", "Nuoseklumas", "Kartoti dienos fokusą", ""], ["3 savaitė", "Peržiūra", "Pamatyti, kas stringa", ""], ["4 savaitė", "Užtvirtinimas", "Palikti tik veikiančią sistemą", ""]]),
@@ -59,6 +69,11 @@ const pdfResources = [
         intro: "Refleksija padeda planą paversti mokymusi, o ne vien užpildytu lapu.",
         checklist: checklist(["Kas šią savaitę davė daugiausia aiškumo?", "Kuri užduotis kartojosi be realios vertės?", "Kada dirbau lengviausiai?", "Ką kitą savaitę supaprastinsiu?", "Koks vienas veiksmas pajudins svarbiausią tikslą?"]),
       },
+      {
+        title: "Pabaigos santrauka",
+        intro: "Užbaik rinkinį vienu aiškiu pasirinkimu: ką tęsi, ką stabdysi ir kokį ritmą paliksi kitam mėnesiui.",
+        worksheet: worksheet(["Ką tęsiu?", "Ką sustabdysiu?", "Ką supaprastinsiu?", "Kitas savaitės tikslas", "Peržiūros data"]),
+      },
     ],
   },
   {
@@ -66,6 +81,11 @@ const pdfResources = [
     title: "30 dienų produktyvumo planuoklis",
     subtitle: "Kasdieniai prioritetai, dienos fokusas, savaitės refleksija ir veiksmo planas.",
     sections: [
+      {
+        title: "Mėnesio kryptis",
+        intro: "Prieš pildant dienas, pasirink vieną mėnesio kryptį. Ji padės spręsti, kurioms užduotims sakyti taip, o kurioms ne.",
+        worksheet: worksheet(["30 dienų kryptis", "Svarbiausias rezultatas", "Kodėl dabar?", "Kaip matuosiu progresą"]),
+      },
       {
         title: "Kasdieniai prioritetai",
         intro: "Kiekvienai dienai pasirink iki trijų prioritetų. Tai padeda neužpildyti dienos darbu, kuris atrodo užimtas, bet nejuda į rezultatą.",
@@ -87,9 +107,19 @@ const pdfResources = [
         table: table(["Savaitė", "Fokusas 1-5", "Užbaigimas 1-5", "Ramybė 1-5", "Pastaba"], [["1", "", "", "", ""], ["2", "", "", "", ""], ["3", "", "", "", ""], ["4", "", "", "", ""]]),
       },
       {
+        title: "Trukdžių peržiūra",
+        intro: "Produktyvumas dažnai stringa ne dėl valios, o dėl pasikartojančių trukdžių. Pažymėk, ką verta keisti pirmiausia.",
+        table: table(["Trukdis", "Kada kartojasi", "Ką keisiu?", "Poveikis"], [["Per dažnas perjungimas", "", "", ""], ["Neaiškus prioritetas", "", "", ""], ["Per mažai poilsio", "", "", ""], ["Per platus darbų sąrašas", "", "", ""]]),
+      },
+      {
         title: "Veiksmo planas kitai savaitei",
-        intro: "Užbaik mėnesį ne dideliu pažadu, o vienu aiškiu veiksmu, kurį tikrai atliksi.",
+        intro: "Užbaik savaitę ne dideliu pažadu, o vienu aiškiu veiksmu, kurį tikrai atliksi.",
         checklist: checklist(["Pasirinkti vieną svarbiausią savaitės rezultatą.", "Iš kalendoriaus išimti bent vieną nereikalingą bloką.", "Palikti vietos poilsiui.", "Pirmadienį pradėti nuo svarbiausio veiksmo."]),
+      },
+      {
+        title: "30 dienų santrauka",
+        intro: "Mėnesio pabaigoje svarbiausia pamatyti ne tik atliktų darbų kiekį, bet ir kokią sistemą verta kartoti.",
+        worksheet: worksheet(["Kas labiausiai veikė?", "Ką kartosiu kitą mėnesį?", "Ką mažinsiu?", "Koks kitas 30 dienų fokusas?"]),
       },
     ],
   },
@@ -119,9 +149,24 @@ const pdfResources = [
         table: table(["Data", "Terminas", "Pasiruošimas", "Ar suplanuota?"], [["", "", "", ""], ["", "", "", ""], ["", "", "", ""]]),
       },
       {
+        title: "Energijos planas",
+        intro: "Ne visi darbai reikalauja tos pačios energijos. Sunkiausius darbus dėk ten, kur paprastai turi daugiausia dėmesio.",
+        table: table(["Dienos dalis", "Energija", "Tinkami darbai", "Pastaba"], [["Rytas", "Aukšta / vidutinė", "", ""], ["Diena", "Vidutinė", "", ""], ["Vakaras", "Žema / rami", "", ""]]),
+      },
+      {
         title: "Savaitės rezultatų peržiūra",
         intro: "Peržiūra uždaro savaitę ir leidžia kitą pradėti švariau.",
         worksheet: worksheet(["Kas užbaigta?", "Kas liko?", "Kas pasikeitė?", "Ką kartosiu?", "Ką sustabdysiu?"]),
+      },
+      {
+        title: "Kitos savaitės perkėlimas",
+        intro: "Ne viską, kas liko, reikia perkelti. Perkelk tik tai, kas vis dar svarbu.",
+        checklist: checklist(["Išbraukti užduotis be aiškios vertės.", "Perkelti tik svarbius likučius.", "Nustatyti naują terminą.", "Pažymėti pirmą veiksmą."]),
+      },
+      {
+        title: "Savaitės santrauka",
+        intro: "Pabaigoje užrašyk vieną pamoką ir vieną sprendimą kitai savaitei.",
+        worksheet: worksheet(["Svarbiausia pamoka", "Geriausias sprendimas", "Kas trukdė?", "Ką darysiu kitaip?"]),
       },
     ],
   },
@@ -151,53 +196,86 @@ const pdfResources = [
         worksheet: worksheet(["Atlikta dienų", "Planuota dienų", "Procentas", "Kas padėjo?", "Ką keisiu?"]),
       },
       {
-        title: "Refleksijos klausimai",
+        title: "Trukdžių analizė",
+        intro: "Įprotis dažniausiai nutrūksta dėl pasikartojančios kliūties. Įvardink ją prieš planuodamas didesnį tikslą.",
+        table: table(["Kliūtis", "Kada atsiranda", "Ką darysiu?", "Minimalus variantas"], [["Nuovargis", "", "", ""], ["Nėra laiko", "", "", ""], ["Pamirštu", "", "", ""], ["Per didelis įprotis", "", "", ""]]),
+      },
+      {
+        title: "Motyvacijos klausimai",
+        intro: "Motyvacija sustiprėja, kai įprotis susiejamas su realiu gyvenimo pokyčiu.",
+        checklist: checklist(["Ką šis įprotis palengvina?", "Kokį rezultatą noriu jausti po 30 dienų?", "Kokį mažą signalą matysiu po savaitės?", "Kas man padės tęsti?"]),
+      },
+      {
+        title: "Savaitės peržiūra",
+        intro: "Kartą per savaitę pažymėk ne tik atlikimą, bet ir tai, kas padėjo išlaikyti ritmą.",
+        worksheet: worksheet(["Kiek kartų atlikau?", "Kas padėjo?", "Kas trukdė?", "Ką keisiu kitą savaitę?"]),
+      },
+      {
+        title: "Pabaigos santrauka",
         intro: "Įprotis laikosi tada, kai jis dera su gyvenimu, o ne kovoja prieš jį.",
-        checklist: checklist(["Kas labiausiai trukdė ritmui?", "Kada įprotį atlikti lengviausia?", "Koks minimalus variantas veiktų blogą dieną?", "Kaip apdovanosiu tęstinumą?", "Koks kitas 30 dienų tikslas?"]),
+        checklist: checklist(["Pasirinkti įprotį, kurį tęsiu.", "Sumažinti įprotį, kuris per didelis.", "Pasirinkti kitą 30 dienų fokusą.", "Pasidžiaugti tęstinumu, ne tobulybe."]),
       },
     ],
   },
 ];
 
+const makeDayRows = (days) =>
+  Array.from({ length: days }, (_, index) => [
+    String(index + 1),
+    "",
+    "",
+    "",
+    "Ne",
+    "",
+    "",
+  ]);
+
 const csvResources = [
   {
     fileName: "stilloak-productivity-starter-kit.csv",
     rows: [
-      ["Diena", "Dienos fokusas", "3 svarbiausi darbai", "Įprotis", "Atlikta?", "Refleksijos pastaba"],
-      ["1", "Aiškiai pradėti dieną", "Užrašyti prioritetus; atlikti svarbiausią darbą; suplanuoti pertrauką", "10 min planavimas", "Ne", ""],
-      ["2", "", "", "", "Ne", ""],
-      ["3", "", "", "", "Ne", ""],
-      ["4", "", "", "", "Ne", ""],
-      ["5", "", "", "", "Ne", ""],
+      ["Diena", "Dienos fokusas", "3 svarbiausi darbai", "Įprotis", "Atlikta?", "Produktyvumo balas 1-5", "Refleksijos pastaba"],
+      ["1", "Aiškiai pradėti dieną", "Užrašyti prioritetus; atlikti svarbiausią darbą; suplanuoti pertrauką", "10 min planavimas", "Ne", "", ""],
+      ...makeDayRows(30).slice(1),
     ],
   },
   {
     fileName: "stilloak-weekly-planner-pro.csv",
     rows: [
-      ["Savaitė", "Tikslas", "Prioritetas", "Užduotis", "Terminas", "Būsena", "Rezultato pastaba"],
-      ["1", "Užbaigti svarbiausią savaitės darbą", "Aukštas", "Skirti 90 min fokuso bloką", "Penktadienis", "Planuojama", ""],
-      ["1", "", "Vidutinis", "", "", "Planuojama", ""],
-      ["1", "", "Žemas", "", "", "Planuojama", ""],
+      ["Savaitė", "Tikslas", "Prioritetas", "Užduotis", "Terminas", "Būsena", "Energijos lygis", "Rezultato pastaba"],
+      ["1", "Užbaigti svarbiausią savaitės darbą", "Aukštas", "Skirti 90 min fokuso bloką", "Penktadienis", "Planuojama", "Aukštas", ""],
+      ["1", "", "Vidutinis", "", "", "Planuojama", "Vidutinis", ""],
+      ["1", "", "Žemas", "", "", "Planuojama", "Žemas", ""],
+      ["2", "", "Aukštas", "", "", "Planuojama", "", ""],
+      ["2", "", "Vidutinis", "", "", "Planuojama", "", ""],
+      ["3", "", "Aukštas", "", "", "Planuojama", "", ""],
+      ["4", "", "Aukštas", "", "", "Planuojama", "", ""],
     ],
   },
   {
     fileName: "stilloak-habit-tracker.csv",
     rows: [
-      ["Įprotis", "Dažnumas", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Progreso procentas", "Refleksija"],
-      ["10 min planavimas", "Kasdien", "Ne", "Ne", "Ne", "Ne", "Ne", "Ne", "Ne", "Ne", "Ne", "Ne", "0%", ""],
-      ["Judėjimas", "3 kartai per savaitę", "Ne", "Ne", "Ne", "Ne", "Ne", "Ne", "Ne", "Ne", "Ne", "Ne", "0%", ""],
-      ["Skaitymas", "5 kartai per savaitę", "Ne", "Ne", "Ne", "Ne", "Ne", "Ne", "Ne", "Ne", "Ne", "Ne", "0%", ""],
+      ["Įprotis", "Dažnumas", ...Array.from({ length: 30 }, (_, index) => String(index + 1)), "Atlikta kartų", "Progreso procentas", "Refleksija"],
+      ["10 min planavimas", "Kasdien", ...Array.from({ length: 30 }, () => "Ne"), "0", "0%", ""],
+      ["Judėjimas", "3 kartai per savaitę", ...Array.from({ length: 30 }, () => "Ne"), "0", "0%", ""],
+      ["Skaitymas", "5 kartai per savaitę", ...Array.from({ length: 30 }, () => "Ne"), "0", "0%", ""],
+      ["Poilsio ritualas", "Kasdien", ...Array.from({ length: 30 }, () => "Ne"), "0", "0%", ""],
     ],
   },
   {
     fileName: "stilloak-time-blocking-template.csv",
     rows: [
       ["Data", "Laiko blokas", "Užduotis", "Kategorija", "Prioritetas", "Energijos lygis", "Statusas", "Dienos santrauka"],
-      ["", "08:00-09:00", "Ryto planavimas", "Planavimas", "Aukštas", "Vidutinis", "Neatlikta", ""],
-      ["", "09:00-11:00", "Gilus darbas", "Darbas / mokslai", "Aukštas", "Aukštas", "Neatlikta", ""],
-      ["", "11:00-12:00", "Administravimas", "Užduotys", "Vidutinis", "Vidutinis", "Neatlikta", ""],
-      ["", "13:00-15:00", "Projektas", "Darbas / mokslai", "Aukštas", "Aukštas", "Neatlikta", ""],
-      ["", "17:00-18:00", "Poilsis / judėjimas", "Poilsis", "Vidutinis", "Žemas", "Neatlikta", ""],
+      ["", "06:00-07:00", "Rytinis pasiruošimas", "Asmeninis ritmas", "Vidutinis", "Žemas", "Neatlikta", ""],
+      ["", "07:00-08:00", "Planavimas ir fokusas", "Planavimas", "Aukštas", "Vidutinis", "Neatlikta", ""],
+      ["", "08:00-10:00", "Gilus darbas", "Darbas / mokslai", "Aukštas", "Aukštas", "Neatlikta", ""],
+      ["", "10:00-11:00", "Žinutės ir administravimas", "Administravimas", "Vidutinis", "Vidutinis", "Neatlikta", ""],
+      ["", "11:00-12:00", "Projektas", "Darbas / mokslai", "Aukštas", "Aukštas", "Neatlikta", ""],
+      ["", "12:00-13:00", "Pietūs / poilsis", "Poilsis", "Vidutinis", "Žemas", "Neatlikta", ""],
+      ["", "13:00-15:00", "Antras fokuso blokas", "Darbas / mokslai", "Aukštas", "Vidutinis", "Neatlikta", ""],
+      ["", "15:00-16:00", "Peržiūra ir korekcijos", "Planavimas", "Vidutinis", "Vidutinis", "Neatlikta", ""],
+      ["", "16:00-17:00", "Lengvesnės užduotys", "Užduotys", "Žemas", "Žemas", "Neatlikta", ""],
+      ["", "17:00-18:00", "Judėjimas / perėjimas", "Poilsis", "Vidutinis", "Žemas", "Neatlikta", ""],
     ],
   },
 ];
@@ -364,7 +442,7 @@ const main = () => {
       const pdfPath = path.join(outputRoot, resource.fileName);
       fs.writeFileSync(htmlPath, buildHtml(resource), "utf8");
       printPdf(edgeExecutable, htmlPath, pdfPath, profileDir);
-      console.log(`Generated ${path.relative(rootDir, pdfPath)}`);
+      console.log(`Generated ${path.relative(rootDir, pdfPath)} (${resource.sections.length + 2} pages)`);
     }
   } finally {
     removeDirIfInsideRoot(tempRoot);
