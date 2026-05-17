@@ -98,7 +98,7 @@ const presets = [
       postType: "privatus-verslas",
       headline: "Premium sprendimas verslo augimui.",
       subtitle: "Skirta rimtesniems poreikiams, daugiau kontrolės ir profesionaliam naudojimui.",
-      badge: "PRIVATUS VERSLAS",
+      badge: "VERSLAS",
       features: [
         "Verslo lygio funkcijos",
         "Daugiau kontrolės",

@@ -64,7 +64,7 @@ const DownloadButton = ({ href, children, variant = "primary" }) => {
 };
 
 const LockedDownloads = ({ isLoggedIn }) => (
-  <div className="rounded-lg border border-white/10 bg-black/24 p-4">
+  <div className="rounded-lg border border-white/10 bg-black/24 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:p-5">
     <p className="flex gap-2 text-sm font-semibold leading-6 text-white">
       <LockKeyhole className="mt-0.5 shrink-0 text-[#f2d99a]" size={16} />
       {isLoggedIn
@@ -78,15 +78,15 @@ const LockedDownloads = ({ isLoggedIn }) => (
     </p>
     <div className="mt-4 grid gap-3 sm:grid-cols-2">
       {isLoggedIn ? (
-        <Link to="/pricing" className="button-primary min-h-[3rem] px-4">
+        <Link to="/pricing" className="button-primary min-h-[3rem] justify-center px-4">
           Peržiūrėti planus
         </Link>
       ) : (
         <>
-          <Link to="/login" className="button-primary min-h-[3rem] px-4">
+          <Link to="/login" className="button-primary min-h-[3rem] justify-center px-4">
             Prisijunkite
           </Link>
-          <Link to="/register" state={{ selectedPlan: "basic" }} className="hero-outline-button min-h-[3rem] px-4">
+          <Link to="/register" state={{ selectedPlan: "basic" }} className="hero-outline-button min-h-[3rem] justify-center px-4">
             Susikurti paskyrą
           </Link>
         </>
@@ -100,7 +100,7 @@ const DigitalProductCard = ({ product, user }) => {
   const requiredPlan = getRequiredPlan(product);
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-white/10 bg-white/[0.055] shadow-[0_26px_72px_rgba(0,0,0,0.22)] transition duration-200 hover:-translate-y-1 hover:border-[#e2ca91]/28">
+    <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-white/10 bg-white/[0.055] shadow-[0_26px_72px_rgba(0,0,0,0.22)] transition duration-200 hover:-translate-y-1 hover:border-[#e2ca91]/28 md:min-h-[620px]">
       <div className="h-1 bg-gradient-to-r from-[#e2ca91] via-[#75b896] to-transparent" />
       <div className="flex flex-1 flex-col p-5 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -159,12 +159,25 @@ const DigitalProductCard = ({ product, user }) => {
   );
 };
 
-const DigitalProductAccessGrid = ({ products = digitalProducts, user }) => (
-  <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-    {products.map((product) => (
-      <DigitalProductCard key={product.id} product={product} user={user} />
-    ))}
-  </div>
-);
+const DigitalProductAccessGrid = ({ products = digitalProducts, user }) => {
+  if (!products.length) {
+    return (
+      <div className="rounded-lg border border-white/10 bg-white/[0.055] px-5 py-12 text-center text-white shadow-[0_26px_72px_rgba(0,0,0,0.18)]">
+        <p className="mx-auto max-w-xl font-display text-3xl font-bold leading-tight">Kol kas čia nėra turinio</p>
+        <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-white/64">
+          Netrukus šioje vietoje matysite savo skaitmeninius produktus, šablonus ir nario įrankius.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      {products.map((product) => (
+        <DigitalProductCard key={product.id} product={product} user={user} />
+      ))}
+    </div>
+  );
+};
 
 export default DigitalProductAccessGrid;

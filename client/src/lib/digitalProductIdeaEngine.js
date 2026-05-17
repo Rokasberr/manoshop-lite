@@ -328,7 +328,7 @@ const categoryTemplates = [
           "Instrukcijų mini gidas",
         ],
         mvp: "Vienas Google Sheets arba Notion dashboardas su 3 pagrindiniais vaizdais.",
-        monetization: "Parduoti kaip produktyvumo įrankį su papildomu premium versijos upsell.",
+        monetization: "Parduoti kaip praktinį planavimo įrankį su papildomu premium versijos upsell.",
       },
       {
         name: (niche) => `${niche} kliento / progreso dashboardas`,

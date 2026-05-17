@@ -119,6 +119,16 @@ const getPlanCta = (planId) => {
   return "Pradėkite nuo Demo versijos ir atsisiųskite atrinktus PDF bei Excel failus.";
 };
 
+const formatDashboardPlanPrice = (price) => {
+  const amount = Number(price || 0);
+
+  if (amount === 0) {
+    return "€0";
+  }
+
+  return `€${Number.isInteger(amount) ? amount : amount.toFixed(2)}`;
+};
+
 const PreviewSwitch = ({ currentPlanId, selectedPlanId, onChange }) => (
   <section className="soft-card rounded-lg p-4 sm:p-5">
     <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -164,7 +174,7 @@ const PreviewSwitch = ({ currentPlanId, selectedPlanId, onChange }) => (
 const DashboardNav = ({ activeSection, onChange, access }) => (
   <>
     <div className="lg:hidden">
-      <div className="soft-card flex gap-2 overflow-x-auto rounded-lg p-2">
+      <div className="soft-card flex gap-2 overflow-x-auto rounded-lg p-2 pb-3 shadow-[0_18px_50px_rgba(17,31,26,0.08)]">
         {dashboardSections.map((section) => {
           const Icon = section.icon;
           const isActive = activeSection === section.id;
@@ -175,7 +185,7 @@ const DashboardNav = ({ activeSection, onChange, access }) => (
               key={section.id}
               type="button"
               onClick={() => onChange(section.id)}
-              className={`inline-flex min-h-[2.75rem] shrink-0 items-center gap-2 rounded-lg px-3 text-sm font-semibold transition ${
+              className={`inline-flex min-h-[3rem] shrink-0 items-center gap-2 rounded-lg px-3.5 text-sm font-semibold transition ${
                 isActive ? "bg-[rgb(var(--accent-strong))] text-white" : "text-muted hover:bg-[rgb(var(--surface-soft))]"
               }`}
             >
@@ -223,15 +233,15 @@ const DashboardNav = ({ activeSection, onChange, access }) => (
 );
 
 const LockedModuleCard = () => (
-  <div className="soft-card rounded-lg border-dashed p-5 sm:p-6">
-    <div className="soft-pill flex h-11 w-11 items-center justify-center rounded-lg text-muted">
+  <div className="soft-card mx-auto max-w-2xl rounded-lg border-dashed p-6 text-center shadow-[0_24px_70px_rgba(17,31,26,0.08)] sm:p-8">
+    <div className="soft-pill mx-auto flex h-12 w-12 items-center justify-center rounded-lg text-muted">
       <LockKeyhole size={20} />
     </div>
-    <h3 className="mt-5 font-display text-2xl font-bold">Atrakinkite šią zoną</h3>
-    <p className="mt-3 text-sm leading-7 text-muted">
+    <h3 className="mt-5 break-words font-display text-3xl font-bold leading-tight">Atrakinkite šią zoną</h3>
+    <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-muted">
       Ši skiltis prieinama aukštesnio plano nariams. Pasirinkite planą, kuris geriausiai atitinka jūsų tikslus.
     </p>
-    <Link to="/pricing" className="button-primary mt-5 gap-2">
+    <Link to="/pricing" className="button-primary mt-6 min-h-[3rem] justify-center gap-2">
       Peržiūrėti planus
       <ArrowRight size={16} />
     </Link>
@@ -239,7 +249,7 @@ const LockedModuleCard = () => (
 );
 
 const ModuleCard = ({ title, subtitle, icon: Icon, isLocked = false, onOpen, to, cta = "Atidaryti" }) => (
-  <article className="marketing-card flex h-full flex-col p-5">
+  <article className="marketing-card flex h-full flex-col p-5 shadow-[0_18px_56px_rgba(17,31,26,0.07)] sm:p-6 md:min-h-[270px]">
     <div className="flex items-start justify-between gap-4">
       <div className="soft-pill flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-[rgb(var(--accent-strong))]">
         <Icon size={20} />
@@ -253,19 +263,19 @@ const ModuleCard = ({ title, subtitle, icon: Icon, isLocked = false, onOpen, to,
         <span className="signal-pill">Aktyvu</span>
       )}
     </div>
-    <h3 className="mt-5 font-display text-2xl font-bold leading-tight">{title}</h3>
+    <h3 className="mt-5 break-words font-display text-2xl font-bold leading-tight">{title}</h3>
     <p className="mt-3 flex-1 text-sm leading-7 text-muted">{subtitle}</p>
     {isLocked ? (
-      <Link to="/pricing" className="button-secondary mt-5 justify-center">
+      <Link to="/pricing" className="button-secondary mt-5 min-h-[3rem] justify-center">
         Peržiūrėti planus
       </Link>
     ) : to ? (
-      <Link to={to} className="button-primary mt-5 gap-2">
+      <Link to={to} className="button-primary mt-5 min-h-[3rem] justify-center gap-2">
         {cta}
         <ArrowRight size={16} />
       </Link>
     ) : (
-      <button type="button" onClick={onOpen} className="button-primary mt-5 gap-2">
+      <button type="button" onClick={onOpen} className="button-primary mt-5 min-h-[3rem] justify-center gap-2">
         {cta}
         <ArrowRight size={16} />
       </button>
@@ -488,15 +498,15 @@ const PlansSection = ({ planId }) => (
         const accent = planAccent[plan.id] || "rgb(var(--accent-strong))";
 
         return (
-          <article key={plan.id} className="marketing-card p-5">
+          <article key={plan.id} className="marketing-card flex h-full flex-col p-5 shadow-[0_18px_56px_rgba(17,31,26,0.07)] sm:p-6 lg:min-h-[430px]">
             <div className="flex items-start justify-between gap-4">
               <span className="signal-pill">{plan.badge}</span>
               {isCurrent && <CheckCircle2 size={20} style={{ color: accent }} />}
             </div>
             <h3 className="mt-5 font-display text-3xl font-bold">{plan.name}</h3>
             <p className="mt-3 text-sm leading-7 text-muted">{plan.subtitle || plan.description}</p>
-            <p className="mt-5 font-display text-4xl font-bold">{Number(plan.price) === 0 ? "€0" : `${plan.price} €`}</p>
-            <div className="mt-5 space-y-2">
+            <p className="mt-5 font-display text-4xl font-bold">{formatDashboardPlanPrice(plan.price)}</p>
+            <div className="mt-5 flex-1 space-y-2">
               {plan.features.map((feature) => (
                 <div key={feature} className="soft-card flex gap-3 rounded-lg px-3 py-2.5">
                   <CheckCircle2 className="mt-0.5 shrink-0" size={16} style={{ color: accent }} />
@@ -504,7 +514,7 @@ const PlansSection = ({ planId }) => (
                 </div>
               ))}
             </div>
-            <Link to="/pricing" className={`mt-5 ${isCurrent ? "button-secondary" : "button-primary"} w-full justify-center`}>
+            <Link to="/pricing" className={`mt-5 min-h-[3rem] ${isCurrent ? "button-secondary" : "button-primary"} w-full justify-center`}>
               {isCurrent ? "Dabartinis planas" : "Peržiūrėti planus"}
             </Link>
           </article>
