@@ -11,7 +11,6 @@ import JournalPage from "./pages/JournalPage";
 import JournalArticlePage from "./pages/JournalArticlePage";
 import SavingsStudioDemoPage from "./pages/SavingsStudioDemoPage";
 import MemberAreaPage from "./pages/MemberAreaPage";
-import DigitalProductGeneratorPage from "./pages/DigitalProductGeneratorPage";
 import ShopPage from "./pages/ShopPage";
 import ProductPage from "./pages/ProductPage";
 import CartPage from "./pages/CartPage";
@@ -35,6 +34,7 @@ import AdminDashboardPreviewPage from "./pages/admin/AdminDashboardPreviewPage";
 import ProductManagerPage from "./pages/admin/ProductManagerPage";
 import OrdersManagerPage from "./pages/admin/OrdersManagerPage";
 import InstagramGeneratorPage from "./pages/admin/InstagramGeneratorPage";
+import AdminDigitalProductGeneratorPage from "./pages/admin/AdminDigitalProductGeneratorPage";
 import AdminShell from "./components/admin-dashboard/AdminShell";
 import { infoPages } from "./content/infoPages";
 
@@ -85,7 +85,6 @@ const App = () => (
       </Route>
 
       <Route element={<ProtectedRoute requireBusinessPlan />}>
-        <Route path="/member/digital-product-generator" element={<DigitalProductGeneratorPage />} />
         <Route path="/business" element={<BusinessDashboardPage />} />
         <Route path="/business/site-builder" element={<SiteBuilderPage />} />
         <Route path="/business/digital-products" element={<BusinessProductsPage />} />
@@ -102,7 +101,9 @@ const App = () => (
           <Route path="products" element={<ProductManagerPage />} />
           <Route path="orders" element={<OrdersManagerPage />} />
           <Route path="instagram-generator" element={<InstagramGeneratorPage />} />
+          <Route path="digital-product-generator" element={<AdminDigitalProductGeneratorPage />} />
         </Route>
+        <Route path="/member/digital-product-generator" element={<Navigate to="/admin/digital-product-generator" replace />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

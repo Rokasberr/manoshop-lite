@@ -1,4 +1,4 @@
-import { ArrowRight, DollarSign, Instagram, Package, ShoppingCart, Users } from "lucide-react";
+import { ArrowRight, DollarSign, Instagram, Lightbulb, Package, ShoppingCart, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
@@ -119,7 +119,7 @@ const AdminDashboardOverview = ({ dashboardData, previewMode = false }) => {
 
       {showInstagramGeneratorShortcut ? (
         <div className="dashboard-panel overflow-hidden p-0">
-          <div className="grid gap-0 lg:grid-cols-[1fr_auto]">
+          <div className="grid gap-0 xl:grid-cols-2">
             <div className="relative overflow-hidden bg-[#061f18] p-6 text-white sm:p-7">
               <div className="pointer-events-none absolute right-8 top-0 h-32 w-32 rounded-full bg-[#b9823a]/20 blur-3xl" />
               <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
@@ -139,6 +139,33 @@ const AdminDashboardOverview = ({ dashboardData, previewMode = false }) => {
                   to="/admin/instagram-generator"
                   aria-label="Open Instagram generator"
                   className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#b9823a]/45 bg-[#b9823a]/20 px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5"
+                >
+                  <span>Open generator</span>
+                  <ArrowRight size={16} />
+                </Link>
+              </div>
+            </div>
+            <div className="relative overflow-hidden bg-slate-950 p-6 text-white sm:p-7">
+              <div className="pointer-events-none absolute right-8 top-0 h-32 w-32 rounded-full bg-sky-400/15 blur-3xl" />
+              <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-sky-300/35 bg-sky-300/12 text-sky-100 shadow-[0_18px_40px_rgba(14,165,233,0.18)]">
+                    <Lightbulb size={22} />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-300">Admin product tool</p>
+                    <h2 className="mt-2 text-2xl font-semibold tracking-[-0.03em] text-white">
+                      Skaitmeninių produktų generatorius
+                    </h2>
+                    <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
+                      Generate and compare digital product ideas inside the admin area.
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  to="/admin/digital-product-generator"
+                  aria-label="Open digital product generator"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-sky-300/35 bg-sky-300/15 px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5"
                 >
                   <span>Open generator</span>
                   <ArrowRight size={16} />

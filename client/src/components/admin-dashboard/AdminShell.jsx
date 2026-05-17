@@ -1,6 +1,7 @@
 import {
   BarChart3,
   Instagram,
+  Lightbulb,
   LogOut,
   Menu,
   Package,
@@ -36,6 +37,11 @@ const adminNavigation = [
     label: "Instagram",
     to: "/admin/instagram-generator",
     icon: Instagram,
+  },
+  {
+    label: "Produktų idėjos",
+    to: "/admin/digital-product-generator",
+    icon: Lightbulb,
   },
 ];
 
