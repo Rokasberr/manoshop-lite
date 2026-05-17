@@ -13,6 +13,7 @@ const navbarCopy = {
       journal: "Nario naujienos",
       contact: "Kontaktai",
       memberArea: "Nario zona",
+      digitalProducts: "Skaitmeniniai produktai",
       productIdeas: "Produktų idėjos",
       business: "Business Studio",
       membership: "Narystės",
@@ -32,6 +33,7 @@ const navbarCopy = {
       journal: "Member news",
       contact: "Contact",
       memberArea: "Member area",
+      digitalProducts: "Digital products",
       productIdeas: "Product ideas",
       business: "Business Studio",
       membership: "Memberships",
@@ -51,6 +53,7 @@ const navbarCopy = {
       journal: "Aktualnosci czlonka",
       contact: "Kontakt",
       memberArea: "Strefa członka",
+      digitalProducts: "Produkty cyfrowe",
       productIdeas: "Pomysły produktów",
       business: "Business Studio",
       membership: "Członkostwo",
@@ -70,6 +73,7 @@ const navbarCopy = {
       journal: "Mitgliedernews",
       contact: "Kontakt",
       memberArea: "Mitgliederbereich",
+      digitalProducts: "Digitale Produkte",
       productIdeas: "Produktideen",
       business: "Business Studio",
       membership: "Mitgliedschaft",
@@ -89,6 +93,7 @@ const navbarCopy = {
       journal: "Actus membres",
       contact: "Contact",
       memberArea: "Espace membre",
+      digitalProducts: "Produits numériques",
       productIdeas: "Idées produits",
       business: "Business Studio",
       membership: "Abonnement",
@@ -108,6 +113,7 @@ const navbarCopy = {
       journal: "Noticias de miembro",
       contact: "Contacto",
       memberArea: "Zona de miembro",
+      digitalProducts: "Productos digitales",
       productIdeas: "Ideas de producto",
       business: "Business Studio",
       membership: "Membresía",
@@ -201,6 +207,14 @@ const Navbar = () => {
                 }`}
               >
                 {copy.nav.memberArea}
+              </Link>
+              <Link
+                to="/digital-products"
+                className={`nav-link-public ${
+                  location.pathname.startsWith("/digital-products") ? "nav-link-public-active" : ""
+                }`}
+              >
+                {copy.nav.digitalProducts}
               </Link>
             </>
           )}
