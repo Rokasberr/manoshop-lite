@@ -281,7 +281,7 @@ const OverviewSection = ({ user, planId, access, onOpenSection }) => {
   const moduleCards = [
     {
       title: "Skaitmeniniai produktai",
-      subtitle: "PDF gidai ir Excel šablonai, skirti aiškesniam planavimui, produktyvumui ir augimui.",
+      subtitle: "PDF gidai, Excel šablonai, planavimo sistemos ir praktiniai įrankiai aiškesniam produktyvumui, finansams ir augimui.",
       icon: FileText,
       onOpen: () => onOpenSection("digital"),
       cta: "Atidaryti produktus",
@@ -362,7 +362,7 @@ const DigitalProductsSection = ({ user }) => {
         <span className="signal-pill">Skaitmeniniai produktai</span>
         <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">Skaitmeniniai produktai</h2>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
-          PDF gidai ir Excel šablonai, skirti aiškesniam planavimui, produktyvumui ir augimui.
+          PDF gidai, Excel šablonai, planavimo sistemos ir praktiniai įrankiai aiškesniam produktyvumui, finansams ir augimui.
         </p>
       </div>
       <div className="rounded-lg border border-white/10 bg-[#071310] p-3 shadow-[0_32px_90px_rgba(0,0,0,0.22)] sm:p-5">

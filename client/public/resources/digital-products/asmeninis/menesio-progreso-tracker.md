@@ -13,7 +13,7 @@ Vienas rezultatas, kurį noriu matyti mėnesio pabaigoje:
 | Taupymas |  |  |  |
 | Investavimas / ateitis |  |  |  |
 
-## Produktyvumas ir įpročiai
+## Planavimas ir įpročiai
 | Įprotis / veiksmas | 1 sav. | 2 sav. | 3 sav. | 4 sav. |
 |---|---|---|---|---|
 | Savaitės planavimas |  |  |  |  |

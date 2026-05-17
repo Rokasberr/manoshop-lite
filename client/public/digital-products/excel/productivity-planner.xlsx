@@ -1,6 +1,0 @@
-Week,Goal,Priority,Task,Due Date,Status,Progress %,Review Note
-Week 1,Choose a monthly goal,High,Define the first next step,,Not started,0,
-Week 2,,Medium,,,Not started,0,
-Week 3,,Medium,,,Not started,0,
-Week 4,,Low,,,Not started,0,
-Monthly Review,What moved forward?,,,,"Review",=AVERAGE(G2:G5),

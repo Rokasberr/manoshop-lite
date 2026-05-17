@@ -22,12 +22,12 @@ export const digitalProducts = [
     premiumCtaText: "Pradėkite nuo šios sistemos, o Asmeninis planas atrakins gilesnius finansų įrankius.",
   },
   {
-    id: "productivity-planner",
-    title: "Productivity Planner",
+    id: "planning-system",
+    title: "Planavimo sistema",
     subtitle: "Savaitės ir mėnesio ritmas fokusuotam, realistiškam progresui.",
     description:
-      "A weekly and monthly productivity planner for goals, tasks, priorities, and progress tracking.",
-    category: "Productivity",
+      "Savaitės ir mėnesio planavimo sistema tikslams, užduotims, prioritetams ir progresui sekti.",
+    category: "Planavimas",
     formats: ["PDF", "XLSX"],
     includedItems: [
       "PDF planavimo gidas mėnesio tikslams ir savaitės prioritetams",
@@ -35,8 +35,8 @@ export const digitalProducts = [
       "Excel planuoklis savaitės planui ir užbaigimo sekimui",
       "Paprasti refleksijos klausimai fokusui išlaikyti",
     ],
-    pdfDownloadUrl: buildDownloadUrl("pdf", "productivity-planner", "pdf"),
-    excelDownloadUrl: buildDownloadUrl("excel", "productivity-planner", "xlsx"),
+    pdfDownloadUrl: buildDownloadUrl("pdf", "planning-system", "pdf"),
+    excelDownloadUrl: buildDownloadUrl("excel", "planning-system", "xlsx"),
     requiredPlan: "basic",
     isPublic: true,
     premiumCtaText: "Pradėkite nuo planuoklio, o narystėje atrakinkite gilesnę savaitės struktūrą.",

@@ -8,14 +8,14 @@ const HomePage = () => (
     <section className="public-section">
       <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
         <div>
-          <span className="eyebrow">Nemokamai visiems</span>
-          <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">Produktyvumo resursai be prisijungimo</h2>
+          <span className="eyebrow">Skaitmeniniai produktai</span>
+          <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">PDF gidai ir Excel šablonai vienoje vietoje</h2>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-muted">
-            Atsisiųsk planuoklius, trackerį ir Excel-compatible CSV šablonus dienai, savaitei, tikslams ir įpročiams susidėlioti.
+            PDF gidai, Excel šablonai, planavimo sistemos ir praktiniai įrankiai aiškesniam produktyvumui, finansams ir augimui.
           </p>
         </div>
-        <Link to="/productivity" className="button-primary">
-          Atidaryti produktyvumo skiltį
+        <Link to="/digital-products" className="button-primary">
+          Atidaryti produktus
         </Link>
       </div>
     </section>

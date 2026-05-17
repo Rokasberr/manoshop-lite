@@ -1,0 +1,6 @@
+Savaite,Tikslas,Prioritetas,Uzduotis,Terminas,Busena,Progresas %,Perziuros pastaba
+1 savaite,Pasirink menesio tiksla,Aukstas,Apibrezk pirma kita zingsni,,Nepradeta,0,
+2 savaite,,Vidutinis,,,Nepradeta,0,
+3 savaite,,Vidutinis,,,Nepradeta,0,
+4 savaite,,Zemas,,,Nepradeta,0,
+Menesio perziura,Kas pajudejo?,,,,"Perziura",=AVERAGE(G2:G5),

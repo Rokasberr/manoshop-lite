@@ -10,11 +10,12 @@ import { hasActiveMembership, isAdminUser, userCanAccessBusinessStudio } from ".
 const navbarCopy = {
   lt: {
     nav: {
+      home: "Pradžia",
       journal: "Nario naujienos",
       contact: "Kontaktai",
       memberArea: "Nario zona",
       digitalProducts: "Skaitmeniniai produktai",
-      productivity: "Produktyvumas",
+      savingStudio: "Saving Studio",
       productIdeas: "Produktų idėjos",
       business: "Business Studio",
       membership: "Narystės",
@@ -31,11 +32,12 @@ const navbarCopy = {
   },
   en: {
     nav: {
+      home: "Home",
       journal: "Member news",
       contact: "Contact",
       memberArea: "Member area",
       digitalProducts: "Digital products",
-      productivity: "Productivity",
+      savingStudio: "Saving Studio",
       productIdeas: "Product ideas",
       business: "Business Studio",
       membership: "Memberships",
@@ -52,11 +54,12 @@ const navbarCopy = {
   },
   pl: {
     nav: {
+      home: "Start",
       journal: "Aktualnosci czlonka",
       contact: "Kontakt",
       memberArea: "Strefa członka",
       digitalProducts: "Produkty cyfrowe",
-      productivity: "Produktywność",
+      savingStudio: "Saving Studio",
       productIdeas: "Pomysły produktów",
       business: "Business Studio",
       membership: "Członkostwo",
@@ -73,11 +76,12 @@ const navbarCopy = {
   },
   de: {
     nav: {
+      home: "Start",
       journal: "Mitgliedernews",
       contact: "Kontakt",
       memberArea: "Mitgliederbereich",
       digitalProducts: "Digitale Produkte",
-      productivity: "Produktivität",
+      savingStudio: "Saving Studio",
       productIdeas: "Produktideen",
       business: "Business Studio",
       membership: "Mitgliedschaft",
@@ -94,11 +98,12 @@ const navbarCopy = {
   },
   fr: {
     nav: {
+      home: "Accueil",
       journal: "Actus membres",
       contact: "Contact",
       memberArea: "Espace membre",
       digitalProducts: "Produits numériques",
-      productivity: "Productivité",
+      savingStudio: "Saving Studio",
       productIdeas: "Idées produits",
       business: "Business Studio",
       membership: "Abonnement",
@@ -115,11 +120,12 @@ const navbarCopy = {
   },
   es: {
     nav: {
+      home: "Inicio",
       journal: "Noticias de miembro",
       contact: "Contacto",
       memberArea: "Zona de miembro",
       digitalProducts: "Productos digitales",
-      productivity: "Productividad",
+      savingStudio: "Saving Studio",
       productIdeas: "Ideas de producto",
       business: "Business Studio",
       membership: "Membresía",
@@ -149,11 +155,10 @@ const Navbar = () => {
   const currentLanguageOption =
     languageOptions.find((option) => option.code === language) || languageOptions[0];
   const publicLinks = [
-    { label: copy.nav.productivity, to: "/productivity" },
+    { label: copy.nav.home, to: "/" },
     { label: copy.nav.digitalProducts, to: "/digital-products" },
+    { label: copy.nav.savingStudio, to: "/savings-studio" },
     { label: copy.nav.membership, to: "/pricing" },
-    { label: copy.nav.journal, to: "/journal" },
-    { label: copy.nav.contact, to: "/contact" },
   ];
 
   const handleLogout = () => {

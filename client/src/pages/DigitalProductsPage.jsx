@@ -68,7 +68,7 @@ const DigitalProductsPage = () => {
             <span className="eyebrow">Produktų biblioteka</span>
             <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">Digital Products</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
-              PDF gidai ir Excel šablonai, skirti aiškesniam planavimui, produktyvumui ir augimui.
+              PDF gidai, Excel šablonai, planavimo sistemos ir praktiniai įrankiai aiškesniam produktyvumui, finansams ir augimui.
             </p>
           </div>
           <div className="soft-pill rounded-lg px-4 py-3 text-sm font-semibold text-muted">
