@@ -1,258 +1,184 @@
 import {
+  ArrowDownToLine,
   ArrowRight,
-  BarChart3,
-  CheckCircle2,
+  BadgeCheck,
+  FileSpreadsheet,
   FileText,
-  LockKeyhole,
   Sparkles,
 } from "lucide-react";
-import { useMemo } from "react";
 import { Link } from "react-router-dom";
 
-import EmptyState from "../components/EmptyState";
-import LoadingSpinner from "../components/LoadingSpinner";
-import {
-  digitalProductPlanLabels,
-  digitalProductPlanOrder,
-  digitalProducts,
-} from "../constants/digitalProducts";
-import { useAuth } from "../context/AuthContext";
-import { hasActiveMembership, isAdminUser, normalizePlan } from "../utils/membership";
+import { digitalProducts } from "../constants/digitalProducts";
 
-const planTabs = [
-  { id: "basic", label: "Bazinis" },
-  { id: "personal", label: "Asmeninis" },
-  { id: "private_business", label: "Privatus verslas" },
-];
-
-const getUserPlanLevel = (user) => {
-  if (isAdminUser(user)) {
-    return "private_business";
-  }
-
-  return normalizePlan(user?.subscription?.plan || "free");
+const formatIcons = {
+  PDF: FileText,
+  XLSX: FileSpreadsheet,
 };
 
-const canOpenProduct = (userPlan, productPlan) =>
-  (digitalProductPlanOrder[userPlan] || 0) >= (digitalProductPlanOrder[productPlan] || 0);
+const getDownloadName = (url) => url.split("/").pop();
 
-const getLockedLabel = (planLevel) => `Prieinama su ${digitalProductPlanLabels[planLevel]} planu`;
+const FormatBadge = ({ format }) => {
+  const Icon = formatIcons[format] || FileText;
 
-const ProductCard = ({ product, isUnlocked, isGuest }) => (
-  <article className="group relative flex min-h-[380px] flex-col overflow-hidden rounded-lg border border-white/12 bg-white/[0.055] p-5 shadow-[0_28px_70px_rgba(0,0,0,0.22)] transition duration-200 hover:-translate-y-1 sm:p-6">
-    <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-white/10 to-transparent" />
-    <div className="relative flex items-start justify-between gap-4">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-[#e2ca91]/30 bg-[#e2ca91]/12 text-[#f2d99a]">
-        {isUnlocked ? <FileText size={22} /> : <LockKeyhole size={22} />}
+  return (
+    <span className="inline-flex items-center gap-2 rounded-lg border border-[#d6c38b]/35 bg-[#f2d99a]/14 px-3 py-1 text-xs font-bold text-[#f8e6b1]">
+      <Icon size={14} />
+      {format}
+    </span>
+  );
+};
+
+const DownloadButton = ({ href, children, variant = "primary" }) => {
+  const className =
+    variant === "primary"
+      ? "button-primary min-h-[3rem] gap-2 px-4"
+      : "inline-flex min-h-[3rem] items-center justify-center gap-2 rounded-lg border border-white/12 bg-white/[0.075] px-4 py-3 text-sm font-semibold text-white transition duration-200 hover:-translate-y-0.5 hover:border-[#e2ca91]/35 hover:bg-[#e2ca91]/12";
+
+  return (
+    <a href={href} download={getDownloadName(href)} className={className}>
+      <ArrowDownToLine size={16} />
+      {children}
+    </a>
+  );
+};
+
+const ProductCard = ({ product }) => (
+  <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-white/10 bg-white/[0.055] shadow-[0_26px_72px_rgba(0,0,0,0.22)] transition duration-200 hover:-translate-y-1 hover:border-[#e2ca91]/28">
+    <div className="h-1 bg-gradient-to-r from-[#e2ca91] via-[#75b896] to-transparent" />
+    <div className="flex flex-1 flex-col p-5 sm:p-6">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <span className="rounded-lg border border-[#e2ca91]/26 bg-[#e2ca91]/12 px-3 py-1 text-xs font-bold uppercase text-[#f2d99a]">
+          {product.category}
+        </span>
+        <div className="flex flex-wrap gap-2">
+          {product.formats.map((format) => (
+            <FormatBadge key={format} format={format} />
+          ))}
+        </div>
       </div>
-      <div className="flex flex-wrap justify-end gap-2">
-        <span className="rounded-lg border border-[#e2ca91]/30 bg-[#e2ca91]/12 px-3 py-1 text-xs font-semibold text-[#f2d99a]">
-          PDF
-        </span>
-        <span className="rounded-lg border border-white/10 bg-white/8 px-3 py-1 text-xs font-semibold text-white/68">
-          Premium resursas
-        </span>
-        <span className="rounded-lg border border-white/10 bg-white/8 px-3 py-1 text-xs font-semibold text-white/68">
-          {product.type}
-        </span>
-        <span className="rounded-lg border border-[#e2ca91]/30 bg-[#e2ca91]/12 px-3 py-1 text-xs font-semibold text-[#f2d99a]">
-          {product.planLabel}
-        </span>
-      </div>
-    </div>
 
-    <div className="relative mt-6 flex flex-1 flex-col">
-      <span className="text-xs font-bold uppercase text-[#f2d99a]/82">{product.badge}</span>
-      <h2 className="mt-3 font-display text-2xl font-bold leading-tight text-white">{product.title}</h2>
-      <p className="mt-4 text-sm leading-7 text-white/66">{product.description}</p>
-
-      <div className="mt-5 rounded-lg border border-white/10 bg-black/16 p-4">
-        <p className="text-xs font-bold uppercase text-white/44">Vertė</p>
-        <p className="mt-2 text-sm leading-6 text-white/72">{product.valueSummary}</p>
+      <div className="mt-6">
+        <h2 className="font-display text-2xl font-bold leading-tight text-white">{product.title}</h2>
+        <p className="mt-3 text-sm font-semibold leading-6 text-[#f2d99a]/82">{product.subtitle}</p>
+        <p className="mt-4 text-sm leading-7 text-white/68">{product.description}</p>
       </div>
 
-      <div className="mt-auto pt-6">
-        {isUnlocked ? (
-          <div className="grid gap-2 sm:grid-cols-2">
-            <a href={product.fileUrl} target="_blank" rel="noreferrer" className="button-primary w-full gap-2">
-              Atidaryti PDF
-              <ArrowRight size={16} />
-            </a>
-            <a
-              href={product.fileUrl}
-              download={product.fileName}
-              className="button-secondary w-full justify-center border-white/12 bg-white/8 text-white"
-            >
-              Atsisiųsti PDF
-            </a>
-          </div>
-        ) : (
-          <div className="rounded-lg border border-white/10 bg-black/20 p-4">
-            <p className="flex items-center gap-2 text-sm font-semibold text-white">
-              <LockKeyhole size={16} className="text-[#f2d99a]" />
-              {isGuest ? "Prisijunk, kad matytum savo prieigą" : getLockedLabel(product.planLevel)}
-            </p>
-            <Link to={isGuest ? "/login" : "/pricing"} className="button-secondary mt-4 w-full justify-center border-white/12 bg-white/8 text-white">
-              {isGuest ? "Prisijungti" : "Atrakinti planą"}
-            </Link>
-          </div>
-        )}
+      <div className="mt-6 rounded-lg border border-white/10 bg-black/18 p-4">
+        <p className="text-xs font-bold uppercase text-white/48">What's included</p>
+        <ul className="mt-4 space-y-3">
+          {product.includedItems.map((item) => (
+            <li key={item} className="flex gap-3 text-sm leading-6 text-white/72">
+              <BadgeCheck className="mt-0.5 shrink-0 text-[#9ad7b1]" size={17} />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <p className="mt-5 text-sm leading-6 text-white/58">{product.premiumCtaText}</p>
+
+      <div className="mt-auto grid gap-3 pt-6 sm:grid-cols-2">
+        <DownloadButton href={product.pdfDownloadUrl}>Download PDF</DownloadButton>
+        <DownloadButton href={product.excelDownloadUrl} variant="secondary">
+          Download Excel
+        </DownloadButton>
       </div>
     </div>
   </article>
 );
 
 const DigitalProductsPage = () => {
-  const { user, isCheckingAuth } = useAuth();
-  const isMember = hasActiveMembership(user);
-  const userPlan = isMember ? getUserPlanLevel(user) : "free";
-  const activeProducts = useMemo(() => digitalProducts.filter((product) => product.isActive), []);
-
-  if (isCheckingAuth) {
-    return <LoadingSpinner fullScreen label="Krauname skaitmeninius produktus..." />;
-  }
-
-  const unlockedCount = activeProducts.filter((product) => canOpenProduct(userPlan, product.planLevel)).length;
-  const featuredProducts = activeProducts.slice(0, 6);
-  const visibleProducts = user ? activeProducts : featuredProducts;
+  const publicProducts = digitalProducts.filter((product) => product.isPublic);
 
   return (
-    <div className="member-workspace space-y-8">
+    <div className="space-y-10">
       <section className="relative overflow-hidden rounded-lg border border-[#e2ca91]/18 bg-[#071310] p-5 text-white shadow-[0_38px_110px_rgba(0,0,0,0.28)] sm:p-8 lg:p-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(226,202,145,0.18),transparent_32%),linear-gradient(135deg,rgba(16,38,31,0.88),rgba(7,19,16,0.96)_58%,rgba(5,10,9,1))]" />
-        <div className="relative grid gap-8 xl:grid-cols-[1fr_0.72fr] xl:items-end">
-          <div className="min-w-0">
-            <span className="inline-flex rounded-lg border border-[#e2ca91]/30 bg-[#e2ca91]/12 px-3 py-1 text-xs font-semibold uppercase text-[#f2d99a]">
-              Skaitmeniniai produktai
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(16,38,31,0.9),rgba(7,19,16,0.97)_58%,rgba(5,10,9,1))]" />
+        <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#e2ca91]/60 to-transparent" />
+
+        <div className="relative grid gap-8 lg:grid-cols-[1fr_0.46fr] lg:items-end">
+          <div>
+            <span className="inline-flex rounded-lg border border-[#e2ca91]/30 bg-[#e2ca91]/12 px-3 py-1 text-xs font-bold uppercase text-[#f2d99a]">
+              Public digital products
             </span>
             <h1 className="mt-5 max-w-4xl font-display text-4xl font-bold leading-tight text-white sm:text-6xl">
-              Premium skaitmeninių resursų biblioteka
+              Premium guides and working templates for clearer decisions.
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-8 text-white/70 sm:text-lg">
-              Gidai, šablonai ir strateginiai įrankiai, paruošti aiškesniems finansiniams ir verslo sprendimams.
+              Download polished StillOak Studio systems for money, planning, business validation, and content. Every product includes a PDF guide and a practical Excel template.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <a href="#resources" className="button-primary gap-2">
-                Peržiūrėti resursus
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <a href="#download-library" className="button-primary gap-2">
+                Browse downloads
                 <ArrowRight size={16} />
               </a>
               <Link to="/pricing" className="hero-outline-button gap-2">
-                Atrakinti narystę
+                Unlock membership
                 <Sparkles size={16} />
               </Link>
             </div>
           </div>
 
-          <div className="rounded-lg border border-white/10 bg-white/[0.065] p-5 shadow-[0_26px_70px_rgba(0,0,0,0.24)]">
-            <p className="text-sm font-semibold text-white">Tavo prieiga</p>
-            <div className="mt-5 grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
+          <div className="rounded-lg border border-white/10 bg-white/[0.065] p-5 shadow-[0_26px_70px_rgba(0,0,0,0.22)]">
+            <p className="text-sm font-semibold text-white">Included today</p>
+            <div className="mt-5 grid grid-cols-3 gap-3 lg:grid-cols-1">
               {[
-                ["Aktyvūs resursai", activeProducts.length],
-                ["Atrakinta", user ? unlockedCount : 0],
-                ["Planai", 3],
+                ["Products", publicProducts.length],
+                ["Formats", "PDF"],
+                ["Templates", "XLSX"],
               ].map(([label, value]) => (
                 <div key={label} className="rounded-lg border border-white/10 bg-black/18 p-4">
-                  <p className="text-xs font-semibold uppercase text-white/44">{label}</p>
-                  <p className="mt-2 font-display text-3xl font-bold text-white">{value}</p>
+                  <p className="text-xs font-bold uppercase text-white/44">{label}</p>
+                  <p className="mt-2 font-display text-2xl font-bold text-white sm:text-3xl">{value}</p>
                 </div>
               ))}
             </div>
-            <p className="mt-5 text-sm leading-7 text-white/60">
-              {user
-                ? `Dabartinis planas: ${digitalProductPlanLabels[userPlan] || "Neaktyvi narystė"}.`
-                : "Prisijunk arba pasirink narystę, kad atrakintum pilną biblioteką."}
-            </p>
           </div>
         </div>
       </section>
 
-      {!user ? (
-        <section className="panel p-5 sm:p-7">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <span className="signal-pill">Premium peržiūra</span>
-              <h2 className="mt-3 font-display text-3xl font-bold">Biblioteka sukurta nariams, kurie nori aiškumo</h2>
-              <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
-                Gali peržiūrėti dalį resursų katalogo. Prisijungus matysi, kurie failai priklauso tavo planui ir kuriuos gali atidaryti iš karto.
-              </p>
-            </div>
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Link to="/login" className="button-secondary justify-center">Prisijungti</Link>
-              <Link to="/pricing" className="button-primary justify-center">Įsigyti narystę</Link>
-            </div>
-          </div>
-        </section>
-      ) : null}
-
-      <section className="grid gap-4 md:grid-cols-3">
-        {planTabs.map((plan) => {
-          const planProducts = activeProducts.filter((product) => product.planLevel === plan.id);
-          const isIncluded = canOpenProduct(userPlan, plan.id);
-
-          return (
-            <div
-              key={plan.id}
-              className="rounded-lg border p-5"
-              style={{
-                borderColor: isIncluded ? "rgb(var(--accent) / 0.35)" : "rgb(var(--line) / 0.78)",
-                backgroundColor: isIncluded ? "rgb(var(--surface) / 0.82)" : "rgb(var(--surface-soft) / 0.56)",
-              }}
-            >
-              <div className="flex items-center justify-between gap-3">
-                <span className="signal-pill">{plan.label}</span>
-                {isIncluded ? <CheckCircle2 size={20} className="text-[rgb(var(--accent-strong))]" /> : <LockKeyhole size={20} className="text-muted" />}
-              </div>
-              <p className="mt-4 font-display text-3xl font-bold">{planProducts.length}</p>
-              <p className="mt-2 text-sm leading-6 text-muted">
-                {isIncluded ? "Įtraukta į tavo prieigą" : getLockedLabel(plan.id)}
-              </p>
-            </div>
-          );
-        })}
-      </section>
-
-      <section id="resources" className="space-y-5">
+      <section id="download-library" className="space-y-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <span className="eyebrow">Biblioteka</span>
-            <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">Skaitmeniniai produktai</h2>
+            <span className="eyebrow">Download library</span>
+            <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">Digital Products</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
-              Kiekvienas resursas turi realų turinį: instrukcijas, klausimus, lenteles, checklistus arba planavimo struktūras.
+              Public resources designed to feel clear, useful, and ready to put to work immediately.
             </p>
           </div>
-          <div
-            className="flex items-center gap-2 rounded-lg border px-4 py-3 text-sm font-semibold text-muted"
-            style={{
-              borderColor: "rgb(var(--line) / 0.8)",
-              backgroundColor: "rgb(var(--surface) / 0.7)",
-            }}
-          >
-            <BarChart3 size={17} />
-            {user ? `${unlockedCount} iš ${activeProducts.length} atrakinta` : "Peržiūros režimas"}
+          <div className="soft-pill rounded-lg px-4 py-3 text-sm font-semibold text-muted">
+            No login required
           </div>
         </div>
 
-        {visibleProducts.length ? (
-          <div className="rounded-lg border border-white/10 bg-[#071310] p-3 shadow-[0_32px_90px_rgba(0,0,0,0.22)] sm:p-5">
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {visibleProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  isGuest={!user}
-                  isUnlocked={Boolean(user) && canOpenProduct(userPlan, product.planLevel)}
-                />
-              ))}
-            </div>
+        <div className="rounded-lg border border-white/10 bg-[#071310] p-3 shadow-[0_32px_90px_rgba(0,0,0,0.22)] sm:p-5">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {publicProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
           </div>
-        ) : (
-          <EmptyState
-            title="Resursų šiuo metu nėra"
-            description="Biblioteka ruošiama. Kai resursai bus aktyvūs, jie atsiras šiame puslapyje."
-            actionLabel="Grįžti į nario zoną"
-            actionTo="/members/savings-studio"
-          />
-        )}
+        </div>
+      </section>
+
+      <section className="relative overflow-hidden rounded-lg border border-[#e2ca91]/24 bg-[#071310] p-6 text-white shadow-[0_28px_82px_rgba(0,0,0,0.24)] sm:p-8 lg:p-10">
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(226,202,145,0.14),transparent_34%),linear-gradient(135deg,rgba(16,38,31,0.92),rgba(7,19,16,0.98))]" />
+        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-3xl">
+            <span className="inline-flex rounded-lg border border-[#e2ca91]/30 bg-[#e2ca91]/12 px-3 py-1 text-xs font-bold uppercase text-[#f2d99a]">
+              StillOak Studio membership
+            </span>
+            <h2 className="mt-4 font-display text-3xl font-bold leading-tight sm:text-4xl">
+              Want more premium tools, guides, and templates?
+            </h2>
+            <p className="mt-4 text-sm leading-7 text-white/70 sm:text-base">
+              Unlock the StillOak Studio membership area to access deeper resources, private tools, structured guides, and premium digital systems.
+            </p>
+          </div>
+          <Link to="/pricing" className="button-primary shrink-0 gap-2">
+            Unlock membership
+            <ArrowRight size={16} />
+          </Link>
+        </div>
       </section>
     </div>
   );

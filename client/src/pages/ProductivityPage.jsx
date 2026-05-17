@@ -10,6 +10,7 @@ import {
   Sparkles,
   Target,
 } from "lucide-react";
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 import EmptyState from "../components/EmptyState";
@@ -56,8 +57,27 @@ const useSteps = [
   "Peržiūrėk rezultatą ir koreguok kitą savaitę.",
 ];
 
+const pageTitle = "Produktyvumo resursai aiškesnei dienai | StillOak Studio";
+const pageDescription =
+  "Nemokami produktyvumo resursai: premium planuokliai, įpročių trackeris, savaitės planavimas ir produktyvumo šablonai PDF bei Excel-compatible formatais.";
+const focusClass = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2";
+
 const formatIcon = (format) =>
   format.toLowerCase().includes("csv") ? <FileSpreadsheet size={18} /> : <FileText size={18} />;
+
+const ensureMetaTag = (attribute, value, content) => {
+  let tag = document.querySelector(`meta[${attribute}="${value}"]`);
+
+  if (!tag) {
+    tag = document.createElement("meta");
+    tag.setAttribute(attribute, value);
+    document.head.appendChild(tag);
+  }
+
+  tag.setAttribute("content", content);
+};
+
+const isFileAvailable = (file) => Boolean(file.fileUrl && file.fileName && file.isAvailable !== false);
 
 const DataTable = ({ title, description, columns, rows }) => (
   <section className="public-section overflow-hidden">
@@ -171,7 +191,7 @@ const ResourceCard = ({ resource }) => (
 
       <div className="mt-auto pt-2">
         <div className="grid gap-3">
-          {resource.files.map((file) => (
+          {resource.files.length ? resource.files.map((file) => (
             <div key={file.fileName} className="soft-card rounded-lg p-3">
               <div className="flex items-center justify-between gap-3">
                 <span className="flex min-w-0 items-center gap-2 text-sm font-semibold">
@@ -181,15 +201,36 @@ const ResourceCard = ({ resource }) => (
                 <span className="signal-pill shrink-0 px-2.5 py-1 text-[11px]">{file.format}</span>
               </div>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                <a href={file.fileUrl} target="_blank" rel="noreferrer" className="button-primary min-h-[44px] px-4 py-2.5">
-                  Atidaryti
-                </a>
-                <a href={file.fileUrl} download={file.fileName} className="button-secondary min-h-[44px] px-4 py-2.5">
-                  Atsisiųsti
-                </a>
+                {isFileAvailable(file) ? (
+                  <>
+                    <a
+                      href={file.fileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`button-primary min-h-[44px] px-4 py-2.5 ${focusClass}`}
+                    >
+                      Atidaryti
+                    </a>
+                    <a
+                      href={file.fileUrl}
+                      download={file.fileName}
+                      className={`button-secondary min-h-[44px] px-4 py-2.5 ${focusClass}`}
+                    >
+                      Atsisiųsti
+                    </a>
+                  </>
+                ) : (
+                  <div className="sm:col-span-2 rounded-lg border border-dashed soft-border bg-[rgb(var(--surface-soft)/0.58)] px-4 py-3 text-sm font-semibold text-muted">
+                    Failas laikinai nepasiekiamas
+                  </div>
+                )}
               </div>
             </div>
-          ))}
+          )) : (
+            <div className="rounded-lg border border-dashed soft-border bg-[rgb(var(--surface-soft)/0.58)] px-4 py-3 text-sm font-semibold text-muted">
+              Failai ruošiami
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -197,6 +238,19 @@ const ResourceCard = ({ resource }) => (
 );
 
 const ProductivityPage = () => {
+  useEffect(() => {
+    const previousTitle = document.title;
+
+    document.title = pageTitle;
+    ensureMetaTag("name", "description", pageDescription);
+    ensureMetaTag("property", "og:title", pageTitle);
+    ensureMetaTag("property", "og:description", pageDescription);
+
+    return () => {
+      document.title = previousTitle;
+    };
+  }, []);
+
   const activeResources = productivityResources.filter((resource) => resource.isActive);
   const pdfCount = activeResources.reduce(
     (total, resource) => total + resource.files.filter((file) => file.format.includes("PDF")).length,
@@ -221,8 +275,8 @@ const ProductivityPage = () => {
               Nemokami premium planuokliai, trackeriai ir šablonai, padedantys susidėlioti prioritetus, įpročius, savaitės ritmą ir 30 dienų veiksmų planą.
             </p>
 
-            <div className="mt-6 grid gap-3 sm:grid-cols-3">
-              {["Nemokama prieiga", "PDF ir Excel-compatible šablonai", "Praktiška naudoti šiandien"].map((item) => (
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              {["Nemokama", "PDF ir Excel-compatible šablonai", "Paruošta naudoti šiandien", "StillOak Studio resource"].map((item) => (
                 <div key={item} className="rounded-lg border border-white/10 bg-white/[0.06] px-4 py-3 text-sm font-semibold text-white/78">
                   {item}
                 </div>
@@ -230,13 +284,13 @@ const ProductivityPage = () => {
             </div>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <a href="#productivity-resources" className="button-primary gap-2">
-                Peržiūrėti resursus
-                <ArrowRight size={16} />
-              </a>
-              <a href="#resource-fit" className="hero-outline-button gap-2">
-                Atsisiųsti šablonus
+              <a href="#productivity-resources" className={`button-primary gap-2 ${focusClass}`}>
+                Atsisiųsti resursus
                 <Download size={16} />
+              </a>
+              <a href="#resource-fit" className={`hero-outline-button gap-2 ${focusClass}`}>
+                Peržiūrėti šablonus
+                <ArrowRight size={16} />
               </a>
             </div>
           </div>
@@ -316,6 +370,7 @@ const ProductivityPage = () => {
         )}
       </section>
 
+      <div id="resource-fit" className="scroll-mt-28">
       <DataTable
         title="Kuris resursas tau tinkamiausias?"
         description="Pasirink pagal tai, ką nori sutvarkyti pirmiausia: dieną, savaitę, įpročius, 30 dienų ritmą ar laiko blokus."
@@ -327,6 +382,7 @@ const ProductivityPage = () => {
         ]}
         rows={productivityFitTable}
       />
+      </div>
 
       <DataTable
         title="30 dienų produktyvumo sistema"
@@ -389,11 +445,11 @@ const ProductivityPage = () => {
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
-            <Link to="/pricing" className="button-primary gap-2">
+            <Link to="/pricing" className={`button-primary gap-2 ${focusClass}`}>
               Atrakinti narystę
               <ArrowRight size={16} />
             </Link>
-            <Link to="/pricing" className="hero-outline-button">
+            <Link to="/pricing" className={`hero-outline-button ${focusClass}`}>
               Peržiūrėti planus
             </Link>
           </div>

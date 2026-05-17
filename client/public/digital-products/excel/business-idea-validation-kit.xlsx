@@ -1,0 +1,5 @@
+Idea,Audience,Problem,Demand Evidence,Pricing Potential,Score,Risk,Next Step
+Idea 1,,,,,=SUM(E2),,
+Idea 2,,,,,=SUM(E3),,
+Idea 3,,,,,=SUM(E4),,
+Validation Questions,Who needs this?,How painful is the problem?,What proof exists?,What would they pay?,Score 1-10,What could block it?,What will you test next?
