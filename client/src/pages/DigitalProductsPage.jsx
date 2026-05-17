@@ -46,6 +46,12 @@ const ProductCard = ({ product, isUnlocked, isGuest }) => (
         {isUnlocked ? <FileText size={22} /> : <LockKeyhole size={22} />}
       </div>
       <div className="flex flex-wrap justify-end gap-2">
+        <span className="rounded-lg border border-[#e2ca91]/30 bg-[#e2ca91]/12 px-3 py-1 text-xs font-semibold text-[#f2d99a]">
+          PDF
+        </span>
+        <span className="rounded-lg border border-white/10 bg-white/8 px-3 py-1 text-xs font-semibold text-white/68">
+          Premium resursas
+        </span>
         <span className="rounded-lg border border-white/10 bg-white/8 px-3 py-1 text-xs font-semibold text-white/68">
           {product.type}
         </span>
@@ -67,15 +73,19 @@ const ProductCard = ({ product, isUnlocked, isGuest }) => (
 
       <div className="mt-auto pt-6">
         {isUnlocked ? (
-          <a
-            href={product.fileUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="button-primary w-full gap-2"
-          >
-            Atidaryti resursą
-            <ArrowRight size={16} />
-          </a>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <a href={product.fileUrl} target="_blank" rel="noreferrer" className="button-primary w-full gap-2">
+              Atidaryti PDF
+              <ArrowRight size={16} />
+            </a>
+            <a
+              href={product.fileUrl}
+              download={product.fileName}
+              className="button-secondary w-full justify-center border-white/12 bg-white/8 text-white"
+            >
+              Atsisiųsti PDF
+            </a>
+          </div>
         ) : (
           <div className="rounded-lg border border-white/10 bg-black/20 p-4">
             <p className="flex items-center gap-2 text-sm font-semibold text-white">
@@ -119,7 +129,7 @@ const DigitalProductsPage = () => {
               Premium skaitmeninių resursų biblioteka
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-8 text-white/70 sm:text-lg">
-              Atrinkti gidai, šablonai ir strateginiai įrankiai aiškesniems finansiniams, kūrybiniams ir verslo sprendimams.
+              Gidai, šablonai ir strateginiai įrankiai, paruošti aiškesniems finansiniams ir verslo sprendimams.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <a href="#resources" className="button-primary gap-2">
@@ -160,7 +170,7 @@ const DigitalProductsPage = () => {
         <section className="panel p-5 sm:p-7">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <span className="signal-pill">Premium preview</span>
+              <span className="signal-pill">Premium peržiūra</span>
               <h2 className="mt-3 font-display text-3xl font-bold">Biblioteka sukurta nariams, kurie nori aiškumo</h2>
               <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
                 Gali peržiūrėti dalį resursų katalogo. Prisijungus matysi, kurie failai priklauso tavo planui ir kuriuos gali atidaryti iš karto.
@@ -218,7 +228,7 @@ const DigitalProductsPage = () => {
             }}
           >
             <BarChart3 size={17} />
-            {user ? `${unlockedCount} iš ${activeProducts.length} atrakinta` : "Preview režimas"}
+            {user ? `${unlockedCount} iš ${activeProducts.length} atrakinta` : "Peržiūros režimas"}
           </div>
         </div>
 
