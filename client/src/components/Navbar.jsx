@@ -150,6 +150,7 @@ const Navbar = () => {
     languageOptions.find((option) => option.code === language) || languageOptions[0];
   const publicLinks = [
     { label: copy.nav.productivity, to: "/productivity" },
+    { label: copy.nav.digitalProducts, to: "/digital-products" },
     { label: copy.nav.membership, to: "/pricing" },
     { label: copy.nav.journal, to: "/journal" },
     { label: copy.nav.contact, to: "/contact" },
@@ -214,14 +215,6 @@ const Navbar = () => {
                 }`}
               >
                 {copy.nav.memberArea}
-              </Link>
-              <Link
-                to="/digital-products"
-                className={`nav-link-public ${
-                  location.pathname.startsWith("/digital-products") ? "nav-link-public-active" : ""
-                }`}
-              >
-                {copy.nav.digitalProducts}
               </Link>
             </>
           )}

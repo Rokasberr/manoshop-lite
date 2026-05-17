@@ -5,6 +5,11 @@ const createPaymentSession = async (payload) => {
   return data;
 };
 
+const activateDemoPlan = async () => {
+  const { data } = await api.post("/billing/activate-demo-plan");
+  return data;
+};
+
 const syncStripeMembership = async (sessionId = "") => {
   const { data } = await api.post("/billing/sync-stripe-membership", { sessionId });
   return data;
@@ -16,6 +21,7 @@ const getBillingProfile = async () => {
 };
 
 export default {
+  activateDemoPlan,
   createPaymentSession,
   syncStripeMembership,
   getBillingProfile,

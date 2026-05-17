@@ -1,12 +1,15 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
+import billingService from "../services/billingService";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const location = useLocation();
+  const { register, refreshProfile } = useAuth();
+  const selectedPlan = location.state?.selectedPlan || "";
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -46,6 +49,15 @@ const RegisterPage = () => {
         email: formData.email.trim(),
         password: formData.password,
       });
+
+      if (selectedPlan === "basic") {
+        await billingService.activateDemoPlan();
+        await refreshProfile();
+        toast.success("Paskyra sukurta. Demo versija aktyvuota.");
+        navigate("/digital-products");
+        return;
+      }
+
       toast.success("Paskyra sukurta. Pasirink planą.");
       navigate("/pricing");
     } catch (submitError) {
@@ -63,7 +75,7 @@ const RegisterPage = () => {
             <span className="eyebrow">naujas narys</span>
             <h1 className="mt-5 font-display text-4xl font-bold">Sukurk paskyrą ir pradėk ramiau</h1>
             <p className="mt-4 text-muted">
-              Po registracijos galėsi tęsti apmokėjimą, matyti sąskaitas ir atrakinti nario lygio patirtį.
+              Po registracijos galėsi pasirinkti Demo versiją arba tęsti į mokamą nario planą.
             </p>
           </div>
 

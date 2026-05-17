@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const Payment = require("../models/Payment");
 const Subscription = require("../models/Subscription");
-const { getPlanById } = require("../config/subscriptionPlans");
+const { getPlanById, normalizePlanId } = require("../config/subscriptionPlans");
 const {
   syncStripeOrderFromSession,
   syncStripeRefundFromPayment,
@@ -85,6 +85,49 @@ const createPaymentSession = async (req, res) => {
       price: plan.price,
       interval: plan.interval,
     },
+  });
+};
+
+const activateDemoPlan = async (req, res) => {
+  const plan = getPlanById("basic");
+
+  if (!plan || plan.provider !== "internal") {
+    res.status(500);
+    throw new Error("Demo versija šiuo metu nepasiekiama.");
+  }
+
+  const user = await User.findById(req.user._id).select("-password");
+
+  if (!user) {
+    res.status(404);
+    throw new Error("Vartotojas nerastas.");
+  }
+
+  const currentPlan = normalizePlanId(user.subscription?.plan || "free");
+
+  if (["personal", "private_business"].includes(currentPlan) && user.subscription?.status === "active") {
+    return res.json({
+      subscription: serializeSubscription(user.subscription),
+    });
+  }
+
+  user.subscription = {
+    ...user.subscription,
+    plan: plan.id,
+    planName: plan.name,
+    status: "active",
+    provider: "internal",
+    currentPeriodEnd: null,
+    stripeCustomerId: user.subscription?.stripeCustomerId || "",
+    stripeSubscriptionId: user.subscription?.stripeSubscriptionId || "",
+    stripePriceId: user.subscription?.stripePriceId || "",
+    lastSyncedAt: new Date(),
+  };
+
+  await user.save();
+
+  res.json({
+    subscription: serializeSubscription(user.subscription),
   });
 };
 
@@ -356,6 +399,7 @@ const handleStripeWebhook = async (req, res) => {
 };
 
 module.exports = {
+  activateDemoPlan,
   createPaymentSession,
   getBillingProfile,
   syncStripeMembership,

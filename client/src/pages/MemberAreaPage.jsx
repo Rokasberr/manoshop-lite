@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { ArrowUpRight, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -12,14 +12,14 @@ const personalPlanIds = new Set(["personal"]);
 const privatePlanIds = new Set(["private_business"]);
 const previewOptions = [
   { id: "current", label: "Dabartinis planas", helper: "Rodo pagal tikrą paskyros planą." },
-  { id: "basic", label: "Bazinis", helper: "Pradinis nario sluoksnis." },
+  { id: "basic", label: "Demo versija", helper: "Nemokama skaitmeninių produktų pradžia." },
   { id: "personal", label: "Asmeninis", helper: "Pilna nario zona." },
   { id: "private_business", label: "Privatus verslas", helper: "Aukščiausia nario patirtis." },
 ];
 const planLabels = {
-  free: "Bazinis",
-  guest: "Bazinis",
-  basic: "Bazinis",
+  free: "Be aktyvios narystės",
+  guest: "Be aktyvios narystės",
+  basic: "Demo versija",
   personal: "Asmeninis",
   private_business: "Privatus verslas",
 };
@@ -34,7 +34,7 @@ const PreviewSwitch = ({ currentPlanId, selectedPlanId, onChange }) => (
           Šis jungiklis nekeičia tikro vartotojo plano. Tik lokaliai parodo, kaip atrodo skirtingi narystės lygiai.
         </p>
         <p className="mt-2 text-xs font-semibold uppercase leading-5 tracking-[0.18em] text-muted">
-          Tikras planas: {planLabels[currentPlanId] || currentPlanId || "Bazinis"}
+          Tikras planas: {planLabels[currentPlanId] || currentPlanId || "Demo versija"}
         </p>
       </div>
 

@@ -1,4 +1,4 @@
-import {
+﻿import {
   ArrowRight,
   BarChart3,
   BriefcaseBusiness,
@@ -25,10 +25,10 @@ const sectionNav = [
 
 const planPresentation = {
   basic: {
-    eyebrow: "Įėjimo planas",
-    cta: "Pradėti nuo Bazinio",
-    comparison: "Pradžiai ir aiškesniam mėnesio startui.",
-    kitName: "Stilloak Start Kit",
+    eyebrow: "Nemokama pradžia",
+    cta: "Pasirinkti Demo versiją",
+    comparison: "Nemokamai susipažinti su skaitmeniniais produktais.",
+    kitName: "Demo skaitmeniniai produktai",
     icon: WalletCards,
     accent: "rgb(164 220 190)",
   },
@@ -60,7 +60,7 @@ const membershipKits = [
       "Tikslų planavimo mini šablonas",
       "7 dienų veiksmų planas",
     ],
-    planLabel: "Įeina į Bazinį planą",
+    planLabel: "Įeina į Demo versiją",
     icon: WalletCards,
   },
   {
@@ -123,9 +123,10 @@ const dashboardCards = [
   },
 ];
 
-const trustLine = "Saugus apmokėjimas · Atšauk bet kada · Aiškūs planų skirtumai · Jokių paslėptų mokesčių";
+const trustLine = "Demo versija be kortelės · Mokami planai atšaukiami bet kada · Aiškūs planų skirtumai · Jokių paslėptų mokesčių";
 
-const formatPlanPrice = (value, intervalLabel) => `${Number(value || 0).toFixed(2)} €${intervalLabel}`;
+const formatPlanPrice = (value, intervalLabel) =>
+  Number(value || 0) === 0 ? "€0" : `${Number(value || 0).toFixed(2)} €${intervalLabel}`;
 
 const MembershipPricingShowcase = ({
   onChoosePlan,
@@ -165,7 +166,7 @@ const MembershipPricingShowcase = ({
             Pasirink nario erdvę pagal savo etapą.
           </h1>
           <p className="mt-6 max-w-3xl text-base leading-7 text-white/72 sm:text-lg">
-            Bazinis padeda pradėti paprastai, Asmeninis atrakina pilną nario erdvę, o Privatus verslas suteikia
+            Demo versija padeda susipažinti su skaitmeniniais produktais, Asmeninis atrakina pilną nario erdvę, o Privatus verslas suteikia
             strateginę verslo erdvę augimui.
           </p>
 
@@ -370,7 +371,7 @@ const DashboardPreview = () => (
       </div>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
-        {["Bazinis", "Asmeninis", "Privatus verslas"].map((item, index) => (
+        {["Demo versija", "Asmeninis", "Privatus verslas"].map((item, index) => (
           <div key={item} className="rounded-lg border border-white/10 bg-white/[0.055] px-3 py-3">
             <p className="text-xs font-semibold uppercase text-white/42">Zona {index + 1}</p>
             <p className="mt-1 text-sm font-semibold text-white">{item}</p>

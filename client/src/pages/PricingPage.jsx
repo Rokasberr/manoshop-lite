@@ -10,7 +10,7 @@ import { normalizePlan } from "../utils/membership";
 const PricingPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const [loadingPlanId, setLoadingPlanId] = useState("");
 
   const handleChoosePlan = async (plan) => {
@@ -21,6 +21,15 @@ const PricingPage = () => {
 
     try {
       setLoadingPlanId(plan.id);
+
+      if (plan.id === "basic") {
+        await billingService.activateDemoPlan();
+        await refreshProfile();
+        toast.success("Demo versija aktyvuota.");
+        navigate("/digital-products");
+        return;
+      }
+
       const session = await billingService.createPaymentSession({
         planId: plan.id,
         provider: "stripe",

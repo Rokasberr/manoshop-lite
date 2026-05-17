@@ -20,7 +20,7 @@ import instagramPostService from "../../services/instagramPostService";
 
 const postTypeOptions = [
   { value: "brand-intro", label: "Brand intro" },
-  { value: "bazinis-planas", label: "Bazinis planas" },
+  { value: "bazinis-planas", label: "Demo versija" },
   { value: "asmeninis-planas", label: "Asmeninis planas" },
   { value: "privatus-verslas", label: "Privatus verslas" },
   { value: "plan-comparison", label: "Plan comparison" },
@@ -46,7 +46,7 @@ const initialForm = {
   subtitle:
     "Sukurta tiems, kurie nori tvarkingos, premium ir lengvai suprantamos skaitmeninės patirties.",
   badge: "PRIVATI NARIO ERDVĖ",
-  features: ["Bazinis", "Asmeninis", "Privatus verslas"].join("\n"),
+  features: ["Demo versija", "Asmeninis", "Privatus verslas"].join("\n"),
   price: "",
   website: "stilloak-studio.com",
   ctaText: "Paprasta pradėti. Aišku naudoti. Sukurta augimui.",
@@ -64,16 +64,16 @@ const presets = [
     },
   },
   {
-    label: "Bazinis",
+    label: "Demo versija",
     icon: FileImage,
     values: {
       ...initialForm,
       postType: "bazinis-planas",
-      headline: "Pradėk paprastai su Baziniu planu.",
+      headline: "Pradėk su nemokama Demo versija.",
       subtitle:
-        "Skirta tiems, kurie nori aiškios pradžios, paprasto naudojimo ir tvarkingos nario erdvės.",
-      badge: "BAZINIS PLANAS",
-      features: ["Pagrindinės funkcijos", "Aiški pradžia", "Lengvas naudojimas", "5.99 €/mėn."].join("\n"),
+        "Skirta tiems, kurie nori susipažinti su atrinktais PDF gidais ir Excel šablonais.",
+      badge: "DEMO VERSIJA",
+      features: ["Demo skaitmeniniai produktai", "PDF gidai", "Excel šablonai", "€0"].join("\n"),
       ctaText: "Prisijungti dabar",
     },
   },
@@ -117,7 +117,7 @@ const presets = [
       headline: "Palygink planus pagal savo etapą.",
       subtitle: "Aiškus kelias nuo paprastos pradžios iki premium verslo naudojimo.",
       badge: "PLANŲ PALYGINIMAS",
-      features: ["Bazinis - 5.99 €/mėn.", "Asmeninis - 15.99 €/mėn.", "Privatus verslas - 44.99 €/mėn."].join("\n"),
+      features: ["Demo versija - €0", "Asmeninis - 15.99 €/mėn.", "Privatus verslas - 44.99 €/mėn."].join("\n"),
       ctaText: "Pasirink savo planą",
     },
   },

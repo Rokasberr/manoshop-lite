@@ -1,4 +1,4 @@
-import { ArrowRight, LockKeyhole } from "lucide-react";
+﻿import { ArrowRight, LockKeyhole } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import JournalCoverArt from "./JournalCoverArt";
@@ -51,7 +51,7 @@ const JournalAccessGate = ({
                 Nauji resursai, produktų pristatymai ir praktinės nario pastabos
               </div>
               <div className="rounded-[18px] bg-white/4 px-4 py-4">
-                Bazinis mato ribotas peržiūras, pilna prieiga lieka mokamiems planams
+                Demo versija mato ribotas peržiūras, pilna prieiga lieka mokamiems planams
               </div>
             </div>
           </div>

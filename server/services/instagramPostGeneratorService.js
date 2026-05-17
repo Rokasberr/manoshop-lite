@@ -33,7 +33,7 @@ const POST_TYPES = {
     captionKey: "brandIntro",
   },
   "bazinis-planas": {
-    label: "Bazinis planas",
+    label: "Demo versija",
     slug: "bazinis",
     template: "template-plan",
     captionKey: "bazinis",
@@ -77,16 +77,16 @@ const CAPTION_TEMPLATES = {
   brandIntro: (website) => `Stilloak Studio – privati nario erdvė aiškesniam pasirinkimui.
 
 Pasirink planą pagal savo etapą:
-• Bazinis
+• Demo versija
 • Asmeninis
 • Privatus verslas
 
 Paprasta pradėti. Aišku naudoti. Sukurta augimui.
 
 ${website}`,
-  bazinis: (website) => `Bazinis planas – paprastas startas su pagrindinėmis funkcijomis kasdieniam naudojimui.
+  bazinis: (website) => `Demo versija – nemokama pradžia su atrinktais skaitmeniniais produktais.
 
-Tinka, jeigu nori aiškios pradžios, paprasto naudojimo ir tvarkingos nario erdvės.
+Tinka, jeigu nori susipažinti su StillOak Studio PDF gidais ir Excel šablonais be mokėjimo kortelės.
 
 ${website}`,
   asmeninis: (website) => `Asmeninis planas – daugiau galimybių, daugiau lankstumo ir patogesnė patirtis aktyviam naudojimui.

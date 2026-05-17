@@ -1,13 +1,13 @@
-export const journalArticles = [
+﻿export const journalArticles = [
   {
     slug: "bazinio-plano-erdve-atnaujinta",
-    category: "Bazinis planas",
+    category: "Demo versija",
     date: "2026 m. gegužės 5 d.",
     readTime: "2 min. skaitymo",
-    title: "Bazinio plano erdvė atnaujinta",
+    title: "Demo versijos erdvė atnaujinta",
     cover: {
       issue: "Naujiena 01",
-      heading: "Aiškesnis Bazinio plano startas.",
+      heading: "Aiškesnis Demo versijos startas.",
       lines: ["mėnesio apžvalga", "pradiniai resursai", "kelias į Asmeninį"],
       background: "linear-gradient(135deg, rgba(20,27,24,0.98) 0%, rgba(56,78,66,0.95) 48%, rgba(184,166,124,0.92) 100%)",
       panel: "linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03))",
@@ -17,25 +17,25 @@ export const journalArticles = [
     excerpt:
       "Pridėta mėnesio apžvalga, pradiniai resursai ir aiškesnis kelias į Asmeninį planą.",
     intro:
-      "Bazinio plano erdvė atnaujinta taip, kad naujas narys greičiau suprastų, nuo ko pradėti. Ji lieka lengvas startas, bet dabar turi daugiau krypties: mėnesio fokusą, pradines resursų peržiūras ir aiškesnį atnaujinimo kelią.",
+      "Demo versijos erdvė atnaujinta taip, kad naujas narys greičiau suprastų, nuo ko pradėti. Ji lieka lengvas startas, bet dabar turi daugiau krypties: mėnesio fokusą, pradines resursų peržiūras ir aiškesnį atnaujinimo kelią.",
     sections: [
       {
-        heading: "Kas pasikeitė Bazinyje",
+        heading: "Kas pasikeitė Demo versijoje",
         paragraphs: [
-          "Bazinis narys dabar mato paprastą mėnesio apžvalgą, gali pasirinkti vieną fokusą ir pasitikrinti pagrindinius žingsnius be sudėtingos sistemos.",
+          "Demo versija narys dabar mato paprastą mėnesio apžvalgą, gali pasirinkti vieną fokusą ir pasitikrinti pagrindinius žingsnius be sudėtingos sistemos.",
           "Pridėti pradiniai resursai padeda pradėti nuo mažų veiksmų: mėnesio sąrašo, biudžeto pasiruošimo ir tikslo planavimo.",
         ],
       },
       {
         heading: "Kaip tai susijungia su Asmeniniu planu",
         paragraphs: [
-          "Bazinis rodo kryptį, o Asmeninis atrakina pilnesnę struktūrą: mėnesio suvestines, tikslų progreso korteles, premium resursus ir pilnas nario naujienas.",
+          "Demo versija rodo kryptį, o Asmeninis atrakina pilnesnę struktūrą: mėnesio suvestines, tikslų progreso korteles, premium resursus ir pilnas nario naujienas.",
           "Atnaujinimo kelias dabar paaiškintas ramiau, kad narys suprastų, ką gauna dabar ir kas atsiveria perėjus į pilną planą.",
         ],
       },
     ],
     takeaway:
-      "Bazinis planas lieka ribotas, bet jis dabar aiškiau parodo pirmus žingsnius ir natūralų kelią į pilną nario patirtį.",
+      "Demo versija lieka ribota, bet ji dabar aiškiau parodo pirmus žingsnius ir natūralų kelią į pilną nario patirtį.",
   },
   {
     slug: "ruosiami-nauji-nario-resursai",
@@ -68,7 +68,7 @@ export const journalArticles = [
         heading: "Kaip jie bus atrenkami",
         paragraphs: [
           "Kiekvienas resursas bus vertinamas pagal naudą nariui, o ne pagal failų skaičių. Mažiau, bet aiškiau yra svarbiau už didelį archyvą be krypties.",
-          "Bazinis planas gali matyti ribotas peržiūras, o pilni resursai bus jungiami prie Asmeninio ir Privataus verslo planų.",
+          "Demo versija gali matyti ribotas peržiūras, o pilni resursai bus jungiami prie Asmeninio ir Privataus verslo planų.",
         ],
       },
     ],
@@ -175,7 +175,7 @@ export const journalArticles = [
         heading: "Ką nariai matys pirmiausia",
         paragraphs: [
           "Asmeninio ir Privataus verslo planų nariai matys ankstyvus produkto pristatymus, naujų resursų paaiškinimus ir svarbiausius platformos pokyčius.",
-          "Bazinis planas gali matyti ribotas peržiūras, kad būtų aišku, kas vyksta, bet pilnas turinys lieka aktyviems mokamiems planams.",
+          "Demo versija gali matyti ribotas peržiūras, kad būtų aišku, kas vyksta, bet pilnas turinys lieka aktyviems mokamiems planams.",
         ],
       },
       {

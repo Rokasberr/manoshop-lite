@@ -13,8 +13,8 @@ export const planAliases = {
 };
 
 export const planDisplayNames = {
-  free: "Bazinis",
-  basic: "Bazinis",
+  free: "Be aktyvios narystės",
+  basic: "Demo versija",
   personal: "Asmeninis",
   private_business: "Privatus verslas",
 };

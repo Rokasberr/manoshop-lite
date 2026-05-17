@@ -1,4 +1,4 @@
-import { Download } from "lucide-react";
+﻿import { Download } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
@@ -32,10 +32,13 @@ const subscriptionStatusLabels = {
 };
 
 const subscriptionPlanLabels = {
-  free: "Bazinis",
-  bazinis: "Bazinis",
+  free: "Be aktyvios narystės",
+  basic: "Demo versija",
+  demo: "Demo versija",
   asmeninis: "Asmeninis",
+  personal: "Asmeninis",
   privatus_verslas: "Privatus verslas",
+  private_business: "Privatus verslas",
 };
 
 const subscriptionProviderLabels = {
@@ -172,7 +175,7 @@ const ProfilePage = () => {
           <div className="panel p-6">
             <p className="eyebrow">narystė</p>
             <h2 className="mt-4 font-display text-3xl font-bold">
-              {subscriptionPlanLabels[user?.subscription?.plan] || user?.subscription?.plan || "Bazinis"} planas
+              {subscriptionPlanLabels[user?.subscription?.plan] || user?.subscription?.plan || "Be aktyvios narystės"} planas
             </h2>
             <p className="mt-2 text-muted">
               Būsena:{" "}

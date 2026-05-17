@@ -1,4 +1,4 @@
-import {
+﻿import {
   ArrowUpRight,
   CalendarRange,
   CheckCircle2,
@@ -14,11 +14,11 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
-const FOCUS_STORAGE_KEY = "stilloak_bazinis_monthly_focus";
-const CHECKLIST_STORAGE_KEY = "stilloak_bazinis_monthly_actions";
-const BUDGET_STORAGE_KEY = "stilloak_bazinis_budget_preview";
-const WEEKLY_ACTION_STORAGE_KEY = "stilloak_bazinis_weekly_action";
-const RESOURCE_STORAGE_KEY = "stilloak_bazinis_resource_panels";
+const FOCUS_STORAGE_KEY = "stilloak_demo_monthly_focus";
+const CHECKLIST_STORAGE_KEY = "stilloak_demo_monthly_actions";
+const BUDGET_STORAGE_KEY = "stilloak_demo_budget_preview";
+const WEEKLY_ACTION_STORAGE_KEY = "stilloak_demo_weekly_action";
+const RESOURCE_STORAGE_KEY = "stilloak_demo_resource_panels";
 
 const focusOptions = ["Išlaidos", "Taupymas", "Tikslai", "Įpročiai"];
 const focusMessages = {
@@ -42,7 +42,7 @@ const availableModules = [
     title: "Mėnesio pradžios planas",
     text: "Fokusas, 3 aiškūs veiksmai ir matomas progresas mėnesio startui.",
     label: "Įtraukta",
-    access: "Bazinio plano vertė",
+    access: "Demo versijos vertė",
     icon: CalendarRange,
   },
   {
@@ -53,7 +53,7 @@ const availableModules = [
     icon: WalletCards,
   },
   {
-    title: "Bazinių resursų biblioteka",
+    title: "Demo resursų biblioteka",
     text: "5 trumpi išskleidžiami resursai, skirti praktiniam startui.",
     label: "Ribota",
     access: "Premium resursai lieka Asmeniniame",
@@ -122,13 +122,13 @@ const resources = [
 const updates = [
   {
     label: "Nauja",
-    title: "Bazinis gauna aiškesnį mėnesio startą",
+    title: "Demo versija gauna aiškesnį mėnesio startą",
     text: "Pridėtas fokusas, 3 veiksmai, mini biudžeto peržiūra ir savaitinis veiksmas.",
   },
   {
     label: "Ruošiama",
-    title: "Plečiama bazinių resursų kryptis",
-    text: "Trumpi checklistai ir pradiniai gidai padės Baziniam planui išlikti praktiškam be premium įrankių atrakinimo.",
+    title: "Plečiama demo resursų kryptis",
+    text: "Trumpi checklistai ir pradiniai gidai padės Demo versijai išlikti praktiškai be premium įrankių atrakinimo.",
   },
   {
     label: "Asmeninis",
@@ -342,20 +342,20 @@ const BazinisMemberPage = () => {
         <div className="grid gap-8 lg:grid-cols-[1fr_0.78fr] lg:items-end">
           <div className="min-w-0">
             <div className="flex flex-wrap gap-2">
-              <span className="signal-pill">Bazinis planas</span>
-              <span className="signal-pill">5.99 €/mėn.</span>
+              <span className="signal-pill">Demo versija</span>
+              <span className="signal-pill">€0</span>
               <span className="signal-pill">Ribota prieiga</span>
               <span className="signal-pill">Galima atnaujinti bet kada</span>
             </div>
             <h1 className="mt-6 max-w-4xl font-display text-4xl font-bold leading-tight sm:text-6xl">
-              Bazinio nario erdvė
+              Demo versijos nario erdvė
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-muted sm:text-lg">
-              Mokama pradžia su konkrečiais mėnesio veiksmais, mini biudžetu ir baziniais resursais, kurie padeda
+              Nemokama pradžia su konkrečiais mėnesio veiksmais, mini biudžetu ir demo resursais, kurie padeda
               pajudėti jau šiandien.
             </p>
             <p className="mt-5 max-w-2xl text-sm leading-6 text-muted">
-              Bazinis neatrakina premium sistemos, tačiau suteikia aiškią, naudingą darbo vietą: fokusą, paprastus
+              Demo versija neatrakina premium sistemos, tačiau suteikia aiškią, naudingą darbo vietą: fokusą, paprastus
               skaičius, savaitės veiksmą ir ribotas nario naujienų peržiūras.
             </p>
           </div>
@@ -366,11 +366,11 @@ const BazinisMemberPage = () => {
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase text-muted">rami pradžia</p>
                 <p className="mt-3 text-sm leading-7 text-muted">
-                  Bazinis yra praktiškas įėjimas į nario zoną. Asmeninis lieka aiškiai gilesnis: su pilnomis
+                  Demo versija yra praktiškas įėjimas į nario zoną. Asmeninis lieka aiškiai gilesnis: su pilnomis
                   suvestinėmis, progreso kortelėmis, archyvu ir premium resursais.
                 </p>
                 <p className="mt-5 text-xs font-semibold uppercase leading-5 text-muted">
-                  Saugus apmokėjimas · Atšauk bet kada · Jokių paslėptų mokesčių
+                  Be mokėjimo kortelės · Atnaujink bet kada · Jokių paslėptų mokesčių
                 </p>
               </div>
             </div>
@@ -451,7 +451,7 @@ const BazinisMemberPage = () => {
               <div className="min-w-0">
                 <p className="text-sm font-semibold">3 paprasti mėnesio veiksmai</p>
                 <p className="mt-1 text-xs leading-5 text-muted">
-                  Bazinis vertingas tada, kai padeda užbaigti mažus, realius žingsnius.
+                  Demo versija vertingas tada, kai padeda užbaigti mažus, realius žingsnius.
                 </p>
               </div>
               <span className="signal-pill shrink-0">
@@ -556,17 +556,17 @@ const BazinisMemberPage = () => {
           </div>
 
           <p className="mt-5 text-xs font-semibold uppercase leading-5 text-muted">
-            Supaprastinta Bazinio plano peržiūra. Pilnos suvestinės ir progreso kortelės atsiveria Asmeniniame plane.
+            Supaprastinta Demo versijos peržiūra. Pilnos suvestinės ir progreso kortelės atsiveria Asmeniniame plane.
           </p>
         </div>
       </section>
 
       <section className="grid gap-5 xl:grid-cols-[1.08fr_0.92fr]">
         <div className="panel p-5 sm:p-6">
-          <span className="signal-pill">Bazinių resursų biblioteka</span>
+          <span className="signal-pill">Demo resursų biblioteka</span>
           <h2 className="mt-4 font-display text-3xl font-bold leading-tight">5 pradiniai resursai</h2>
           <p className="mt-3 text-sm leading-7 text-muted">
-            Trumpi, išskleidžiami resursai skirti startui. Jie suteikia aiškią naudą Baziniame plane, bet neatrakina
+            Trumpi, išskleidžiami resursai skirti startui. Jie suteikia aiškią naudą Demo versijoje plane, bet neatrakina
             premium šablonų ar pilnų paketų.
           </p>
 
@@ -603,7 +603,7 @@ const BazinisMemberPage = () => {
                         ))}
                       </ul>
                       <p className="mt-4 text-xs font-semibold uppercase leading-5 text-muted">
-                        Bazinis resursas · Atsisiuntimai ir premium paketai nepridėti
+                        Demo resursas · Atsisiuntimai ir premium paketai nepridėti
                       </p>
                     </div>
                   )}
@@ -629,14 +629,14 @@ const BazinisMemberPage = () => {
                   Peržiūrėk 3 didžiausias išlaidas ir nuspręsk, kurią gali sumažinti.
                 </span>
                 <span className="mt-2 block text-sm leading-6 text-muted">
-                  Viena užbaigta užduotis per savaitę padeda Baziniam planui jaustis kaip reali pagalba, ne tik peržiūra.
+                  Viena užbaigta užduotis per savaitę padeda Demo versijai jaustis kaip reali pagalba, ne tik peržiūra.
                 </span>
               </span>
             </label>
           </div>
 
           <div className="marketing-card p-5 sm:p-6">
-            <span className="signal-pill">Bazinio riba</span>
+            <span className="signal-pill">Demo versijos riba</span>
             <h3 className="mt-4 font-display text-2xl font-bold leading-tight">Paprasta nauda be premium atrakinimo</h3>
             <p className="mt-4 text-sm leading-7 text-muted">
               Ši erdvė padeda pradėti, bet sąmoningai nepakeičia Asmeninio plano: nėra pilnų suvestinių, tikslų
@@ -686,7 +686,7 @@ const BazinisMemberPage = () => {
             premium resursus.
           </p>
           <p className="mt-4 max-w-2xl text-sm leading-6 text-white/58">
-            Bazinis lieka naudingas startas. Asmeninis yra skirtas tada, kai nori gilesnio mėnesio valdymo ir daugiau
+            Demo versija lieka naudingu startu. Asmeninis yra skirtas tada, kai nori gilesnio mėnesio valdymo ir daugiau
             nario įrankių.
           </p>
           <Link to="/pricing" className="button-primary mt-8 gap-2">
@@ -694,13 +694,13 @@ const BazinisMemberPage = () => {
             <ArrowUpRight size={16} />
           </Link>
           <p className="mt-6 text-xs font-semibold uppercase leading-5 text-white/52">
-            Saugus apmokėjimas · Atšauk bet kada · Jokių paslėptų mokesčių
+            Demo versija be kortelės · Mokami planai atšaukiami bet kada · Jokių paslėptų mokesčių
           </p>
         </div>
 
         <div className="panel p-5 sm:p-6">
           <span className="signal-pill">Kas atsiveria Asmeniniame</span>
-          <h2 className="mt-4 font-display text-3xl font-bold leading-tight">Aiškiai daugiau nei Bazinis</h2>
+          <h2 className="mt-4 font-display text-3xl font-bold leading-tight">Aiškiai daugiau nei Demo versija</h2>
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             {lockedAsmeninisFeatures.map((feature) => (
               <div key={feature.title} className="rounded-lg border p-5" style={{ borderColor: "rgb(var(--line) / 0.82)" }}>
