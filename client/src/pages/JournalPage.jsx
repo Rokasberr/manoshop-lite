@@ -30,7 +30,7 @@ const JournalPage = () => {
     return (
       <JournalAccessGate
         user={user}
-        title="Nario naujienos pilnai atsiveria Asmeniniam ir Privataus verslo planui."
+        title="Nario naujienos pilnai atsiveria Asmeniniam ir Verslo planui."
         description="Demo versija gali matyti ribotas peržiūras, tačiau pilni įrašai, resursų pristatymai ir nario erdvių pokyčiai lieka aktyviems mokamiems planams."
       />
     );
@@ -115,7 +115,7 @@ const JournalPage = () => {
             </p>
           </div>
           <div className="marketing-card p-6">
-            <p className="text-xs uppercase tracking-[0.3em] text-muted">Asmeninis ir Privatus verslas</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-muted">Asmeninis ir Verslas</p>
             <h3 className="mt-4 font-display text-3xl font-bold">Pilna prieiga</h3>
             <p className="mt-4 text-sm leading-7 text-muted">
               Mokami planai atveria visus įrašus, resursų pristatymus ir nario erdvių pokyčių paaiškinimus.

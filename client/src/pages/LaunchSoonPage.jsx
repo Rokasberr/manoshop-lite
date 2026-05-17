@@ -16,7 +16,7 @@ const launchCardsBase = [
     key: "journal",
     icon: BookOpenText,
     status: "Atidaryta nariams",
-    target: "Asmeninis ir Privatus verslas",
+    target: "Asmeninis ir Verslas",
   },
 ];
 

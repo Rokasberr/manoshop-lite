@@ -14,9 +14,9 @@ import LoadingSpinner from "./LoadingSpinner";
 const UpgradeRequired = () => (
   <div className="mx-auto max-w-3xl py-10">
     <section className="panel overflow-hidden p-6 sm:p-8">
-      <span className="signal-pill">Privatus verslas</span>
+      <span className="signal-pill">Verslas</span>
       <h1 className="mt-5 break-words font-display text-3xl font-bold leading-tight sm:text-5xl">
-        Business Studio prieinama tik Privatus verslas planui
+        Business Studio prieinama tik Verslas plano nariams
       </h1>
       <p className="mt-4 text-sm leading-7 text-muted sm:text-base">
         Saving Studio lieka pasiekiama pagal tavo naryste, bet Site Builder, My Store, Orders ir Earnings yra

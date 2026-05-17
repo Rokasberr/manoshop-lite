@@ -172,7 +172,7 @@ const demoCopy = {
     accessChip: "Prieiga",
     accessTitle: "Pilna versija atrakinta nariams.",
     accessText:
-      "Peržiūra parodo, kaip Stilloak veikia. Pilna darbo erdvė atsiranda aktyvavus Asmeninį arba Privataus verslo planą.",
+      "Peržiūra parodo, kaip Stilloak veikia. Pilna darbo erdvė atsiranda aktyvavus Asmeninį arba Verslo planą.",
     accessBullets: [
       { icon: LockKeyhole, text: "Pilna darbo erdvė atsidaro tik aktyviems nariams." },
       { icon: ShieldCheck, text: "Prieiga susieta su tavo privačia paskyra." },
@@ -283,7 +283,7 @@ const demoCopy = {
     accessChip: "Access",
     accessTitle: "The full version unlocks for members.",
     accessText:
-      "The demo shows how Stilloak works. The full workspace appears inside an active Asmeninis or Privatus verslas plan.",
+      "The demo shows how Stilloak works. The full workspace appears inside an active Asmeninis or Verslas plan.",
     accessBullets: [
       { icon: LockKeyhole, text: "The full dashboard opens only for active members." },
       { icon: ShieldCheck, text: "Access is tied to your private account." },

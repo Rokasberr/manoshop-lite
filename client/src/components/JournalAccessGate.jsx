@@ -7,7 +7,7 @@ import { journalArticles } from "../content/journalArticles";
 const JournalAccessGate = ({
   user,
   title = "Nario naujienos atsiveria aktyviems nariams.",
-  description = "Asmeninio ir Privataus verslo nariai gauna pilną StillOak Studio atnaujinimų, resursų, produktų pristatymų ir nario erdvės pokyčių zoną.",
+  description = "Asmeninio ir Verslo plano nariai gauna pilną StillOak Studio atnaujinimų, resursų, produktų pristatymų ir nario erdvės pokyčių zoną.",
 }) => {
   const previewArticles = journalArticles.slice(0, 3);
 
@@ -41,7 +41,7 @@ const JournalAccessGate = ({
           <div className="rounded-[28px] border border-white/8 bg-white/5 p-6">
             <div className="inline-flex items-center gap-3 rounded-full bg-white/6 px-4 py-2 text-sm text-white/72">
               <LockKeyhole size={16} style={{ color: "rgb(var(--accent-strong))" }} />
-              Asmeninis ir Privatus verslas planai atrakina pilnas nario naujienas
+              Asmeninis ir Verslas planai atrakina pilnas nario naujienas
             </div>
             <div className="mt-6 space-y-3 text-sm text-white/68">
               <div className="rounded-[18px] bg-white/4 px-4 py-4">

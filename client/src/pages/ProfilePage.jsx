@@ -37,8 +37,8 @@ const subscriptionPlanLabels = {
   demo: "Demo versija",
   asmeninis: "Asmeninis",
   personal: "Asmeninis",
-  privatus_verslas: "Privatus verslas",
-  private_business: "Privatus verslas",
+  privatus_verslas: "Verslas",
+  private_business: "Verslas",
 };
 
 const subscriptionProviderLabels = {

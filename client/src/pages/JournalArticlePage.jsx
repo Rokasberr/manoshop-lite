@@ -30,7 +30,7 @@ const JournalArticlePage = () => {
       <JournalAccessGate
         user={user}
         title={`„${article.title}“ pilnai atsiveria aktyviems nariams.`}
-        description="Pilnas įrašas matomas, kai aktyvus Asmeninis arba Privatus verslas planas. Užraktas susietas su mokamos narystės būsena, ne vien su paskyros sukūrimu."
+        description="Pilnas įrašas matomas, kai aktyvus Asmeninis arba Verslas planas. Užraktas susietas su mokamos narystės būsena, ne vien su paskyros sukūrimu."
       />
     );
   }

@@ -42,8 +42,8 @@ const planPresentation = {
   },
   private_business: {
     eyebrow: "Strateginis lygis",
-    cta: "Rinktis Privatų verslą",
-    comparison: "Verslo strategijai, pasiūlymui ir augimui.",
+    cta: "Pasirinkti Verslas",
+    comparison: "Verslo įrankiams, svetainei, produktams ir pajamų apžvalgai.",
     kitName: "Stilloak Business Kit",
     icon: BriefcaseBusiness,
     accent: "rgb(226 202 145)",
@@ -87,7 +87,7 @@ const membershipKits = [
       "Reklamos kampanijos planavimo šablonas",
       "Prioritetiniai atnaujinimai",
     ],
-    planLabel: "Įeina į Privatus verslas planą",
+    planLabel: "Įeina į Verslo planą",
     icon: BriefcaseBusiness,
   },
 ];
@@ -125,8 +125,18 @@ const dashboardCards = [
 
 const trustLine = "Demo versija be kortelės · Mokami planai atšaukiami bet kada · Aiškūs planų skirtumai · Jokių paslėptų mokesčių";
 
-const formatPlanPrice = (value, intervalLabel) =>
-  Number(value || 0) === 0 ? "€0" : `${Number(value || 0).toFixed(2)} €${intervalLabel}`;
+const formatPlanPrice = (value, intervalLabel) => {
+  const amount = Number(value || 0);
+
+  if (amount === 0) {
+    return "€0";
+  }
+
+  const formattedAmount = Number.isInteger(amount) ? String(amount) : amount.toFixed(2);
+  const formattedInterval = intervalLabel ? ` ${intervalLabel.replace("/", "/ ")}` : "";
+
+  return `€${formattedAmount}${formattedInterval}`;
+};
 
 const MembershipPricingShowcase = ({
   onChoosePlan,
@@ -166,7 +176,7 @@ const MembershipPricingShowcase = ({
             Pasirink nario erdvę pagal savo etapą.
           </h1>
           <p className="mt-6 max-w-3xl text-base leading-7 text-white/72 sm:text-lg">
-            Demo versija padeda susipažinti su skaitmeniniais produktais, Asmeninis atrakina pilną nario erdvę, o Privatus verslas suteikia
+            Demo versija padeda susipažinti su skaitmeniniais produktais, Asmeninis atrakina pilną nario erdvę, o Verslas suteikia
             strateginę verslo erdvę augimui.
           </p>
 
@@ -371,7 +381,7 @@ const DashboardPreview = () => (
       </div>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
-        {["Demo versija", "Asmeninis", "Privatus verslas"].map((item, index) => (
+        {["Demo versija", "Asmeninis", "Verslas"].map((item, index) => (
           <div key={item} className="rounded-lg border border-white/10 bg-white/[0.055] px-3 py-3">
             <p className="text-xs font-semibold uppercase text-white/42">Zona {index + 1}</p>
             <p className="mt-1 text-sm font-semibold text-white">{item}</p>

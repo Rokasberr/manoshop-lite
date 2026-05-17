@@ -259,7 +259,7 @@ const journeySteps = [
   {
     title: "Pasirenka planą",
     text: "Klientas lygina pasirinkimus ir ieško saugiausio sprendimo.",
-    suggestion: "Padaryk skirtumus tarp lygių greitai nuskaitomus, ypač tarp Asmeninis ir Privatus verslas.",
+    suggestion: "Padaryk skirtumus tarp lygių greitai nuskaitomus, ypač tarp Asmeninis ir Verslas.",
   },
   {
     title: "Tampa nariu / klientu",
@@ -336,7 +336,7 @@ const decisionFocusCards = [
     id: "membership",
     title: "Narystės vertė",
     text: "Kai kiekvienas planas turi aiškią priežastį egzistuoti.",
-    recommendation: "Palygink Demo versiją, Asmeninis ir Privatus verslas pagal rezultatą, ne tik pagal funkcijas.",
+    recommendation: "Palygink Demo versiją, Asmeninis ir Verslas pagal rezultatą, ne tik pagal funkcijas.",
   },
   {
     id: "products",
@@ -365,7 +365,7 @@ const recommendations = [
   },
   {
     title: "Aiškiau parodyti narystės skirtumus",
-    text: "Privatus verslas turi jaustis kaip strateginis lygis, o ne tiesiog ilgesnis funkcijų sąrašas.",
+    text: "Verslo planas turi jaustis kaip strateginis lygis, o ne tiesiog ilgesnis funkcijų sąrašas.",
   },
   {
     title: "Patobulinti pirmą vartotojo kelionę",
@@ -468,12 +468,12 @@ const PrivateBusinessPreview = () => (
     <div className="grid gap-8 lg:grid-cols-[1.05fr_0.78fr] lg:items-end">
       <div className="min-w-0">
         <div className="flex flex-wrap gap-2">
-          <span className="hero-chip">Privatus verslas</span>
+          <span className="hero-chip">Verslas</span>
           <span className="hero-chip">Peržiūra</span>
           <span className="hero-chip">Užrakinta</span>
         </div>
         <h2 className="mt-6 max-w-3xl break-words font-display text-4xl font-bold leading-tight sm:text-5xl">
-          Privataus verslo erdvė
+          Verslo erdvė
         </h2>
         <p className="mt-5 max-w-2xl text-sm leading-7 text-white/72 sm:text-base">
           Aukščiausio lygio strateginė darbo erdvė projektams, pasiūlymams, prioritetams ir skaitmeninio augimo
@@ -493,11 +493,11 @@ const PrivateBusinessPreview = () => (
         <p className="text-xs font-semibold uppercase leading-5 text-white/52">aukščiausias lygis</p>
         <h3 className="mt-4 break-words font-display text-3xl font-bold leading-tight">Verslo komandos režimas</h3>
         <p className="mt-4 text-sm leading-7 text-white/66">
-          Privatus verslas prideda strateginį sluoksnį virš Asmeninio plano: pasiūlymo aiškumą, kliento kelionės
+          Verslo planas prideda strateginį sluoksnį virš Asmeninio plano: pasiūlymo aiškumą, kliento kelionės
           peržiūrą ir aukštesnio lygio resursų struktūrą.
         </p>
         <Link to="/pricing" className="button-primary mt-6 w-full gap-2">
-          Rinktis Privatų verslą
+          Pasirinkti Verslas
           <ArrowUpRight size={16} />
         </Link>
       </div>
@@ -773,14 +773,14 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
         <div className="grid gap-8 xl:grid-cols-[1.08fr_0.72fr] xl:items-end">
           <div className="min-w-0">
             <div className="flex flex-wrap gap-2">
-              {["Privatus verslas", "Aukščiausias planas", "Strateginė erdvė", "Prioritetinė prieiga"].map((chip) => (
+              {["Verslas", "Aukščiausias planas", "Strateginė erdvė", "Prioritetinė prieiga"].map((chip) => (
                 <span key={chip} className="hero-chip">
                   {chip}
                 </span>
               ))}
             </div>
             <h1 className="mt-7 max-w-4xl break-words font-display text-4xl font-bold leading-tight sm:text-6xl lg:text-7xl">
-              Privataus verslo erdvė
+              Verslo erdvė
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-white/74 sm:text-lg">
               Privati strateginė erdvė projektams, pasiūlymams, prioritetams ir aukštesnio lygio skaitmeniniam
@@ -811,7 +811,7 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
               <ShieldCheck size={22} className="mt-1 shrink-0 text-white/72" />
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase leading-5 text-white/52">lokali darbo erdvė</p>
-                <h2 className="mt-4 break-words font-display text-3xl font-bold leading-tight">Privatus strateginis kambarys</h2>
+                <h2 className="mt-4 break-words font-display text-3xl font-bold leading-tight">Verslo strateginis kambarys</h2>
                 <p className="mt-4 text-sm leading-7 text-white/66">
                   Strategijos, pasiūlymo ir 30 dienų plano įrašai saugomi tik šiame įrenginyje per localStorage.
                   Backend, Stripe ir narystės logika nekeičiama.
@@ -1346,9 +1346,9 @@ const PrivateBusinessWorkspacePage = ({ lockedPreview = false }) => {
       <section className="grid gap-6 lg:grid-cols-[1fr_0.76fr]">
         <div className="panel p-5 sm:p-7 lg:p-8">
           <SectionHeading
-            eyebrow="Įtraukta į Privatus verslas"
+            eyebrow="Įtraukta į Verslas"
             title="Aukščiausias StillOak Studio nario sluoksnis"
-            text="Privatus verslas aiškiai stovi virš Asmeninio plano: daugiau strategijos, verslo resursų ir premium sprendimų erdvės."
+            text="Verslo planas aiškiai stovi virš Asmeninio plano: daugiau strategijos, verslo resursų ir premium sprendimų erdvės."
           />
 
           <div className="mt-7 grid gap-3 sm:grid-cols-2">

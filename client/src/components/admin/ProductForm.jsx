@@ -227,7 +227,7 @@ const ProductForm = ({
                 checked={formData.allowedForResale}
                 onChange={(event) => handleChange("allowedForResale", event.target.checked)}
               />
-              Leisti Privatus verslas nariams prideti i savo store perpardavimui
+              Leisti Verslas plano nariams prideti i savo store perpardavimui
             </label>
 
             <div>

@@ -654,8 +654,8 @@ const BazinisMemberPage = () => {
           </div>
           <div className="max-w-xl">
             <p className="text-sm leading-6 text-muted">
-              Ribotos peržiūros rodo narystės kryptį. Pilnas archyvas ir detalūs įrašai lieka Asmeniniame ir Privataus
-              verslo planuose.
+              Ribotos peržiūros rodo narystės kryptį. Pilnas archyvas ir detalūs įrašai lieka Asmeniniame ir Verslo
+              planuose.
             </p>
             <Link to="/journal" className="button-secondary mt-4 gap-2">
               Peržiūrėti Nario naujienas

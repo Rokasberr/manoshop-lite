@@ -68,7 +68,7 @@
         heading: "Kaip jie bus atrenkami",
         paragraphs: [
           "Kiekvienas resursas bus vertinamas pagal naudą nariui, o ne pagal failų skaičių. Mažiau, bet aiškiau yra svarbiau už didelį archyvą be krypties.",
-          "Demo versija gali matyti ribotas peržiūras, o pilni resursai bus jungiami prie Asmeninio ir Privataus verslo planų.",
+          "Demo versija gali matyti ribotas peržiūras, o pilni resursai bus jungiami prie Asmeninio ir Verslo planų.",
         ],
       },
     ],
@@ -115,10 +115,10 @@
   },
   {
     slug: "privataus-verslo-planui-ruosiama-projektu-erdve",
-    category: "Privatus verslas",
+    category: "Verslas",
     date: "2026 m. gegužės 5 d.",
     readTime: "3 min. skaitymo",
-    title: "Privataus verslo planui ruošiama projektų erdvė",
+    title: "Verslo planui ruošiama projektų erdvė",
     cover: {
       issue: "Naujiena 04",
       heading: "Projektų sluoksnis verslo nariams.",
@@ -131,7 +131,7 @@
     excerpt:
       "Verslo nariams ruošiami projektų, prioritetinės pagalbos ir verslo resursų blokai.",
     intro:
-      "Privataus verslo planas plečiamas kaip aukščiausias nario lygis projektams, prioritetui ir praktiškesnei verslo atramai. Pirmieji blokai ruošiami taip, kad narys matytų daugiau tvarkos aplink projektus ir pagalbos poreikius.",
+      "Verslo planas plečiamas kaip aukščiausias nario lygis projektams, prioritetui ir praktiškesnei verslo atramai. Pirmieji blokai ruošiami taip, kad narys matytų daugiau tvarkos aplink projektus ir pagalbos poreikius.",
     sections: [
       {
         heading: "Projektų erdvės kryptis",
@@ -143,13 +143,13 @@
       {
         heading: "Kas liks premium sluoksnyje",
         paragraphs: [
-          "Privataus verslo plane toliau išlieka prioritetinė pagalba, verslo resursai ir premium nario patirtis.",
+          "Verslo plane toliau išlieka prioritetinė pagalba, verslo resursai ir premium nario patirtis.",
           "Nario naujienose verslo nariai matys su projektais ir resursais susijusius pranešimus, kai jie bus paruošti naudojimui.",
         ],
       },
     ],
     takeaway:
-      "Privataus verslo planas juda link aiškesnės projektų atramos, išlaikant ramų ir minimalų Stilloak Studio toną.",
+      "Verslo planas juda link aiškesnės projektų atramos, išlaikant ramų ir minimalų Stilloak Studio toną.",
   },
   {
     slug: "nauji-produkto-pristatymai-ir-atrinkti-resursai",
@@ -174,7 +174,7 @@
       {
         heading: "Ką nariai matys pirmiausia",
         paragraphs: [
-          "Asmeninio ir Privataus verslo planų nariai matys ankstyvus produkto pristatymus, naujų resursų paaiškinimus ir svarbiausius platformos pokyčius.",
+          "Asmeninio ir Verslo planų nariai matys ankstyvus produkto pristatymus, naujų resursų paaiškinimus ir svarbiausius platformos pokyčius.",
           "Demo versija gali matyti ribotas peržiūras, kad būtų aišku, kas vyksta, bet pilnas turinys lieka aktyviems mokamiems planams.",
         ],
       },

@@ -111,7 +111,7 @@ const BusinessDashboardPage = () => {
           <div>
             <div className="flex flex-wrap gap-2">
               <span className="hero-chip">Business Studio</span>
-              <span className="hero-chip">Privatus verslas</span>
+              <span className="hero-chip">Verslas</span>
             </div>
             <h1 className="mt-6 break-words font-display text-4xl font-bold leading-tight sm:text-6xl">
               Tavo verslo zona, parduotuve ir pajamu eiga vienoje vietoje

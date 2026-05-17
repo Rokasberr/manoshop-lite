@@ -40,7 +40,7 @@ const previewOptions = [
   { id: "current", label: "Dabartinis planas", helper: "Rodo pagal tikrą paskyros planą." },
   { id: "basic", label: "Demo versija", helper: "Nemokama skaitmeninių produktų pradžia." },
   { id: "personal", label: "Asmeninis", helper: "Pilna Saving Studio patirtis." },
-  { id: "private_business", label: "Privatus verslas", helper: "Business Studio ir verslo įrankiai." },
+  { id: "private_business", label: "Verslas", helper: "Business Studio ir verslo įrankiai." },
 ];
 
 const planAccent = {
@@ -303,11 +303,11 @@ const OverviewSection = ({ user, planId, access, onOpenSection }) => {
     },
     {
       title: "Business Studio",
-      subtitle: "Privati verslo zona svetainėms, produktams, užsakymams ir pajamų apžvalgai.",
+      subtitle: "Verslo zona svetainėms, produktams, užsakymams ir pajamų apžvalgai.",
       icon: BriefcaseBusiness,
       isLocked: !access.business,
       onOpen: () => onOpenSection("business"),
-      cta: "Atidaryti verslo zoną",
+      cta: "Atidaryti Business Studio",
     },
   ];
 
@@ -396,7 +396,7 @@ const JournalSection = ({ access }) => {
         <span className="signal-pill">Journal</span>
         <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">Journal ir gidai</h2>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
-          Asmeninio ir Privataus verslo nariams skirti gidai, naujienos ir struktūruotos pastabos.
+          Asmeninio ir Verslo plano nariams skirti gidai, naujienos ir struktūruotos pastabos.
         </p>
         <Link to="/journal" className="button-primary mt-5 gap-2">
           Atidaryti Journal
@@ -425,10 +425,10 @@ const BusinessStudioSection = ({ access }) => {
   return (
     <section className="space-y-5">
       <div className="panel p-5 sm:p-6">
-        <span className="signal-pill">Privatus verslas</span>
+        <span className="signal-pill">Verslas</span>
         <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">Business Studio</h2>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
-          Privati verslo zona svetainėms, produktams, užsakymams ir pajamų apžvalgai.
+          Verslo zona svetainėms, produktams, užsakymams ir pajamų apžvalgai.
         </p>
       </div>
 
@@ -463,7 +463,7 @@ const AccountSection = ({ user, planId }) => (
       <span className="signal-pill">Planai</span>
       <h2 className="mt-4 font-display text-3xl font-bold">Keiskite planą tada, kai reikia daugiau.</h2>
       <p className="mt-3 text-sm leading-7 text-muted">
-        Demo versija tinka failų pradžiai, Asmeninis atrakina pilną Saving Studio, o Privatus verslas prideda verslo zonas.
+        Demo versija tinka failų pradžiai, Asmeninis atrakina pilną Saving Studio, o Verslas prideda verslo zonas.
       </p>
       <Link to="/pricing" className="button-secondary mt-5 justify-center">
         Peržiūrėti planus
@@ -478,7 +478,7 @@ const PlansSection = ({ planId }) => (
       <span className="signal-pill">Planai</span>
       <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">Pasirinkite kitą lygį</h2>
       <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
-        Kiekvienas planas turi aiškią paskirtį: Demo failams, Asmeninis pilnai asmeninei sistemai, Privatus verslas verslo valdymui.
+        Kiekvienas planas turi aiškią paskirtį: Demo failams, Asmeninis pilnai asmeninei sistemai, Verslas verslo valdymui.
       </p>
     </div>
 
