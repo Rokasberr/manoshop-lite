@@ -36,7 +36,7 @@ export const subscriptionPlans = [
   {
     id: "private_business",
     name: "Verslas",
-    price: 99,
+    price: 44.99,
     intervalLabel: "/mėn.",
     subtitle: "Verslo įrankiai, svetainės zona, produktai, užsakymai ir pajamų apžvalga vienoje vietoje.",
     description: "Verslo įrankiai, svetainės zona, produktai, užsakymai ir pajamų apžvalga vienoje vietoje.",
