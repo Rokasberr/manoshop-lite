@@ -6,7 +6,11 @@ import JournalAccessGate from "../components/JournalAccessGate";
 import { journalArticles } from "../content/journalArticles";
 import JournalCoverArt from "../components/JournalCoverArt";
 import { useAuth } from "../context/AuthContext";
-import { hasActiveMembership } from "../utils/membership";
+import { hasActiveMembership, isAdminUser, normalizePlan } from "../utils/membership";
+
+const canAccessFullJournal = (user) =>
+  isAdminUser(user) ||
+  (hasActiveMembership(user) && ["personal", "private_business"].includes(normalizePlan(user?.subscription?.plan)));
 
 const newsPoints = [
   "narystės, planų ir nario erdvių pokyčiai",
@@ -16,7 +20,7 @@ const newsPoints = [
 
 const JournalPage = () => {
   const { user, isCheckingAuth } = useAuth();
-  const canAccessJournal = hasActiveMembership(user);
+  const canAccessJournal = canAccessFullJournal(user);
 
   if (isCheckingAuth) {
     return <LoadingSpinner label="Tikriname narystės prieigą..." />;

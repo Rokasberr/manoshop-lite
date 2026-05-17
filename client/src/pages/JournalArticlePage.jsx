@@ -6,7 +6,11 @@ import JournalCoverArt from "../components/JournalCoverArt";
 import { getJournalArticleBySlug, journalArticles } from "../content/journalArticles";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useAuth } from "../context/AuthContext";
-import { hasActiveMembership } from "../utils/membership";
+import { hasActiveMembership, isAdminUser, normalizePlan } from "../utils/membership";
+
+const canAccessFullJournal = (user) =>
+  isAdminUser(user) ||
+  (hasActiveMembership(user) && ["personal", "private_business"].includes(normalizePlan(user?.subscription?.plan)));
 
 const JournalArticlePage = () => {
   const { user, isCheckingAuth } = useAuth();
@@ -21,7 +25,7 @@ const JournalArticlePage = () => {
     return <LoadingSpinner label="Tikriname narystės prieigą..." />;
   }
 
-  if (!hasActiveMembership(user)) {
+  if (!canAccessFullJournal(user)) {
     return (
       <JournalAccessGate
         user={user}
