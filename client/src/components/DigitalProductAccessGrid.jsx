@@ -31,8 +31,8 @@ const formatIcons = {
   XLSX: FileSpreadsheet,
 };
 
-const getDownloadName = (url) => url.split("/").pop();
-const getRequiredPlan = (product) => normalizePlan(product.requiredPlan || "basic");
+const getDownloadName = (url) => url?.split("/").pop() || "";
+const getRequiredPlan = (product) => normalizePlan(product.accessPlan || product.requiredPlan || "basic");
 
 export const canAccessDigitalProduct = (user, product) => {
   if (isAdminUser(user)) {
@@ -65,7 +65,28 @@ const AccessBadge = ({ plan }) => (
   </span>
 );
 
+const FeatureBadge = ({ children }) => (
+  <span className="inline-flex items-center rounded-lg border border-white/10 bg-white/[0.075] px-3 py-1 text-xs font-bold text-white/78">
+    {children}
+  </span>
+);
+
+const ProductDetail = ({ label, value }) => (
+  <div className="rounded-lg border border-white/10 bg-black/16 px-3 py-2.5">
+    <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-white/38">{label}</p>
+    <p className="mt-1 text-sm font-semibold leading-5 text-white/78">{value}</p>
+  </div>
+);
+
 const DownloadButton = ({ href, children, variant = "primary" }) => {
+  if (!href) {
+    return (
+      <span className="inline-flex min-h-[3rem] items-center justify-center rounded-lg border border-white/10 bg-white/[0.045] px-4 py-3 text-center text-sm font-semibold leading-5 text-white/48">
+        Failas netrukus bus pasiekiamas
+      </span>
+    );
+  }
+
   const className =
     variant === "primary"
       ? "button-primary min-h-[3rem] justify-center gap-2 px-4"
@@ -83,30 +104,19 @@ const LockedDownloads = ({ isLoggedIn }) => (
   <div className="rounded-lg border border-white/10 bg-black/24 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:p-5">
     <p className="flex gap-2 text-sm font-semibold leading-6 text-white">
       <LockKeyhole className="mt-0.5 shrink-0 text-[#f2d99a]" size={16} />
-      {isLoggedIn
-        ? "Atrakinkite šią zoną"
-        : "Prisijunkite arba susikurkite paskyrą, kad galėtumėte atsisiųsti PDF ir Excel failus."}
+      Atrakinkite šį produktą
     </p>
     <p className="mt-2 text-sm leading-6 text-white/62">
-      {isLoggedIn
-        ? "Ši skiltis prieinama aukštesnio plano nariams. Pasirinkite planą, kuris geriausiai atitinka jūsų tikslus."
-        : "Demo versija suteikia prieigą prie atrinktų PDF gidų ir Excel šablonų be mokėjimo kortelės."}
+      Šis produktas prieinamas aukštesnio plano nariams. Pasirinkite planą, kuris geriausiai atitinka jūsų tikslus.
     </p>
-    <div className="mt-4 grid gap-3 sm:grid-cols-2">
-      {isLoggedIn ? (
-        <Link to="/pricing" className="button-primary min-h-[3rem] justify-center px-4">
-          Peržiūrėti planus
-        </Link>
-      ) : (
-        <>
-          <Link to="/login" className="button-primary min-h-[3rem] justify-center px-4">
-            Prisijunkite
-          </Link>
-          <Link to="/register" state={{ selectedPlan: "basic" }} className="hero-outline-button min-h-[3rem] justify-center px-4">
-            Susikurti paskyrą
-          </Link>
-        </>
-      )}
+    <div className="mt-4">
+      <Link
+        to={isLoggedIn ? "/pricing" : "/register"}
+        state={!isLoggedIn ? { selectedPlan: "basic" } : undefined}
+        className="button-primary min-h-[3rem] w-full justify-center px-4"
+      >
+        Peržiūrėti planus
+      </Link>
     </div>
   </div>
 );
@@ -130,6 +140,9 @@ const DigitalProductCard = ({ product, user }) => {
             {product.formats.map((format) => (
               <FormatBadge key={format} format={format} />
             ))}
+            {product.excelFeatures?.map((feature) => (
+              <FeatureBadge key={feature}>{feature}</FeatureBadge>
+            ))}
           </div>
         </div>
 
@@ -137,6 +150,15 @@ const DigitalProductCard = ({ product, user }) => {
           <h3 className="font-display text-2xl font-bold leading-tight text-white">{product.title}</h3>
           <p className="mt-3 text-sm font-semibold leading-6 text-[#f2d99a]/82">{product.subtitle}</p>
           <p className="mt-4 text-sm leading-7 text-white/68">{product.description}</p>
+        </div>
+
+        <div className="mt-5 grid gap-2 sm:grid-cols-2">
+          <ProductDetail label="Versija" value={product.version || "1.0"} />
+          <ProductDetail label="Formatai" value="PDF + XLSX" />
+          <ProductDetail label="Excel" value="Su formulėmis" />
+          <ProductDetail label="Atnaujinta" value={product.lastUpdated || "2026"} />
+          <ProductDetail label="Prieiga" value={accessLabels[requiredPlan] || planDisplayNames[requiredPlan] || "Narystė"} />
+          <ProductDetail label="Failai" value={product.fileNotes || "PDF gidas ir Excel modelis paruošti naudojimui."} />
         </div>
 
         <div className="mt-6 rounded-lg border border-white/10 bg-black/18 p-4">
@@ -149,6 +171,20 @@ const DigitalProductCard = ({ product, user }) => {
               </li>
             ))}
           </ul>
+        </div>
+
+        <div className="mt-4 rounded-lg border border-white/10 bg-black/18 p-4">
+          <p className="text-xs font-bold uppercase text-white/48">Kaip naudoti</p>
+          <ol className="mt-4 space-y-3">
+            {(product.howToUseSteps || []).map((step, index) => (
+              <li key={step} className="flex gap-3 text-sm leading-6 text-white/72">
+                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#e2ca91]/30 bg-[#e2ca91]/10 text-xs font-bold text-[#f2d99a]">
+                  {index + 1}
+                </span>
+                <span>{step}</span>
+              </li>
+            ))}
+          </ol>
         </div>
 
         <div className="mt-auto pt-6">
