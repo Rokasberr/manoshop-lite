@@ -15,6 +15,11 @@ const {
   refundPayment,
 } = require("../controllers/adminPaymentController");
 const {
+  downloadAdminDigitalProductFile,
+  listAdminDigitalProducts,
+  previewAdminDigitalProductPdf,
+} = require("../controllers/adminDigitalProductController");
+const {
   downloadAdminInstagramPost,
   generateAdminInstagramPost,
   getRecentAdminInstagramPosts,
@@ -36,6 +41,9 @@ router.get("/payments", asyncHandler(getAdminPayments));
 router.get("/subscriptions", asyncHandler(getAdminSubscriptions));
 router.post("/payments/:id/refund", validateObjectId("id"), asyncHandler(refundPayment));
 router.post("/subscriptions/:id/cancel", validateObjectId("id"), asyncHandler(cancelSubscription));
+router.get("/digital-products", asyncHandler(listAdminDigitalProducts));
+router.get("/digital-products/:productId/preview/pdf", asyncHandler(previewAdminDigitalProductPdf));
+router.get("/digital-products/:productId/download/:format", asyncHandler(downloadAdminDigitalProductFile));
 router.post(
   "/instagram-posts/generate",
   instagramGenerationRateLimiter,

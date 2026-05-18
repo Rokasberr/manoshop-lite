@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  FileText,
   Instagram,
   Lightbulb,
   LogOut,
@@ -27,6 +28,11 @@ const adminNavigation = [
     label: "Produktai",
     to: "/admin/products",
     icon: Package,
+  },
+  {
+    label: "Skaitmeniniai produktai",
+    to: "/admin/digital-products",
+    icon: FileText,
   },
   {
     label: "Užsakymai",

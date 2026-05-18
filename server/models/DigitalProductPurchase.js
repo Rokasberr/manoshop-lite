@@ -18,7 +18,6 @@ const digitalProductPurchaseSchema = new mongoose.Schema(
       type: String,
       default: "",
       trim: true,
-      index: true,
     },
     stripePaymentIntentId: {
       type: String,
