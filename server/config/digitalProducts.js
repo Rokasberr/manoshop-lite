@@ -13,7 +13,7 @@ const digitalProducts = [
     stripePriceEnvKey: null,
     stripePriceIdReference: "dynamic_one_time_checkout",
     pdfFileName: null,
-    excelFileName: "StillOak_Personal_Budget_System_V10_English_Polished.xlsx",
+    excelFileName: "StillOak_Personal_Budget_System.xlsx",
   },
   {
     id: "12-month-savings-tracker",
@@ -29,7 +29,7 @@ const digitalProducts = [
     stripePriceEnvKey: null,
     stripePriceIdReference: "dynamic_one_time_checkout",
     pdfFileName: null,
-    excelFileName: "StillOak_Savings_Tracker_V15_StillOak_Premium.xlsx",
+    excelFileName: "StillOak_Savings_Tracker.xlsx",
   },
   {
     id: "weekly-planning-system",
@@ -45,7 +45,7 @@ const digitalProducts = [
     stripePriceEnvKey: null,
     stripePriceIdReference: "dynamic_one_time_checkout",
     pdfFileName: null,
-    excelFileName: "StillOak_Weekly_Planning_System_V15_Dashboard_Premium.xlsx",
+    excelFileName: "StillOak_Weekly_Planning_System.xlsx",
   },
 ];
 

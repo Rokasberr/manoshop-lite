@@ -30,7 +30,7 @@ export const digitalProducts = [
     version: "V10",
     imageUrl: "/digital-products/previews/personal-budget-system-preview.png",
     pdfFileName: null,
-    excelFileName: "StillOak_Personal_Budget_System_V10_English_Polished.xlsx",
+    excelFileName: "StillOak_Personal_Budget_System.xlsx",
     badges: ["Excel", "Su formulėmis", "Automatinis dashboard", "Finansai"],
     benefits: [
       "Padeda aiškiai matyti mėnesio pajamas, išlaidas ir balansą.",
@@ -100,7 +100,7 @@ export const digitalProducts = [
     version: "V15",
     imageUrl: "/digital-products/previews/savings-tracker-preview.png",
     pdfFileName: null,
-    excelFileName: "StillOak_Savings_Tracker_V15_StillOak_Premium.xlsx",
+    excelFileName: "StillOak_Savings_Tracker.xlsx",
     badges: ["Excel", "Su formulėmis", "Automatinis dashboard", "Finansai"],
     benefits: [
       "Padeda suskaidyti didesnį tikslą į aiškius mėnesio veiksmus.",
@@ -170,7 +170,7 @@ export const digitalProducts = [
     version: "V15",
     imageUrl: "/digital-products/previews/weekly-planning-system-preview.png",
     pdfFileName: null,
-    excelFileName: "StillOak_Weekly_Planning_System_V15_Dashboard_Premium.xlsx",
+    excelFileName: "StillOak_Weekly_Planning_System.xlsx",
     badges: ["Excel", "Su formulėmis", "Automatinis dashboard", "Planavimas"],
     benefits: [
       "Padeda susidėti savaitės prioritetus prieš prasidedant darbams.",
