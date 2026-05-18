@@ -7,9 +7,9 @@ const sharedProductMeta = {
   stripePriceEnvKey: null,
   stripePriceIdReference: "dynamic_one_time_checkout",
   ctaLabels: {
-    guest: "Gauti prieigą",
+    guest: "Prisiregistruoti ir įsigyti",
     purchase: "Pirkti dabar",
-    download: "Atsisiųsti po pirkimo",
+    download: "Atsisiųsti Excel",
   },
 };
 
@@ -17,13 +17,13 @@ export const digitalProducts = [
   {
     ...sharedProductMeta,
     id: "personal-budget-system",
-    slug: "personal-budget-system",
+    slug: "stilloak-personal-budget-system",
     title: "StillOak Personal Budget System",
-    subtitle: "Premium asmeninio biudžeto Excel sistema su dashboard ir formulėmis.",
+    subtitle: "Premium asmeninio biudžeto Excel sistema aiškesniam pinigų valdymui.",
     description:
-      "Aiški biudžeto valdymo sistema pajamoms, išlaidoms, kategorijoms, taupymo tikslams ir mėnesio balansui sekti.",
+      "Profesionalus Excel modelis pajamoms, išlaidoms, kategorijoms, taupymo tikslams ir mėnesio balansui valdyti vienoje aiškioje sistemoje.",
     salesDescription:
-      "Šis Excel modelis sukurtas kaip ramus, profesionalus finansų valdymo centras. Jis padeda vienoje vietoje susidėti mėnesio planą, sekti realius skaičius, matyti nukrypimus ir priimti geresnius sprendimus be sudėtingų formulių kūrimo nuo nulio.",
+      "Sukurtas žmonėms, kurie nori matyti realų finansų vaizdą be chaoso. Įveskite planą, faktinius skaičius ir taupymo tikslus, o dashboard padės greitai suprasti, kur pinigai juda gerai ir kur verta koreguoti įpročius.",
     category: "Finansai",
     priceLabel: "€19",
     priceCents: 1900,
@@ -31,13 +31,15 @@ export const digitalProducts = [
     imageUrl: "/digital-products/previews/personal-budget-system-preview.png",
     pdfFileName: null,
     excelFileName: "StillOak_Personal_Budget_System.xlsx",
+    highlightBadge: "Geriausia pradžiai",
     badges: ["Excel", "Su formulėmis", "Automatinis dashboard", "Finansai"],
+    trustBadges: ["Saugus pirkimas", "Skaitmeninis atsisiuntimas", "Prieiga po apmokėjimo", "Paruošta naudoti"],
     benefits: [
-      "Padeda aiškiai matyti mėnesio pajamas, išlaidas ir balansą.",
-      "Automatiškai parodo, kur biudžetas viršija planą.",
-      "Sutvarko taupymo tikslus ir progreso stebėjimą vienoje vietoje.",
-      "Suteikia profesionalų dashboard be papildomo kūrimo darbo.",
-      "Tinka tiek asmeniniam, tiek namų ūkio biudžetui.",
+      "Aiškiai parodo mėnesio pajamas, išlaidas ir balansą.",
+      "Padeda pastebėti, kurios kategorijos viršija planą.",
+      "Sujungia taupymo tikslus ir progresą vienoje vietoje.",
+      "Suteikia paruoštą dashboard be papildomo kūrimo darbo.",
+      "Tinka asmeniniam arba namų ūkio biudžetui.",
     ],
     includedItems: [
       "Excel biudžeto modelis su formulėmis",
@@ -57,7 +59,7 @@ export const digitalProducts = [
     targetAudience: [
       "Žmonėms, kurie nori tvarkingai valdyti asmeninį biudžetą.",
       "Poroms ar namų ūkiams, norintiems matyti bendrą finansų vaizdą.",
-      "Pradedantiesiems, kuriems reikia aiškios struktūros be sudėtingo setup.",
+      "Pradedantiesiems, kuriems reikia aiškios struktūros be sudėtingo pasiruošimo.",
       "Visiems, kurie nori kas mėnesį priimti ramesnius finansinius sprendimus.",
     ],
     howToUseSteps: [
@@ -87,13 +89,13 @@ export const digitalProducts = [
   {
     ...sharedProductMeta,
     id: "12-month-savings-tracker",
-    slug: "12-month-savings-tracker",
-    title: "StillOak 12-Month Savings Tracker",
-    subtitle: "Premium metinis taupymo trackeris tikslams, įmokoms ir progresui sekti.",
+    slug: "stilloak-savings-tracker",
+    title: "StillOak Savings Tracker",
+    subtitle: "Premium taupymo trackeris tikslams, įmokoms ir progresui sekti.",
     description:
-      "Metinė taupymo sistema, padedanti planuoti tikslą, sekti realias įmokas ir matyti, ar judate tinkamu tempu.",
+      "Švari taupymo sistema, padedanti nusistatyti tikslą, sekti įmokas, išlaikyti discipliną ir matyti, kiek liko iki rezultato.",
     salesDescription:
-      "Šis trackeris skirtas žmonėms, kurie nori taupyti ne iš nuojautos, o pagal aiškų metinį ritmą. Modelis padeda susidėti tikslą, matyti mėnesio įmokas, palyginti planą su realybe ir laiku pastebėti, kada reikia koreguoti tempą.",
+      "Modelis padeda taupyti ne iš nuojautos, o pagal aiškų ritmą. Susidėkite tikslą, stebėkite planuotas ir realias įmokas, matykite progresą ir laiku koreguokite tempą, kai mėnuo nukrypsta nuo plano.",
     category: "Finansai",
     priceLabel: "€15",
     priceCents: 1500,
@@ -101,9 +103,11 @@ export const digitalProducts = [
     imageUrl: "/digital-products/previews/savings-tracker-preview.png",
     pdfFileName: null,
     excelFileName: "StillOak_Savings_Tracker.xlsx",
+    highlightBadge: "Populiaru",
     badges: ["Excel", "Su formulėmis", "Automatinis dashboard", "Finansai"],
+    trustBadges: ["Saugus pirkimas", "Skaitmeninis atsisiuntimas", "Prieiga po apmokėjimo", "Paruošta naudoti"],
     benefits: [
-      "Padeda suskaidyti didesnį tikslą į aiškius mėnesio veiksmus.",
+      "Suskaido didesnį tikslą į aiškius mėnesio veiksmus.",
       "Parodo planuotų ir realių įmokų skirtumus.",
       "Automatiškai skaičiuoja progresą ir likusią sumą.",
       "Padeda išlaikyti taupymo ritmą visus metus.",
@@ -157,13 +161,13 @@ export const digitalProducts = [
   {
     ...sharedProductMeta,
     id: "weekly-planning-system",
-    slug: "weekly-planning-system",
+    slug: "stilloak-weekly-planning-system",
     title: "StillOak Weekly Planning System",
-    subtitle: "Premium savaitės planavimo sistema tikslams, užduotims ir fokusui valdyti.",
+    subtitle: "Premium savaitės planavimo sistema prioritetams, užduotims ir fokusui valdyti.",
     description:
-      "Savaitės planavimo Excel sistema, padedanti susidėlioti prioritetus, sekti užduotis ir aiškiai užbaigti savaitę.",
+      "Profesionalus savaitės planavimo Excel modelis, padedantis susidėlioti prioritetus, valdyti užduotis ir aiškiai matyti savaitės progresą.",
     salesDescription:
-      "Šis modelis sujungia savaitės tikslus, prioritetus, užduočių eigą ir refleksiją į vieną aiškų darbo ritmą. Jis sukurtas žmonėms, kurie nori mažiau chaoso, daugiau struktūros ir konkretesnio savaitės progreso.",
+      "Sukurtas žmonėms, kurie nori mažiau chaoso ir daugiau krypties. Modelis sujungia savaitės tikslus, prioritetus, užduočių eigą ir refleksiją į vieną aiškų planavimo ritmą.",
     category: "Planavimas",
     priceLabel: "€12",
     priceCents: 1200,
@@ -171,9 +175,11 @@ export const digitalProducts = [
     imageUrl: "/digital-products/previews/weekly-planning-system-preview.png",
     pdfFileName: null,
     excelFileName: "StillOak_Weekly_Planning_System.xlsx",
+    highlightBadge: "Planavimui",
     badges: ["Excel", "Su formulėmis", "Automatinis dashboard", "Planavimas"],
+    trustBadges: ["Saugus pirkimas", "Skaitmeninis atsisiuntimas", "Prieiga po apmokėjimo", "Paruošta naudoti"],
     benefits: [
-      "Padeda susidėti savaitės prioritetus prieš prasidedant darbams.",
+      "Padeda susidėlioti savaitės prioritetus prieš prasidedant darbams.",
       "Suteikia aiškų užduočių, terminų ir statusų vaizdą.",
       "Parodo savaitės progresą ir fokuso kokybę.",
       "Padeda užbaigti savaitę su refleksija ir kitu veiksmu.",

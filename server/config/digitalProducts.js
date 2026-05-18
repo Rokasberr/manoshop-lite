@@ -1,6 +1,7 @@
 const digitalProducts = [
   {
     id: "personal-budget-system",
+    slug: "stilloak-personal-budget-system",
     title: "StillOak Personal Budget System",
     category: "Finansai",
     priceCents: 1900,
@@ -17,7 +18,8 @@ const digitalProducts = [
   },
   {
     id: "12-month-savings-tracker",
-    title: "StillOak 12-Month Savings Tracker",
+    slug: "stilloak-savings-tracker",
+    title: "StillOak Savings Tracker",
     category: "Finansai",
     priceCents: 1500,
     priceLabel: "€15",
@@ -33,6 +35,7 @@ const digitalProducts = [
   },
   {
     id: "weekly-planning-system",
+    slug: "stilloak-weekly-planning-system",
     title: "StillOak Weekly Planning System",
     category: "Planavimas",
     priceCents: 1200,

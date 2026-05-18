@@ -1,4 +1,4 @@
-import { ArrowRight, ShoppingBag, UserPlus, X } from "lucide-react";
+import { ArrowRight, CheckCircle2, FileSpreadsheet, ShieldCheck, ShoppingBag, Sparkles, UserPlus, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -9,6 +9,50 @@ import { digitalProducts } from "../constants/digitalProducts";
 import { useAuth } from "../context/AuthContext";
 import adminDigitalProductService from "../services/adminDigitalProductService";
 import digitalProductService from "../services/digitalProductService";
+
+const trustItems = ["Saugus pirkimas", "Atsisiuntimas po apmokėjimo", "Paruošta naudoti"];
+
+const valueProps = [
+  {
+    title: "Aiški struktūra",
+    text: "Kiekvienas modelis turi paruoštus lapus, pavyzdinius duomenis ir aiškų darbo ritmą.",
+  },
+  {
+    title: "Lengva pradėti",
+    text: "Atsidarote failą, pakeičiate pavyzdinius skaičius savo duomenimis ir iškart matote rezultatus.",
+  },
+  {
+    title: "Premium dizainas",
+    text: "Šablonai sukurti taip, kad būtų malonu naudoti kasdien ir patogu pristatyti sau aiškią apžvalgą.",
+  },
+  {
+    title: "Praktiški įrankiai",
+    text: "Finansų, taupymo ir savaitės planavimo sistemos orientuotos į realius sprendimus, ne triukšmą.",
+  },
+];
+
+const faqItems = [
+  {
+    question: "Ar failą gausiu iškart po apmokėjimo?",
+    answer:
+      "Po sėkmingo apmokėjimo produktas priskiriamas jūsų paskyrai. Prisijungę matysite atsisiuntimo mygtuką prie įsigyto produkto.",
+  },
+  {
+    question: "Ar reikia Excel programos?",
+    answer:
+      "Rekomenduojame naudoti Microsoft Excel. Failai yra .xlsx formato ir neturi makrokomandų ar išorinių duomenų jungčių.",
+  },
+  {
+    question: "Ar tai vienkartinis pirkimas?",
+    answer:
+      "Taip. Skaitmeniniai produktai perkami atskirai nuo narystės, o atsisiuntimas aktyvuojamas konkrečiam įsigytam produktui.",
+  },
+  {
+    question: "Ar galiu naudoti asmeniškai?",
+    answer:
+      "Taip. Produktai skirti asmeniniam naudojimui: finansams, taupymo tikslams, savaitei ir kasdieniams planavimo sprendimams tvarkyti.",
+  },
+];
 
 const DigitalProductsPage = () => {
   const navigate = useNavigate();
@@ -180,23 +224,35 @@ const DigitalProductsPage = () => {
   return (
     <div className="space-y-10">
       <section className="relative overflow-hidden rounded-lg border border-[#e2ca91]/18 bg-[#071310] p-5 text-white shadow-[0_38px_110px_rgba(0,0,0,0.28)] sm:p-8 lg:p-10">
-        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(16,38,31,0.9),rgba(7,19,16,0.97)_58%,rgba(5,10,9,1))]" />
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(31,26,23,0.94),rgba(7,19,16,0.96)_56%,rgba(5,10,9,1))]" />
         <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#e2ca91]/60 to-transparent" />
 
         <div className="relative grid gap-8 lg:grid-cols-[1fr_0.46fr] lg:items-end">
           <div>
-            <span className="inline-flex rounded-lg border border-[#e2ca91]/30 bg-[#e2ca91]/12 px-3 py-1 text-xs font-bold uppercase text-[#f2d99a]">
-              Skaitmeniniai produktai
+            <span className="inline-flex items-center gap-2 rounded-lg border border-[#e2ca91]/30 bg-[#e2ca91]/12 px-3 py-1 text-xs font-bold uppercase text-[#f2d99a]">
+              <Sparkles size={14} />
+              Premium Excel katalogas
             </span>
             <h1 className="mt-5 max-w-4xl font-display text-4xl font-bold leading-tight text-white sm:text-6xl">
-              Skaitmeniniai produktai
+              Skaitmeniniai įrankiai finansams, taupymui ir produktyvumui
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-8 text-white/70 sm:text-lg">
-              Premium Excel modeliai ir praktinės sistemos finansams, planavimui ir aiškesniam kasdieniam progresui.
+              Paruošti naudoti Excel šablonai, kurie padeda aiškiau planuoti pinigus, tikslus ir savaitės darbus.
             </p>
             <p className="mt-4 max-w-3xl text-sm leading-7 text-white/58">
               Produktus galite peržiūrėti viešai. Norint įsigyti ir atsisiųsti failus, reikia prisijungti arba susikurti paskyrą.
             </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              {trustItems.map((item) => (
+                <span
+                  key={item}
+                  className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.07] px-3 py-2 text-xs font-semibold text-white/72"
+                >
+                  <ShieldCheck size={14} className="text-[#9ad7b1]" />
+                  {item}
+                </span>
+              ))}
+            </div>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a href="#product-catalog" className="button-primary gap-2">
                 Peržiūrėti katalogą
@@ -212,12 +268,15 @@ const DigitalProductsPage = () => {
           </div>
 
           <div className="rounded-lg border border-white/10 bg-white/[0.065] p-5 shadow-[0_26px_70px_rgba(0,0,0,0.22)]">
-            <p className="text-sm font-semibold text-white">Katalogo būsena</p>
+            <p className="flex items-center gap-2 text-sm font-semibold text-white">
+              <FileSpreadsheet size={17} className="text-[#f2d99a]" />
+              Premium katalogas
+            </p>
             <div className="mt-5 grid grid-cols-3 gap-3 lg:grid-cols-1">
               {[
                 ["Produktai", publicProducts.length],
-                ["Įsigyta", user ? purchasedProductIds.length : 0],
                 ["Formatas", "Excel"],
+                ["Prieiga", "Po pirkimo"],
               ].map(([label, value]) => (
                 <div key={label} className="rounded-lg border border-white/10 bg-black/18 p-4">
                   <p className="text-xs font-bold uppercase text-white/44">{label}</p>
@@ -235,7 +294,7 @@ const DigitalProductsPage = () => {
             <span className="eyebrow">Produktų katalogas</span>
             <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">Skaitmeniniai produktai</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
-              Peržiūrėkite produktų aprašymus, kainas, formatus ir įtrauktas dalis. Atsisiuntimai atsiranda tik įsigijus pasirinktą produktą.
+              Trys mokami StillOak Excel produktai su aiškiais aprašymais, peržiūros vaizdais, kainomis ir saugia prieiga po apmokėjimo.
             </p>
           </div>
           <div className="soft-pill rounded-lg px-4 py-3 text-sm font-semibold text-muted">
@@ -264,6 +323,58 @@ const DigitalProductsPage = () => {
         </div>
       </section>
 
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        {valueProps.map((item) => (
+          <article
+            key={item.title}
+            className="rounded-lg border border-[rgb(var(--line))] bg-[rgb(var(--surface))] p-5 shadow-[0_18px_50px_rgba(31,26,23,0.08)]"
+          >
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[#e2ca91]/28 bg-[#e2ca91]/12 text-[#8a6d2d]">
+              <CheckCircle2 size={18} />
+            </span>
+            <h3 className="mt-5 font-display text-xl font-bold leading-tight">{item.title}</h3>
+            <p className="mt-3 text-sm leading-7 text-muted">{item.text}</p>
+          </article>
+        ))}
+      </section>
+
+      <section className="rounded-lg border border-[rgb(var(--line))] bg-[rgb(var(--surface))] p-6 shadow-[0_20px_70px_rgba(31,26,23,0.08)] sm:p-8">
+        <div className="max-w-3xl">
+          <span className="eyebrow">Kodėl StillOak</span>
+          <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">Kodėl verta naudoti StillOak šablonus?</h2>
+          <p className="mt-3 text-sm leading-7 text-muted">
+            Šie produktai sukurti kaip praktiški darbo failai: ne teorijai, o kasdieniam naudojimui, aiškiems sprendimams ir tvarkingam progresui.
+          </p>
+        </div>
+        <div className="mt-6 grid gap-4 lg:grid-cols-3">
+          {[
+            ["Vienas aiškus failas", "Kiekvienas produktas turi paruoštą struktūrą, pavyzdinius duomenis ir dashboard vaizdą."],
+            ["Be sudėtingo pasiruošimo", "Nereikia kurti formulių nuo nulio. Pradedate nuo paruošto modelio ir pritaikote jį sau."],
+            ["Atskirai įsigyjama", "Produktai nėra automatiškai įtraukti į Demo versiją. Perkate tik tai, ko jums reikia."],
+          ].map(([title, text]) => (
+            <div key={title} className="rounded-lg border border-[rgb(var(--line))] bg-[rgb(var(--surface-soft))] p-5">
+              <p className="font-display text-xl font-bold">{title}</p>
+              <p className="mt-3 text-sm leading-7 text-muted">{text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-[rgb(var(--line))] bg-[rgb(var(--surface))] p-6 shadow-[0_20px_70px_rgba(31,26,23,0.08)] sm:p-8">
+        <div className="max-w-3xl">
+          <span className="eyebrow">Klausimai</span>
+          <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">Dažniausiai užduodami klausimai</h2>
+        </div>
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          {faqItems.map((item) => (
+            <article key={item.question} className="rounded-lg border border-[rgb(var(--line))] bg-[rgb(var(--surface-soft))] p-5">
+              <h3 className="font-display text-xl font-bold leading-tight">{item.question}</h3>
+              <p className="mt-3 text-sm leading-7 text-muted">{item.answer}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section className="relative overflow-hidden rounded-lg border border-[#e2ca91]/24 bg-[#071310] p-6 text-white shadow-[0_28px_82px_rgba(0,0,0,0.24)] sm:p-8 lg:p-10">
         <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(226,202,145,0.14),transparent_34%),linear-gradient(135deg,rgba(16,38,31,0.92),rgba(7,19,16,0.98))]" />
         <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
@@ -272,10 +383,10 @@ const DigitalProductsPage = () => {
               Saugi produkto prieiga
             </span>
             <h2 className="mt-4 font-display text-3xl font-bold leading-tight sm:text-4xl">
-              Įsigykite tik tai, ko reikia.
+              Įsigykite tik tai, ko reikia, ir atsisiųskite po apmokėjimo.
             </h2>
             <p className="mt-4 text-sm leading-7 text-white/70 sm:text-base">
-              Skaitmeniniai produktai yra atskirai įsigyjami Excel modeliai. Demo versija skirta Saving Studio pradžiai, o produktų failai atsiveria tik po individualaus įsigijimo.
+              Skaitmeniniai produktai yra atskirai įsigyjami Excel modeliai. Demo versija skirta Saving Studio pradžiai, o produktų failai atsiveria tik po individualaus pirkimo.
             </p>
           </div>
           {user ? (
