@@ -7,6 +7,7 @@ const path = require("path");
 const connectDatabase = require("../database/connect");
 const authRoutes = require("./routes/authRoutes");
 const billingRoutes = require("./routes/billingRoutes");
+const digitalProductRoutes = require("./routes/digitalProductRoutes");
 const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -102,6 +103,7 @@ app.get("/api/health", (_req, res) => {
 app.use("/api", authRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/billing", billingRoutes);
+app.use("/api/digital-products", digitalProductRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/users", userRoutes);

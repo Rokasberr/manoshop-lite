@@ -1,10 +1,10 @@
-const buildDownloadUrl = (folder, id, extension) => `/digital-products/${folder}/${id}.${extension}`;
-
 const sharedProductMeta = {
   formats: ["PDF", "XLSX"],
   lastUpdated: "2026",
   version: "1.0",
   isPublic: true,
+  stripePriceEnvKey: null,
+  stripePriceIdReference: "dynamic_one_time_checkout",
 };
 
 export const digitalProducts = [
@@ -14,21 +14,22 @@ export const digitalProducts = [
     title: "Personal Budget System",
     subtitle: "Mėnesio biudžeto sistema pajamoms, išlaidoms, tikslams ir balansui.",
     description:
-      "Aiški finansų sistema ramiam mėnesio planavimui. PDF gidas padeda susidėlioti darbo eigą, o Excel modelis su formulėmis automatiškai skaičiuoja pajamas, išlaidas, taupymą ir mėnesio likutį.",
+      "Rami finansų sistema mėnesio planavimui. PDF gidas paaiškina darbo eigą, o Excel modelis su formulėmis automatiškai skaičiuoja pajamas, išlaidas, taupymo procentą ir mėnesio likutį.",
     category: "Finansai",
-    accessPlan: "basic",
-    pdfDownloadUrl: buildDownloadUrl("pdf", "personal-budget-system", "pdf"),
-    excelDownloadUrl: buildDownloadUrl("excel", "personal-budget-system", "xlsx"),
+    priceLabel: "€9",
+    priceCents: 900,
+    pdfFileName: "personal-budget-system.pdf",
+    excelFileName: "personal-budget-system.xlsx",
     includedItems: [
-      "PDF gidas su mėnesio biudžeto naudojimo eiga",
+      "PDF gidas su aiškia mėnesio biudžeto naudojimo eiga",
       "Excel modelis pajamoms, išlaidoms ir balansui skaičiuoti",
       "Taupymo tikslų ir mėnesio progreso sekimo lapai",
-      "Trumpa mėnesio peržiūra geresniems sprendimams",
+      "Automatinė apžvalga sprendimams priimti ramiau",
     ],
     howToUseSteps: [
       "Įrašykite mėnesio pajamas ir pagrindines išlaidų grupes.",
       "Pažymėkite taupymo tikslą ir planuojamą mėnesio įnašą.",
-      "Savaitės pabaigoje atnaujinkite skaičius ir peržiūrėkite balansą.",
+      "Savaitės pabaigoje atnaujinkite skaičius ir peržiūrėkite rekomendaciją.",
     ],
     excelFeatures: ["Su formulėmis", "Automatinis dashboard"],
     pdfFeatures: ["Naudojimo eiga", "Skaičių pavyzdys", "Mėnesio checklist"],
@@ -40,11 +41,10 @@ export const digitalProducts = [
       "Didžiausia išlaidų kategorija",
       "Tikslo progresas",
     ],
-    recommendationLogic: "Rekomendacija keičiasi pagal balansą, taupymo procentą ir išlaidų santykį.",
+    recommendationLogic: "Rekomendacija keičiama pagal balansą, taupymo procentą ir išlaidų santykį.",
     estimatedUseTime: "30-45 min.",
     difficultyLevel: "Lengvas",
     fileNotes: "PDF paaiškina sistemą, Excel modelis skirtas kasdieniam biudžeto pildymui.",
-    premiumCtaText: "Pradėkite nuo Demo versijos, o Asmeninis planas atrakins gilesnius finansų įrankius.",
   },
   {
     ...sharedProductMeta,
@@ -52,11 +52,12 @@ export const digitalProducts = [
     title: "12-Month Savings Tracker",
     subtitle: "Metinis trackeris planuojamoms įmokoms, progresui ir taupymo įpročiams.",
     description:
-      "Metinė taupymo sistema, kuri padeda matyti tikslą, ritmą ir realų progresą. PDF gidas paaiškina, kaip susikurti taupymo planą, o Excel modelis su formulėmis seka įmokas, skirtumą ir bendrą balansą.",
+      "Metinė taupymo sistema, kuri padeda matyti tikslą, ritmą ir realų progresą. PDF gidas padeda susikurti taupymo planą, o Excel modelis seka įmokas, likutį ir progreso procentą.",
     category: "Finansai",
-    accessPlan: "basic",
-    pdfDownloadUrl: buildDownloadUrl("pdf", "12-month-savings-tracker", "pdf"),
-    excelDownloadUrl: buildDownloadUrl("excel", "12-month-savings-tracker", "xlsx"),
+    priceLabel: "€9",
+    priceCents: 900,
+    pdfFileName: "savings-tracker.pdf",
+    excelFileName: "savings-tracker.xlsx",
     includedItems: [
       "PDF gidas taupymo tikslui ir mėnesio ritmui nusistatyti",
       "Excel modelis planuotoms ir realioms įmokoms palyginti",
@@ -78,11 +79,10 @@ export const digitalProducts = [
       "Progresas",
       "Mėnesiai iki tikslo",
     ],
-    recommendationLogic: "Statusas parodo, ar taupymo ritmas yra pakankamas tikslui pasiekti laiku.",
+    recommendationLogic: "Statusas parodo, ar taupymo ritmas pakankamas tikslui pasiekti laiku.",
     estimatedUseTime: "20-30 min.",
     difficultyLevel: "Lengvas",
-    fileNotes: "PDF padeda susikurti taupymo ritmą, Excel modelis seka progresą per visus metus.",
-    premiumCtaText: "Naudokite trackerį Demo versijoje, o narystėje atrakinkite išsamesnį taupymo planavimą.",
+    fileNotes: "PDF padeda susikurti taupymo ritmą, Excel modelis seka progresą per metus.",
   },
   {
     ...sharedProductMeta,
@@ -90,11 +90,12 @@ export const digitalProducts = [
     title: "Weekly Planning System",
     subtitle: "Savaitės sistema tikslams, prioritetams, užduotims ir progresui.",
     description:
-      "Minimalus savaitės planavimo rėmas aiškesniam fokusui. PDF gidas padeda susidėlioti prioritetus, o Excel modelis su formulėmis seka užduotis, būsenas ir savaitės užbaigimo progresą.",
+      "Minimalus savaitės planavimo modelis aiškesniam fokusui. PDF gidas padeda susidėlioti prioritetus, o Excel modelis su formulėmis seka užduotis, būsenas ir savaitės rezultatą.",
     category: "Planavimas",
-    accessPlan: "basic",
-    pdfDownloadUrl: buildDownloadUrl("pdf", "weekly-planning-system", "pdf"),
-    excelDownloadUrl: buildDownloadUrl("excel", "weekly-planning-system", "xlsx"),
+    priceLabel: "€7",
+    priceCents: 700,
+    pdfFileName: "weekly-planning-system.pdf",
+    excelFileName: "weekly-planning-system.xlsx",
     includedItems: [
       "PDF gidas savaitės tikslams, prioritetams ir refleksijai",
       "Excel modelis užduočių progresui ir užbaigimui sekti",
@@ -106,7 +107,7 @@ export const digitalProducts = [
       "Užduotis suskirstykite pagal prioritetą ir terminą.",
       "Savaitės pabaigoje peržiūrėkite progresą ir perkelkite likusius veiksmus.",
     ],
-    excelFeatures: ["Su formulėmis"],
+    excelFeatures: ["Su formulėmis", "Automatinis dashboard"],
     pdfFeatures: ["Savaitės sistema", "Prioritetų pavyzdys", "Fokuso checklist"],
     dashboardMetrics: [
       "Užduočių skaičius",
@@ -120,7 +121,6 @@ export const digitalProducts = [
     estimatedUseTime: "15-25 min.",
     difficultyLevel: "Lengvas",
     fileNotes: "PDF paaiškina planavimo ritmą, Excel modelis padeda sekti savaitės eigą.",
-    premiumCtaText: "Pradėkite nuo savaitės planavimo, o narystėje atrakinkite gilesnę asmeninę sistemą.",
   },
   {
     ...sharedProductMeta,
@@ -128,14 +128,15 @@ export const digitalProducts = [
     title: "Business Idea Validation Kit",
     subtitle: "Verslo idėjos patikra paklausai, kainai, auditorijai ir kitam žingsniui.",
     description:
-      "Struktūruotas būdas įvertinti, ar idėja turi aiškią auditoriją, paklausą ir kainos potencialą. PDF gidas veda per sprendimo klausimus, o Excel modelis su formulėmis padeda palyginti stiprumą ir riziką.",
+      "Struktūruotas būdas įvertinti, ar idėja turi aiškią auditoriją, paklausą ir kainos potencialą. PDF gidas veda per sprendimo klausimus, o Excel modelis padeda palyginti stiprumą, riziką ir pelno galimybę.",
     category: "Verslas",
-    accessPlan: "private_business",
-    pdfDownloadUrl: buildDownloadUrl("pdf", "business-idea-validation-kit", "pdf"),
-    excelDownloadUrl: buildDownloadUrl("excel", "business-idea-validation-kit", "xlsx"),
+    priceLabel: "€19",
+    priceCents: 1900,
+    pdfFileName: "business-idea-validation-kit.pdf",
+    excelFileName: "business-idea-validation-kit.xlsx",
     includedItems: [
       "PDF validavimo gidas paklausai, auditorijai, pasiūlymui ir kainai",
-      "Excel modelis idėjos stiprumui ir rizikai įvertinti",
+      "Excel modelis idėjos stiprumui, rizikai ir pelno potencialui įvertinti",
       "Klausimų rinkinys pirkimo motyvui ir testavimo krypčiai patikrinti",
       "Sprendimo lentelė, ką verta testuoti pirmiausia",
     ],
@@ -160,7 +161,6 @@ export const digitalProducts = [
     estimatedUseTime: "45-60 min.",
     difficultyLevel: "Vidutinis",
     fileNotes: "PDF padeda įvertinti idėją, Excel modelis parodo prioritetą ir kitą testavimo žingsnį.",
-    premiumCtaText: "Patikrinkite idėją Verslas plane ir atrakinkite daugiau paleidimo resursų.",
   },
   {
     ...sharedProductMeta,
@@ -170,9 +170,10 @@ export const digitalProducts = [
     description:
       "Rami turinio planavimo sistema savaitės ritmui, kanalams ir įrašų eigai. PDF gidas padeda išlaikyti kryptį, o Excel modelis su formulėmis seka būsenas, kanalus ir savaitės progresą.",
     category: "Marketingas",
-    accessPlan: "personal",
-    pdfDownloadUrl: buildDownloadUrl("pdf", "social-media-content-calendar", "pdf"),
-    excelDownloadUrl: buildDownloadUrl("excel", "social-media-content-calendar", "xlsx"),
+    priceLabel: "€12",
+    priceCents: 1200,
+    pdfFileName: "social-media-content-calendar.pdf",
+    excelFileName: "social-media-content-calendar.xlsx",
     includedItems: [
       "PDF gidas turinio temoms, savaitės ritmui ir peržiūrai",
       "Excel modelis įrašų būsenai ir savaitės progresui sekti",
@@ -199,6 +200,5 @@ export const digitalProducts = [
     estimatedUseTime: "30-40 min.",
     difficultyLevel: "Lengvas",
     fileNotes: "PDF paaiškina turinio ritmą, Excel modelis padeda valdyti įrašų eigą ir progresą.",
-    premiumCtaText: "Planuokite turinį Asmeniniame plane, o Verslas atrakina papildomus verslo įrankius.",
   },
 ];

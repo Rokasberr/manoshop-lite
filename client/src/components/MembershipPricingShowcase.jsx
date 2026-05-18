@@ -26,9 +26,9 @@ const sectionNav = [
 const planPresentation = {
   basic: {
     eyebrow: "Nemokama pradžia",
-    cta: "Pasirinkti Demo versiją",
-    comparison: "Nemokamai susipažinti su skaitmeniniais produktais.",
-    kitName: "Demo skaitmeniniai produktai",
+    cta: "Pradėti Demo versiją",
+    comparison: "Nemokama Saving Studio peržiūra.",
+    kitName: "Saving Studio demo",
     icon: WalletCards,
     accent: "rgb(164 220 190)",
   },
@@ -52,15 +52,15 @@ const planPresentation = {
 
 const membershipKits = [
   {
-    title: "Stilloak Start Kit",
-    subtitle: "Pradžiai skirtas rinkinys su checklistais ir paprastais planavimo šablonais.",
+    title: "Saving Studio Start",
+    subtitle: "Pradžiai skirta Saving Studio peržiūra su paprastomis planavimo kortelėmis.",
     included: [
-      "Projekto pradžios checklistas",
-      "Biudžeto planavimo šablonas",
-      "Tikslų planavimo mini šablonas",
-      "7 dienų veiksmų planas",
+      "Mėnesio fokuso kortelė",
+      "Mini biudžeto peržiūra",
+      "Paprastas tikslų planas",
+      "7 dienų veiksmų ritmas",
     ],
-    planLabel: "Įeina į Demo versiją",
+    planLabel: "Demo versijos peržiūra",
     icon: WalletCards,
   },
   {
@@ -176,7 +176,7 @@ const MembershipPricingShowcase = ({
             Pasirink nario erdvę pagal savo etapą.
           </h1>
           <p className="mt-6 max-w-3xl text-base leading-7 text-white/72 sm:text-lg">
-            Demo versija padeda susipažinti su skaitmeniniais produktais, Asmeninis atrakina pilną nario erdvę, o Verslas suteikia
+            Demo versija padeda susipažinti su Saving Studio, Asmeninis atrakina pilną nario erdvę, o Verslas suteikia
             strateginę verslo erdvę augimui.
           </p>
 
@@ -395,13 +395,13 @@ const DashboardPreview = () => (
 const MembershipKitsSection = () => (
   <div id="rinkiniai" className="mt-10 scroll-mt-28">
     <div className="mx-auto max-w-4xl text-center">
-      <span className="hero-chip">Skaitmeniniai rinkiniai</span>
+      <span className="hero-chip">Nario zonos rinkiniai</span>
       <h2 className="mt-5 break-words font-display text-3xl font-bold leading-tight text-white sm:text-5xl">
         Kas įeina į narystę?
       </h2>
       <p className="mx-auto mt-5 max-w-3xl text-base leading-7 text-white/70 sm:text-lg">
-        Kiekvienas Stilloak Studio planas suteikia prieigą prie skaitmeninių rinkinių, kurie padeda aiškiau
-        planuoti, kurti turinį ir auginti savo projektą.
+        Kiekvienas Stilloak Studio planas turi aiškią paskirtį. Skaitmeniniai produktai įsigyjami atskirai, o narystė
+        atrakina nario zonas ir darbo ritmą.
       </p>
     </div>
 

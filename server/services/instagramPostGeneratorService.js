@@ -45,7 +45,7 @@ const POST_TYPES = {
     captionKey: "asmeninis",
   },
   "privatus-verslas": {
-    label: "Privatus verslas",
+    label: "Verslas",
     slug: "privatus-verslas",
     template: "template-plan",
     captionKey: "privatusVerslas",
@@ -79,14 +79,14 @@ const CAPTION_TEMPLATES = {
 Pasirink planą pagal savo etapą:
 • Demo versija
 • Asmeninis
-• Privatus verslas
+• Verslas
 
 Paprasta pradėti. Aišku naudoti. Sukurta augimui.
 
 ${website}`,
-  bazinis: (website) => `Demo versija – nemokama pradžia su atrinktais skaitmeniniais produktais.
+  bazinis: (website) => `Demo versija – nemokama Saving Studio pradžia.
 
-Tinka, jeigu nori susipažinti su StillOak Studio PDF gidais ir Excel šablonais be mokėjimo kortelės.
+Tinka, jeigu nori susipažinti su bazinėmis planavimo kortelėmis ir vėliau pereiti į Asmeninį planą.
 
 ${website}`,
   asmeninis: (website) => `Asmeninis planas – daugiau galimybių, daugiau lankstumo ir patogesnė patirtis aktyviam naudojimui.
@@ -94,7 +94,7 @@ ${website}`,
 Populiariausias pasirinkimas tiems, kurie nori daugiau vertės.
 
 ${website}`,
-  privatusVerslas: (website) => `Privatus verslas – premium sprendimas verslui su daugiau kontrolės, prioriteto ir profesionalių funkcijų.
+  privatusVerslas: (website) => `Verslas – premium sprendimas verslui su daugiau kontrolės, prioriteto ir profesionalių funkcijų.
 
 Skirta rimtesniems poreikiams, verslo naudojimui ir aukštesniam aptarnavimo lygiui.
 

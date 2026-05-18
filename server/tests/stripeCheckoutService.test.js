@@ -13,7 +13,7 @@ test("subscription checkout uses configured Stripe price IDs", () => {
 
   const lineItem = buildSubscriptionLineItem({
     id: "bazinis",
-    name: "Bazinis",
+    name: "Demo versija",
     price: 5.99,
     currency: "eur",
     interval: "month",
@@ -34,7 +34,7 @@ test("subscription checkout uses selected plan Stripe price ID", () => {
 
   const lineItem = buildSubscriptionLineItem({
     id: "privatus_verslas",
-    name: "Privatus verslas",
+    name: "Verslas",
     price: 44.99,
     currency: "eur",
     interval: "month",

@@ -71,9 +71,9 @@ const presets = [
       postType: "bazinis-planas",
       headline: "Pradėk su nemokama Demo versija.",
       subtitle:
-        "Skirta tiems, kurie nori susipažinti su atrinktais PDF gidais ir Excel šablonais.",
+        "Skirta tiems, kurie nori susipažinti su Saving Studio aplinka ir bazinėmis planavimo kortelėmis.",
       badge: "DEMO VERSIJA",
-      features: ["Demo skaitmeniniai produktai", "PDF gidai", "Excel šablonai", "€0"].join("\n"),
+      features: ["Saving Studio peržiūra", "Bazinės planavimo kortelės", "Atskiri produktų pirkimai", "€0"].join("\n"),
       ctaText: "Prisijungti dabar",
     },
   },

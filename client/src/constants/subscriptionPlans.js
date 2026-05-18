@@ -2,18 +2,17 @@ export const subscriptionPlans = [
   {
     id: "basic",
     name: "Demo versija",
-    subtitle: "Nemokama prieiga susipažinti su StillOak Studio skaitmeniniais produktais.",
+    subtitle: "Nemokama prieiga susipažinti su Saving Studio aplinka.",
     price: 0,
     intervalLabel: "",
-    description: "Susikurkite paskyrą ir gaukite prieigą prie atrinktų PDF gidų bei Excel šablonų.",
+    description: "Nemokama prieiga susipažinti su Saving Studio aplinka.",
     provider: "internal",
     badge: "Nemokama",
     features: [
-      "Prieiga prie demo skaitmeninių produktų",
-      "PDF gidų peržiūra ir atsisiuntimas",
-      "Excel šablonų atsisiuntimas",
+      "Saving Studio peržiūra",
+      "Bazinės planavimo kortelės",
       "Galimybė bet kada pereiti į Asmeninį planą",
-      "Be mokėjimo kortelės",
+      "Skaitmeninius produktus galima įsigyti atskirai",
     ],
   },
   {

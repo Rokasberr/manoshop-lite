@@ -9,9 +9,9 @@ const HomePage = () => (
       <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
         <div>
           <span className="eyebrow">Skaitmeniniai produktai</span>
-          <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">PDF gidai ir Excel šablonai vienoje vietoje</h2>
+          <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">Atskirai įsigyjami PDF gidai ir Excel modeliai</h2>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-muted">
-            PDF gidai, Excel šablonai, planavimo sistemos ir praktiniai įrankiai aiškesniam produktyvumui, finansams ir augimui.
+            Peržiūrėkite viešą katalogą, pasirinkite produktą ir atsisiųskite failus po įsigijimo.
           </p>
         </div>
         <Link to="/digital-products" className="button-primary">

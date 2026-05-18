@@ -26,7 +26,7 @@ const PricingPage = () => {
         await billingService.activateDemoPlan();
         await refreshProfile();
         toast.success("Demo versija aktyvuota.");
-        navigate("/digital-products");
+        navigate("/members/savings-studio");
         return;
       }
 

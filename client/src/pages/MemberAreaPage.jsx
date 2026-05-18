@@ -19,7 +19,6 @@ import {
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
-import DigitalProductAccessGrid, { canAccessDigitalProduct } from "../components/DigitalProductAccessGrid";
 import { digitalProducts } from "../constants/digitalProducts";
 import { subscriptionPlans } from "../constants/subscriptionPlans";
 import { journalArticles } from "../content/journalArticles";
@@ -38,7 +37,7 @@ const planOrder = {
 
 const previewOptions = [
   { id: "current", label: "Dabartinis planas", helper: "Rodo pagal tikrą paskyros planą." },
-  { id: "basic", label: "Demo versija", helper: "Nemokama skaitmeninių produktų pradžia." },
+  { id: "basic", label: "Demo versija", helper: "Nemokama Saving Studio peržiūra." },
   { id: "personal", label: "Asmeninis", helper: "Pilna Saving Studio patirtis." },
   { id: "private_business", label: "Verslas", helper: "Business Studio ir verslo įrankiai." },
 ];
@@ -116,7 +115,7 @@ const getPlanCta = (planId) => {
     return "Atrakinkite Asmeninį planą ir gaukite pilną Saving Studio patirtį.";
   }
 
-  return "Pradėkite nuo Demo versijos ir atsisiųskite atrinktus PDF bei Excel failus.";
+  return "Demo versija suteikia Saving Studio pradžią. Skaitmeninius produktus galima įsigyti atskirai.";
 };
 
 const formatDashboardPlanPrice = (price) => {
@@ -283,18 +282,18 @@ const ModuleCard = ({ title, subtitle, icon: Icon, isLocked = false, onOpen, to,
   </article>
 );
 
-const OverviewSection = ({ user, planId, access, onOpenSection }) => {
+const OverviewSection = ({ planId, access, onOpenSection }) => {
   const publicProducts = digitalProducts.filter((product) => product.isPublic);
-  const unlockedProducts = publicProducts.filter((product) => canAccessDigitalProduct(user, product)).length;
   const currentPlanLabel = planDisplayNames[planId] || "Demo versija";
 
   const moduleCards = [
     {
       title: "Skaitmeniniai produktai",
-      subtitle: "PDF gidai, Excel šablonai, planavimo sistemos ir praktiniai įrankiai aiškesniam produktyvumui, finansams ir augimui.",
+      subtitle:
+        "Skaitmeniniai produktai yra atskirai įsigyjami PDF gidai ir Excel modeliai. Peržiūrėkite katalogą, pasirinkite produktą ir atsisiųskite jį po įsigijimo.",
       icon: FileText,
       onOpen: () => onOpenSection("digital"),
-      cta: "Atidaryti produktus",
+      cta: "Peržiūrėti produktus",
     },
     {
       title: "Saving Studio",
@@ -341,7 +340,7 @@ const OverviewSection = ({ user, planId, access, onOpenSection }) => {
             <div className="mt-5 grid gap-3">
               {[
                 ["Planai", currentPlanLabel],
-                ["Produktai", `${unlockedProducts} / ${publicProducts.length}`],
+                ["Produktai", `${publicProducts.length} kataloge`],
                 ["Business", access.business ? "Aktyvu" : "Užrakinta"],
               ].map(([label, value]) => (
                 <div key={label} className="rounded-lg border border-white/10 bg-black/18 p-4">
@@ -363,20 +362,36 @@ const OverviewSection = ({ user, planId, access, onOpenSection }) => {
   );
 };
 
-const DigitalProductsSection = ({ user }) => {
+const DigitalProductsSection = () => {
   const publicProducts = digitalProducts.filter((product) => product.isPublic);
 
   return (
     <section className="space-y-5">
-      <div className="panel p-5 sm:p-6">
-        <span className="signal-pill">Skaitmeniniai produktai</span>
-        <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">Skaitmeniniai produktai</h2>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
-          PDF gidai paaiškina, kaip naudoti Excel modelius su formulėmis finansams, planavimui, verslui ir marketingui.
-        </p>
-      </div>
-      <div className="rounded-lg border border-white/10 bg-[#071310] p-3 shadow-[0_32px_90px_rgba(0,0,0,0.22)] sm:p-5">
-        <DigitalProductAccessGrid products={publicProducts} user={user} />
+      <div className="panel overflow-hidden p-5 sm:p-6">
+        <div className="grid gap-6 lg:grid-cols-[1fr_0.38fr] lg:items-end">
+          <div>
+            <span className="signal-pill">Skaitmeniniai produktai</span>
+            <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">Skaitmeniniai produktai</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
+              Skaitmeniniai produktai yra atskirai įsigyjami PDF gidai ir Excel modeliai. Peržiūrėkite katalogą, pasirinkite produktą ir atsisiųskite jį po įsigijimo.
+            </p>
+          </div>
+          <div className="soft-card rounded-lg p-4">
+            <p className="text-xs font-bold uppercase text-muted">Kataloge</p>
+            <p className="mt-2 font-display text-3xl font-bold">{publicProducts.length}</p>
+            <p className="mt-2 text-sm leading-6 text-muted">PDF gidai ir Excel modeliai</p>
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <Link to="/digital-products" className="button-primary min-h-[3rem] justify-center gap-2">
+            Peržiūrėti produktus
+            <ArrowRight size={16} />
+          </Link>
+          <Link to="/pricing" className="button-secondary min-h-[3rem] justify-center">
+            Peržiūrėti planus
+          </Link>
+        </div>
       </div>
     </section>
   );
@@ -473,7 +488,7 @@ const AccountSection = ({ user, planId }) => (
       <span className="signal-pill">Planai</span>
       <h2 className="mt-4 font-display text-3xl font-bold">Keiskite planą tada, kai reikia daugiau.</h2>
       <p className="mt-3 text-sm leading-7 text-muted">
-        Demo versija tinka failų pradžiai, Asmeninis atrakina pilną Saving Studio, o Verslas prideda verslo zonas.
+        Demo versija skirta Saving Studio peržiūrai, Asmeninis atrakina pilną Saving Studio, o Verslas prideda verslo zonas.
       </p>
       <Link to="/pricing" className="button-secondary mt-5 justify-center">
         Peržiūrėti planus
@@ -488,7 +503,7 @@ const PlansSection = ({ planId }) => (
       <span className="signal-pill">Planai</span>
       <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">Pasirinkite kitą lygį</h2>
       <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
-        Kiekvienas planas turi aiškią paskirtį: Demo failams, Asmeninis pilnai asmeninei sistemai, Verslas verslo valdymui.
+        Kiekvienas planas turi aiškią paskirtį: Demo Saving Studio pradžiai, Asmeninis pilnai asmeninei sistemai, Verslas verslo valdymui.
       </p>
     </div>
 
@@ -543,7 +558,7 @@ const MemberAreaPage = () => {
   const renderActiveSection = () => {
     switch (activeSection) {
       case "digital":
-        return <DigitalProductsSection user={user} />;
+        return <DigitalProductsSection />;
       case "saving":
         return <SavingStudioSection access={access} />;
       case "journal":
@@ -556,7 +571,7 @@ const MemberAreaPage = () => {
         return <PlansSection planId={effectivePlanId} />;
       case "overview":
       default:
-        return <OverviewSection user={user} planId={effectivePlanId} access={access} onOpenSection={setActiveSection} />;
+        return <OverviewSection planId={effectivePlanId} access={access} onOpenSection={setActiveSection} />;
     }
   };
 

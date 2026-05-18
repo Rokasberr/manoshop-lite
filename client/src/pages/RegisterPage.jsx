@@ -10,6 +10,7 @@ const RegisterPage = () => {
   const location = useLocation();
   const { register, refreshProfile } = useAuth();
   const selectedPlan = location.state?.selectedPlan || "";
+  const purchaseProductId = location.state?.purchaseProductId || "";
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -54,7 +55,13 @@ const RegisterPage = () => {
         await billingService.activateDemoPlan();
         await refreshProfile();
         toast.success("Paskyra sukurta. Demo versija aktyvuota.");
-        navigate("/digital-products");
+        navigate("/members/savings-studio");
+        return;
+      }
+
+      if (purchaseProductId) {
+        toast.success("Paskyra sukurta. Galite įsigyti pasirinktą produktą.");
+        navigate(`/digital-products?product=${encodeURIComponent(purchaseProductId)}`);
         return;
       }
 

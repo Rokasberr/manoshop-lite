@@ -15,7 +15,7 @@ test("normalizes supported Instagram generator payloads", () => {
     outputType: "png",
     headline: "Premium sprendimas verslo augimui.",
     subtitle: "Skirta rimtesniems poreikiams ir profesionaliam naudojimui.",
-    badge: "PRIVATUS VERSLAS",
+    badge: "VERSLAS",
     features: ["Verslo lygio funkcijos", "Daugiau kontrolės", "Prioritetinis aptarnavimas"],
     website: "stilloak-studio.com",
   });
@@ -52,9 +52,9 @@ test("builds clean filenames and caption templates", () => {
     postType: "bazinis-planas",
     format: "square",
     outputType: "jpg",
-    headline: "Pradėk paprastai su Baziniu planu.",
+    headline: "Pradėk paprastai su Demo versija.",
     subtitle: "Skirta aiškiai pradžiai.",
-    badge: "BAZINIS PLANAS",
+    badge: "DEMO VERSIJA",
     features: ["Pagrindinės funkcijos", "Aiški pradžia", "Lengvas naudojimas"],
     website: "stilloak-studio.com",
   });
@@ -62,6 +62,6 @@ test("builds clean filenames and caption templates", () => {
   const caption = buildCaption(payload);
 
   assert.equal(filename, "stilloak-bazinis-20260506-0809");
-  assert.match(caption, /Bazinis planas/);
+  assert.match(caption, /Demo versija/);
   assert.match(caption, /stilloak-studio\.com$/);
 });

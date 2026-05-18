@@ -1,15 +1,117 @@
-import { ArrowRight, Sparkles } from "lucide-react";
-import { Link } from "react-router-dom";
+import { ArrowRight, ShoppingBag, UserPlus } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import toast from "react-hot-toast";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
-import DigitalProductAccessGrid, { canAccessDigitalProduct } from "../components/DigitalProductAccessGrid";
+import DigitalProductAccessGrid from "../components/DigitalProductAccessGrid";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { digitalProducts } from "../constants/digitalProducts";
 import { useAuth } from "../context/AuthContext";
+import digitalProductService from "../services/digitalProductService";
 
 const DigitalProductsPage = () => {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user, isCheckingAuth } = useAuth();
-  const publicProducts = digitalProducts.filter((product) => product.isPublic);
-  const unlockedCount = publicProducts.filter((product) => canAccessDigitalProduct(user, product)).length;
+  const publicProducts = useMemo(() => digitalProducts.filter((product) => product.isPublic), []);
+  const [purchasedProductIds, setPurchasedProductIds] = useState([]);
+  const [isLoadingPurchases, setIsLoadingPurchases] = useState(false);
+  const [purchaseLoadingId, setPurchaseLoadingId] = useState("");
+  const [downloadLoadingKey, setDownloadLoadingKey] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadPurchases = async () => {
+      if (!user) {
+        setPurchasedProductIds([]);
+        return;
+      }
+
+      try {
+        setIsLoadingPurchases(true);
+        const data = await digitalProductService.getPurchases();
+
+        if (isMounted) {
+          setPurchasedProductIds(data.purchasedProductIds || []);
+        }
+      } catch (_error) {
+        if (isMounted) {
+          toast.error("Nepavyko atnaujinti įsigytų produktų.");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingPurchases(false);
+        }
+      }
+    };
+
+    loadPurchases();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user]);
+
+  useEffect(() => {
+    const purchaseState = searchParams.get("purchase");
+
+    if (purchaseState === "success") {
+      toast.success("Apmokėjimas priimtas. Atsisiuntimai pasirodys, kai pirkimas bus patvirtintas.");
+      setSearchParams({}, { replace: true });
+    }
+
+    if (purchaseState === "cancel") {
+      toast("Pirkimas atšauktas. Produktą galite įsigyti vėliau.");
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+
+  const handlePurchase = async (product) => {
+    if (!user) {
+      navigate("/register", {
+        state: { from: "/digital-products", purchaseProductId: product.id },
+      });
+      return;
+    }
+
+    try {
+      setPurchaseLoadingId(product.id);
+      const session = await digitalProductService.createCheckoutSession(product.id);
+
+      if (session.alreadyPurchased) {
+        setPurchasedProductIds((currentIds) =>
+          currentIds.includes(product.id) ? currentIds : [...currentIds, product.id]
+        );
+        toast.success("Šis produktas jau įsigytas.");
+        return;
+      }
+
+      window.location.assign(session.url);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Nepavyko paruošti produkto pirkimo.");
+    } finally {
+      setPurchaseLoadingId("");
+    }
+  };
+
+  const handleDownload = async (product, format) => {
+    const fileName = format === "pdf" ? product.pdfFileName : product.excelFileName;
+
+    if (!fileName) {
+      toast("Failas netrukus bus pasiekiamas.");
+      return;
+    }
+
+    try {
+      setDownloadLoadingKey(`${product.id}:${format}`);
+      await digitalProductService.downloadProductFile(product.id, format, fileName);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Nepavyko atsisiųsti failo.");
+    } finally {
+      setDownloadLoadingKey("");
+    }
+  };
 
   if (isCheckingAuth) {
     return <LoadingSpinner fullScreen label="Krauname skaitmeninius produktus..." />;
@@ -27,29 +129,34 @@ const DigitalProductsPage = () => {
               Skaitmeniniai produktai
             </span>
             <h1 className="mt-5 max-w-4xl font-display text-4xl font-bold leading-tight text-white sm:text-6xl">
-              Premium PDF gidų ir Excel modelių biblioteka.
+              Skaitmeniniai produktai
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-8 text-white/70 sm:text-lg">
-              Kiekvienas produktas turi praktinį PDF gidą ir funkcinį Excel modelį su formulėmis. Svečiai gali peržiūrėti biblioteką, o atsisiuntimai atsiveria prisijungus ir pasirinkus Demo versiją arba aukštesnį planą.
+              Premium PDF gidai, Excel modeliai ir praktinės sistemos finansams, planavimui, verslui ir augimui.
+            </p>
+            <p className="mt-4 max-w-3xl text-sm leading-7 text-white/58">
+              Produktus galite peržiūrėti viešai. Norint įsigyti ir atsisiųsti failus, reikia prisijungti arba susikurti paskyrą.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <a href="#download-library" className="button-primary gap-2">
-                Peržiūrėti produktus
+              <a href="#product-catalog" className="button-primary gap-2">
+                Peržiūrėti katalogą
                 <ArrowRight size={16} />
               </a>
-              <Link to={user ? "/pricing" : "/register"} state={!user ? { selectedPlan: "basic" } : undefined} className="hero-outline-button gap-2">
-                Pasirinkti Demo versiją
-                <Sparkles size={16} />
-              </Link>
+              {!user && (
+                <Link to="/register" state={{ from: "/digital-products" }} className="hero-outline-button gap-2">
+                  Prisiregistruoti ir įsigyti
+                  <UserPlus size={16} />
+                </Link>
+              )}
             </div>
           </div>
 
           <div className="rounded-lg border border-white/10 bg-white/[0.065] p-5 shadow-[0_26px_70px_rgba(0,0,0,0.22)]">
-            <p className="text-sm font-semibold text-white">Prieiga</p>
+            <p className="text-sm font-semibold text-white">Katalogo būsena</p>
             <div className="mt-5 grid grid-cols-3 gap-3 lg:grid-cols-1">
               {[
                 ["Produktai", publicProducts.length],
-                ["Atrakinta", user ? unlockedCount : 0],
+                ["Įsigyta", user ? purchasedProductIds.length : 0],
                 ["Formatas", "PDF + Excel"],
               ].map(([label, value]) => (
                 <div key={label} className="rounded-lg border border-white/10 bg-black/18 p-4">
@@ -62,22 +169,34 @@ const DigitalProductsPage = () => {
         </div>
       </section>
 
-      <section id="download-library" className="space-y-5">
+      <section id="product-catalog" className="space-y-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <span className="eyebrow">Produktų biblioteka</span>
+            <span className="eyebrow">Produktų katalogas</span>
             <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">Skaitmeniniai produktai</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
-              Filtruokite pagal finansus, planavimą, verslą ir marketingą. PDF gidai paaiškina, kaip naudoti Excel modelius, o Excel failai skirti praktiniam skaičiavimui, planavimui ir progresui sekti.
+              Peržiūrėkite produktų aprašymus, kainas, formatus ir įtrauktas dalis. Atsisiuntimai atsiranda tik įsigijus pasirinktą produktą.
             </p>
           </div>
           <div className="soft-pill rounded-lg px-4 py-3 text-sm font-semibold text-muted">
-            {user ? `${unlockedCount} iš ${publicProducts.length} atsisiuntimų aktyvūs` : "Prisijunkite atsisiuntimui"}
+            {user
+              ? isLoadingPurchases
+                ? "Tikriname pirkinius..."
+                : `${purchasedProductIds.length} iš ${publicProducts.length} įsigyta`
+              : "Prisiregistruokite, kad galėtumėte įsigyti"}
           </div>
         </div>
 
         <div className="rounded-lg border border-white/10 bg-[#071310] p-3 shadow-[0_32px_90px_rgba(0,0,0,0.22)] sm:p-5">
-          <DigitalProductAccessGrid products={publicProducts} user={user} />
+          <DigitalProductAccessGrid
+            products={publicProducts}
+            user={user}
+            purchasedProductIds={purchasedProductIds}
+            onPurchase={handlePurchase}
+            onDownload={handleDownload}
+            purchaseLoadingId={purchaseLoadingId}
+            downloadLoadingKey={downloadLoadingKey}
+          />
         </div>
       </section>
 
@@ -86,19 +205,26 @@ const DigitalProductsPage = () => {
         <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-3xl">
             <span className="inline-flex rounded-lg border border-[#e2ca91]/30 bg-[#e2ca91]/12 px-3 py-1 text-xs font-bold uppercase text-[#f2d99a]">
-              StillOak Studio narystė
+              Saugi produkto prieiga
             </span>
             <h2 className="mt-4 font-display text-3xl font-bold leading-tight sm:text-4xl">
-              Norite daugiau premium įrankių?
+              Įsigykite tik tai, ko reikia.
             </h2>
             <p className="mt-4 text-sm leading-7 text-white/70 sm:text-base">
-              Demo versija suteikia prieigą prie atrinktų PDF ir Excel failų. Atrakinkite Asmeninį planą, jei norite daugiau struktūruotų gidų, šablonų ir premium nario zonos galimybių.
+              Skaitmeniniai produktai yra atskiri PDF gidai ir Excel modeliai. Demo versija skirta Saving Studio pradžiai, o produktų failai atsiveria tik po individualaus įsigijimo.
             </p>
           </div>
-          <Link to="/pricing" className="button-primary shrink-0 gap-2">
-            Atrakinti Asmeninį planą
-            <ArrowRight size={16} />
-          </Link>
+          {user ? (
+            <a href="#product-catalog" className="button-primary shrink-0 gap-2">
+              Grįžti į katalogą
+              <ShoppingBag size={16} />
+            </a>
+          ) : (
+            <Link to="/register" state={{ from: "/digital-products" }} className="button-primary shrink-0 gap-2">
+              Sukurti paskyrą
+              <UserPlus size={16} />
+            </Link>
+          )}
         </div>
       </section>
     </div>

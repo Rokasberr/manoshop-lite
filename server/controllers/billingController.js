@@ -6,6 +6,7 @@ const {
   syncStripeOrderFromSession,
   syncStripeRefundFromPayment,
 } = require("../services/orderCheckoutService");
+const { syncDigitalProductPurchaseFromSession } = require("../services/digitalProductPurchaseService");
 const { ensureStripeCustomerForUser } = require("../services/stripeCustomerService");
 const { buildIdempotencyKey } = require("../services/stripeCheckoutService");
 const {
@@ -301,6 +302,11 @@ const handleStripeWebhook = async (req, res) => {
 
         if (session.metadata?.checkoutType === "order") {
           await syncStripeOrderFromSession(session);
+          break;
+        }
+
+        if (session.metadata?.type === "digital_product" || session.metadata?.checkoutType === "digital_product") {
+          await syncDigitalProductPurchaseFromSession(session);
           break;
         }
 
