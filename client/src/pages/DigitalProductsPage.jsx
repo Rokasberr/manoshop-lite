@@ -27,10 +27,10 @@ const DigitalProductsPage = () => {
               Skaitmeniniai produktai
             </span>
             <h1 className="mt-5 max-w-4xl font-display text-4xl font-bold leading-tight text-white sm:text-6xl">
-              Premium PDF gidai ir Excel šablonai aiškesniems sprendimams.
+              Premium PDF gidų ir Excel modelių biblioteka.
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-8 text-white/70 sm:text-lg">
-              Svečiai gali peržiūrėti produktus, o atsisiuntimai atsiveria prisijungus ir pasirinkus Demo versiją arba aukštesnį planą.
+              Kiekvienas produktas turi praktinį PDF gidą ir funkcinį Excel modelį su formulėmis. Svečiai gali peržiūrėti biblioteką, o atsisiuntimai atsiveria prisijungus ir pasirinkus Demo versiją arba aukštesnį planą.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a href="#download-library" className="button-primary gap-2">
@@ -66,9 +66,9 @@ const DigitalProductsPage = () => {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <span className="eyebrow">Produktų biblioteka</span>
-            <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">Digital Products</h2>
+            <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">Skaitmeniniai produktai</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
-              PDF gidai, Excel šablonai, planavimo sistemos ir praktiniai įrankiai aiškesniam produktyvumui, finansams ir augimui.
+              Filtruokite pagal finansus, planavimą, verslą ir marketingą. PDF gidai paaiškina, kaip naudoti Excel modelius, o Excel failai skirti praktiniam skaičiavimui, planavimui ir progresui sekti.
             </p>
           </div>
           <div className="soft-pill rounded-lg px-4 py-3 text-sm font-semibold text-muted">

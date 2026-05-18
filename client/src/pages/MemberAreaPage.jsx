@@ -372,7 +372,7 @@ const DigitalProductsSection = ({ user }) => {
         <span className="signal-pill">Skaitmeniniai produktai</span>
         <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">Skaitmeniniai produktai</h2>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
-          PDF gidai, Excel šablonai, planavimo sistemos ir praktiniai įrankiai aiškesniam produktyvumui, finansams ir augimui.
+          PDF gidai paaiškina, kaip naudoti Excel modelius su formulėmis finansams, planavimui, verslui ir marketingui.
         </p>
       </div>
       <div className="rounded-lg border border-white/10 bg-[#071310] p-3 shadow-[0_32px_90px_rgba(0,0,0,0.22)] sm:p-5">
