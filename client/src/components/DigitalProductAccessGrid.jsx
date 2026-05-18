@@ -158,7 +158,32 @@ const DigitalProductCard = ({ product, user }) => {
           <ProductDetail label="Excel" value="Su formulėmis" />
           <ProductDetail label="Atnaujinta" value={product.lastUpdated || "2026"} />
           <ProductDetail label="Prieiga" value={accessLabels[requiredPlan] || planDisplayNames[requiredPlan] || "Narystė"} />
+          <ProductDetail label="Trukmė" value={product.estimatedUseTime || "20-40 min."} />
+          <ProductDetail label="Lygis" value={product.difficultyLevel || "Lengvas"} />
           <ProductDetail label="Failai" value={product.fileNotes || "PDF gidas ir Excel modelis paruošti naudojimui."} />
+        </div>
+
+        <div className="mt-4 grid gap-3 lg:grid-cols-2">
+          <div className="rounded-lg border border-white/10 bg-black/18 p-4">
+            <p className="text-xs font-bold uppercase text-white/48">Excel funkcijos</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {(product.dashboardMetrics || product.excelFeatures || []).slice(0, 5).map((item) => (
+                <span key={item} className="rounded-lg border border-white/10 bg-white/[0.06] px-3 py-1 text-xs font-semibold text-white/70">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-lg border border-white/10 bg-black/18 p-4">
+            <p className="text-xs font-bold uppercase text-white/48">PDF gidas</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {(product.pdfFeatures || []).slice(0, 4).map((item) => (
+                <span key={item} className="rounded-lg border border-[#e2ca91]/20 bg-[#e2ca91]/10 px-3 py-1 text-xs font-semibold text-[#f2d99a]">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className="mt-6 rounded-lg border border-white/10 bg-black/18 p-4">
