@@ -1,4 +1,4 @@
-import { ArrowRight, ShoppingBag, UserPlus } from "lucide-react";
+import { ArrowRight, ShoppingBag, UserPlus, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -7,6 +7,7 @@ import DigitalProductAccessGrid from "../components/DigitalProductAccessGrid";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { digitalProducts } from "../constants/digitalProducts";
 import { useAuth } from "../context/AuthContext";
+import adminDigitalProductService from "../services/adminDigitalProductService";
 import digitalProductService from "../services/digitalProductService";
 
 const DigitalProductsPage = () => {
@@ -18,6 +19,9 @@ const DigitalProductsPage = () => {
   const [isLoadingPurchases, setIsLoadingPurchases] = useState(false);
   const [purchaseLoadingId, setPurchaseLoadingId] = useState("");
   const [downloadLoadingKey, setDownloadLoadingKey] = useState("");
+  const [adminPreview, setAdminPreview] = useState(null);
+  const [adminPreviewLoadingId, setAdminPreviewLoadingId] = useState("");
+  const [adminDownloadLoadingKey, setAdminDownloadLoadingKey] = useState("");
 
   useEffect(() => {
     let isMounted = true;
@@ -67,6 +71,15 @@ const DigitalProductsPage = () => {
     }
   }, [searchParams, setSearchParams]);
 
+  useEffect(
+    () => () => {
+      if (adminPreview?.url) {
+        window.URL.revokeObjectURL(adminPreview.url);
+      }
+    },
+    [adminPreview]
+  );
+
   const handlePurchase = async (product) => {
     if (!user) {
       navigate("/register", {
@@ -110,6 +123,53 @@ const DigitalProductsPage = () => {
       toast.error(error.response?.data?.message || "Nepavyko atsisiųsti failo.");
     } finally {
       setDownloadLoadingKey("");
+    }
+  };
+
+  const closeAdminPreview = () => {
+    if (adminPreview?.url) {
+      window.URL.revokeObjectURL(adminPreview.url);
+    }
+
+    setAdminPreview(null);
+  };
+
+  const handleAdminPreview = async (product) => {
+    if (!product.pdfFileName) {
+      toast("Failas netrukus bus pasiekiamas.");
+      return;
+    }
+
+    try {
+      setAdminPreviewLoadingId(product.id);
+      const url = await adminDigitalProductService.createPdfPreviewUrl(product.id);
+
+      setAdminPreview({
+        title: product.title,
+        url,
+      });
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Nepavyko atidaryti PDF peržiūros.");
+    } finally {
+      setAdminPreviewLoadingId("");
+    }
+  };
+
+  const handleAdminDownload = async (product, format) => {
+    const fileName = format === "pdf" ? product.pdfFileName : product.excelFileName;
+
+    if (!fileName) {
+      toast("Failas netrukus bus pasiekiamas.");
+      return;
+    }
+
+    try {
+      setAdminDownloadLoadingKey(`${product.id}:${format}`);
+      await adminDigitalProductService.downloadFile(product.id, format, fileName);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Nepavyko atsisiųsti failo.");
+    } finally {
+      setAdminDownloadLoadingKey("");
     }
   };
 
@@ -194,8 +254,12 @@ const DigitalProductsPage = () => {
             purchasedProductIds={purchasedProductIds}
             onPurchase={handlePurchase}
             onDownload={handleDownload}
+            onAdminPreview={handleAdminPreview}
+            onAdminDownload={handleAdminDownload}
             purchaseLoadingId={purchaseLoadingId}
             downloadLoadingKey={downloadLoadingKey}
+            adminPreviewLoadingId={adminPreviewLoadingId}
+            adminDownloadLoadingKey={adminDownloadLoadingKey}
           />
         </div>
       </section>
@@ -227,6 +291,28 @@ const DigitalProductsPage = () => {
           )}
         </div>
       </section>
+
+      {adminPreview && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
+          <div className="flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-lg border border-white/12 bg-[#071310] text-white shadow-[0_32px_110px_rgba(0,0,0,0.45)]">
+            <div className="flex items-center justify-between gap-4 border-b border-white/10 px-5 py-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#f2d99a]">Admin PDF peržiūra</p>
+                <h3 className="mt-1 font-display text-xl font-bold">{adminPreview.title}</h3>
+              </div>
+              <button
+                type="button"
+                onClick={closeAdminPreview}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/[0.06] text-white/74 transition hover:bg-white/12 hover:text-white"
+                aria-label="Uždaryti PDF peržiūrą"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <iframe title={`${adminPreview.title} PDF`} src={adminPreview.url} className="h-[75vh] w-full bg-white" />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

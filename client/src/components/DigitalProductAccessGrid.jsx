@@ -2,6 +2,7 @@ import {
   ArrowDownToLine,
   BadgeCheck,
   CreditCard,
+  Eye,
   FileSpreadsheet,
   FileText,
   LockKeyhole,
@@ -12,6 +13,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { digitalProducts } from "../constants/digitalProducts";
+import { isAdminUser } from "../utils/membership";
 
 const filterOptions = ["Visi", "Finansai", "Planavimas", "Verslas", "Marketingas"];
 
@@ -95,9 +97,60 @@ const PurchaseActions = ({
   isPurchased,
   onPurchase,
   onDownload,
+  onAdminPreview,
+  onAdminDownload,
   purchaseLoadingId,
   downloadLoadingKey,
+  adminPreviewLoadingId,
+  adminDownloadLoadingKey,
 }) => {
+  const showAdminActions = isAdminUser(user) && product.id === "personal-budget-system";
+
+  if (showAdminActions) {
+    return (
+      <div className="space-y-3">
+        {product.pdfFileName ? (
+          <button
+            type="button"
+            onClick={() => onAdminPreview?.(product)}
+            disabled={adminPreviewLoadingId === product.id}
+            className="inline-flex min-h-[3rem] w-full items-center justify-center gap-2 rounded-lg border border-[#e2ca91]/32 bg-[#e2ca91]/14 px-4 py-3 text-sm font-semibold text-[#f8e6b1] transition duration-200 hover:-translate-y-0.5 hover:border-[#e2ca91]/55 hover:bg-[#e2ca91]/20 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <Eye size={16} />
+            {adminPreviewLoadingId === product.id ? "Ruošiama..." : "Peržiūrėti PDF"}
+          </button>
+        ) : (
+          <FileUnavailable />
+        )}
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          {product.pdfFileName ? (
+            <DownloadButton
+              onClick={() => onAdminDownload?.(product, "pdf")}
+              isLoading={adminDownloadLoadingKey === `${product.id}:pdf`}
+            >
+              Atsisiųsti PDF
+            </DownloadButton>
+          ) : (
+            <FileUnavailable />
+          )}
+
+          {product.excelFileName ? (
+            <DownloadButton
+              variant="secondary"
+              onClick={() => onAdminDownload?.(product, "excel")}
+              isLoading={adminDownloadLoadingKey === `${product.id}:excel`}
+            >
+              Atsisiųsti Excel
+            </DownloadButton>
+          ) : (
+            <FileUnavailable />
+          )}
+        </div>
+      </div>
+    );
+  }
+
   if (!user) {
     return (
       <div className="rounded-lg border border-white/10 bg-black/24 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:p-5">
@@ -168,8 +221,12 @@ const DigitalProductCard = ({
   purchasedProductIds,
   onPurchase,
   onDownload,
+  onAdminPreview,
+  onAdminDownload,
   purchaseLoadingId,
   downloadLoadingKey,
+  adminPreviewLoadingId,
+  adminDownloadLoadingKey,
 }) => {
   const isPurchased = purchasedProductIds.includes(product.id);
   const featureBadges = Array.from(new Set(product.badges || product.excelFeatures || []));
@@ -280,8 +337,12 @@ const DigitalProductCard = ({
             isPurchased={isPurchased}
             onPurchase={onPurchase}
             onDownload={onDownload}
+            onAdminPreview={onAdminPreview}
+            onAdminDownload={onAdminDownload}
             purchaseLoadingId={purchaseLoadingId}
             downloadLoadingKey={downloadLoadingKey}
+            adminPreviewLoadingId={adminPreviewLoadingId}
+            adminDownloadLoadingKey={adminDownloadLoadingKey}
           />
         </div>
       </div>
@@ -306,8 +367,12 @@ const DigitalProductAccessGrid = ({
   purchasedProductIds = [],
   onPurchase,
   onDownload,
+  onAdminPreview,
+  onAdminDownload,
   purchaseLoadingId = "",
   downloadLoadingKey = "",
+  adminPreviewLoadingId = "",
+  adminDownloadLoadingKey = "",
 }) => {
   const [activeFilter, setActiveFilter] = useState("Visi");
   const filteredProducts = useMemo(
@@ -352,8 +417,12 @@ const DigitalProductAccessGrid = ({
               purchasedProductIds={purchasedProductIds}
               onPurchase={onPurchase}
               onDownload={onDownload}
+              onAdminPreview={onAdminPreview}
+              onAdminDownload={onAdminDownload}
               purchaseLoadingId={purchaseLoadingId}
               downloadLoadingKey={downloadLoadingKey}
+              adminPreviewLoadingId={adminPreviewLoadingId}
+              adminDownloadLoadingKey={adminDownloadLoadingKey}
             />
           ))}
         </div>

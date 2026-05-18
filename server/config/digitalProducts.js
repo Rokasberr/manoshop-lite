@@ -6,6 +6,8 @@ const digitalProducts = [
     priceCents: 900,
     priceLabel: "€9",
     currency: "eur",
+    version: "V16",
+    lastUpdated: "2026",
     stripePriceEnvKey: null,
     stripePriceIdReference: "dynamic_one_time_checkout",
     pdfFileName: "personal-budget-system.pdf",
