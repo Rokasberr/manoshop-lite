@@ -172,7 +172,7 @@ const DigitalProductCard = ({
   downloadLoadingKey,
 }) => {
   const isPurchased = purchasedProductIds.includes(product.id);
-  const featureBadges = Array.from(new Set(product.excelFeatures || []));
+  const featureBadges = Array.from(new Set(product.badges || product.excelFeatures || []));
 
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-white/10 bg-white/[0.055] shadow-[0_26px_72px_rgba(0,0,0,0.22)] transition duration-200 hover:-translate-y-1 hover:border-[#e2ca91]/28 md:min-h-[640px]">
