@@ -15,12 +15,13 @@ import { Link } from "react-router-dom";
 import { digitalProducts } from "../constants/digitalProducts";
 import { isAdminUser } from "../utils/membership";
 
-const filterOptions = ["Visi", "Finansai", "Planavimas", "Verslas", "Marketingas"];
-
 const formatIcons = {
   PDF: FileText,
   XLSX: FileSpreadsheet,
 };
+
+const getFormatLabel = (formats = []) =>
+  formats.map((format) => (format === "XLSX" ? "Excel" : format)).join(" + ") || "Excel";
 
 const FormatBadge = ({ format }) => {
   const Icon = formatIcons[format] || FileText;
@@ -77,6 +78,34 @@ const FileUnavailable = () => (
   </span>
 );
 
+const ProductPreview = ({ product }) => {
+  const [hasImageError, setHasImageError] = useState(false);
+
+  if (!product.imageUrl || hasImageError) {
+    return (
+      <div className="flex aspect-[16/10] items-center justify-center border-b border-white/10 bg-[linear-gradient(135deg,rgba(226,202,145,0.18),rgba(126,143,117,0.2),rgba(7,19,16,0.96))] px-6 text-center">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#f2d99a]">StillOak Studio</p>
+          <p className="mt-3 font-display text-2xl font-bold leading-tight text-white">{product.title}</p>
+          <p className="mt-2 text-sm leading-6 text-white/62">Premium Excel digital product</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="aspect-[16/10] overflow-hidden border-b border-white/10 bg-[#071310]">
+      <img
+        src={product.imageUrl}
+        alt={`${product.title} preview`}
+        loading="lazy"
+        onError={() => setHasImageError(true)}
+        className="h-full w-full object-cover object-top transition duration-300 group-hover:scale-[1.025]"
+      />
+    </div>
+  );
+};
+
 const DownloadButton = ({ disabled, isLoading, onClick, children, variant = "primary" }) => {
   const className =
     variant === "primary"
@@ -91,6 +120,22 @@ const DownloadButton = ({ disabled, isLoading, onClick, children, variant = "pri
   );
 };
 
+const getDownloadOptions = (product, ctaLabels = {}) =>
+  [
+    {
+      format: "pdf",
+      fileName: product.pdfFileName,
+      label: "Atsisiųsti PDF",
+      variant: "primary",
+    },
+    {
+      format: "excel",
+      fileName: product.excelFileName,
+      label: ctaLabels.download || "Atsisiųsti po pirkimo",
+      variant: product.pdfFileName ? "secondary" : "primary",
+    },
+  ].filter((option) => option.fileName);
+
 const PurchaseActions = ({
   product,
   user,
@@ -104,12 +149,13 @@ const PurchaseActions = ({
   adminPreviewLoadingId,
   adminDownloadLoadingKey,
 }) => {
-  const showAdminActions = isAdminUser(user) && product.id === "personal-budget-system";
+  const ctaLabels = product.ctaLabels || {};
+  const downloadOptions = getDownloadOptions(product, ctaLabels);
 
-  if (showAdminActions) {
+  if (isAdminUser(user)) {
     return (
       <div className="space-y-3">
-        {product.pdfFileName ? (
+        {product.pdfFileName && (
           <button
             type="button"
             onClick={() => onAdminPreview?.(product)}
@@ -119,34 +165,24 @@ const PurchaseActions = ({
             <Eye size={16} />
             {adminPreviewLoadingId === product.id ? "Ruošiama..." : "Peržiūrėti PDF"}
           </button>
+        )}
+
+        {downloadOptions.length ? (
+          <div className={`grid gap-3 ${downloadOptions.length > 1 ? "sm:grid-cols-2" : ""}`}>
+            {downloadOptions.map((option) => (
+              <DownloadButton
+                key={option.format}
+                variant={option.variant}
+                onClick={() => onAdminDownload?.(product, option.format)}
+                isLoading={adminDownloadLoadingKey === `${product.id}:${option.format}`}
+              >
+                {option.label}
+              </DownloadButton>
+            ))}
+          </div>
         ) : (
           <FileUnavailable />
         )}
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          {product.pdfFileName ? (
-            <DownloadButton
-              onClick={() => onAdminDownload?.(product, "pdf")}
-              isLoading={adminDownloadLoadingKey === `${product.id}:pdf`}
-            >
-              Atsisiųsti PDF
-            </DownloadButton>
-          ) : (
-            <FileUnavailable />
-          )}
-
-          {product.excelFileName ? (
-            <DownloadButton
-              variant="secondary"
-              onClick={() => onAdminDownload?.(product, "excel")}
-              isLoading={adminDownloadLoadingKey === `${product.id}:excel`}
-            >
-              Atsisiųsti Excel
-            </DownloadButton>
-          ) : (
-            <FileUnavailable />
-          )}
-        </div>
       </div>
     );
   }
@@ -167,7 +203,7 @@ const PurchaseActions = ({
           className="button-primary mt-4 min-h-[3rem] w-full justify-center gap-2 px-4"
         >
           <UserPlus size={16} />
-          Prisiregistruoti ir įsigyti
+          {ctaLabels.guest || "Gauti prieigą"}
         </Link>
       </div>
     );
@@ -182,35 +218,42 @@ const PurchaseActions = ({
         className="button-primary min-h-[3rem] w-full justify-center gap-2 px-4 disabled:cursor-not-allowed disabled:opacity-60"
       >
         <CreditCard size={16} />
-        {purchaseLoadingId === product.id ? "Ruošiama..." : "Įsigyti produktą"}
+        {purchaseLoadingId === product.id ? "Ruošiama..." : ctaLabels.purchase || "Pirkti dabar"}
       </button>
     );
   }
 
-  return (
-    <div className="grid gap-3 sm:grid-cols-2">
-      {product.pdfFileName ? (
+  return downloadOptions.length ? (
+    <div className={`grid gap-3 ${downloadOptions.length > 1 ? "sm:grid-cols-2" : ""}`}>
+      {downloadOptions.map((option) => (
         <DownloadButton
-          onClick={() => onDownload?.(product, "pdf")}
-          isLoading={downloadLoadingKey === `${product.id}:pdf`}
+          key={option.format}
+          variant={option.variant}
+          onClick={() => onDownload?.(product, option.format)}
+          isLoading={downloadLoadingKey === `${product.id}:${option.format}`}
         >
-          Atsisiųsti PDF
+          {option.label}
         </DownloadButton>
-      ) : (
-        <FileUnavailable />
-      )}
+      ))}
+    </div>
+  ) : (
+    <FileUnavailable />
+  );
+};
 
-      {product.excelFileName ? (
-        <DownloadButton
-          variant="secondary"
-          onClick={() => onDownload?.(product, "excel")}
-          isLoading={downloadLoadingKey === `${product.id}:excel`}
-        >
-          Atsisiųsti Excel
-        </DownloadButton>
-      ) : (
-        <FileUnavailable />
-      )}
+const DetailPillList = ({ items = [], tone = "neutral" }) => {
+  const className =
+    tone === "gold"
+      ? "rounded-lg border border-[#e2ca91]/20 bg-[#e2ca91]/10 px-3 py-1 text-xs font-semibold text-[#f2d99a]"
+      : "rounded-lg border border-white/10 bg-white/[0.06] px-3 py-1 text-xs font-semibold text-white/70";
+
+  return (
+    <div className="mt-3 flex flex-wrap gap-2">
+      {items.slice(0, 6).map((item) => (
+        <span key={item} className={className}>
+          {item}
+        </span>
+      ))}
     </div>
   );
 };
@@ -230,9 +273,11 @@ const DigitalProductCard = ({
 }) => {
   const isPurchased = purchasedProductIds.includes(product.id);
   const featureBadges = Array.from(new Set(product.badges || product.excelFeatures || []));
+  const includedItems = product.whatsIncluded || product.includedItems || [];
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-white/10 bg-white/[0.055] shadow-[0_26px_72px_rgba(0,0,0,0.22)] transition duration-200 hover:-translate-y-1 hover:border-[#e2ca91]/28 md:min-h-[640px]">
+    <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-white/10 bg-white/[0.055] shadow-[0_26px_72px_rgba(0,0,0,0.22)] transition duration-200 hover:-translate-y-1 hover:border-[#e2ca91]/28">
+      <ProductPreview product={product} />
       <div className="h-1 bg-gradient-to-r from-[#e2ca91] via-[#75b896] to-transparent" />
       <div className="flex flex-1 flex-col p-5 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -243,7 +288,7 @@ const DigitalProductCard = ({
             <ProductStatusBadge user={user} isPurchased={isPurchased} />
           </div>
           <div className="flex flex-wrap gap-2">
-            {product.formats.map((format) => (
+            {(product.formats || []).map((format) => (
               <FormatBadge key={format} format={format} />
             ))}
             {featureBadges.map((feature) => (
@@ -263,13 +308,14 @@ const DigitalProductCard = ({
               <p className="font-display text-2xl font-bold text-[#f8e6b1]">{product.priceLabel}</p>
             </div>
           </div>
-          <p className="mt-4 text-sm leading-7 text-white/68">{product.description}</p>
+          <p className="mt-4 text-sm leading-7 text-white/72">{product.description}</p>
+          {product.salesDescription && <p className="mt-3 text-sm leading-7 text-white/58">{product.salesDescription}</p>}
         </div>
 
         <div className="mt-5 grid gap-2 sm:grid-cols-2">
           <ProductDetail label="Versija" value={product.version || "1.0"} />
-          <ProductDetail label="Formatai" value="PDF + XLSX" />
-          <ProductDetail label="Excel" value="Su formulėmis" />
+          <ProductDetail label="Formatai" value={getFormatLabel(product.formats)} />
+          <ProductDetail label="Tipas" value="Mokamas skaitmeninis produktas" />
           <ProductDetail label="Atnaujinta" value={product.lastUpdated || "2026"} />
           <ProductDetail label="Trukmė" value={product.estimatedUseTime || "20-40 min."} />
           <ProductDetail label="Lygis" value={product.difficultyLevel || "Lengvas"} />
@@ -277,31 +323,19 @@ const DigitalProductCard = ({
 
         <div className="mt-4 grid gap-3 lg:grid-cols-2">
           <div className="rounded-lg border border-white/10 bg-black/18 p-4">
-            <p className="text-xs font-bold uppercase text-white/48">Excel funkcijos</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {(product.dashboardMetrics || []).slice(0, 5).map((item) => (
-                <span key={item} className="rounded-lg border border-white/10 bg-white/[0.06] px-3 py-1 text-xs font-semibold text-white/70">
-                  {item}
-                </span>
-              ))}
-            </div>
+            <p className="text-xs font-bold uppercase text-white/48">Nauda</p>
+            <DetailPillList items={product.benefits || product.dashboardMetrics || []} />
           </div>
           <div className="rounded-lg border border-white/10 bg-black/18 p-4">
-            <p className="text-xs font-bold uppercase text-white/48">PDF gidas</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {(product.pdfFeatures || []).slice(0, 4).map((item) => (
-                <span key={item} className="rounded-lg border border-[#e2ca91]/20 bg-[#e2ca91]/10 px-3 py-1 text-xs font-semibold text-[#f2d99a]">
-                  {item}
-                </span>
-              ))}
-            </div>
+            <p className="text-xs font-bold uppercase text-white/48">Kam skirta?</p>
+            <DetailPillList items={product.targetAudience || []} tone="gold" />
           </div>
         </div>
 
         <div className="mt-6 rounded-lg border border-white/10 bg-black/18 p-4">
-          <p className="text-xs font-bold uppercase text-white/48">Kas įtraukta</p>
+          <p className="text-xs font-bold uppercase text-white/48">Kas įeina?</p>
           <ul className="mt-4 space-y-3">
-            {product.includedItems.map((item) => (
+            {includedItems.map((item) => (
               <li key={item} className="flex gap-3 text-sm leading-6 text-white/72">
                 <BadgeCheck className="mt-0.5 shrink-0 text-[#9ad7b1]" size={17} />
                 <span>{item}</span>
@@ -375,6 +409,10 @@ const DigitalProductAccessGrid = ({
   adminDownloadLoadingKey = "",
 }) => {
   const [activeFilter, setActiveFilter] = useState("Visi");
+  const filterOptions = useMemo(
+    () => ["Visi", ...Array.from(new Set(products.map((product) => product.category).filter(Boolean)))],
+    [products]
+  );
   const filteredProducts = useMemo(
     () => (activeFilter === "Visi" ? products : products.filter((product) => product.category === activeFilter)),
     [activeFilter, products]

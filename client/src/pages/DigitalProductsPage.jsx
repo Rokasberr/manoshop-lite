@@ -192,7 +192,7 @@ const DigitalProductsPage = () => {
               Skaitmeniniai produktai
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-8 text-white/70 sm:text-lg">
-              Premium PDF gidai, Excel modeliai ir praktinės sistemos finansams, planavimui, verslui ir augimui.
+              Premium Excel modeliai ir praktinės sistemos finansams, planavimui ir aiškesniam kasdieniam progresui.
             </p>
             <p className="mt-4 max-w-3xl text-sm leading-7 text-white/58">
               Produktus galite peržiūrėti viešai. Norint įsigyti ir atsisiųsti failus, reikia prisijungti arba susikurti paskyrą.
@@ -217,7 +217,7 @@ const DigitalProductsPage = () => {
               {[
                 ["Produktai", publicProducts.length],
                 ["Įsigyta", user ? purchasedProductIds.length : 0],
-                ["Formatas", "PDF + Excel"],
+                ["Formatas", "Excel"],
               ].map(([label, value]) => (
                 <div key={label} className="rounded-lg border border-white/10 bg-black/18 p-4">
                   <p className="text-xs font-bold uppercase text-white/44">{label}</p>
@@ -275,7 +275,7 @@ const DigitalProductsPage = () => {
               Įsigykite tik tai, ko reikia.
             </h2>
             <p className="mt-4 text-sm leading-7 text-white/70 sm:text-base">
-              Skaitmeniniai produktai yra atskiri PDF gidai ir Excel modeliai. Demo versija skirta Saving Studio pradžiai, o produktų failai atsiveria tik po individualaus įsigijimo.
+              Skaitmeniniai produktai yra atskirai įsigyjami Excel modeliai. Demo versija skirta Saving Studio pradžiai, o produktų failai atsiveria tik po individualaus įsigijimo.
             </p>
           </div>
           {user ? (

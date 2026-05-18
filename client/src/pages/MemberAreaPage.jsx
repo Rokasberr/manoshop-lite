@@ -290,7 +290,7 @@ const OverviewSection = ({ planId, access, onOpenSection }) => {
     {
       title: "Skaitmeniniai produktai",
       subtitle:
-        "Skaitmeniniai produktai yra atskirai įsigyjami PDF gidai ir Excel modeliai. Peržiūrėkite katalogą, pasirinkite produktą ir atsisiųskite jį po įsigijimo.",
+        "Skaitmeniniai produktai yra atskirai įsigyjami premium Excel modeliai. Peržiūrėkite katalogą, pasirinkite produktą ir atsisiųskite jį po įsigijimo.",
       icon: FileText,
       onOpen: () => onOpenSection("digital"),
       cta: "Peržiūrėti produktus",
@@ -373,13 +373,13 @@ const DigitalProductsSection = () => {
             <span className="signal-pill">Skaitmeniniai produktai</span>
             <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">Skaitmeniniai produktai</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
-              Skaitmeniniai produktai yra atskirai įsigyjami PDF gidai ir Excel modeliai. Peržiūrėkite katalogą, pasirinkite produktą ir atsisiųskite jį po įsigijimo.
+              Skaitmeniniai produktai yra atskirai įsigyjami premium Excel modeliai. Peržiūrėkite katalogą, pasirinkite produktą ir atsisiųskite jį po įsigijimo.
             </p>
           </div>
           <div className="soft-card rounded-lg p-4">
             <p className="text-xs font-bold uppercase text-muted">Kataloge</p>
             <p className="mt-2 font-display text-3xl font-bold">{publicProducts.length}</p>
-            <p className="mt-2 text-sm leading-6 text-muted">PDF gidai ir Excel modeliai</p>
+            <p className="mt-2 text-sm leading-6 text-muted">Premium Excel modeliai</p>
           </div>
         </div>
 
