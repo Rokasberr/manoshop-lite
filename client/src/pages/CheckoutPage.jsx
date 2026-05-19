@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 
 import EmptyState from "../components/EmptyState";
 import SectionTitle from "../components/SectionTitle";
+import { STORE_PURCHASES_PAUSED, STORE_PURCHASES_PAUSED_MESSAGE } from "../constants/storefront";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
-import { STORE_PURCHASES_PAUSED, STORE_PURCHASES_PAUSED_MESSAGE } from "../constants/storefront";
+import { useLanguage } from "../context/LanguageContext";
 import orderService from "../services/orderService";
 import { formatCurrency } from "../utils/currency";
 
@@ -14,6 +15,8 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { cartItems, subtotal, clearCart } = useCart();
+  const { t } = useLanguage();
+  const copy = t("checkout");
   const [formData, setFormData] = useState({
     fullName: "",
     address: "",
@@ -45,21 +48,15 @@ const CheckoutPage = () => {
   }, [hasDigitalProducts]);
 
   if (!cartItems.length) {
-    return (
-      <EmptyState
-        title="Krepšelis tuščias"
-        description="Pasirink produktą prieš tęsiant į apmokėjimą."
-        actionLabel="Peržiūrėti kolekciją"
-      />
-    );
+    return <EmptyState title={copy.emptyCartTitle} description={copy.emptyCartText} actionLabel={copy.viewCollection} />;
   }
 
   if (STORE_PURCHASES_PAUSED) {
     return (
       <EmptyState
-        title="Apmokėjimas laikinai pristabdytas"
+        title={copy.pausedTitle}
         description={STORE_PURCHASES_PAUSED_MESSAGE}
-        actionLabel="Peržiūrėti atidarymo būseną"
+        actionLabel={copy.viewLaunchStatus}
         actionTo="/launch-soon"
       />
     );
@@ -84,16 +81,12 @@ const CheckoutPage = () => {
           !formData.postalCode.trim() ||
           !formData.country.trim()))
     ) {
-      setError(
-        requiresShipping
-          ? "Užpildyk visus privalomus pristatymo laukus."
-          : "Užpildyk pirkėjo vardą ir pavardę."
-      );
+      setError(requiresShipping ? copy.shippingRequiredError : copy.buyerRequiredError);
       return;
     }
 
     if (hasDigitalProducts && formData.paymentMethod !== "card") {
-      setError("Skaitmeniniams produktams šiuo metu galimas tik atsiskaitymas kortele.");
+      setError(copy.digitalCardOnlyError);
       return;
     }
 
@@ -121,7 +114,7 @@ const CheckoutPage = () => {
         const session = await orderService.createStripeCheckoutSession(orderPayload);
 
         if (!session?.url) {
-          throw new Error("Nepavyko paruošti saugaus apmokėjimo.");
+          throw new Error(copy.securePaymentFailed);
         }
 
         window.location.assign(session.url);
@@ -133,14 +126,14 @@ const CheckoutPage = () => {
       try {
         await orderService.downloadInvoice(order._id, order.invoice?.number || `invoice-${order._id}`);
       } catch (_invoiceError) {
-        toast.error("Užsakymas sukurtas, bet PDF sąskaitos atsisiųsti nepavyko.");
+        toast.error(copy.invoiceAfterOrderFailed);
       }
 
       clearCart();
-      toast.success("Užsakymas sukurtas, sąskaita sugeneruota.");
+      toast.success(copy.orderCreated);
       navigate("/profile");
     } catch (submitError) {
-      setError(submitError.response?.data?.message || "Nepavyko sukurti užsakymo.");
+      setError(submitError.response?.data?.message || copy.orderCreateFailed);
     } finally {
       setSubmitting(false);
     }
@@ -148,17 +141,11 @@ const CheckoutPage = () => {
 
   return (
     <div className="space-y-8">
-      <SectionTitle
-        eyebrow="apmokėjimas"
-        title="Užbaik pirkimą ramiai"
-        subtitle="Patikrink duomenis, peržiūrėk sumą ir tęsk į saugų apmokėjimą."
-      />
+      <SectionTitle eyebrow={copy.successEyebrow} title={copy.pageTitle} subtitle={copy.pageSubtitle} />
 
       <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
         <form className="panel space-y-5 p-6" onSubmit={handleSubmit}>
-          <h2 className="font-display text-3xl font-bold">
-            {requiresShipping ? "Pristatymo informacija" : "Pirkėjo informacija"}
-          </h2>
+          <h2 className="font-display text-3xl font-bold">{requiresShipping ? copy.shippingInfo : copy.buyerInfo}</h2>
 
           {error && (
             <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-300">
@@ -168,14 +155,13 @@ const CheckoutPage = () => {
 
           {!requiresShipping && (
             <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-              Šiame užsakyme yra tik skaitmeniniai produktai, todėl pristatymo adreso nereikia. Po apmokėjimo
-              atsisiuntimai atsiras tavo profilyje.
+              {copy.digitalOnlyNote}
             </div>
           )}
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className="mb-2 block text-sm font-semibold">Vardas ir pavardė</label>
+              <label className="mb-2 block text-sm font-semibold">{copy.fullName}</label>
               <input
                 className="input-field"
                 value={formData.fullName}
@@ -186,7 +172,7 @@ const CheckoutPage = () => {
             {requiresShipping && (
               <>
                 <div className="sm:col-span-2">
-                  <label className="mb-2 block text-sm font-semibold">Adresas</label>
+                  <label className="mb-2 block text-sm font-semibold">{copy.address}</label>
                   <input
                     className="input-field"
                     value={formData.address}
@@ -195,16 +181,12 @@ const CheckoutPage = () => {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-semibold">Miestas</label>
-                  <input
-                    className="input-field"
-                    value={formData.city}
-                    onChange={(event) => handleChange("city", event.target.value)}
-                  />
+                  <label className="mb-2 block text-sm font-semibold">{copy.city}</label>
+                  <input className="input-field" value={formData.city} onChange={(event) => handleChange("city", event.target.value)} />
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-semibold">Pašto kodas</label>
+                  <label className="mb-2 block text-sm font-semibold">{copy.postalCode}</label>
                   <input
                     className="input-field"
                     value={formData.postalCode}
@@ -213,7 +195,7 @@ const CheckoutPage = () => {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-semibold">Šalis</label>
+                  <label className="mb-2 block text-sm font-semibold">{copy.country}</label>
                   <input
                     className="input-field"
                     value={formData.country}
@@ -222,21 +204,17 @@ const CheckoutPage = () => {
                 </div>
 
                 <div>
-                  <label className="mb-2 block text-sm font-semibold">Telefonas</label>
-                  <input
-                    className="input-field"
-                    value={formData.phone}
-                    onChange={(event) => handleChange("phone", event.target.value)}
-                  />
+                  <label className="mb-2 block text-sm font-semibold">{copy.phone}</label>
+                  <input className="input-field" value={formData.phone} onChange={(event) => handleChange("phone", event.target.value)} />
                 </div>
               </>
             )}
 
             <div className="sm:col-span-2">
-              <label className="mb-2 block text-sm font-semibold">Mokėjimo būdas</label>
+              <label className="mb-2 block text-sm font-semibold">{copy.paymentMethod}</label>
               {hasDigitalProducts ? (
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                  Skaitmeniniams produktams naudojamas saugus atsiskaitymas kortele.
+                  {copy.digitalCardNote}
                 </div>
               ) : (
                 <select
@@ -244,26 +222,22 @@ const CheckoutPage = () => {
                   value={formData.paymentMethod}
                   onChange={(event) => handleChange("paymentMethod", event.target.value)}
                 >
-                  <option value="card">Kortelė</option>
-                  <option value="bank-transfer">Bankinis pavedimas</option>
-                  <option value="cash-on-delivery">Apmokėti pristatymo metu</option>
+                  <option value="card">{copy.card}</option>
+                  <option value="bank-transfer">{copy.bankTransfer}</option>
+                  <option value="cash-on-delivery">{copy.cashOnDelivery}</option>
                 </select>
               )}
             </div>
           </div>
 
           <button type="submit" disabled={submitting} className="button-primary w-full">
-            {submitting
-              ? "Tvirtinama..."
-              : formData.paymentMethod === "card"
-                ? "Tęsti į saugų apmokėjimą"
-                : "Patvirtinti užsakymą"}
+            {submitting ? copy.confirmingOrder : formData.paymentMethod === "card" ? copy.continueToSecurePayment : copy.confirmOrder}
           </button>
         </form>
 
         <aside className="panel h-fit p-6">
-          <p className="eyebrow">suvestinė</p>
-          <h2 className="mt-4 font-display text-3xl font-bold">Galutinė suma</h2>
+          <p className="eyebrow">{copy.summary}</p>
+          <h2 className="mt-4 font-display text-3xl font-bold">{copy.finalAmount}</h2>
 
           <div className="mt-6 space-y-4">
             {cartItems.map((item) => (
@@ -275,9 +249,7 @@ const CheckoutPage = () => {
                     <p className="text-sm text-muted">
                       {item.quantity} x {formatCurrency(item.price)}
                     </p>
-                    {item.productType === "digital" && (
-                      <p className="text-xs uppercase tracking-[0.2em] text-muted">Digital</p>
-                    )}
+                    {item.productType === "digital" && <p className="text-xs uppercase tracking-[0.2em] text-muted">{copy.digital}</p>}
                   </div>
                 </div>
                 <p className="font-semibold">{formatCurrency(item.quantity * item.price)}</p>
@@ -287,21 +259,19 @@ const CheckoutPage = () => {
 
           <div className="soft-border-top mt-6 space-y-3 pt-6 text-sm">
             <div className="flex items-center justify-between">
-              <span className="text-muted">Prekės</span>
+              <span className="text-muted">{copy.subtotal}</span>
               <span>{formatCurrency(subtotal)}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-muted">Pristatymas</span>
-              <span>
-                {!requiresShipping ? "Netaikoma" : shipping === 0 ? "Nemokamas" : formatCurrency(shipping)}
-              </span>
+              <span className="text-muted">{copy.shipping}</span>
+              <span>{!requiresShipping ? copy.notApplicable : shipping === 0 ? copy.free : formatCurrency(shipping)}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-muted">PVM</span>
+              <span className="text-muted">{copy.vat}</span>
               <span>{formatCurrency(tax)}</span>
             </div>
             <div className="flex items-center justify-between font-display text-2xl font-bold">
-              <span>Viso</span>
+              <span>{copy.total}</span>
               <span>{formatCurrency(total)}</span>
             </div>
           </div>

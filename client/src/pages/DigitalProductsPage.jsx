@@ -5,60 +5,20 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import DigitalProductAccessGrid from "../components/DigitalProductAccessGrid";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { digitalProducts } from "../constants/digitalProducts";
+import { getLocalizedDigitalProducts } from "../constants/digitalProducts";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 import adminDigitalProductService from "../services/adminDigitalProductService";
 import digitalProductService from "../services/digitalProductService";
-
-const trustItems = ["Saugus pirkimas", "Atsisiuntimas po apmokėjimo", "Paruošta naudoti"];
-
-const valueProps = [
-  {
-    title: "Aiški struktūra",
-    text: "Kiekvienas modelis turi paruoštus lapus, pavyzdinius duomenis ir aiškų darbo ritmą.",
-  },
-  {
-    title: "Lengva pradėti",
-    text: "Atsidarote failą, pakeičiate pavyzdinius skaičius savo duomenimis ir iškart matote rezultatus.",
-  },
-  {
-    title: "Premium dizainas",
-    text: "Šablonai sukurti taip, kad būtų malonu naudoti kasdien ir patogu pristatyti sau aiškią apžvalgą.",
-  },
-  {
-    title: "Praktiški įrankiai",
-    text: "Finansų, taupymo ir savaitės planavimo sistemos orientuotos į realius sprendimus, ne triukšmą.",
-  },
-];
-
-const faqItems = [
-  {
-    question: "Ar failą gausiu iškart po apmokėjimo?",
-    answer:
-      "Po sėkmingo apmokėjimo produktas priskiriamas jūsų paskyrai. Prisijungę matysite atsisiuntimo mygtuką prie įsigyto produkto.",
-  },
-  {
-    question: "Ar reikia Excel programos?",
-    answer:
-      "Rekomenduojame naudoti Microsoft Excel. Failai yra .xlsx formato ir neturi makrokomandų ar išorinių duomenų jungčių.",
-  },
-  {
-    question: "Ar tai vienkartinis pirkimas?",
-    answer:
-      "Taip. Skaitmeniniai produktai perkami atskirai nuo narystės, o atsisiuntimas aktyvuojamas konkrečiam įsigytam produktui.",
-  },
-  {
-    question: "Ar galiu naudoti asmeniškai?",
-    answer:
-      "Taip. Produktai skirti asmeniniam naudojimui: finansams, taupymo tikslams, savaitei ir kasdieniams planavimo sprendimams tvarkyti.",
-  },
-];
 
 const DigitalProductsPage = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user, isCheckingAuth } = useAuth();
-  const publicProducts = useMemo(() => digitalProducts.filter((product) => product.isPublic), []);
+  const { language, t } = useLanguage();
+  const copy = t("digitalProductsPage");
+  const localizedProducts = useMemo(() => getLocalizedDigitalProducts(language), [language]);
+  const publicProducts = useMemo(() => localizedProducts.filter((product) => product.isPublic), [localizedProducts]);
   const [purchasedProductIds, setPurchasedProductIds] = useState([]);
   const [isLoadingPurchases, setIsLoadingPurchases] = useState(false);
   const [purchaseLoadingId, setPurchaseLoadingId] = useState("");
@@ -85,7 +45,7 @@ const DigitalProductsPage = () => {
         }
       } catch (_error) {
         if (isMounted) {
-          toast.error("Nepavyko atnaujinti įsigytų produktų.");
+          toast.error(t("common.toast.purchasesFailed"));
         }
       } finally {
         if (isMounted) {
@@ -105,12 +65,12 @@ const DigitalProductsPage = () => {
     const purchaseState = searchParams.get("purchase");
 
     if (purchaseState === "success") {
-      toast.success("Apmokėjimas priimtas. Atsisiuntimai pasirodys, kai pirkimas bus patvirtintas.");
+      toast.success(copy.purchaseSuccess);
       setSearchParams({}, { replace: true });
     }
 
     if (purchaseState === "cancel") {
-      toast("Pirkimas atšauktas. Produktą galite įsigyti vėliau.");
+      toast(copy.purchaseCancel);
       setSearchParams({}, { replace: true });
     }
   }, [searchParams, setSearchParams]);
@@ -140,13 +100,13 @@ const DigitalProductsPage = () => {
         setPurchasedProductIds((currentIds) =>
           currentIds.includes(product.id) ? currentIds : [...currentIds, product.id]
         );
-        toast.success("Šis produktas jau įsigytas.");
+        toast.success(t("common.toast.purchaseAlreadyOwned"));
         return;
       }
 
       window.location.assign(session.url);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Nepavyko paruošti produkto pirkimo.");
+      toast.error(error.response?.data?.message || t("common.toast.purchaseReadyFailed"));
     } finally {
       setPurchaseLoadingId("");
     }
@@ -156,7 +116,7 @@ const DigitalProductsPage = () => {
     const fileName = format === "pdf" ? product.pdfFileName : product.excelFileName;
 
     if (!fileName) {
-      toast("Failas netrukus bus pasiekiamas.");
+      toast(t("common.toast.fileSoon"));
       return;
     }
 
@@ -164,7 +124,7 @@ const DigitalProductsPage = () => {
       setDownloadLoadingKey(`${product.id}:${format}`);
       await digitalProductService.downloadProductFile(product.id, format, fileName);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Nepavyko atsisiųsti failo.");
+      toast.error(error.response?.data?.message || t("common.toast.downloadFailed"));
     } finally {
       setDownloadLoadingKey("");
     }
@@ -180,7 +140,7 @@ const DigitalProductsPage = () => {
 
   const handleAdminPreview = async (product) => {
     if (!product.pdfFileName) {
-      toast("Failas netrukus bus pasiekiamas.");
+      toast(t("common.toast.fileSoon"));
       return;
     }
 
@@ -193,7 +153,7 @@ const DigitalProductsPage = () => {
         url,
       });
     } catch (error) {
-      toast.error(error.response?.data?.message || "Nepavyko atidaryti PDF peržiūros.");
+      toast.error(error.response?.data?.message || t("common.toast.previewFailed"));
     } finally {
       setAdminPreviewLoadingId("");
     }
@@ -203,7 +163,7 @@ const DigitalProductsPage = () => {
     const fileName = format === "pdf" ? product.pdfFileName : product.excelFileName;
 
     if (!fileName) {
-      toast("Failas netrukus bus pasiekiamas.");
+      toast(t("common.toast.fileSoon"));
       return;
     }
 
@@ -211,14 +171,14 @@ const DigitalProductsPage = () => {
       setAdminDownloadLoadingKey(`${product.id}:${format}`);
       await adminDigitalProductService.downloadFile(product.id, format, fileName);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Nepavyko atsisiųsti failo.");
+      toast.error(error.response?.data?.message || t("common.toast.downloadFailed"));
     } finally {
       setAdminDownloadLoadingKey("");
     }
   };
 
   if (isCheckingAuth) {
-    return <LoadingSpinner fullScreen label="Krauname skaitmeninius produktus..." />;
+    return <LoadingSpinner fullScreen label={copy.loading} />;
   }
 
   return (
@@ -231,19 +191,19 @@ const DigitalProductsPage = () => {
           <div>
             <span className="inline-flex items-center gap-2 rounded-lg border border-[#e2ca91]/[0.42] bg-[#e2ca91]/[0.16] px-3 py-1 text-xs font-bold uppercase text-[#f8e6b1]">
               <Sparkles size={14} />
-              Premium Excel katalogas
+              {copy.heroBadge}
             </span>
             <h1 className="mt-5 max-w-4xl font-display text-4xl font-bold leading-tight text-white sm:text-6xl">
-              Skaitmeniniai įrankiai finansams, taupymui ir produktyvumui
+              {copy.heroTitle}
             </h1>
             <p className="mt-5 max-w-3xl text-base leading-8 text-white/[0.86] sm:text-lg">
-              Paruošti naudoti Excel šablonai, kurie padeda aiškiau planuoti pinigus, tikslus ir savaitės darbus.
+              {copy.heroSubtitle}
             </p>
             <p className="mt-4 max-w-3xl text-sm leading-7 text-white/[0.78]">
-              Produktus galite peržiūrėti viešai. Norint įsigyti ir atsisiųsti failus, reikia prisijungti arba susikurti paskyrą.
+              {copy.heroNote}
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
-              {trustItems.map((item) => (
+              {copy.trustItems.map((item) => (
                 <span
                   key={item}
                   className="inline-flex items-center gap-2 rounded-lg border border-white/[0.16] bg-white/[0.1] px-3 py-2 text-xs font-semibold text-white/[0.86]"
@@ -255,12 +215,12 @@ const DigitalProductsPage = () => {
             </div>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a href="#product-catalog" className="button-primary gap-2">
-                Peržiūrėti katalogą
+                {copy.viewCatalog}
                 <ArrowRight size={16} />
               </a>
               {!user && (
                 <Link to="/register" state={{ from: "/digital-products" }} className="hero-outline-button gap-2">
-                  Prisiregistruoti ir įsigyti
+                  {copy.registerAndBuy}
                   <UserPlus size={16} />
                 </Link>
               )}
@@ -270,13 +230,13 @@ const DigitalProductsPage = () => {
           <div className="rounded-lg border border-white/[0.16] bg-white/[0.1] p-5 shadow-[0_26px_70px_rgba(0,0,0,0.22)]">
             <p className="flex items-center gap-2 text-sm font-semibold text-white">
               <FileSpreadsheet size={17} className="text-[#f2d99a]" />
-              Premium katalogas
+              {copy.catalogCardTitle}
             </p>
             <div className="mt-5 grid grid-cols-3 gap-3 lg:grid-cols-1">
               {[
-                ["Produktai", publicProducts.length],
-                ["Formatas", "Excel"],
-                ["Prieiga", "Po pirkimo"],
+                [copy.statProducts, publicProducts.length],
+                [copy.statFormat, "Excel"],
+                [copy.statAccess, copy.afterPurchase],
               ].map(([label, value]) => (
                 <div key={label} className="rounded-lg border border-white/[0.16] bg-black/[0.28] p-4">
                   <p className="text-xs font-bold uppercase text-white/[0.68]">{label}</p>
@@ -291,18 +251,18 @@ const DigitalProductsPage = () => {
       <section id="product-catalog" className="space-y-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <span className="eyebrow">Produktų katalogas</span>
-            <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">Skaitmeniniai produktai</h2>
+            <span className="eyebrow">{copy.catalogEyebrow}</span>
+            <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">{copy.catalogTitle}</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
-              Trys mokami StillOak Excel produktai su aiškiais aprašymais, peržiūros vaizdais, kainomis ir saugia prieiga po apmokėjimo.
+              {copy.catalogText}
             </p>
           </div>
           <div className="soft-pill rounded-lg px-4 py-3 text-sm font-semibold text-muted">
             {user
               ? isLoadingPurchases
-                ? "Tikriname pirkinius..."
-                : `${purchasedProductIds.length} iš ${publicProducts.length} įsigyta`
-              : "Prisiregistruokite, kad galėtumėte įsigyti"}
+                ? copy.checkingPurchases
+                : t("digitalProductsPage.purchasedCount", { count: purchasedProductIds.length, total: publicProducts.length })
+              : copy.guestCatalogCta}
           </div>
         </div>
 
@@ -324,7 +284,7 @@ const DigitalProductsPage = () => {
       </section>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {valueProps.map((item) => (
+        {copy.valueProps.map((item) => (
           <article
             key={item.title}
             className="rounded-lg border border-[rgb(var(--line))] bg-[rgb(var(--surface))] p-5 shadow-[0_18px_50px_rgba(31,26,23,0.08)]"
@@ -340,21 +300,17 @@ const DigitalProductsPage = () => {
 
       <section className="rounded-lg border border-[rgb(var(--line))] bg-[rgb(var(--surface))] p-6 shadow-[0_20px_70px_rgba(31,26,23,0.08)] sm:p-8">
         <div className="max-w-3xl">
-          <span className="eyebrow">Kodėl StillOak</span>
-          <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">Kodėl verta naudoti StillOak šablonus?</h2>
+          <span className="eyebrow">{copy.whyEyebrow}</span>
+          <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">{copy.whyTitle}</h2>
           <p className="mt-3 text-sm leading-7 text-muted">
-            Šie produktai sukurti kaip praktiški darbo failai: ne teorijai, o kasdieniam naudojimui, aiškiems sprendimams ir tvarkingam progresui.
+            {copy.whyText}
           </p>
         </div>
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
-          {[
-            ["Vienas aiškus failas", "Kiekvienas produktas turi paruoštą struktūrą, pavyzdinius duomenis ir dashboard vaizdą."],
-            ["Be sudėtingo pasiruošimo", "Nereikia kurti formulių nuo nulio. Pradedate nuo paruošto modelio ir pritaikote jį sau."],
-            ["Atskirai įsigyjama", "Produktai nėra automatiškai įtraukti į Demo versiją. Perkate tik tai, ko jums reikia."],
-          ].map(([title, text]) => (
-            <div key={title} className="rounded-lg border border-[rgb(var(--line))] bg-[rgb(var(--surface-soft))] p-5">
-              <p className="font-display text-xl font-bold">{title}</p>
-              <p className="mt-3 text-sm leading-7 text-muted">{text}</p>
+          {copy.whyCards.map((item) => (
+            <div key={item.title} className="rounded-lg border border-[rgb(var(--line))] bg-[rgb(var(--surface-soft))] p-5">
+              <p className="font-display text-xl font-bold">{item.title}</p>
+              <p className="mt-3 text-sm leading-7 text-muted">{item.text}</p>
             </div>
           ))}
         </div>
@@ -362,11 +318,11 @@ const DigitalProductsPage = () => {
 
       <section className="rounded-lg border border-[rgb(var(--line))] bg-[rgb(var(--surface))] p-6 shadow-[0_20px_70px_rgba(31,26,23,0.08)] sm:p-8">
         <div className="max-w-3xl">
-          <span className="eyebrow">Klausimai</span>
-          <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">Dažniausiai užduodami klausimai</h2>
+          <span className="eyebrow">{copy.faqEyebrow}</span>
+          <h2 className="mt-3 font-display text-3xl font-bold sm:text-4xl">{copy.faqTitle}</h2>
         </div>
         <div className="mt-6 grid gap-4 md:grid-cols-2">
-          {faqItems.map((item) => (
+          {copy.faqItems.map((item) => (
             <article key={item.question} className="rounded-lg border border-[rgb(var(--line))] bg-[rgb(var(--surface-soft))] p-5">
               <h3 className="font-display text-xl font-bold leading-tight">{item.question}</h3>
               <p className="mt-3 text-sm leading-7 text-muted">{item.answer}</p>
@@ -380,22 +336,22 @@ const DigitalProductsPage = () => {
         <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-3xl">
             <span className="inline-flex rounded-lg border border-[#e2ca91]/[0.42] bg-[#e2ca91]/[0.16] px-3 py-1 text-xs font-bold uppercase text-[#f8e6b1]">
-              Premium resursai
+              {copy.ctaEyebrow}
             </span>
             <h2 className="mt-4 font-display text-3xl font-bold leading-tight sm:text-4xl">
-              Nori daugiau premium resursų?
+              {copy.ctaTitle}
             </h2>
             <p className="mt-4 text-sm leading-7 text-white/[0.84] sm:text-base">
-              Narystėje rasite daugiau nario įrankių, struktūruotų gidų ir premium planavimo sistemų. Skaitmeniniai produktai lieka atskirai įsigyjami, o narystė padeda dirbti su platesne StillOak Studio erdve.
+              {copy.ctaText}
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link to="/pricing" className="button-primary shrink-0 gap-2">
-              Atrakinti narystę
+              {t("common.buttons.unlockMembership")}
               <UserPlus size={16} />
             </Link>
             <Link to="/pricing" className="hero-outline-button shrink-0 gap-2">
-              Peržiūrėti planus
+              {t("common.buttons.viewPlans")}
               <ArrowRight size={16} />
             </Link>
           </div>
@@ -407,14 +363,14 @@ const DigitalProductsPage = () => {
           <div className="flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-lg border border-white/[0.18] bg-[#071310] text-white shadow-[0_32px_110px_rgba(0,0,0,0.45)]">
             <div className="flex items-center justify-between gap-4 border-b border-white/[0.16] px-5 py-4">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#f2d99a]">Admin PDF peržiūra</p>
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#f2d99a]">{copy.adminPreview}</p>
                 <h3 className="mt-1 font-display text-xl font-bold">{adminPreview.title}</h3>
               </div>
               <button
                 type="button"
                 onClick={closeAdminPreview}
                 className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/[0.16] bg-white/[0.1] text-white/[0.86] transition hover:bg-white/[0.16] hover:text-white"
-                aria-label="Uždaryti PDF peržiūrą"
+                aria-label={copy.closePdfPreview}
               >
                 <X size={18} />
               </button>

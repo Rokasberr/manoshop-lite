@@ -5,15 +5,18 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
 import SectionTitle from "../components/SectionTitle";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 import billingService from "../services/billingService";
 import { hasActiveMembership } from "../utils/membership";
 
 const BillingSuccessPage = () => {
   const { refreshProfile, user } = useAuth();
+  const { t } = useLanguage();
+  const copy = t("billing");
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
-  const [statusMessage, setStatusMessage] = useState("Tikriname narystės aktyvaciją...");
+  const [statusMessage, setStatusMessage] = useState(copy.checking);
   const sessionId = searchParams.get("session_id") || "";
 
   const isStripeActive = hasActiveMembership(user);
@@ -34,7 +37,7 @@ const BillingSuccessPage = () => {
           }
 
           if (hasActiveMembership({ ...(user || {}), subscription: profile?.subscription })) {
-            setStatusMessage("Narystė aktyvuota. Tuoj atidarysime Stilloak.");
+            setStatusMessage(copy.activated);
             setLoading(false);
             setTimeout(() => {
               if (!cancelled) {
@@ -53,7 +56,7 @@ const BillingSuccessPage = () => {
       }
 
       if (!cancelled) {
-        setStatusMessage("Apmokėjimas pavyko. Jei planas dar neatsinaujino, po kelių sekundžių atsidaryk profilį dar kartą.");
+        setStatusMessage(copy.fallback);
         setLoading(false);
       }
     };
@@ -63,34 +66,28 @@ const BillingSuccessPage = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [copy.activated, copy.fallback, navigate, refreshProfile, sessionId, user]);
 
   return (
     <div className="space-y-8">
-      <SectionTitle
-        eyebrow="apmokėjimas pavyko"
-        title="Mokėjimas priimtas"
-        subtitle="Sinchronizuojame tavo narystę su paskyra."
-      />
+      <SectionTitle eyebrow={copy.successEyebrow} title={copy.successTitle} subtitle={copy.successSubtitle} />
 
       <div className="panel mx-auto max-w-3xl p-8 text-center">
         {loading ? (
-          <LoadingSpinner label="Tikriname narystės aktyvaciją..." />
+          <LoadingSpinner label={copy.checking} />
         ) : (
           <>
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300">
               {isStripeActive ? <CheckCircle2 size={36} /> : <Clock3 size={36} />}
             </div>
             <h2 className="mt-6 font-display text-4xl font-bold">{statusMessage}</h2>
-            <p className="mt-4 text-muted">
-              Narystės informacija išsaugota tavo paskyroje. Jei būsena dar atsinaujina, profilis ją parodys po kelių akimirkų.
-            </p>
+            <p className="mt-4 text-muted">{copy.saved}</p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link to="/members/savings-studio?welcome=membership" className="button-primary">
-                Atidaryti Stilloak
+                {t("common.buttons.openStudio")}
               </Link>
               <Link to="/pricing" className="button-secondary">
-                Peržiūrėti narystę
+                {t("common.buttons.viewMembership")}
               </Link>
             </div>
           </>

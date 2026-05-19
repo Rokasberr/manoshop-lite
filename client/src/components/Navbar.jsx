@@ -7,149 +7,14 @@ import { useLanguage } from "../context/LanguageContext";
 import { useTheme } from "../context/ThemeContext";
 import { hasActiveMembership, isAdminUser, userCanAccessBusinessStudio } from "../utils/membership";
 
-const navbarCopy = {
-  lt: {
-    nav: {
-      home: "Pradžia",
-      journal: "Nario naujienos",
-      contact: "Kontaktai",
-      memberArea: "Nario zona",
-      digitalProducts: "Skaitmeniniai produktai",
-      savingStudio: "Saving Studio",
-      productIdeas: "Produktų idėjos",
-      business: "Business Studio",
-      membership: "Narystės",
-      admin: "Admin",
-    },
-    tagline: "aiškesnis mėnuo",
-    bag: "Krepšelis",
-    signOut: "Atsijungti",
-    signIn: "Prisijungti",
-    join: "Atrakinti narystę",
-    openStudio: "Atidaryti Stilloak",
-    languageLabel: "Kalba",
-    studioLabel: "privati nario erdvė",
-  },
-  en: {
-    nav: {
-      home: "Home",
-      journal: "Member news",
-      contact: "Contact",
-      memberArea: "Member area",
-      digitalProducts: "Digital products",
-      savingStudio: "Saving Studio",
-      productIdeas: "Product ideas",
-      business: "Business Studio",
-      membership: "Memberships",
-      admin: "Admin",
-    },
-    tagline: "clearer months",
-    bag: "Bag",
-    signOut: "Sign out",
-    signIn: "Sign in",
-    join: "Unlock membership",
-    openStudio: "Open Stilloak",
-    languageLabel: "Language",
-    studioLabel: "private member space",
-  },
-  pl: {
-    nav: {
-      home: "Start",
-      journal: "Aktualnosci czlonka",
-      contact: "Kontakt",
-      memberArea: "Strefa członka",
-      digitalProducts: "Produkty cyfrowe",
-      savingStudio: "Saving Studio",
-      productIdeas: "Pomysły produktów",
-      business: "Business Studio",
-      membership: "Członkostwo",
-      admin: "Admin",
-    },
-    tagline: "spokojniejsza kontrola",
-    bag: "Koszyk",
-    signOut: "Wyloguj",
-    signIn: "Zaloguj",
-    join: "Odblokuj członkostwo",
-    openStudio: "Otwórz Stilloak",
-    languageLabel: "Język",
-    studioLabel: "prywatna przestrzeń finansów",
-  },
-  de: {
-    nav: {
-      home: "Start",
-      journal: "Mitgliedernews",
-      contact: "Kontakt",
-      memberArea: "Mitgliederbereich",
-      digitalProducts: "Digitale Produkte",
-      savingStudio: "Saving Studio",
-      productIdeas: "Produktideen",
-      business: "Business Studio",
-      membership: "Mitgliedschaft",
-      admin: "Admin",
-    },
-    tagline: "ruhigere klarheit",
-    bag: "Warenkorb",
-    signOut: "Abmelden",
-    signIn: "Anmelden",
-    join: "Mitgliedschaft freischalten",
-    openStudio: "Stilloak öffnen",
-    languageLabel: "Sprache",
-    studioLabel: "private geldübersicht",
-  },
-  fr: {
-    nav: {
-      home: "Accueil",
-      journal: "Actus membres",
-      contact: "Contact",
-      memberArea: "Espace membre",
-      digitalProducts: "Produits numériques",
-      savingStudio: "Saving Studio",
-      productIdeas: "Idées produits",
-      business: "Business Studio",
-      membership: "Abonnement",
-      admin: "Admin",
-    },
-    tagline: "une clarté plus calme",
-    bag: "Panier",
-    signOut: "Déconnexion",
-    signIn: "Connexion",
-    join: "Débloquer l’abonnement",
-    openStudio: "Ouvrir Stilloak",
-    languageLabel: "Langue",
-    studioLabel: "espace financier privé",
-  },
-  es: {
-    nav: {
-      home: "Inicio",
-      journal: "Noticias de miembro",
-      contact: "Contacto",
-      memberArea: "Zona de miembro",
-      digitalProducts: "Productos digitales",
-      savingStudio: "Saving Studio",
-      productIdeas: "Ideas de producto",
-      business: "Business Studio",
-      membership: "Membresía",
-      admin: "Admin",
-    },
-    tagline: "claridad más serena",
-    bag: "Bolsa",
-    signOut: "Salir",
-    signIn: "Entrar",
-    join: "Desbloquear membresía",
-    openStudio: "Abrir Stilloak",
-    languageLabel: "Idioma",
-    studioLabel: "espacio privado financiero",
-  },
-};
-
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { cartCount } = useCart();
   const { theme, toggleTheme } = useTheme();
-  const { language, languageOptions, setLanguage } = useLanguage();
-  const copy = navbarCopy[language] || navbarCopy.lt;
+  const { language, languageOptions, setLanguage, t } = useLanguage();
+  const copy = t("navbar");
   const isMember = hasActiveMembership(user);
   const isBusinessMember = userCanAccessBusinessStudio(user);
   const currentLanguageOption =
@@ -279,7 +144,7 @@ const Navbar = () => {
             type="button"
             onClick={toggleTheme}
             className="button-secondary h-10 w-10 px-0"
-            aria-label="Pakeisti temą"
+            aria-label={copy.themeToggle}
           >
             {theme === "dark" ? <SunMedium size={18} /> : <Moon size={18} />}
           </button>

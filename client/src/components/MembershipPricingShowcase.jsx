@@ -14,116 +14,27 @@
 import { Link } from "react-router-dom";
 
 import FloatingMarketNumbers from "./FloatingMarketNumbers";
-import { subscriptionPlans } from "../constants/subscriptionPlans";
-
-const sectionNav = [
-  { label: "Funkcijos", href: "#funkcijos" },
-  { label: "Narystės", href: "#narystes" },
-  { label: "Rinkiniai", href: "#rinkiniai" },
-  { label: "Atsiliepimai", href: "#atsiliepimai" },
-];
+import { getLocalizedSubscriptionPlans } from "../constants/subscriptionPlans";
+import { useLanguage } from "../context/LanguageContext";
 
 const planPresentation = {
   basic: {
-    eyebrow: "Nemokama pradžia",
-    cta: "Pradėti Demo versiją",
-    comparison: "Nemokama Saving Studio peržiūra.",
-    kitName: "Saving Studio demo",
     icon: WalletCards,
     accent: "rgb(164 220 190)",
   },
   personal: {
-    eyebrow: "Rekomenduojama",
-    cta: "Rinktis Asmeninį",
-    comparison: "Pilnai nario erdvei ir asmeniniam progresui.",
-    kitName: "Stilloak Growth Kit",
     icon: Target,
     accent: "rgb(194 239 211)",
   },
   private_business: {
-    eyebrow: "Strateginis lygis",
-    cta: "Pasirinkti Verslas",
-    comparison: "Verslo įrankiams, svetainei, produktams ir pajamų apžvalgai.",
-    kitName: "Stilloak Business Kit",
     icon: BriefcaseBusiness,
     accent: "rgb(226 202 145)",
   },
 };
-
-const membershipKits = [
-  {
-    title: "Saving Studio Start",
-    subtitle: "Pradžiai skirta Saving Studio peržiūra su paprastomis planavimo kortelėmis.",
-    included: [
-      "Mėnesio fokuso kortelė",
-      "Mini biudžeto peržiūra",
-      "Paprastas tikslų planas",
-      "7 dienų veiksmų ritmas",
-    ],
-    planLabel: "Demo versijos peržiūra",
-    icon: WalletCards,
-  },
-  {
-    title: "Stilloak Growth Kit",
-    subtitle: "Daugiau įrankių aktyviam naudojimui, turinio planavimui ir projekto augimui.",
-    included: [
-      "Viskas iš Start Kit",
-      "Instagram postų idėjų rinkinys",
-      "Turinio planavimo šablonas",
-      "Produkto/paslaugos aprašymo šablonas",
-      "Mėnesio veiksmų planas",
-    ],
-    planLabel: "Įeina į Asmeninį planą",
-    icon: Target,
-  },
-  {
-    title: "Stilloak Business Kit",
-    subtitle: "Premium rinkinys verslui su pasiūlymų, klientų ir kainodaros šablonais.",
-    included: [
-      "Viskas iš Growth Kit",
-      "Verslo pasiūlymo šablonas",
-      "Kliento onboarding checklistas",
-      "Premium kainodaros šablonas",
-      "Reklamos kampanijos planavimo šablonas",
-      "Prioritetiniai atnaujinimai",
-    ],
-    planLabel: "Įeina į Verslo planą",
-    icon: BriefcaseBusiness,
-  },
-];
-
-const dashboardCards = [
-  {
-    label: "Mini biudžetas",
-    value: "1 240 €",
-    note: "planuojamas likutis",
-    icon: WalletCards,
-    progress: 68,
-  },
-  {
-    label: "Tikslų progresas",
-    value: "74%",
-    note: "3 aktyvūs tikslai",
-    icon: Target,
-    progress: 74,
-  },
-  {
-    label: "Nario naujienos",
-    value: "5",
-    note: "ramūs atnaujinimai",
-    icon: FileText,
-    progress: 52,
-  },
-  {
-    label: "Strategijos lenta",
-    value: "30 d.",
-    note: "augimo kryptis",
-    icon: BriefcaseBusiness,
-    progress: 86,
-  },
-];
-
-const trustLine = "Demo versija be kortelės · Mokami planai atšaukiami bet kada · Aiškūs planų skirtumai · Jokių paslėptų mokesčių";
+const sectionHrefs = ["#funkcijos", "#narystes", "#rinkiniai", "#atsiliepimai"];
+const kitIcons = [WalletCards, Target, BriefcaseBusiness];
+const dashboardCardIcons = [WalletCards, Target, FileText, BriefcaseBusiness];
+const dashboardCardProgress = [68, 74, 52, 86];
 
 const formatPlanPrice = (value, intervalLabel) => {
   const amount = Number(value || 0);
@@ -145,6 +56,12 @@ const MembershipPricingShowcase = ({
   joinLoadingLabel = "Jungiama...",
   currentPlanLabel = "Aktyvus planas",
 }) => {
+  const { language, t } = useLanguage();
+  const copy = t("pricing");
+  const subscriptionPlans = getLocalizedSubscriptionPlans(language);
+  const localizedSectionNav = copy.nav.map((label, index) => ({ label, href: sectionHrefs[index] }));
+  const effectiveJoinLoadingLabel = joinLoadingLabel === "Jungiama..." ? copy.joinLoading : joinLoadingLabel;
+  const effectiveCurrentPlanLabel = currentPlanLabel === "Aktyvus planas" ? copy.currentPlan : currentPlanLabel;
   const canChoosePlan = typeof onChoosePlan === "function";
 
   return (
@@ -157,7 +74,7 @@ const MembershipPricingShowcase = ({
           aria-label="StillOak Studio narystės navigacija"
           className="inline-flex w-full max-w-2xl items-center justify-between gap-1 rounded-full border border-white/10 bg-white/6 p-1 text-sm text-white/72 shadow-2xl shadow-black/18 backdrop-blur sm:w-auto sm:justify-center"
         >
-          {sectionNav.map((item) => (
+          {localizedSectionNav.map((item) => (
             <a
               key={item.label}
               href={item.href}
@@ -171,30 +88,29 @@ const MembershipPricingShowcase = ({
 
       <div className="mt-10 grid gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-end xl:gap-12">
         <div className="min-w-0">
-          <span className="hero-chip">StillOak Studio narystė</span>
+          <span className="hero-chip">{copy.heroChip}</span>
           <h1 className="mt-6 max-w-4xl break-words font-display text-4xl font-bold leading-tight sm:text-6xl lg:text-[4.45rem]">
-            Pasirink nario erdvę pagal savo etapą.
+            {copy.heroTitle}
           </h1>
           <p className="mt-6 max-w-3xl text-base leading-7 text-white/72 sm:text-lg">
-            Demo versija padeda susipažinti su Saving Studio, Asmeninis atrakina pilną nario erdvę, o Verslas suteikia
-            strateginę verslo erdvę augimui.
+            {copy.heroText}
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <a href="#narystes" className="button-primary min-h-[52px] gap-2">
-              Peržiūrėti narystes
+              {copy.viewMemberships}
               <ArrowRight size={16} className="shrink-0" />
             </a>
             <a href="#funkcijos" className="hero-outline-button min-h-[52px] gap-2">
               <LayoutDashboard size={16} className="shrink-0" />
-              Pamatyti nario zonas
+              {copy.viewZones}
             </a>
           </div>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-3">
           {subscriptionPlans.map((plan) => {
-            const meta = planPresentation[plan.id] || planPresentation.basic;
+            const meta = { ...(planPresentation[plan.id] || planPresentation.basic), ...(copy.planPresentation[plan.id] || {}) };
             const Icon = meta.icon;
 
             return (
@@ -223,8 +139,8 @@ const MembershipPricingShowcase = ({
               canChoosePlan={canChoosePlan}
               loadingPlanId={loadingPlanId}
               currentPlanId={currentPlanId}
-              joinLoadingLabel={joinLoadingLabel}
-              currentPlanLabel={currentPlanLabel}
+              joinLoadingLabel={effectiveJoinLoadingLabel}
+              currentPlanLabel={effectiveCurrentPlanLabel}
             />
           ))}
         </div>
@@ -234,7 +150,7 @@ const MembershipPricingShowcase = ({
 
       <div className="mt-5 grid gap-3 lg:grid-cols-3">
         {subscriptionPlans.map((plan) => {
-          const meta = planPresentation[plan.id] || planPresentation.basic;
+          const meta = { ...(planPresentation[plan.id] || planPresentation.basic), ...(copy.planPresentation[plan.id] || {}) };
 
           return (
             <div key={plan.id} className="rounded-lg border border-white/10 bg-white/5 p-4">
@@ -252,12 +168,12 @@ const MembershipPricingShowcase = ({
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-start gap-3">
             <ShieldCheck size={18} className="mt-0.5 shrink-0" style={{ color: "rgb(var(--accent-strong))" }} />
-            <p className="text-sm font-semibold leading-6 text-white/78">{trustLine}</p>
+            <p className="text-sm font-semibold leading-6 text-white/78">{copy.trustLine}</p>
           </div>
           <div className="flex flex-wrap gap-2 text-xs font-semibold text-white/56">
-            <span className="rounded-full border border-white/10 px-3 py-1">Funkcijos aiškios</span>
-            <span className="rounded-full border border-white/10 px-3 py-1">Narystės atskirtos</span>
-            <span className="rounded-full border border-white/10 px-3 py-1">Ramus pasirinkimas</span>
+            {copy.trustPills.map((pill) => (
+              <span key={pill} className="rounded-full border border-white/10 px-3 py-1">{pill}</span>
+            ))}
           </div>
         </div>
       </div>
@@ -266,11 +182,15 @@ const MembershipPricingShowcase = ({
   );
 };
 
-const DashboardPreview = () => (
+const DashboardPreview = () => {
+  const { t } = useLanguage();
+  const copy = t("pricing.dashboard");
+
+  return (
   <div
     className="relative min-h-[560px] overflow-hidden rounded-lg border border-white/10 bg-[rgb(6_13_12)] p-4 shadow-2xl shadow-black/30 sm:p-5 lg:p-6"
     role="img"
-    aria-label="StillOak Studio nario zonos peržiūra su mėnesio apžvalga, mini biudžetu, tikslų progresu, nario naujienomis ir strategijos lenta"
+    aria-label={copy.aria}
   >
     <div
       className="absolute inset-0 opacity-65"
@@ -292,15 +212,15 @@ const DashboardPreview = () => (
     <div className="relative flex min-h-full flex-col">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <span className="hero-chip">Nario zonos peržiūra</span>
-          <h2 className="mt-5 break-words font-display text-3xl font-bold leading-tight sm:text-4xl">Mėnesio apžvalga</h2>
+          <span className="hero-chip">{copy.chip}</span>
+          <h2 className="mt-5 break-words font-display text-3xl font-bold leading-tight sm:text-4xl">{copy.title}</h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-white/62">
-            Viena rami erdvė mėnesio ritmui, tikslams, naujienoms ir strateginiams veiksmams.
+            {copy.text}
           </p>
         </div>
         <div className="w-full rounded-lg border border-white/10 bg-white/6 p-3 sm:w-52">
-          <p className="text-xs font-semibold uppercase text-white/46">Mėnuo</p>
-          <p className="mt-2 font-display text-2xl font-bold text-white">Gegužė</p>
+          <p className="text-xs font-semibold uppercase text-white/46">{copy.monthLabel}</p>
+          <p className="mt-2 font-display text-2xl font-bold text-white">{copy.month}</p>
           <div className="mt-3 h-2 rounded-full bg-white/10">
             <div className="h-full w-[72%] rounded-full bg-[rgb(164_220_190)]" />
           </div>
@@ -311,7 +231,7 @@ const DashboardPreview = () => (
         <div className="rounded-lg border border-white/10 bg-white/[0.075] p-4">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-xs font-semibold uppercase text-white/46">Mėnesio apžvalga</p>
+              <p className="text-xs font-semibold uppercase text-white/46">{copy.summaryLabel}</p>
               <p className="mt-2 font-display text-4xl font-bold text-white">72%</p>
             </div>
             <BarChart3 size={22} style={{ color: "rgb(var(--accent-strong))" }} />
@@ -341,7 +261,7 @@ const DashboardPreview = () => (
               ))}
             </svg>
             <div className="mt-3 grid gap-2 sm:grid-cols-3">
-              {["Pajamos", "Išlaidos", "Tikslai"].map((item, index) => (
+              {copy.metrics.map((item, index) => (
                 <div key={item} className="rounded-lg bg-[rgb(var(--surface-soft))] px-3 py-2">
                   <p className="text-xs font-semibold text-muted">{item}</p>
                   <p className="mt-1 font-display text-lg font-bold">{[2480, 1240, 860][index]} €</p>
@@ -352,8 +272,9 @@ const DashboardPreview = () => (
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-          {dashboardCards.map((card) => {
-            const Icon = card.icon;
+          {copy.cards.map((card, index) => {
+            const Icon = dashboardCardIcons[index] || WalletCards;
+            const progress = dashboardCardProgress[index] || 60;
 
             return (
               <div key={card.label} className="rounded-lg border border-white/10 bg-white/[0.07] p-4">
@@ -369,7 +290,7 @@ const DashboardPreview = () => (
                   <div
                     className="h-full rounded-full"
                     style={{
-                      width: `${card.progress}%`,
+                      width: `${progress}%`,
                       background: "linear-gradient(90deg, rgb(var(--accent-strong)), rgb(226 202 145 / 0.86))",
                     }}
                   />
@@ -381,33 +302,37 @@ const DashboardPreview = () => (
       </div>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
-        {["Demo versija", "Asmeninis", "Verslas"].map((item, index) => (
+        {copy.zones.map((item, index) => (
           <div key={item} className="rounded-lg border border-white/10 bg-white/[0.055] px-3 py-3">
-            <p className="text-xs font-semibold uppercase text-white/42">Zona {index + 1}</p>
+            <p className="text-xs font-semibold uppercase text-white/42">{t("pricing.dashboard.zoneLabel", { number: index + 1 })}</p>
             <p className="mt-1 text-sm font-semibold text-white">{item}</p>
           </div>
         ))}
       </div>
     </div>
   </div>
-);
+  );
+};
 
-const MembershipKitsSection = () => (
+const MembershipKitsSection = () => {
+  const { t } = useLanguage();
+  const copy = t("pricing.kits");
+
+  return (
   <div id="rinkiniai" className="mt-10 scroll-mt-28">
     <div className="mx-auto max-w-4xl text-center">
-      <span className="hero-chip">Nario zonos rinkiniai</span>
+      <span className="hero-chip">{copy.chip}</span>
       <h2 className="mt-5 break-words font-display text-3xl font-bold leading-tight text-white sm:text-5xl">
-        Kas įeina į narystę?
+        {copy.title}
       </h2>
       <p className="mx-auto mt-5 max-w-3xl text-base leading-7 text-white/70 sm:text-lg">
-        Kiekvienas Stilloak Studio planas turi aiškią paskirtį. Skaitmeniniai produktai įsigyjami atskirai, o narystė
-        atrakina nario zonas ir darbo ritmą.
+        {copy.text}
       </p>
     </div>
 
     <div className="mt-8 grid gap-4 lg:grid-cols-3">
-      {membershipKits.map((kit, index) => {
-        const Icon = kit.icon;
+      {copy.items.map((kit, index) => {
+        const Icon = kitIcons[index] || WalletCards;
         const isBusiness = index === 2;
 
         return (
@@ -452,12 +377,13 @@ const MembershipKitsSection = () => (
 
     <div className="mt-7 flex justify-center">
       <a href="#narystes" className="button-primary min-h-[52px] gap-2">
-        Pasirink planą
+        {copy.choosePlan}
         <ArrowRight size={16} className="shrink-0" />
       </a>
     </div>
   </div>
-);
+  );
+};
 
 const MembershipPlanCard = ({
   plan,
@@ -468,7 +394,9 @@ const MembershipPlanCard = ({
   joinLoadingLabel,
   currentPlanLabel,
 }) => {
-  const meta = planPresentation[plan.id] || planPresentation.basic;
+  const { t } = useLanguage();
+  const pricingCopy = t("pricing");
+  const meta = { ...(planPresentation[plan.id] || planPresentation.basic), ...(pricingCopy.planPresentation[plan.id] || {}) };
   const Icon = meta.icon;
   const isFeatured = plan.id === "personal";
   const isPrivate = plan.id === "private_business";

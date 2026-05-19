@@ -3,12 +3,15 @@ import toast from "react-hot-toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 import billingService from "../services/billingService";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { register, refreshProfile } = useAuth();
+  const { t } = useLanguage();
+  const copy = t("auth.register");
   const selectedPlan = location.state?.selectedPlan || "";
   const purchaseProductId = location.state?.purchaseProductId || "";
   const [formData, setFormData] = useState({
@@ -28,17 +31,17 @@ const RegisterPage = () => {
     event.preventDefault();
 
     if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim()) {
-      setError("Užpildyk visus laukus.");
+      setError(copy.required);
       return;
     }
 
     if (formData.password.length < 6) {
-      setError("Slaptažodis turi būti bent 6 simbolių.");
+      setError(copy.passwordLength);
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Slaptažodžiai nesutampa.");
+      setError(copy.passwordMismatch);
       return;
     }
 
@@ -54,21 +57,21 @@ const RegisterPage = () => {
       if (selectedPlan === "basic") {
         await billingService.activateDemoPlan();
         await refreshProfile();
-        toast.success("Paskyra sukurta. Demo versija aktyvuota.");
+        toast.success(copy.demoSuccess);
         navigate("/members/savings-studio");
         return;
       }
 
       if (purchaseProductId) {
-        toast.success("Paskyra sukurta. Galite įsigyti pasirinktą produktą.");
+        toast.success(copy.productSuccess);
         navigate(`/digital-products?product=${encodeURIComponent(purchaseProductId)}`);
         return;
       }
 
-      toast.success("Paskyra sukurta. Pasirink planą.");
+      toast.success(copy.success);
       navigate("/pricing");
     } catch (submitError) {
-      setError(submitError.response?.data?.message || "Registracija nepavyko.");
+      setError(submitError.response?.data?.message || copy.fail);
     } finally {
       setLoading(false);
     }
@@ -79,22 +82,20 @@ const RegisterPage = () => {
       <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
         <div className="panel flex flex-col justify-between p-8">
           <div>
-            <span className="eyebrow">naujas narys</span>
-            <h1 className="mt-5 font-display text-4xl font-bold">Sukurk paskyrą ir pradėk ramiau</h1>
-            <p className="mt-4 text-muted">
-              Po registracijos galėsi pasirinkti Demo versiją arba tęsti į mokamą nario planą.
-            </p>
+            <span className="eyebrow">{copy.eyebrow}</span>
+            <h1 className="mt-5 font-display text-4xl font-bold">{copy.title}</h1>
+            <p className="mt-4 text-muted">{copy.intro}</p>
           </div>
 
           <div className="soft-border mt-8 rounded-[24px] border p-5 text-sm text-muted">
-            Paskyroje saugomi užsakymai, sąskaitos ir narystės prieiga nuo pirmo pirkimo.
+            {copy.note}
           </div>
         </div>
 
         <form className="panel space-y-5 p-8" onSubmit={handleSubmit}>
           <div>
-            <h2 className="font-display text-3xl font-bold">Sukurti paskyrą</h2>
-            <p className="mt-2 text-muted">Greita pradžia į tavo privačią Stilloak erdvę.</p>
+            <h2 className="font-display text-3xl font-bold">{copy.formTitle}</h2>
+            <p className="mt-2 text-muted">{copy.formText}</p>
           </div>
 
           {error && (
@@ -104,7 +105,7 @@ const RegisterPage = () => {
           )}
 
           <div>
-            <label className="mb-2 block text-sm font-semibold">Vardas</label>
+            <label className="mb-2 block text-sm font-semibold">{copy.name}</label>
             <input
               className="input-field"
               value={formData.name}
@@ -113,7 +114,7 @@ const RegisterPage = () => {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-semibold">El. paštas</label>
+            <label className="mb-2 block text-sm font-semibold">{copy.email}</label>
             <input
               className="input-field"
               type="email"
@@ -124,7 +125,7 @@ const RegisterPage = () => {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-2 block text-sm font-semibold">Slaptažodis</label>
+              <label className="mb-2 block text-sm font-semibold">{copy.password}</label>
               <input
                 className="input-field"
                 type="password"
@@ -134,7 +135,7 @@ const RegisterPage = () => {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-semibold">Pakartok slaptažodį</label>
+              <label className="mb-2 block text-sm font-semibold">{copy.confirmPassword}</label>
               <input
                 className="input-field"
                 type="password"
@@ -145,13 +146,13 @@ const RegisterPage = () => {
           </div>
 
           <button type="submit" disabled={loading} className="button-primary w-full">
-            {loading ? "Kuriama..." : "Sukurti paskyrą"}
+            {loading ? copy.loading : copy.submit}
           </button>
 
           <p className="text-sm text-muted">
-            Jau turi paskyrą?{" "}
+            {copy.hasAccount}{" "}
             <Link to="/login" className="font-semibold" style={{ color: "rgb(var(--accent-strong))" }}>
-              Prisijungti
+              {copy.signIn}
             </Link>
           </p>
         </form>

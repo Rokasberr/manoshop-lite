@@ -1,3 +1,5 @@
+import { translations } from "../i18n/translations";
+
 const sharedProductMeta = {
   formats: ["XLSX"],
   lastUpdated: "2026",
@@ -231,3 +233,29 @@ export const digitalProducts = [
     fileNotes: "Mokamas Excel modelis. Atsisiuntimas pasiekiamas tik po sėkmingo pirkimo.",
   },
 ];
+
+export const getLocalizedDigitalProducts = (language = "lt") => {
+  const locale = translations[language] || translations.lt;
+  const fallback = translations.lt;
+  const productCopies = locale.digitalProductItems || {};
+  const fallbackProductCopies = fallback.digitalProductItems || {};
+  const common = locale.common || fallback.common;
+
+  return digitalProducts.map((product) => {
+    const localizedProduct = {
+      ...(fallbackProductCopies[product.id] || {}),
+      ...(productCopies[product.id] || {}),
+    };
+
+    return {
+      ...product,
+      ...localizedProduct,
+      ctaLabels: {
+        guest: common.buttons.registerAndBuy,
+        purchase: common.buttons.buyNow,
+        download: common.buttons.downloadExcel,
+        ...(localizedProduct.ctaLabels || {}),
+      },
+    };
+  });
+};

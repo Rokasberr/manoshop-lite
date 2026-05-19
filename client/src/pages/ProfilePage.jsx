@@ -8,52 +8,22 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import SectionTitle from "../components/SectionTitle";
 import StatusBadge from "../components/admin/StatusBadge";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 import billingService from "../services/billingService";
 import orderService from "../services/orderService";
 import {
   canAccessBusinessStudio,
   hasActiveMembership,
   isAdminUser,
+  normalizePlan,
   normalizeUserRole,
 } from "../utils/membership";
 import { formatCurrency } from "../utils/currency";
 
-const roleLabels = {
-  admin: "Admin",
-  customer: "Customer",
-  seller: "Seller",
-};
-
-const subscriptionStatusLabels = {
-  active: "aktyvi",
-  inactive: "neaktyvi",
-  canceled: "atšaukta",
-  past_due: "laukiama apmokėjimo",
-};
-
-const subscriptionPlanLabels = {
-  free: "Be aktyvios narystės",
-  basic: "Demo versija",
-  demo: "Demo versija",
-  asmeninis: "Asmeninis",
-  personal: "Asmeninis",
-  privatus_verslas: "Verslas",
-  private_business: "Verslas",
-};
-
-const subscriptionProviderLabels = {
-  internal: "Stilloak",
-  stripe: "Saugus mokėjimų partneris",
-};
-
-const paymentMethodLabels = {
-  card: "Kortelė",
-  "bank-transfer": "Bankinis pavedimas",
-  "cash-on-delivery": "Apmokėjimas pristatymo metu",
-};
-
 const ProfilePage = () => {
   const { user, refreshProfile } = useAuth();
+  const { language, t } = useLanguage();
+  const copy = t("profile");
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -77,7 +47,7 @@ const ProfilePage = () => {
         const data = await orderService.getUserOrders();
         setOrders(data);
       } catch (loadError) {
-        setError(loadError.response?.data?.message || "Nepavyko užkrauti užsakymų.");
+        setError(loadError.response?.data?.message || copy.ordersFailed);
       } finally {
         setLoading(false);
       }
@@ -93,9 +63,9 @@ const ProfilePage = () => {
         order._id,
         order.invoice?.number || `invoice-${order._id}`
       );
-      toast.success("PDF sąskaita atsisiųsta.");
+      toast.success(copy.invoiceDownloaded);
     } catch (downloadError) {
-      toast.error(downloadError.response?.data?.message || "Nepavyko atsisiųsti sąskaitos.");
+      toast.error(downloadError.response?.data?.message || copy.invoiceFailed);
     } finally {
       setDownloadingInvoiceId("");
     }
@@ -111,9 +81,9 @@ const ProfilePage = () => {
         item.product,
         item.digitalAsset?.fileName || `${item.name}.pdf`
       );
-      toast.success("Skaitmeninis failas atsisiųstas.");
+      toast.success(copy.digitalDownloaded);
     } catch (downloadError) {
-      toast.error(downloadError.response?.data?.message || "Nepavyko atsisiųsti skaitmeninio failo.");
+      toast.error(downloadError.response?.data?.message || copy.digitalFailed);
     } finally {
       setDownloadingDigitalKey("");
     }
@@ -129,13 +99,13 @@ const ProfilePage = () => {
         result.subscription?.provider === "stripe" &&
         hasActiveMembership({ ...(user || {}), subscription: result.subscription })
       ) {
-        toast.success("Narystė atnaujinta.");
+        toast.success(copy.membershipUpdated);
         return;
       }
 
-      toast("Patikrinimas baigtas, bet aktyvi narystė dar nerasta.");
+      toast(copy.membershipNotFound);
     } catch (syncError) {
-      toast.error(syncError.response?.data?.message || "Nepavyko atnaujinti narystės.");
+      toast.error(syncError.response?.data?.message || copy.membershipUpdateFailed);
     } finally {
       setSyncingMembership(false);
     }
@@ -144,21 +114,21 @@ const ProfilePage = () => {
   return (
     <div className="space-y-8">
       <SectionTitle
-        eyebrow="paskyra"
-        title={`Sveikas, ${user?.name?.split(" ")[0] || "vartotojau"}`}
-        subtitle="Čia matai narystę, sąskaitas ir užsakymų istoriją vienoje vietoje."
+        eyebrow={copy.eyebrow}
+        title={t("profile.greeting", { name: user?.name?.split(" ")[0] || copy.fallbackName })}
+        subtitle={copy.subtitle}
       />
 
       <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
         <div className="space-y-6">
           <div className="panel p-6">
-            <p className="eyebrow">paskyra</p>
+            <p className="eyebrow">{copy.account}</p>
             <h2 className="mt-4 font-display text-3xl font-bold">{user?.name}</h2>
             <p className="mt-2 text-muted">{user?.email}</p>
             <div className="soft-card mt-6 rounded-[24px] p-5">
-              <p className="text-xs uppercase tracking-[0.3em] text-muted">rolė</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-muted">{copy.role}</p>
               <p className="mt-2 font-display text-2xl font-bold">
-                {roleLabels[profileRole] || "Customer"}
+                {copy.roles[profileRole] || copy.roles.customer}
               </p>
               <span
                 className="mt-4 inline-flex rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em]"
@@ -167,42 +137,42 @@ const ProfilePage = () => {
                   color: "rgb(var(--accent-strong))",
                 }}
               >
-                Backend role: {normalizedRole}
+                {copy.backendRole}: {normalizedRole}
               </span>
             </div>
           </div>
 
           <div className="panel p-6">
-            <p className="eyebrow">narystė</p>
+            <p className="eyebrow">{copy.membership}</p>
             <h2 className="mt-4 font-display text-3xl font-bold">
-              {subscriptionPlanLabels[user?.subscription?.plan] || user?.subscription?.plan || "Be aktyvios narystės"} planas
+              {t(`common.plans.${normalizePlan(user?.subscription?.plan) || "free"}`)} {copy.planSuffix}
             </h2>
             <p className="mt-2 text-muted">
-              Būsena:{" "}
+              {copy.status}:{" "}
               <span className="font-semibold capitalize text-current">
-                {subscriptionStatusLabels[user?.subscription?.status] || user?.subscription?.status || "neaktyvi"}
+                {copy.subscriptionStatuses[user?.subscription?.status] || user?.subscription?.status || copy.subscriptionStatuses.inactive}
               </span>
             </p>
             <p className="mt-2 text-muted">
-              Teikėjas:{" "}
+              {copy.provider}:{" "}
               <span className="font-semibold capitalize text-current">
-                {subscriptionProviderLabels[user?.subscription?.provider] || user?.subscription?.provider || "Stilloak"}
+                {copy.subscriptionProviders[user?.subscription?.provider] || user?.subscription?.provider || copy.subscriptionProviders.internal}
               </span>
             </p>
             {user?.subscription?.currentPeriodEnd && (
               <p className="mt-2 text-muted">
-                Atnaujinama iki:{" "}
+                {copy.renewsUntil}:{" "}
                 <span className="font-semibold text-current">
-                  {new Date(user.subscription.currentPeriodEnd).toLocaleDateString("lt-LT")}
+                  {new Date(user.subscription.currentPeriodEnd).toLocaleDateString(language)}
                 </span>
               </p>
             )} 
             <Link to="/pricing" className="button-secondary mt-6 inline-flex">
-              Valdyti planą
+              {t("common.buttons.managePlan")}
             </Link>
             {hasActiveMembership(user) && (
               <Link to="/members/savings-studio" className="button-primary mt-4 inline-flex">
-                Atidaryti Stilloak
+                {t("common.buttons.openStudio")}
               </Link>
             )}
             {!hasActiveMembership(user) && (
@@ -212,7 +182,7 @@ const ProfilePage = () => {
                 disabled={syncingMembership}
                 className="button-primary mt-4 inline-flex disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {syncingMembership ? "Tikrinama..." : "Patikrinti narystę"}
+                {syncingMembership ? t("common.states.checking") : t("common.buttons.checkMembership")}
               </button>
             )}
           </div>
@@ -221,10 +191,10 @@ const ProfilePage = () => {
         <div className="panel p-6">
           <div className="flex items-center justify-between gap-4">
             <div>
-            <p className="eyebrow">užsakymai</p>
-              <h2 className="mt-4 font-display text-3xl font-bold">Užsakymų archyvas</h2>
+            <p className="eyebrow">{copy.orders}</p>
+              <h2 className="mt-4 font-display text-3xl font-bold">{copy.orderArchive}</h2>
             </div>
-            <p className="text-sm text-muted">Viso: {orders.length}</p>
+            <p className="text-sm text-muted">{copy.total}: {orders.length}</p>
           </div>
 
           {loading ? (
@@ -234,9 +204,9 @@ const ProfilePage = () => {
           ) : !orders.length ? (
             <div className="mt-6">
               <EmptyState
-                title="Dar nėra užsakymų"
-                description="Kai tik sukursi pirmą užsakymą, jis atsiras čia."
-                actionLabel="Peržiūrėti kolekciją"
+                title={copy.noOrdersTitle}
+                description={copy.noOrdersText}
+                actionLabel={copy.viewCollection}
               />
             </div>
           ) : (
@@ -256,7 +226,7 @@ const ProfilePage = () => {
                         {order.invoice?.number || `#${order._id.slice(-6).toUpperCase()}`}
                       </p>
                       <p className="mt-1 text-sm text-muted">
-                        {new Date(order.createdAt).toLocaleDateString("lt-LT")}
+                        {new Date(order.createdAt).toLocaleDateString(language)}
                       </p>
                     </div>
                     <StatusBadge status={order.status} />
@@ -264,21 +234,21 @@ const ProfilePage = () => {
 
                   <div className="mt-4 grid gap-4 sm:grid-cols-4">
                     <div>
-                      <p className="text-xs uppercase tracking-[0.25em] text-muted">prekės</p>
+                      <p className="text-xs uppercase tracking-[0.25em] text-muted">{copy.items}</p>
                       <p className="mt-2 font-semibold">{order.items.length}</p>
                     </div>
                     <div>
-                      <p className="text-xs uppercase tracking-[0.25em] text-muted">apmokėjimas</p>
-                      <p className="mt-2 font-semibold">{paymentMethodLabels[order.paymentMethod] || order.paymentMethod}</p>
+                      <p className="text-xs uppercase tracking-[0.25em] text-muted">{copy.payment}</p>
+                      <p className="mt-2 font-semibold">{copy.paymentMethods[order.paymentMethod] || order.paymentMethod}</p>
                     </div>
                     <div>
-                      <p className="text-xs uppercase tracking-[0.25em] text-muted">būsena</p>
+                      <p className="text-xs uppercase tracking-[0.25em] text-muted">{copy.status}</p>
                       <div className="mt-2">
                         <StatusBadge status={order.paymentStatus || "pending"} />
                       </div>
                     </div>
                     <div>
-                      <p className="text-xs uppercase tracking-[0.25em] text-muted">suma</p>
+                      <p className="text-xs uppercase tracking-[0.25em] text-muted">{copy.amount}</p>
                       <p className="mt-2 font-semibold">{formatCurrency(order.totalPrice)}</p>
                     </div>
                   </div>
@@ -291,7 +261,7 @@ const ProfilePage = () => {
                       className="button-secondary gap-2 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       <Download size={16} />
-                      {downloadingInvoiceId === order._id ? "Generuojama..." : "Atsisiųsti PDF"}
+                      {downloadingInvoiceId === order._id ? t("common.states.generating") : t("common.buttons.downloadPdf")}
                     </button>
                     {digitalItems.map((item) => {
                       const downloadKey = `${order._id}:${item.product}`;
@@ -306,14 +276,14 @@ const ProfilePage = () => {
                         >
                           <Download size={16} />
                           {downloadingDigitalKey === downloadKey
-                            ? "Atsiunčiama..."
-                            : item.digitalAsset?.downloadLabel || `Atsisiųsti ${item.name}`}
+                            ? t("common.states.downloading")
+                            : item.digitalAsset?.downloadLabel || `${t("common.buttons.downloadExcel")} ${item.name}`}
                         </button>
                       );
                     })}
                     {!!digitalItems.length && order.paymentStatus !== "paid" && (
                       <p className="text-sm text-muted">
-                        Atsisiuntimai atrakinsis po sėkmingo apmokėjimo.
+                        {copy.downloadsAfterPayment}
                       </p>
                     )}
                   </div>

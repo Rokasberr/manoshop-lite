@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import MembershipPricingShowcase from "../components/MembershipPricingShowcase";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 import billingService from "../services/billingService";
 import { normalizePlan } from "../utils/membership";
 
@@ -11,6 +12,7 @@ const PricingPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, refreshProfile } = useAuth();
+  const { t } = useLanguage();
   const [loadingPlanId, setLoadingPlanId] = useState("");
 
   const handleChoosePlan = async (plan) => {
@@ -25,7 +27,7 @@ const PricingPage = () => {
       if (plan.id === "basic") {
         await billingService.activateDemoPlan();
         await refreshProfile();
-        toast.success("Demo versija aktyvuota.");
+        toast.success(t("pricing.demoActivated"));
         navigate("/members/savings-studio");
         return;
       }
@@ -37,7 +39,7 @@ const PricingPage = () => {
 
       window.location.assign(session.url);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Nepavyko paruošti saugaus apmokėjimo.");
+      toast.error(error.response?.data?.message || t("common.toast.purchaseReadyFailed"));
     } finally {
       setLoadingPlanId("");
     }

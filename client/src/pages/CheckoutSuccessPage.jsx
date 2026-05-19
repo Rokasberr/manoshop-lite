@@ -6,26 +6,16 @@ import { Link, useSearchParams } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
 import SectionTitle from "../components/SectionTitle";
 import { useCart } from "../context/CartContext";
+import { useLanguage } from "../context/LanguageContext";
 import orderService from "../services/orderService";
 import { formatCurrency } from "../utils/currency";
-
-const checkoutStatusLabels = {
-  complete: "užbaigta",
-  open: "atidaryta",
-  expired: "pasibaigusi",
-};
-
-const paymentStatusLabels = {
-  paid: "apmokėta",
-  pending: "laukiama",
-  unpaid: "neapmokėta",
-  failed: "nepavyko",
-};
 
 const CheckoutSuccessPage = () => {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session_id");
   const { clearCart } = useCart();
+  const { t } = useLanguage();
+  const copy = t("checkout");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [order, setOrder] = useState(null);
@@ -38,7 +28,7 @@ const CheckoutSuccessPage = () => {
 
     const loadCheckoutStatus = async () => {
       if (!sessionId) {
-        setError("Trūksta apmokėjimo patvirtinimo.");
+        setError(copy.missingConfirmation);
         setLoading(false);
         return;
       }
@@ -59,7 +49,7 @@ const CheckoutSuccessPage = () => {
         }
       } catch (loadError) {
         if (!cancelled) {
-          setError(loadError.response?.data?.message || "Nepavyko patvirtinti apmokėjimo.");
+          setError(loadError.response?.data?.message || copy.confirmFailed);
         }
       } finally {
         if (!cancelled) {
@@ -73,7 +63,7 @@ const CheckoutSuccessPage = () => {
     return () => {
       cancelled = true;
     };
-  }, [clearCart, sessionId]);
+  }, [clearCart, copy.confirmFailed, copy.missingConfirmation, sessionId]);
 
   const handleDownloadInvoice = async () => {
     if (!order?._id) {
@@ -83,9 +73,9 @@ const CheckoutSuccessPage = () => {
     try {
       setDownloadingInvoice(true);
       await orderService.downloadInvoice(order._id, order.invoice?.number || `invoice-${order._id}`);
-      toast.success("PDF sąskaita atsisiųsta.");
+      toast.success(t("profile.invoiceDownloaded"));
     } catch (downloadError) {
-      toast.error(downloadError.response?.data?.message || "Nepavyko atsisiųsti sąskaitos.");
+      toast.error(downloadError.response?.data?.message || t("profile.invoiceFailed"));
     } finally {
       setDownloadingInvoice(false);
     }
@@ -95,28 +85,24 @@ const CheckoutSuccessPage = () => {
 
   return (
     <div className="space-y-8">
-      <SectionTitle
-        eyebrow="apmokėjimas"
-        title="Mokėjimo būsena"
-        subtitle="Patikrinome apmokėjimą ir išsaugojome užsakymo informaciją tavo paskyroje."
-      />
+      <SectionTitle eyebrow={copy.successEyebrow} title={copy.successTitle} subtitle={copy.successSubtitle} />
 
       <div className="panel mx-auto max-w-3xl p-8 text-center">
         {loading ? (
-          <LoadingSpinner label="Patvirtiname apmokėjimą..." />
+          <LoadingSpinner label={copy.confirming} />
         ) : error ? (
           <>
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-300">
               <Clock3 size={34} />
             </div>
-            <h2 className="mt-6 font-display text-4xl font-bold">Nepavyko patvirtinti apmokėjimo</h2>
+            <h2 className="mt-6 font-display text-4xl font-bold">{copy.failedTitle}</h2>
             <p className="mt-4 text-muted">{error}</p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link to="/profile" className="button-secondary">
-                Eiti į profilį
+                {copy.goToProfile}
               </Link>
               <Link to="/checkout" className="button-primary">
-                Grįžti į apmokėjimą
+                {copy.backToCheckout}
               </Link>
             </div>
           </>
@@ -126,40 +112,40 @@ const CheckoutSuccessPage = () => {
               {isPaid ? <CheckCircle2 size={36} /> : <Clock3 size={36} />}
             </div>
             <h2 className="mt-6 font-display text-4xl font-bold">
-              {isPaid ? "Mokėjimas priimtas" : "Mokėjimas dar apdorojamas"}
+              {isPaid ? copy.paymentAccepted : copy.paymentProcessing}
             </h2>
-            <p className="mt-4 text-muted">
-              {isPaid
-                ? "Mokėjimas priimtas, todėl užsakymas jau išsaugotas tavo istorijoje."
-                : "Sesija užbaigta, bet apmokėjimo būsena dar nėra galutinė. Po kelių sekundžių patikrink profilį dar kartą."}
-            </p>
+            <p className="mt-4 text-muted">{isPaid ? copy.paidText : copy.processingText}</p>
 
             {order && (
               <div className="soft-card mt-8 rounded-[28px] p-6 text-left">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.3em] text-muted">užsakymas</p>
+                    <p className="text-xs uppercase tracking-[0.3em] text-muted">{copy.order}</p>
                     <p className="mt-2 font-display text-2xl font-bold">
                       {order.invoice?.number || `#${order._id.slice(-6).toUpperCase()}`}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs uppercase tracking-[0.3em] text-muted">suma</p>
+                    <p className="text-xs uppercase tracking-[0.3em] text-muted">{copy.amount}</p>
                     <p className="mt-2 font-display text-2xl font-bold">{formatCurrency(order.totalPrice)}</p>
                   </div>
                 </div>
 
                 <div className="mt-5 grid gap-4 sm:grid-cols-3">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.25em] text-muted">būsena</p>
-                    <p className="mt-2 font-semibold">{checkoutStatusLabels[checkoutStatus] || checkoutStatus || "tikrinama"}</p>
+                    <p className="text-xs uppercase tracking-[0.25em] text-muted">{copy.status}</p>
+                    <p className="mt-2 font-semibold">
+                      {copy.checkoutStatuses[checkoutStatus] || checkoutStatus || copy.checkoutStatuses.checking}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-[0.25em] text-muted">apmokėjimas</p>
-                    <p className="mt-2 font-semibold">{paymentStatusLabels[paymentStatus] || paymentStatus || "laukiama"}</p>
+                    <p className="text-xs uppercase tracking-[0.25em] text-muted">{copy.payment}</p>
+                    <p className="mt-2 font-semibold">
+                      {copy.paymentStatuses[paymentStatus] || paymentStatus || copy.paymentStatuses.pending}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-xs uppercase tracking-[0.25em] text-muted">prekės</p>
+                    <p className="text-xs uppercase tracking-[0.25em] text-muted">{copy.items}</p>
                     <p className="mt-2 font-semibold">{order.items?.length || 0}</p>
                   </div>
                 </div>
@@ -168,10 +154,10 @@ const CheckoutSuccessPage = () => {
 
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link to="/profile" className="button-primary">
-                Eiti į profilį
+                {copy.goToProfile}
               </Link>
               <Link to="/shop" className="button-secondary">
-                Tęsti pirkimą
+                {copy.continueShopping}
               </Link>
               {order?._id && isPaid && (
                 <button
@@ -181,7 +167,7 @@ const CheckoutSuccessPage = () => {
                   className="button-secondary gap-2 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <Download size={16} />
-                  {downloadingInvoice ? "Generuojama..." : "Atsisiųsti PDF"}
+                  {downloadingInvoice ? t("common.states.generating") : t("common.buttons.downloadPdf")}
                 </button>
               )}
             </div>

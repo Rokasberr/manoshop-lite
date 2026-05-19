@@ -1,3 +1,5 @@
+import { translations } from "../i18n/translations";
+
 export const subscriptionPlans = [
   {
     id: "basic",
@@ -51,3 +53,13 @@ export const subscriptionPlans = [
     ],
   },
 ];
+
+export const getLocalizedSubscriptionPlans = (language = "lt") => {
+  const locale = translations[language] || translations.lt;
+  const planCopies = locale.subscriptionPlans || {};
+
+  return subscriptionPlans.map((plan) => ({
+    ...plan,
+    ...(planCopies[plan.id] || {}),
+  }));
+};

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, Navigate, Outlet, useLocation } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 import billingService from "../services/billingService";
 import {
   hasActiveMembership,
@@ -12,30 +13,36 @@ import {
 import LoadingSpinner from "./LoadingSpinner";
 
 const UpgradeRequired = () => (
-  <div className="mx-auto max-w-3xl py-10">
-    <section className="panel overflow-hidden p-6 sm:p-8">
-      <span className="signal-pill">Verslas</span>
-      <h1 className="mt-5 break-words font-display text-3xl font-bold leading-tight sm:text-5xl">
-        Business Studio prieinama tik Verslas plano nariams
-      </h1>
-      <p className="mt-4 text-sm leading-7 text-muted sm:text-base">
-        Saving Studio lieka pasiekiama pagal tavo naryste, bet Site Builder, My Store, Orders ir Earnings yra
-        papildoma verslo zona.
-      </p>
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-        <Link to="/pricing" className="button-primary justify-center">
-          Perziureti planus
-        </Link>
-        <Link to="/members/savings-studio" className="button-secondary justify-center">
-          Grizti i Saving Studio
-        </Link>
-      </div>
-    </section>
-  </div>
+  <UpgradeRequiredContent />
 );
+
+const UpgradeRequiredContent = () => {
+  const { t } = useLanguage();
+
+  return (
+    <div className="mx-auto max-w-3xl py-10">
+      <section className="panel overflow-hidden p-6 sm:p-8">
+        <span className="signal-pill">{t("protected.businessEyebrow")}</span>
+        <h1 className="mt-5 break-words font-display text-3xl font-bold leading-tight sm:text-5xl">
+          {t("protected.businessTitle")}
+        </h1>
+        <p className="mt-4 text-sm leading-7 text-muted sm:text-base">{t("protected.businessText")}</p>
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <Link to="/pricing" className="button-primary justify-center">
+            {t("common.buttons.viewPlans")}
+          </Link>
+          <Link to="/members/savings-studio" className="button-secondary justify-center">
+            {t("protected.backToSaving")}
+          </Link>
+        </div>
+      </section>
+    </div>
+  );
+};
 
 const AdminRoleGate = ({ user }) => {
   const { refreshProfile } = useAuth();
+  const { t } = useLanguage();
   const [isResolving, setIsResolving] = useState(true);
   const [canAccess, setCanAccess] = useState(() => isAdminUser(user));
 
@@ -72,7 +79,7 @@ const AdminRoleGate = ({ user }) => {
   }
 
   if (isResolving) {
-    return <LoadingSpinner fullScreen label="Tikriname administratoriaus teises..." />;
+    return <LoadingSpinner fullScreen label={t("common.loadingAdmin")} />;
   }
 
   return <Navigate to="/profile" replace />;
@@ -80,6 +87,7 @@ const AdminRoleGate = ({ user }) => {
 
 const MembershipActivationGate = ({ membershipRedirect, user }) => {
   const { refreshProfile } = useAuth();
+  const { t } = useLanguage();
   const location = useLocation();
   const [isResolving, setIsResolving] = useState(true);
   const [canAccess, setCanAccess] = useState(() => hasActiveMembership(user));
@@ -141,7 +149,7 @@ const MembershipActivationGate = ({ membershipRedirect, user }) => {
   }
 
   if (isResolving) {
-    return <LoadingSpinner fullScreen label="Tikriname tavo narystę..." />;
+    return <LoadingSpinner fullScreen label={t("common.loadingMembership")} />;
   }
 
   return <Navigate to={membershipRedirect} replace state={{ from: `${location.pathname}${location.search}` }} />;

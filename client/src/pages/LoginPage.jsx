@@ -3,12 +3,15 @@ import toast from "react-hot-toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 import { hasActiveMembership, isAdminUser } from "../utils/membership";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, user } = useAuth();
+  const { t } = useLanguage();
+  const copy = t("auth.login");
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -44,7 +47,7 @@ const LoginPage = () => {
     event.preventDefault();
 
     if (!formData.email.trim() || !formData.password.trim()) {
-      setError("Įvesk el. paštą ir slaptažodį.");
+      setError(copy.emptyError);
       return;
     }
 
@@ -56,9 +59,9 @@ const LoginPage = () => {
         password: formData.password,
       });
 
-      toast.success("Prisijungimas sėkmingas.");
+      toast.success(copy.success);
     } catch (submitError) {
-      setError(submitError.response?.data?.message || "Prisijungti nepavyko.");
+      setError(submitError.response?.data?.message || copy.fail);
     } finally {
       setLoading(false);
     }
@@ -69,22 +72,20 @@ const LoginPage = () => {
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="panel flex flex-col justify-between p-8">
           <div>
-            <span className="eyebrow">sugrįžimas</span>
-            <h1 className="mt-5 font-display text-4xl font-bold">Grįžk į savo privačią Stilloak erdvę</h1>
-            <p className="mt-4 text-muted">
-              Prisijungęs tęsi pirkimą, matai savo sąskaitas ir valdai narystę be papildomo triukšmo.
-            </p>
+            <span className="eyebrow">{copy.eyebrow}</span>
+            <h1 className="mt-5 font-display text-4xl font-bold">{copy.title}</h1>
+            <p className="mt-4 text-muted">{copy.intro}</p>
           </div>
 
           <div className="soft-border mt-8 rounded-[24px] border p-5 text-sm text-muted">
-            Užsakymai, sąskaitos ir narystės informacija lieka vienoje saugioje paskyroje.
+            {copy.note}
           </div>
         </div>
 
         <form className="panel space-y-5 p-8" onSubmit={handleSubmit}>
           <div>
-            <h2 className="font-display text-3xl font-bold">Prisijungti</h2>
-            <p className="mt-2 text-muted">Įvesk paskyros duomenis ir tęsk.</p>
+            <h2 className="font-display text-3xl font-bold">{copy.formTitle}</h2>
+            <p className="mt-2 text-muted">{copy.formText}</p>
           </div>
 
           {error && (
@@ -94,7 +95,7 @@ const LoginPage = () => {
           )}
 
           <div>
-            <label className="mb-2 block text-sm font-semibold">El. paštas</label>
+            <label className="mb-2 block text-sm font-semibold">{copy.email}</label>
             <input
               className="input-field"
               type="email"
@@ -104,7 +105,7 @@ const LoginPage = () => {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-semibold">Slaptažodis</label>
+            <label className="mb-2 block text-sm font-semibold">{copy.password}</label>
             <input
               className="input-field"
               type="password"
@@ -114,13 +115,13 @@ const LoginPage = () => {
           </div>
 
           <button type="submit" disabled={loading} className="button-primary w-full">
-            {loading ? "Jungiama..." : "Įeiti į paskyrą"}
+            {loading ? copy.loading : copy.submit}
           </button>
 
           <p className="text-sm text-muted">
-            Naujas narys?{" "}
+            {copy.newMember}{" "}
             <Link to="/register" className="font-semibold" style={{ color: "rgb(var(--accent-strong))" }}>
-              Sukurti paskyrą
+              {copy.createAccount}
             </Link>
           </p>
         </form>

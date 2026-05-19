@@ -16,6 +16,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { digitalProducts } from "../constants/digitalProducts";
+import { useLanguage } from "../context/LanguageContext";
 import { isAdminUser } from "../utils/membership";
 
 const formatIcons = {
@@ -47,10 +48,12 @@ const FeatureBadge = ({ children }) => (
 );
 
 const ProductStatusBadge = ({ user, isPurchased }) => {
+  const { t } = useLanguage();
+
   if (isPurchased) {
     return (
       <span className="inline-flex items-center rounded-lg border border-[#9ad7b1]/[0.45] bg-[#9ad7b1]/[0.16] px-2.5 py-1 text-[11px] font-bold text-[#d7f8df]">
-        Įsigyta
+        {t("common.productLabels.purchased")}
       </span>
     );
   }
@@ -58,20 +61,21 @@ const ProductStatusBadge = ({ user, isPurchased }) => {
   if (!user) {
     return (
       <span className="inline-flex items-center rounded-lg border border-[#e2ca91]/[0.42] bg-[#e2ca91]/[0.16] px-2.5 py-1 text-[11px] font-bold text-[#f8e6b1]">
-        Reikalinga registracija
+        {t("common.productLabels.registrationRequired")}
       </span>
     );
   }
 
   return (
     <span className="inline-flex items-center rounded-lg border border-white/[0.16] bg-white/[0.1] px-2.5 py-1 text-[11px] font-bold text-white/[0.86]">
-      Galima įsigyti
+      {t("common.productLabels.availableToBuy")}
     </span>
   );
 };
 
 const ProductPreview = ({ product }) => {
   const [hasImageError, setHasImageError] = useState(false);
+  const { t } = useLanguage();
 
   if (!product.imageUrl || hasImageError) {
     return (
@@ -79,7 +83,7 @@ const ProductPreview = ({ product }) => {
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#f2d99a]">StillOak Studio</p>
           <p className="mt-3 font-display text-2xl font-bold leading-tight text-white">{product.title}</p>
-          <p className="mt-2 text-sm leading-6 text-white/[0.78]">Premium Excel produktas</p>
+          <p className="mt-2 text-sm leading-6 text-white/[0.78]">{t("common.productLabels.premiumExcelProduct")}</p>
         </div>
       </div>
     );
@@ -89,7 +93,7 @@ const ProductPreview = ({ product }) => {
     <div className="aspect-[16/10] overflow-hidden bg-[#071310]">
       <img
         src={product.imageUrl}
-        alt={`${product.title} peržiūra`}
+        alt={product.imageAlt || `${product.title} preview`}
         loading="lazy"
         onError={() => setHasImageError(true)}
         className="h-full w-full object-cover object-top transition duration-300 group-hover:scale-[1.025]"
@@ -98,13 +102,18 @@ const ProductPreview = ({ product }) => {
   );
 };
 
-const FileUnavailable = () => (
-  <span className="inline-flex min-h-[3rem] items-center justify-center rounded-lg border border-white/[0.16] bg-white/[0.08] px-4 py-3 text-center text-sm font-semibold leading-5 text-white/[0.76]">
-    Failas netrukus bus pasiekiamas
-  </span>
-);
+const FileUnavailable = () => {
+  const { t } = useLanguage();
+
+  return (
+    <span className="inline-flex min-h-[3rem] items-center justify-center rounded-lg border border-white/[0.16] bg-white/[0.08] px-4 py-3 text-center text-sm font-semibold leading-5 text-white/[0.76]">
+      {t("common.states.fileSoon")}
+    </span>
+  );
+};
 
 const DownloadButton = ({ disabled, isLoading, onClick, children, variant = "primary" }) => {
+  const { t } = useLanguage();
   const className =
     variant === "primary"
       ? "button-primary min-h-[3rem] justify-center gap-2 px-4 disabled:cursor-not-allowed disabled:opacity-60"
@@ -113,23 +122,23 @@ const DownloadButton = ({ disabled, isLoading, onClick, children, variant = "pri
   return (
     <button type="button" onClick={onClick} disabled={disabled || isLoading} className={className}>
       <ArrowDownToLine size={16} />
-      {isLoading ? "Ruošiama..." : children}
+      {isLoading ? t("common.states.preparing") : children}
     </button>
   );
 };
 
-const getDownloadOptions = (product) =>
+const getDownloadOptions = (product, t) =>
   [
     {
       format: "pdf",
       fileName: product.pdfFileName,
-      label: "Atsisiųsti PDF",
+      label: t("common.buttons.downloadPdf"),
       variant: "secondary",
     },
     {
       format: "excel",
       fileName: product.excelFileName,
-      label: "Atsisiųsti Excel",
+      label: t("common.buttons.downloadExcel"),
       variant: "primary",
     },
   ].filter((option) => option.fileName);
@@ -147,8 +156,9 @@ const PurchaseActions = ({
   adminPreviewLoadingId,
   adminDownloadLoadingKey,
 }) => {
+  const { t } = useLanguage();
   const ctaLabels = product.ctaLabels || {};
-  const downloadOptions = getDownloadOptions(product);
+  const downloadOptions = getDownloadOptions(product, t);
 
   if (isAdminUser(user)) {
     return (
@@ -161,7 +171,7 @@ const PurchaseActions = ({
             className="inline-flex min-h-[3rem] w-full items-center justify-center gap-2 rounded-lg border border-[#e2ca91]/[0.42] bg-[#e2ca91]/[0.16] px-4 py-3 text-sm font-semibold text-[#f8e6b1] transition duration-200 hover:-translate-y-0.5 hover:border-[#e2ca91]/[0.6] hover:bg-[#e2ca91]/[0.22] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Eye size={16} />
-            {adminPreviewLoadingId === product.id ? "Ruošiama..." : "Peržiūrėti PDF"}
+            {adminPreviewLoadingId === product.id ? t("common.states.preparing") : t("digitalProductsPage.adminPreview")}
           </button>
         )}
 
@@ -190,10 +200,10 @@ const PurchaseActions = ({
       <div className="rounded-lg border border-white/[0.16] bg-black/[0.32] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
         <p className="flex gap-2 text-sm font-semibold leading-6 text-white">
           <LockKeyhole className="mt-0.5 shrink-0 text-[#f2d99a]" size={16} />
-          Prisiregistruokite, kad galėtumėte įsigyti
+          {t("digitalProductsPage.guestCatalogCta")}
         </p>
         <p className="mt-2 text-sm leading-6 text-white/[0.78]">
-          Pirkimui ir atsisiuntimui reikia paskyros. Produktą galėsite atsisiųsti po apmokėjimo.
+          {t("common.productLabels.downloadAfterPayment")}
         </p>
         <Link
           to="/register"
@@ -201,7 +211,7 @@ const PurchaseActions = ({
           className="button-primary mt-4 min-h-[3rem] w-full justify-center gap-2 px-4"
         >
           <UserPlus size={16} />
-          {ctaLabels.guest || "Prisiregistruoti ir įsigyti"}
+          {ctaLabels.guest || t("common.buttons.registerAndBuy")}
         </Link>
       </div>
     );
@@ -216,7 +226,7 @@ const PurchaseActions = ({
         className="button-primary min-h-[3rem] w-full justify-center gap-2 px-4 disabled:cursor-not-allowed disabled:opacity-60"
       >
         <CreditCard size={16} />
-        {purchaseLoadingId === product.id ? "Ruošiama..." : ctaLabels.purchase || "Pirkti dabar"}
+        {purchaseLoadingId === product.id ? t("common.states.preparing") : ctaLabels.purchase || t("common.buttons.buyNow")}
       </button>
     );
   }
@@ -270,6 +280,7 @@ const DigitalProductCard = ({
   adminPreviewLoadingId,
   adminDownloadLoadingKey,
 }) => {
+  const { t } = useLanguage();
   const isPurchased = purchasedProductIds.includes(product.id);
   const featureBadges = Array.from(
     new Set(product.badges || product.excelFeatures || [])
@@ -314,9 +325,9 @@ const DigitalProductCard = ({
 
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
           {[
-            ["Kaina", product.priceLabel],
-            ["Formatas", getFormatLabel(product.formats)],
-            ["Versija", product.version || "1.0"],
+            [t("common.productLabels.price"), product.priceLabel],
+            [t("common.productLabels.format"), getFormatLabel(product.formats)],
+            [t("common.productLabels.version"), product.version || "1.0"],
           ].map(([label, value]) => (
             <div key={label} className="rounded-lg border border-white/[0.16] bg-white/[0.09] px-3 py-3">
               <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-white/[0.64]">{label}</p>
@@ -326,7 +337,7 @@ const DigitalProductCard = ({
         </div>
 
         <div className="mt-5 rounded-lg border border-[#e2ca91]/[0.28] bg-[#e2ca91]/[0.13] p-4">
-          <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#f8e6b1]">Pagrindinė nauda</p>
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#f8e6b1]">{t("common.productLabels.mainBenefit")}</p>
           <ul className="mt-4 space-y-3">
             {(product.benefits || []).slice(0, 5).map((benefit) => (
               <li key={benefit} className="flex gap-3 text-sm leading-6 text-white/[0.86]">
@@ -338,12 +349,12 @@ const DigitalProductCard = ({
         </div>
 
         <div className="mt-4 grid gap-3 lg:grid-cols-2">
-          <SectionList title="Ką gausi?" items={includedItems} />
-          <SectionList title="Kam tinka?" items={product.targetAudience || []} tone="gold" />
+          <SectionList title={t("common.productLabels.whatYouGet")} items={includedItems} />
+          <SectionList title={t("common.productLabels.whoFor")} items={product.targetAudience || []} tone="gold" />
         </div>
 
         <div className="mt-4 rounded-lg border border-white/[0.16] bg-black/[0.26] p-4">
-          <p className="text-xs font-bold uppercase tracking-[0.12em] text-white/[0.68]">Kaip veikia</p>
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-white/[0.68]">{t("common.productLabels.howItWorks")}</p>
           <ol className="mt-4 space-y-3">
             {(product.howToUseSteps || []).map((step, index) => (
               <li key={step} className="flex gap-3 text-sm leading-6 text-white/[0.84]">
@@ -372,14 +383,14 @@ const DigitalProductCard = ({
           <div className="rounded-lg border border-white/[0.16] bg-black/[0.34] p-4">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/[0.68]">Vienkartinė kaina</p>
+                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/[0.68]">{t("common.productLabels.oneTimePrice")}</p>
                 <p className="mt-1 font-display text-3xl font-bold text-[#f8e6b1]">{product.priceLabel}</p>
               </div>
               <div className="sm:min-w-[13rem]">
                 {isPurchased && (
                   <span className="mb-3 inline-flex items-center gap-2 rounded-lg border border-[#9ad7b1]/[0.42] bg-[#9ad7b1]/[0.16] px-3 py-1 text-xs font-bold text-[#d7f8df]">
                     <ShoppingBag size={14} />
-                    Paruošta atsisiųsti
+                    {t("common.productLabels.readyToDownload")}
                   </span>
                 )}
                 <PurchaseActions
@@ -398,7 +409,7 @@ const DigitalProductCard = ({
               </div>
             </div>
             <p className="mt-3 text-xs font-semibold leading-5 text-white/[0.72]">
-              Atsisiuntimas aktyvuojamas po apmokėjimo. Failas pasiekiamas tik prisijungus prie paskyros.
+              {t("common.productLabels.downloadAfterPayment")}
             </p>
           </div>
         </div>
@@ -407,16 +418,20 @@ const DigitalProductCard = ({
   );
 };
 
-const FilteredEmptyState = ({ activeFilter }) => (
-  <div className="rounded-lg border border-white/[0.16] bg-white/[0.09] px-5 py-12 text-center text-white shadow-[0_26px_72px_rgba(0,0,0,0.18)]">
-    <p className="mx-auto max-w-xl font-display text-3xl font-bold leading-tight">Kol kas čia nėra turinio</p>
-    <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-white/[0.78]">
-      {activeFilter === "Visi"
-        ? "Netrukus šioje vietoje matysite skaitmeninius produktus, šablonus ir nario įrankius."
-        : "Šioje kategorijoje produktų dar nėra. Pasirinkite kitą filtrą arba grįžkite į visą biblioteką."}
-    </p>
-  </div>
-);
+const FilteredEmptyState = ({ activeFilter }) => {
+  const { t } = useLanguage();
+
+  return (
+    <div className="rounded-lg border border-white/[0.16] bg-white/[0.09] px-5 py-12 text-center text-white shadow-[0_26px_72px_rgba(0,0,0,0.18)]">
+      <p className="mx-auto max-w-xl font-display text-3xl font-bold leading-tight">{t("common.empty.title")}</p>
+      <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-white/[0.78]">
+        {activeFilter === "all"
+          ? t("common.empty.description")
+          : t("common.empty.description")}
+      </p>
+    </div>
+  );
+};
 
 const DigitalProductAccessGrid = ({
   products = digitalProducts,
@@ -431,38 +446,45 @@ const DigitalProductAccessGrid = ({
   adminPreviewLoadingId = "",
   adminDownloadLoadingKey = "",
 }) => {
-  const [activeFilter, setActiveFilter] = useState("Visi");
+  const { t } = useLanguage();
+  const [activeFilter, setActiveFilter] = useState("all");
   const filterOptions = useMemo(
-    () => ["Visi", ...Array.from(new Set(products.map((product) => product.category).filter(Boolean)))],
-    [products]
+    () => [
+      { value: "all", label: t("common.filters.all") },
+      ...Array.from(new Set(products.map((product) => product.category).filter(Boolean))).map((category) => ({
+        value: category,
+        label: category,
+      })),
+    ],
+    [products, t]
   );
   const filteredProducts = useMemo(
-    () => (activeFilter === "Visi" ? products : products.filter((product) => product.category === activeFilter)),
+    () => (activeFilter === "all" ? products : products.filter((product) => product.category === activeFilter)),
     [activeFilter, products]
   );
 
   if (!products.length) {
-    return <FilteredEmptyState activeFilter="Visi" />;
+    return <FilteredEmptyState activeFilter="all" />;
   }
 
   return (
     <div className="space-y-6">
       <div className="flex gap-2 overflow-x-auto rounded-lg border border-white/[0.16] bg-white/[0.09] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
         {filterOptions.map((filter) => {
-          const isActive = activeFilter === filter;
+          const isActive = activeFilter === filter.value;
 
           return (
             <button
-              key={filter}
+              key={filter.value}
               type="button"
-              onClick={() => setActiveFilter(filter)}
+              onClick={() => setActiveFilter(filter.value)}
               className={`min-h-[2.75rem] shrink-0 rounded-lg px-4 text-sm font-bold transition duration-200 ${
                 isActive
                   ? "bg-[#e2ca91] text-[#111815] shadow-[0_14px_30px_rgba(0,0,0,0.22)]"
                   : "text-white/[0.82] hover:bg-white/[0.12] hover:text-white"
               }`}
             >
-              {filter}
+              {filter.label}
             </button>
           );
         })}
