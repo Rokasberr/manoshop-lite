@@ -33,7 +33,7 @@ const FormatBadge = ({ format }) => {
   const label = format === "XLSX" ? "Excel" : format;
 
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2ca91]/26 bg-[#e2ca91]/10 px-2.5 py-1 text-[11px] font-bold text-[#f8e6b1]">
+    <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2ca91]/[0.34] bg-[#e2ca91]/[0.14] px-2.5 py-1 text-[11px] font-bold text-[#f8e6b1]">
       <Icon size={13} />
       {label}
     </span>
@@ -41,7 +41,7 @@ const FormatBadge = ({ format }) => {
 };
 
 const FeatureBadge = ({ children }) => (
-  <span className="inline-flex items-center rounded-lg border border-white/10 bg-white/[0.07] px-2.5 py-1 text-[11px] font-bold text-white/72">
+  <span className="inline-flex items-center rounded-lg border border-white/[0.16] bg-white/[0.1] px-2.5 py-1 text-[11px] font-bold text-white/[0.86]">
     {children}
   </span>
 );
@@ -49,7 +49,7 @@ const FeatureBadge = ({ children }) => (
 const ProductStatusBadge = ({ user, isPurchased }) => {
   if (isPurchased) {
     return (
-      <span className="inline-flex items-center rounded-lg border border-[#9ad7b1]/35 bg-[#9ad7b1]/12 px-2.5 py-1 text-[11px] font-bold text-[#c6f4d3]">
+      <span className="inline-flex items-center rounded-lg border border-[#9ad7b1]/[0.45] bg-[#9ad7b1]/[0.16] px-2.5 py-1 text-[11px] font-bold text-[#d7f8df]">
         Įsigyta
       </span>
     );
@@ -57,14 +57,14 @@ const ProductStatusBadge = ({ user, isPurchased }) => {
 
   if (!user) {
     return (
-      <span className="inline-flex items-center rounded-lg border border-[#e2ca91]/32 bg-[#e2ca91]/12 px-2.5 py-1 text-[11px] font-bold text-[#f2d99a]">
+      <span className="inline-flex items-center rounded-lg border border-[#e2ca91]/[0.42] bg-[#e2ca91]/[0.16] px-2.5 py-1 text-[11px] font-bold text-[#f8e6b1]">
         Reikalinga registracija
       </span>
     );
   }
 
   return (
-    <span className="inline-flex items-center rounded-lg border border-white/10 bg-white/[0.075] px-2.5 py-1 text-[11px] font-bold text-white/72">
+    <span className="inline-flex items-center rounded-lg border border-white/[0.16] bg-white/[0.1] px-2.5 py-1 text-[11px] font-bold text-white/[0.86]">
       Galima įsigyti
     </span>
   );
@@ -79,7 +79,7 @@ const ProductPreview = ({ product }) => {
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#f2d99a]">StillOak Studio</p>
           <p className="mt-3 font-display text-2xl font-bold leading-tight text-white">{product.title}</p>
-          <p className="mt-2 text-sm leading-6 text-white/62">Premium Excel produktas</p>
+          <p className="mt-2 text-sm leading-6 text-white/[0.78]">Premium Excel produktas</p>
         </div>
       </div>
     );
@@ -99,7 +99,7 @@ const ProductPreview = ({ product }) => {
 };
 
 const FileUnavailable = () => (
-  <span className="inline-flex min-h-[3rem] items-center justify-center rounded-lg border border-white/10 bg-white/[0.045] px-4 py-3 text-center text-sm font-semibold leading-5 text-white/50">
+  <span className="inline-flex min-h-[3rem] items-center justify-center rounded-lg border border-white/[0.16] bg-white/[0.08] px-4 py-3 text-center text-sm font-semibold leading-5 text-white/[0.76]">
     Failas netrukus bus pasiekiamas
   </span>
 );
@@ -108,7 +108,7 @@ const DownloadButton = ({ disabled, isLoading, onClick, children, variant = "pri
   const className =
     variant === "primary"
       ? "button-primary min-h-[3rem] justify-center gap-2 px-4 disabled:cursor-not-allowed disabled:opacity-60"
-      : "inline-flex min-h-[3rem] items-center justify-center gap-2 rounded-lg border border-white/12 bg-white/[0.075] px-4 py-3 text-sm font-semibold text-white transition duration-200 hover:-translate-y-0.5 hover:border-[#e2ca91]/35 hover:bg-[#e2ca91]/12 disabled:cursor-not-allowed disabled:opacity-60";
+      : "inline-flex min-h-[3rem] items-center justify-center gap-2 rounded-lg border border-white/[0.18] bg-white/[0.1] px-4 py-3 text-sm font-semibold text-white transition duration-200 hover:-translate-y-0.5 hover:border-[#e2ca91]/[0.48] hover:bg-[#e2ca91]/[0.16] disabled:cursor-not-allowed disabled:opacity-60";
 
   return (
     <button type="button" onClick={onClick} disabled={disabled || isLoading} className={className}>
@@ -158,7 +158,7 @@ const PurchaseActions = ({
             type="button"
             onClick={() => onAdminPreview?.(product)}
             disabled={adminPreviewLoadingId === product.id}
-            className="inline-flex min-h-[3rem] w-full items-center justify-center gap-2 rounded-lg border border-[#e2ca91]/32 bg-[#e2ca91]/14 px-4 py-3 text-sm font-semibold text-[#f8e6b1] transition duration-200 hover:-translate-y-0.5 hover:border-[#e2ca91]/55 hover:bg-[#e2ca91]/20 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex min-h-[3rem] w-full items-center justify-center gap-2 rounded-lg border border-[#e2ca91]/[0.42] bg-[#e2ca91]/[0.16] px-4 py-3 text-sm font-semibold text-[#f8e6b1] transition duration-200 hover:-translate-y-0.5 hover:border-[#e2ca91]/[0.6] hover:bg-[#e2ca91]/[0.22] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Eye size={16} />
             {adminPreviewLoadingId === product.id ? "Ruošiama..." : "Peržiūrėti PDF"}
@@ -187,12 +187,12 @@ const PurchaseActions = ({
 
   if (!user) {
     return (
-      <div className="rounded-lg border border-white/10 bg-black/22 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+      <div className="rounded-lg border border-white/[0.16] bg-black/[0.32] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
         <p className="flex gap-2 text-sm font-semibold leading-6 text-white">
           <LockKeyhole className="mt-0.5 shrink-0 text-[#f2d99a]" size={16} />
           Prisiregistruokite, kad galėtumėte įsigyti
         </p>
-        <p className="mt-2 text-sm leading-6 text-white/62">
+        <p className="mt-2 text-sm leading-6 text-white/[0.78]">
           Pirkimui ir atsisiuntimui reikia paskyros. Produktą galėsite atsisiųsti po apmokėjimo.
         </p>
         <Link
@@ -243,11 +243,11 @@ const SectionList = ({ title, items = [], limit = 4, tone = "neutral" }) => {
   const iconClass = tone === "gold" ? "text-[#f2d99a]" : "text-[#9ad7b1]";
 
   return (
-    <div className="rounded-lg border border-white/10 bg-black/18 p-4">
-      <p className="text-xs font-bold uppercase tracking-[0.12em] text-white/44">{title}</p>
+    <div className="rounded-lg border border-white/[0.16] bg-black/[0.26] p-4">
+      <p className="text-xs font-bold uppercase tracking-[0.12em] text-white/[0.68]">{title}</p>
       <ul className="mt-4 space-y-3">
         {items.slice(0, limit).map((item) => (
-          <li key={item} className="flex gap-3 text-sm leading-6 text-white/72">
+          <li key={item} className="flex gap-3 text-sm leading-6 text-white/[0.84]">
             <CheckCircle2 className={`mt-0.5 shrink-0 ${iconClass}`} size={16} />
             <span>{item}</span>
           </li>
@@ -278,11 +278,11 @@ const DigitalProductCard = ({
   const trustBadges = product.trustBadges || defaultTrustBadges;
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-white/10 bg-[#0b1714] shadow-[0_28px_80px_rgba(0,0,0,0.24)] transition duration-200 hover:-translate-y-1 hover:border-[#e2ca91]/32">
-      <div className="relative border-b border-white/10">
+    <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-white/[0.16] bg-[#0b1714] text-white shadow-[0_28px_80px_rgba(0,0,0,0.24)] transition duration-200 hover:-translate-y-1 hover:border-[#e2ca91]/[0.42]">
+      <div className="relative border-b border-white/[0.14]">
         <ProductPreview product={product} />
         <div className="absolute left-4 top-4 flex flex-wrap gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2ca91]/35 bg-[#071310]/86 px-3 py-1 text-xs font-bold text-[#f8e6b1] shadow-[0_10px_24px_rgba(0,0,0,0.22)] backdrop-blur">
+          <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2ca91]/[0.46] bg-[#071310]/[0.92] px-3 py-1 text-xs font-bold text-[#f8e6b1] shadow-[0_10px_24px_rgba(0,0,0,0.22)] backdrop-blur">
             <Sparkles size={13} />
             {product.highlightBadge || product.category}
           </span>
@@ -294,7 +294,7 @@ const DigitalProductCard = ({
 
       <div className="flex flex-1 flex-col p-5 sm:p-6">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-lg border border-[#e2ca91]/26 bg-[#e2ca91]/10 px-3 py-1 text-xs font-bold uppercase text-[#f2d99a]">
+          <span className="rounded-lg border border-[#e2ca91]/[0.36] bg-[#e2ca91]/[0.14] px-3 py-1 text-xs font-bold uppercase text-[#f8e6b1]">
             {product.category}
           </span>
           {(product.formats || []).map((format) => (
@@ -307,9 +307,9 @@ const DigitalProductCard = ({
 
         <div className="mt-5">
           <h3 className="font-display text-2xl font-bold leading-tight text-white">{product.title}</h3>
-          <p className="mt-3 text-sm font-semibold leading-6 text-[#f2d99a]/82">{product.subtitle}</p>
-          <p className="mt-4 text-sm leading-7 text-white/72">{product.description}</p>
-          {product.salesDescription && <p className="mt-3 text-sm leading-7 text-white/58">{product.salesDescription}</p>}
+          <p className="mt-3 text-sm font-semibold leading-6 text-[#f8e6b1]">{product.subtitle}</p>
+          <p className="mt-4 text-sm leading-7 text-white/[0.86]">{product.description}</p>
+          {product.salesDescription && <p className="mt-3 text-sm leading-7 text-white/[0.76]">{product.salesDescription}</p>}
         </div>
 
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
@@ -318,18 +318,18 @@ const DigitalProductCard = ({
             ["Formatas", getFormatLabel(product.formats)],
             ["Versija", product.version || "1.0"],
           ].map(([label, value]) => (
-            <div key={label} className="rounded-lg border border-white/10 bg-white/[0.055] px-3 py-3">
-              <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-white/38">{label}</p>
+            <div key={label} className="rounded-lg border border-white/[0.16] bg-white/[0.09] px-3 py-3">
+              <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-white/[0.64]">{label}</p>
               <p className="mt-1 text-sm font-bold leading-5 text-white">{value}</p>
             </div>
           ))}
         </div>
 
-        <div className="mt-5 rounded-lg border border-[#e2ca91]/18 bg-[#e2ca91]/10 p-4">
-          <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#f2d99a]/80">Pagrindinė nauda</p>
+        <div className="mt-5 rounded-lg border border-[#e2ca91]/[0.28] bg-[#e2ca91]/[0.13] p-4">
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#f8e6b1]">Pagrindinė nauda</p>
           <ul className="mt-4 space-y-3">
             {(product.benefits || []).slice(0, 5).map((benefit) => (
-              <li key={benefit} className="flex gap-3 text-sm leading-6 text-white/76">
+              <li key={benefit} className="flex gap-3 text-sm leading-6 text-white/[0.86]">
                 <BadgeCheck className="mt-0.5 shrink-0 text-[#f2d99a]" size={17} />
                 <span>{benefit}</span>
               </li>
@@ -338,16 +338,16 @@ const DigitalProductCard = ({
         </div>
 
         <div className="mt-4 grid gap-3 lg:grid-cols-2">
-          <SectionList title="Kas įeina?" items={includedItems} />
-          <SectionList title="Kam skirta?" items={product.targetAudience || []} tone="gold" />
+          <SectionList title="Ką gausi?" items={includedItems} />
+          <SectionList title="Kam tinka?" items={product.targetAudience || []} tone="gold" />
         </div>
 
-        <div className="mt-4 rounded-lg border border-white/10 bg-black/18 p-4">
-          <p className="text-xs font-bold uppercase tracking-[0.12em] text-white/44">Kaip veikia</p>
+        <div className="mt-4 rounded-lg border border-white/[0.16] bg-black/[0.26] p-4">
+          <p className="text-xs font-bold uppercase tracking-[0.12em] text-white/[0.68]">Kaip veikia</p>
           <ol className="mt-4 space-y-3">
             {(product.howToUseSteps || []).map((step, index) => (
-              <li key={step} className="flex gap-3 text-sm leading-6 text-white/72">
-                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#e2ca91]/30 bg-[#e2ca91]/10 text-xs font-bold text-[#f2d99a]">
+              <li key={step} className="flex gap-3 text-sm leading-6 text-white/[0.84]">
+                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#e2ca91]/[0.38] bg-[#e2ca91]/[0.14] text-xs font-bold text-[#f8e6b1]">
                   {index + 1}
                 </span>
                 <span>{step}</span>
@@ -360,7 +360,7 @@ const DigitalProductCard = ({
           {trustBadges.slice(0, 4).map((badge) => (
             <span
               key={badge}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.055] px-3 py-1 text-xs font-semibold text-white/64"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.16] bg-white/[0.09] px-3 py-1 text-xs font-semibold text-white/[0.78]"
             >
               <ShieldCheck size={13} className="text-[#9ad7b1]" />
               {badge}
@@ -369,15 +369,15 @@ const DigitalProductCard = ({
         </div>
 
         <div className="mt-auto pt-6">
-          <div className="rounded-lg border border-white/10 bg-black/24 p-4">
+          <div className="rounded-lg border border-white/[0.16] bg-black/[0.34] p-4">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/42">Vienkartinė kaina</p>
+                <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/[0.68]">Vienkartinė kaina</p>
                 <p className="mt-1 font-display text-3xl font-bold text-[#f8e6b1]">{product.priceLabel}</p>
               </div>
               <div className="sm:min-w-[13rem]">
                 {isPurchased && (
-                  <span className="mb-3 inline-flex items-center gap-2 rounded-lg border border-[#9ad7b1]/30 bg-[#9ad7b1]/10 px-3 py-1 text-xs font-bold text-[#bff0cf]">
+                  <span className="mb-3 inline-flex items-center gap-2 rounded-lg border border-[#9ad7b1]/[0.42] bg-[#9ad7b1]/[0.16] px-3 py-1 text-xs font-bold text-[#d7f8df]">
                     <ShoppingBag size={14} />
                     Paruošta atsisiųsti
                   </span>
@@ -397,7 +397,7 @@ const DigitalProductCard = ({
                 />
               </div>
             </div>
-            <p className="mt-3 text-xs font-semibold leading-5 text-white/50">
+            <p className="mt-3 text-xs font-semibold leading-5 text-white/[0.72]">
               Atsisiuntimas aktyvuojamas po apmokėjimo. Failas pasiekiamas tik prisijungus prie paskyros.
             </p>
           </div>
@@ -408,9 +408,9 @@ const DigitalProductCard = ({
 };
 
 const FilteredEmptyState = ({ activeFilter }) => (
-  <div className="rounded-lg border border-white/10 bg-white/[0.055] px-5 py-12 text-center text-white shadow-[0_26px_72px_rgba(0,0,0,0.18)]">
+  <div className="rounded-lg border border-white/[0.16] bg-white/[0.09] px-5 py-12 text-center text-white shadow-[0_26px_72px_rgba(0,0,0,0.18)]">
     <p className="mx-auto max-w-xl font-display text-3xl font-bold leading-tight">Kol kas čia nėra turinio</p>
-    <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-white/64">
+    <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-white/[0.78]">
       {activeFilter === "Visi"
         ? "Netrukus šioje vietoje matysite skaitmeninius produktus, šablonus ir nario įrankius."
         : "Šioje kategorijoje produktų dar nėra. Pasirinkite kitą filtrą arba grįžkite į visą biblioteką."}
@@ -447,7 +447,7 @@ const DigitalProductAccessGrid = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex gap-2 overflow-x-auto rounded-lg border border-white/10 bg-white/[0.055] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+      <div className="flex gap-2 overflow-x-auto rounded-lg border border-white/[0.16] bg-white/[0.09] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
         {filterOptions.map((filter) => {
           const isActive = activeFilter === filter;
 
@@ -459,7 +459,7 @@ const DigitalProductAccessGrid = ({
               className={`min-h-[2.75rem] shrink-0 rounded-lg px-4 text-sm font-bold transition duration-200 ${
                 isActive
                   ? "bg-[#e2ca91] text-[#111815] shadow-[0_14px_30px_rgba(0,0,0,0.22)]"
-                  : "text-white/66 hover:bg-white/10 hover:text-white"
+                  : "text-white/[0.82] hover:bg-white/[0.12] hover:text-white"
               }`}
             >
               {filter}

@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2, FileSpreadsheet, ShieldCheck, ShoppingBag, Sparkles, UserPlus, X } from "lucide-react";
+import { ArrowRight, CheckCircle2, FileSpreadsheet, ShieldCheck, Sparkles, UserPlus, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -223,30 +223,30 @@ const DigitalProductsPage = () => {
 
   return (
     <div className="space-y-10">
-      <section className="relative overflow-hidden rounded-lg border border-[#e2ca91]/18 bg-[#071310] p-5 text-white shadow-[0_38px_110px_rgba(0,0,0,0.28)] sm:p-8 lg:p-10">
-        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(31,26,23,0.94),rgba(7,19,16,0.96)_56%,rgba(5,10,9,1))]" />
-        <div className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-[#e2ca91]/60 to-transparent" />
+      <section className="relative overflow-hidden rounded-lg border border-[#e2ca91]/[0.28] bg-[#071310] p-5 text-white shadow-[0_38px_110px_rgba(0,0,0,0.28)] sm:p-8 lg:p-10">
+        <div className="absolute inset-0 z-0 bg-[linear-gradient(135deg,rgba(31,26,23,0.94),rgba(7,19,16,0.96)_56%,rgba(5,10,9,1))]" />
+        <div className="pointer-events-none absolute inset-x-8 top-0 z-0 h-px bg-gradient-to-r from-transparent via-[#e2ca91]/[0.72] to-transparent" />
 
-        <div className="relative grid gap-8 lg:grid-cols-[1fr_0.46fr] lg:items-end">
+        <div className="relative z-10 grid gap-8 lg:grid-cols-[1fr_0.46fr] lg:items-end">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-lg border border-[#e2ca91]/30 bg-[#e2ca91]/12 px-3 py-1 text-xs font-bold uppercase text-[#f2d99a]">
+            <span className="inline-flex items-center gap-2 rounded-lg border border-[#e2ca91]/[0.42] bg-[#e2ca91]/[0.16] px-3 py-1 text-xs font-bold uppercase text-[#f8e6b1]">
               <Sparkles size={14} />
               Premium Excel katalogas
             </span>
             <h1 className="mt-5 max-w-4xl font-display text-4xl font-bold leading-tight text-white sm:text-6xl">
               Skaitmeniniai įrankiai finansams, taupymui ir produktyvumui
             </h1>
-            <p className="mt-5 max-w-3xl text-base leading-8 text-white/70 sm:text-lg">
+            <p className="mt-5 max-w-3xl text-base leading-8 text-white/[0.86] sm:text-lg">
               Paruošti naudoti Excel šablonai, kurie padeda aiškiau planuoti pinigus, tikslus ir savaitės darbus.
             </p>
-            <p className="mt-4 max-w-3xl text-sm leading-7 text-white/58">
+            <p className="mt-4 max-w-3xl text-sm leading-7 text-white/[0.78]">
               Produktus galite peržiūrėti viešai. Norint įsigyti ir atsisiųsti failus, reikia prisijungti arba susikurti paskyrą.
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
               {trustItems.map((item) => (
                 <span
                   key={item}
-                  className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.07] px-3 py-2 text-xs font-semibold text-white/72"
+                  className="inline-flex items-center gap-2 rounded-lg border border-white/[0.16] bg-white/[0.1] px-3 py-2 text-xs font-semibold text-white/[0.86]"
                 >
                   <ShieldCheck size={14} className="text-[#9ad7b1]" />
                   {item}
@@ -267,7 +267,7 @@ const DigitalProductsPage = () => {
             </div>
           </div>
 
-          <div className="rounded-lg border border-white/10 bg-white/[0.065] p-5 shadow-[0_26px_70px_rgba(0,0,0,0.22)]">
+          <div className="rounded-lg border border-white/[0.16] bg-white/[0.1] p-5 shadow-[0_26px_70px_rgba(0,0,0,0.22)]">
             <p className="flex items-center gap-2 text-sm font-semibold text-white">
               <FileSpreadsheet size={17} className="text-[#f2d99a]" />
               Premium katalogas
@@ -278,8 +278,8 @@ const DigitalProductsPage = () => {
                 ["Formatas", "Excel"],
                 ["Prieiga", "Po pirkimo"],
               ].map(([label, value]) => (
-                <div key={label} className="rounded-lg border border-white/10 bg-black/18 p-4">
-                  <p className="text-xs font-bold uppercase text-white/44">{label}</p>
+                <div key={label} className="rounded-lg border border-white/[0.16] bg-black/[0.28] p-4">
+                  <p className="text-xs font-bold uppercase text-white/[0.68]">{label}</p>
                   <p className="mt-2 font-display text-xl font-bold text-white sm:text-2xl">{value}</p>
                 </div>
               ))}
@@ -306,7 +306,7 @@ const DigitalProductsPage = () => {
           </div>
         </div>
 
-        <div className="rounded-lg border border-white/10 bg-[#071310] p-3 shadow-[0_32px_90px_rgba(0,0,0,0.22)] sm:p-5">
+        <div className="rounded-lg border border-white/[0.16] bg-[#071310] p-3 shadow-[0_32px_90px_rgba(0,0,0,0.22)] sm:p-5">
           <DigitalProductAccessGrid
             products={publicProducts}
             user={user}
@@ -329,7 +329,7 @@ const DigitalProductsPage = () => {
             key={item.title}
             className="rounded-lg border border-[rgb(var(--line))] bg-[rgb(var(--surface))] p-5 shadow-[0_18px_50px_rgba(31,26,23,0.08)]"
           >
-            <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[#e2ca91]/28 bg-[#e2ca91]/12 text-[#8a6d2d]">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[#e2ca91]/[0.38] bg-[#e2ca91]/[0.16] text-[#8a6d2d]">
               <CheckCircle2 size={18} />
             </span>
             <h3 className="mt-5 font-display text-xl font-bold leading-tight">{item.title}</h3>
@@ -375,38 +375,37 @@ const DigitalProductsPage = () => {
         </div>
       </section>
 
-      <section className="relative overflow-hidden rounded-lg border border-[#e2ca91]/24 bg-[#071310] p-6 text-white shadow-[0_28px_82px_rgba(0,0,0,0.24)] sm:p-8 lg:p-10">
-        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(226,202,145,0.14),transparent_34%),linear-gradient(135deg,rgba(16,38,31,0.92),rgba(7,19,16,0.98))]" />
-        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+      <section className="relative overflow-hidden rounded-lg border border-[#e2ca91]/[0.34] bg-[#071310] p-6 text-white shadow-[0_28px_82px_rgba(0,0,0,0.24)] sm:p-8 lg:p-10">
+        <div className="absolute inset-0 z-0 bg-[linear-gradient(135deg,rgba(226,202,145,0.14),transparent_34%),linear-gradient(135deg,rgba(16,38,31,0.92),rgba(7,19,16,0.98))]" />
+        <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-3xl">
-            <span className="inline-flex rounded-lg border border-[#e2ca91]/30 bg-[#e2ca91]/12 px-3 py-1 text-xs font-bold uppercase text-[#f2d99a]">
-              Saugi produkto prieiga
+            <span className="inline-flex rounded-lg border border-[#e2ca91]/[0.42] bg-[#e2ca91]/[0.16] px-3 py-1 text-xs font-bold uppercase text-[#f8e6b1]">
+              Premium resursai
             </span>
             <h2 className="mt-4 font-display text-3xl font-bold leading-tight sm:text-4xl">
-              Įsigykite tik tai, ko reikia, ir atsisiųskite po apmokėjimo.
+              Nori daugiau premium resursų?
             </h2>
-            <p className="mt-4 text-sm leading-7 text-white/70 sm:text-base">
-              Skaitmeniniai produktai yra atskirai įsigyjami Excel modeliai. Demo versija skirta Saving Studio pradžiai, o produktų failai atsiveria tik po individualaus pirkimo.
+            <p className="mt-4 text-sm leading-7 text-white/[0.84] sm:text-base">
+              Narystėje rasite daugiau nario įrankių, struktūruotų gidų ir premium planavimo sistemų. Skaitmeniniai produktai lieka atskirai įsigyjami, o narystė padeda dirbti su platesne StillOak Studio erdve.
             </p>
           </div>
-          {user ? (
-            <a href="#product-catalog" className="button-primary shrink-0 gap-2">
-              Grįžti į katalogą
-              <ShoppingBag size={16} />
-            </a>
-          ) : (
-            <Link to="/register" state={{ from: "/digital-products" }} className="button-primary shrink-0 gap-2">
-              Sukurti paskyrą
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Link to="/pricing" className="button-primary shrink-0 gap-2">
+              Atrakinti narystę
               <UserPlus size={16} />
             </Link>
-          )}
+            <Link to="/pricing" className="hero-outline-button shrink-0 gap-2">
+              Peržiūrėti planus
+              <ArrowRight size={16} />
+            </Link>
+          </div>
         </div>
       </section>
 
       {adminPreview && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
-          <div className="flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-lg border border-white/12 bg-[#071310] text-white shadow-[0_32px_110px_rgba(0,0,0,0.45)]">
-            <div className="flex items-center justify-between gap-4 border-b border-white/10 px-5 py-4">
+          <div className="flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-lg border border-white/[0.18] bg-[#071310] text-white shadow-[0_32px_110px_rgba(0,0,0,0.45)]">
+            <div className="flex items-center justify-between gap-4 border-b border-white/[0.16] px-5 py-4">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#f2d99a]">Admin PDF peržiūra</p>
                 <h3 className="mt-1 font-display text-xl font-bold">{adminPreview.title}</h3>
@@ -414,7 +413,7 @@ const DigitalProductsPage = () => {
               <button
                 type="button"
                 onClick={closeAdminPreview}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/[0.06] text-white/74 transition hover:bg-white/12 hover:text-white"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/[0.16] bg-white/[0.1] text-white/[0.86] transition hover:bg-white/[0.16] hover:text-white"
                 aria-label="Uždaryti PDF peržiūrą"
               >
                 <X size={18} />
