@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
+import { useCookieConsent } from "../context/CookieConsentContext";
 import { useLanguage } from "../context/LanguageContext";
 
 const Footer = () => {
   const { t } = useLanguage();
+  const { openPreferences } = useCookieConsent();
   const copy = t("footer");
   const footerColumns = [
     {
@@ -29,6 +31,7 @@ const Footer = () => {
         { label: copy.links.shipping, to: "/shipping" },
         { label: copy.links.returns, to: "/returns" },
         { label: copy.links.privacy, to: "/privacy" },
+        { label: copy.links.cookiePolicy, to: "/cookie-policy" },
         { label: copy.links.terms, to: "/terms" },
       ],
     },
@@ -110,8 +113,15 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="mt-9 border-t border-white/8 pt-5 text-sm text-white/44">
-        © 2026 Stilloak Studio. {copy.links.rights}
+      <div className="mt-9 flex flex-col gap-3 border-t border-white/8 pt-5 text-sm text-white/44 sm:flex-row sm:items-center sm:justify-between">
+        <p>© 2026 Stilloak Studio. {copy.links.rights}</p>
+        <button
+          type="button"
+          onClick={openPreferences}
+          className="w-fit rounded-lg border border-white/10 px-3 py-2 text-left text-white/66 transition hover:border-white/24 hover:text-white"
+        >
+          {copy.links.cookieSettings}
+        </button>
       </div>
     </footer>
   );

@@ -75,6 +75,7 @@ const App = () => (
       <Route path="/shipping" element={<InfoPage page={infoPages.shipping} />} />
       <Route path="/returns" element={<InfoPage page={infoPages.returns} />} />
       <Route path="/privacy" element={<InfoPage page={infoPages.privacy} />} />
+      <Route path="/cookie-policy" element={<InfoPage page={infoPages.cookiePolicy} />} />
       <Route path="/terms" element={<InfoPage page={infoPages.terms} />} />
 
       <Route element={<ProtectedRoute />}>

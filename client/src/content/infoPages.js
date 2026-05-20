@@ -321,6 +321,49 @@ export const infoPages = {
     ],
     cta: { label: "Susisiekti su pagalba", to: "/private-support" },
   },
+  cookiePolicy: {
+    title: "Slapukų politika",
+    eyebrow: "Privatumas",
+    summary:
+      "Šiame puslapyje paaiškiname, kokius slapukų pasirinkimus gali valdyti Stilloak Studio lankytojai ir kodėl kai kurie slapukai yra būtini svetainei veikti.",
+    lastUpdated: "2026 m. gegužės 20 d.",
+    highlights: [
+      "Būtinieji slapukai reikalingi svetainei veikti",
+      "Funkciniai, analitiniai ir marketingo slapukai yra pasirenkami",
+      "Slapukų nustatymus galima pakeisti bet kada puslapio apačioje",
+    ],
+    sections: [
+      {
+        heading: "Kas yra slapukai",
+        paragraphs: [
+          "Slapukai yra nedideli duomenų įrašai, kurie padeda svetainei prisiminti svarbius pasirinkimus, palaikyti saugų prisijungimą ir sklandžiai vykdyti pirkimo procesą.",
+          "Stilloak Studio nenaudoja pasirenkamų analitinių ar marketingo slapukų be aiškaus lankytojo pasirinkimo.",
+        ],
+      },
+      {
+        heading: "Kodėl naudojame slapukus",
+        bullets: [
+          "kad veiktų prisijungimas, paskyra ir saugumas",
+          "kad būtų galima išsaugoti kalbos ir slapukų pasirinkimus",
+          "kad pirkimo ir atsisiuntimo patirtis būtų stabili",
+          "kad su sutikimu galėtume geriau suprasti, kaip gerinti svetainę",
+        ],
+      },
+      {
+        heading: "Slapukų kategorijos",
+        paragraphs: [
+          "Būtinieji slapukai visada įjungti, nes be jų svetainė negalėtų patikimai veikti. Funkciniai slapukai padeda prisiminti patogumo nustatymus. Analitiniai slapukai padeda suprasti svetainės naudojimą tik tada, kai jiems suteikiamas sutikimas. Marketingo slapukai naudojami tik tuo atveju, jei ateityje svetainėje bus reklamos ar kampanijų matavimas ir vartotojas tam pritars.",
+        ],
+      },
+      {
+        heading: "Kaip pakeisti pasirinkimus",
+        paragraphs: [
+          "Slapukų pasirinkimus galima atidaryti puslapio apačioje paspaudus „Slapukų nustatymai“. Ten galima priimti visus slapukus, atmesti nebūtinuosius arba pasirinkti konkrečias kategorijas.",
+        ],
+      },
+    ],
+    cta: { label: "Atidaryti privatumo informaciją", to: "/privacy" },
+  },
   terms: {
     title: "Taisyklės",
     eyebrow: "Pagalba",

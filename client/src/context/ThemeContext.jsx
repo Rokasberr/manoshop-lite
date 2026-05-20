@@ -1,15 +1,30 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
+import { hasCookieConsent } from "../utils/cookieConsent";
+
 const ThemeContext = createContext(null);
 const storageKey = "manoshop_theme";
 
+const getInitialTheme = () => {
+  if (typeof window === "undefined" || !hasCookieConsent("functional")) {
+    return "light";
+  }
+
+  return localStorage.getItem(storageKey) || "light";
+};
+
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() => localStorage.getItem(storageKey) || "light");
+  const [theme, setTheme] = useState(getInitialTheme);
 
   useEffect(() => {
     const root = document.documentElement;
     root.classList.toggle("dark", theme === "dark");
-    localStorage.setItem(storageKey, theme);
+
+    if (hasCookieConsent("functional")) {
+      localStorage.setItem(storageKey, theme);
+    } else {
+      localStorage.removeItem(storageKey);
+    }
   }, [theme]);
 
   const value = {

@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import CookieConsentBanner from "./CookieConsentBanner";
 
 const Layout = () => (
   <div className="app-surface relative min-h-screen overflow-hidden">
@@ -14,6 +15,7 @@ const Layout = () => (
     </main>
 
     <Footer />
+    <CookieConsentBanner />
   </div>
 );
 

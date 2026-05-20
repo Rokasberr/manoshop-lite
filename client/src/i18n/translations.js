@@ -488,11 +488,51 @@ export const translations = {
         shipping: "Pristatymas",
         returns: "Grąžinimai",
         privacy: "Privatumas",
+        cookiePolicy: "Slapukų politika",
         terms: "Taisyklės",
         visitContact: "Susisiekti",
+        cookieSettings: "Slapukų nustatymai",
         rights: "Visos teisės saugomos.",
         hours: "I-V 9:00-18:00",
         location: "Vilnius, Lietuva",
+      },
+    },
+    cookieConsent: {
+      bannerTitle: "Slapukų pasirinkimai",
+      bannerText:
+        "Mes naudojame slapukus, kad svetainė veiktų tinkamai, prisimintų jūsų pasirinkimus ir padėtų mums gerinti Stilloak Studio patirtį. Galite priimti visus slapukus, atmesti nebūtinuosius arba pasirinkti, kuriuos leisti.",
+      settingsEyebrow: "Privatumas",
+      modalTitle: "Tvarkyti slapukų pasirinkimus",
+      modalText:
+        "Pasirinkite, kokias slapukų kategorijas leidžiate. Būtinieji slapukai visada įjungti, nes jie reikalingi svetainei veikti.",
+      acceptAll: "Priimti visus",
+      rejectNonEssential: "Atmesti nebūtinuosius",
+      managePreferences: "Tvarkyti pasirinkimus",
+      savePreferences: "Išsaugoti pasirinkimus",
+      close: "Uždaryti",
+      alwaysOn: "Visada įjungta",
+      optional: "Pasirenkama",
+      policyLink: "Skaityti slapukų politiką",
+      firstChoiceNote: "Pasirinkimą galėsite pakeisti bet kada puslapio apačioje.",
+      categories: {
+        necessary: {
+          title: "Būtinieji slapukai",
+          description:
+            "Reikalingi, kad svetainė veiktų: prisijungimas, saugumas, pirkimo procesas, kalbos pasirinkimas ir slapukų pasirinkimo išsaugojimas. Šių slapukų išjungti negalima.",
+        },
+        functional: {
+          title: "Funkciniai slapukai",
+          description: "Padeda prisiminti jūsų pasirinkimus, pvz. kalbą, temą ar kitus patogumo nustatymus.",
+        },
+        analytics: {
+          title: "Analitiniai slapukai",
+          description:
+            "Padeda suprasti, kurie puslapiai naudojami dažniausiai, kur vartotojai susiduria su problemomis ir kaip pagerinti svetainę.",
+        },
+        marketing: {
+          title: "Marketingo slapukai",
+          description: "Naudojami tik jei svetainėje bus reklamos, remarketingas ar reklamos kampanijų matavimas.",
+        },
       },
     },
     home: {
@@ -1026,11 +1066,50 @@ translations.en = mergeLocale(translations.lt, {
       shipping: "Shipping",
       returns: "Returns",
       privacy: "Privacy",
+      cookiePolicy: "Cookie policy",
       terms: "Terms",
       visitContact: "Contact us",
+      cookieSettings: "Cookie settings",
       rights: "All rights reserved.",
       hours: "Mon-Fri 9:00-18:00",
       location: "Vilnius, Lithuania",
+    },
+  },
+  cookieConsent: {
+    bannerTitle: "Cookie choices",
+    bannerText:
+      "We use cookies to make the website work properly, remember your preferences, and help us improve the Stilloak Studio experience. You can accept all cookies, reject non-essential cookies, or choose which cookies to allow.",
+    settingsEyebrow: "Privacy",
+    modalTitle: "Manage cookie preferences",
+    modalText:
+      "Choose which cookie categories you allow. Necessary cookies are always enabled because they are required for the website to work.",
+    acceptAll: "Accept all",
+    rejectNonEssential: "Reject non-essential",
+    managePreferences: "Manage preferences",
+    savePreferences: "Save preferences",
+    close: "Close",
+    alwaysOn: "Always on",
+    optional: "Optional",
+    policyLink: "Read cookie policy",
+    firstChoiceNote: "You can change your choice anytime from the footer.",
+    categories: {
+      necessary: {
+        title: "Necessary cookies",
+        description:
+          "Required for the website to work: login, security, checkout, language selection, and saving cookie preferences. These cookies cannot be disabled.",
+      },
+      functional: {
+        title: "Functional cookies",
+        description: "Help remember your preferences, such as language, theme, or other convenience settings.",
+      },
+      analytics: {
+        title: "Analytics cookies",
+        description: "Help us understand which pages are used most often, where users face issues, and how to improve the website.",
+      },
+      marketing: {
+        title: "Marketing cookies",
+        description: "Used only if the website uses ads, remarketing, or advertising campaign measurement.",
+      },
     },
   },
   home: {
@@ -1466,11 +1545,50 @@ translations.pl = mergeLocale(translations.en, {
       shipping: "Dostawa",
       returns: "Zwroty",
       privacy: "Prywatność",
+      cookiePolicy: "Polityka cookies",
       terms: "Regulamin",
       visitContact: "Skontaktuj się",
+      cookieSettings: "Ustawienia cookies",
       rights: "Wszelkie prawa zastrzeżone.",
       hours: "Pon-Pt 9:00-18:00",
       location: "Wilno, Litwa",
+    },
+  },
+  cookieConsent: {
+    bannerTitle: "Wybór cookies",
+    bannerText:
+      "Używamy cookies, aby strona działała prawidłowo, zapamiętywała Twoje preferencje i pomagała nam ulepszać doświadczenie Stilloak Studio. Możesz zaakceptować wszystkie cookies, odrzucić nieobowiązkowe albo wybrać, które kategorie dopuścić.",
+    settingsEyebrow: "Prywatność",
+    modalTitle: "Zarządzaj preferencjami cookies",
+    modalText:
+      "Wybierz kategorie cookies, na które się zgadzasz. Niezbędne cookies są zawsze włączone, ponieważ są wymagane do działania strony.",
+    acceptAll: "Akceptuj wszystkie",
+    rejectNonEssential: "Odrzuć nieobowiązkowe",
+    managePreferences: "Zarządzaj preferencjami",
+    savePreferences: "Zapisz preferencje",
+    close: "Zamknij",
+    alwaysOn: "Zawsze włączone",
+    optional: "Opcjonalne",
+    policyLink: "Przeczytaj politykę cookies",
+    firstChoiceNote: "Możesz zmienić wybór w dowolnym momencie w stopce.",
+    categories: {
+      necessary: {
+        title: "Niezbędne cookies",
+        description:
+          "Wymagane do działania strony: logowanie, bezpieczeństwo, zakup, wybór języka i zapis preferencji cookies. Tych cookies nie można wyłączyć.",
+      },
+      functional: {
+        title: "Funkcjonalne cookies",
+        description: "Pomagają zapamiętać preferencje, takie jak język, motyw lub inne ustawienia wygody.",
+      },
+      analytics: {
+        title: "Analityczne cookies",
+        description: "Pomagają zrozumieć, które strony są używane najczęściej, gdzie użytkownicy napotykają problemy i jak ulepszać stronę.",
+      },
+      marketing: {
+        title: "Marketingowe cookies",
+        description: "Używane tylko wtedy, gdy strona korzysta z reklam, remarketingu lub pomiaru kampanii reklamowych.",
+      },
     },
   },
   home: {
@@ -1681,11 +1799,50 @@ translations.de = mergeLocale(translations.en, {
       shipping: "Versand",
       returns: "Retouren",
       privacy: "Datenschutz",
+      cookiePolicy: "Cookie-Richtlinie",
       terms: "Bedingungen",
       visitContact: "Kontakt aufnehmen",
+      cookieSettings: "Cookie-Einstellungen",
       rights: "Alle Rechte vorbehalten.",
       hours: "Mo-Fr 9:00-18:00",
       location: "Vilnius, Litauen",
+    },
+  },
+  cookieConsent: {
+    bannerTitle: "Cookie-Auswahl",
+    bannerText:
+      "Wir verwenden Cookies, damit die Website richtig funktioniert, Ihre Einstellungen speichert und uns hilft, das Stilloak Studio Erlebnis zu verbessern. Sie können alle Cookies akzeptieren, nicht erforderliche Cookies ablehnen oder auswählen, welche Cookies erlaubt sind.",
+    settingsEyebrow: "Datenschutz",
+    modalTitle: "Cookie-Einstellungen verwalten",
+    modalText:
+      "Wählen Sie aus, welche Cookie-Kategorien Sie erlauben. Erforderliche Cookies sind immer aktiviert, da sie für den Betrieb der Website notwendig sind.",
+    acceptAll: "Alle akzeptieren",
+    rejectNonEssential: "Nicht erforderliche ablehnen",
+    managePreferences: "Einstellungen verwalten",
+    savePreferences: "Einstellungen speichern",
+    close: "Schließen",
+    alwaysOn: "Immer aktiv",
+    optional: "Optional",
+    policyLink: "Cookie-Richtlinie lesen",
+    firstChoiceNote: "Sie können Ihre Auswahl jederzeit über die Fußzeile ändern.",
+    categories: {
+      necessary: {
+        title: "Erforderliche Cookies",
+        description:
+          "Erforderlich für den Betrieb der Website: Anmeldung, Sicherheit, Checkout, Sprachauswahl und Speicherung der Cookie-Einstellungen. Diese Cookies können nicht deaktiviert werden.",
+      },
+      functional: {
+        title: "Funktionale Cookies",
+        description: "Helfen, Ihre Einstellungen wie Sprache, Design oder andere Komfortoptionen zu speichern.",
+      },
+      analytics: {
+        title: "Analyse-Cookies",
+        description: "Helfen uns zu verstehen, welche Seiten am häufigsten genutzt werden, wo Probleme auftreten und wie wir die Website verbessern können.",
+      },
+      marketing: {
+        title: "Marketing-Cookies",
+        description: "Werden nur verwendet, wenn die Website Werbung, Remarketing oder Kampagnenmessung nutzt.",
+      },
     },
   },
   home: {
@@ -1924,11 +2081,50 @@ translations.fr = mergeLocale(translations.en, {
       shipping: "Livraison",
       returns: "Retours",
       privacy: "Confidentialité",
+      cookiePolicy: "Politique cookies",
       terms: "Conditions",
       visitContact: "Nous contacter",
+      cookieSettings: "Paramètres des cookies",
       rights: "Tous droits réservés.",
       hours: "Lun-Ven 9:00-18:00",
       location: "Vilnius, Lituanie",
+    },
+  },
+  cookieConsent: {
+    bannerTitle: "Choix des cookies",
+    bannerText:
+      "Nous utilisons des cookies pour assurer le bon fonctionnement du site, mémoriser vos préférences et nous aider à améliorer l’expérience Stilloak Studio. Vous pouvez accepter tous les cookies, refuser les cookies non essentiels ou choisir ceux que vous autorisez.",
+    settingsEyebrow: "Confidentialité",
+    modalTitle: "Gérer les préférences de cookies",
+    modalText:
+      "Choisissez les catégories de cookies que vous autorisez. Les cookies nécessaires sont toujours activés car ils sont indispensables au fonctionnement du site.",
+    acceptAll: "Tout accepter",
+    rejectNonEssential: "Refuser les non essentiels",
+    managePreferences: "Gérer les préférences",
+    savePreferences: "Enregistrer les préférences",
+    close: "Fermer",
+    alwaysOn: "Toujours activé",
+    optional: "Optionnel",
+    policyLink: "Lire la politique cookies",
+    firstChoiceNote: "Vous pouvez modifier votre choix à tout moment depuis le pied de page.",
+    categories: {
+      necessary: {
+        title: "Cookies nécessaires",
+        description:
+          "Requis pour le fonctionnement du site : connexion, sécurité, paiement, sélection de la langue et sauvegarde des préférences de cookies. Ces cookies ne peuvent pas être désactivés.",
+      },
+      functional: {
+        title: "Cookies fonctionnels",
+        description: "Aident à mémoriser vos préférences, comme la langue, le thème ou d’autres réglages de confort.",
+      },
+      analytics: {
+        title: "Cookies analytiques",
+        description: "Nous aident à comprendre quelles pages sont le plus utilisées, où les utilisateurs rencontrent des problèmes et comment améliorer le site.",
+      },
+      marketing: {
+        title: "Cookies marketing",
+        description: "Utilisés uniquement si le site utilise des publicités, du remarketing ou la mesure de campagnes publicitaires.",
+      },
     },
   },
   home: {
@@ -2130,11 +2326,50 @@ translations.es = mergeLocale(translations.en, {
       shipping: "Envío",
       returns: "Devoluciones",
       privacy: "Privacidad",
+      cookiePolicy: "Política de cookies",
       terms: "Términos",
       visitContact: "Contactar",
+      cookieSettings: "Configuración de cookies",
       rights: "Todos los derechos reservados.",
       hours: "Lun-Vie 9:00-18:00",
       location: "Vilna, Lituania",
+    },
+  },
+  cookieConsent: {
+    bannerTitle: "Preferencias de cookies",
+    bannerText:
+      "Usamos cookies para que el sitio funcione correctamente, recuerde tus preferencias y nos ayude a mejorar la experiencia de Stilloak Studio. Puedes aceptar todas las cookies, rechazar las no esenciales o elegir cuáles permitir.",
+    settingsEyebrow: "Privacidad",
+    modalTitle: "Gestionar preferencias de cookies",
+    modalText:
+      "Elige qué categorías de cookies permites. Las cookies necesarias siempre están activadas porque son imprescindibles para que el sitio funcione.",
+    acceptAll: "Aceptar todas",
+    rejectNonEssential: "Rechazar no esenciales",
+    managePreferences: "Gestionar preferencias",
+    savePreferences: "Guardar preferencias",
+    close: "Cerrar",
+    alwaysOn: "Siempre activas",
+    optional: "Opcional",
+    policyLink: "Leer política de cookies",
+    firstChoiceNote: "Puedes cambiar tu elección en cualquier momento desde el pie de página.",
+    categories: {
+      necessary: {
+        title: "Cookies necesarias",
+        description:
+          "Necesarias para que el sitio funcione: inicio de sesión, seguridad, compra, selección de idioma y guardado de preferencias de cookies. Estas cookies no se pueden desactivar.",
+      },
+      functional: {
+        title: "Cookies funcionales",
+        description: "Ayudan a recordar tus preferencias, como idioma, tema u otros ajustes de comodidad.",
+      },
+      analytics: {
+        title: "Cookies analíticas",
+        description: "Nos ayudan a entender qué páginas se usan más, dónde aparecen problemas y cómo mejorar el sitio.",
+      },
+      marketing: {
+        title: "Cookies de marketing",
+        description: "Se usan solo si el sitio utiliza anuncios, remarketing o medición de campañas publicitarias.",
+      },
     },
   },
   home: {
