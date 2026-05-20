@@ -479,7 +479,6 @@ export const translations = {
       links: {
         memberAreas: "Nario erdvės",
         journal: "Nario naujienos",
-        collection: "Kolekcija",
         membership: "Narystės",
         secureCheckout: "Saugus apmokėjimas",
         receiptArchive: "Sąskaitų archyvas",
@@ -857,7 +856,7 @@ export const translations = {
       amount: "Suma",
       noOrdersTitle: "Dar nėra užsakymų",
       noOrdersText: "Kai tik sukursi pirmą užsakymą, jis atsiras čia.",
-      viewCollection: "Peržiūrėti kolekciją",
+      viewProducts: "Peržiūrėti produktus",
       invoiceDownloaded: "PDF sąskaita atsisiųsta.",
       invoiceFailed: "Nepavyko atsisiųsti sąskaitos.",
       digitalDownloaded: "Skaitmeninis failas atsisiųstas.",
@@ -904,7 +903,7 @@ export const translations = {
       viewCart: "Peržiūrėti krepšelį",
       emptyCartTitle: "Krepšelis tuščias",
       emptyCartText: "Pasirink produktą prieš tęsiant į apmokėjimą.",
-      viewCollection: "Peržiūrėti kolekciją",
+      viewProducts: "Peržiūrėti produktus",
       pausedTitle: "Apmokėjimas laikinai pristabdytas",
       viewLaunchStatus: "Peržiūrėti atidarymo būseną",
       shippingRequiredError: "Užpildyk visus privalomus pristatymo laukus.",
@@ -1104,7 +1103,6 @@ translations.en = mergeLocale(translations.lt, {
     links: {
       memberAreas: "Member areas",
       journal: "Member news",
-      collection: "Collection",
       membership: "Memberships",
       secureCheckout: "Secure payment",
       receiptArchive: "Receipt archive",
@@ -1430,7 +1428,7 @@ translations.en = mergeLocale(translations.lt, {
     amount: "Amount",
     noOrdersTitle: "No orders yet",
     noOrdersText: "Your first order will appear here once it is created.",
-    viewCollection: "View collection",
+    viewProducts: "View products",
     invoiceDownloaded: "PDF invoice downloaded.",
     invoiceFailed: "Could not download the invoice.",
     digitalDownloaded: "Digital file downloaded.",
@@ -1477,7 +1475,7 @@ translations.en = mergeLocale(translations.lt, {
     viewCart: "View cart",
     emptyCartTitle: "Cart is empty",
     emptyCartText: "Choose a product before continuing to payment.",
-    viewCollection: "View collection",
+    viewProducts: "View products",
     pausedTitle: "Payment is temporarily paused",
     viewLaunchStatus: "View launch status",
     shippingRequiredError: "Fill in all required shipping fields.",
@@ -1630,7 +1628,6 @@ translations.pl = mergeLocale(translations.en, {
     links: {
       memberAreas: "Strefy członka",
       journal: "Aktualności członka",
-      collection: "Kolekcja",
       membership: "Członkostwo",
       secureCheckout: "Bezpieczna płatność",
       receiptArchive: "Archiwum rachunków",
@@ -1931,7 +1928,6 @@ translations.de = mergeLocale(translations.en, {
     links: {
       memberAreas: "Mitgliederbereiche",
       journal: "Mitgliedernews",
-      collection: "Kollektion",
       membership: "Mitgliedschaft",
       secureCheckout: "Sichere Zahlung",
       receiptArchive: "Belegarchiv",
@@ -2260,7 +2256,6 @@ translations.fr = mergeLocale(translations.en, {
     links: {
       memberAreas: "Espaces membres",
       journal: "Actus membres",
-      collection: "Collection",
       membership: "Abonnement",
       secureCheckout: "Paiement sécurisé",
       receiptArchive: "Archive des reçus",
@@ -2552,7 +2547,6 @@ translations.es = mergeLocale(translations.en, {
     links: {
       memberAreas: "Zonas de miembro",
       journal: "Noticias de miembro",
-      collection: "Colección",
       membership: "Membresía",
       secureCheckout: "Pago seguro",
       receiptArchive: "Archivo de recibos",

@@ -216,7 +216,7 @@ const SiteBuilderPage = () => {
                       className={`flex min-w-0 gap-4 rounded-lg border p-3 text-left transition hover:-translate-y-0.5 ${selected ? "bg-[rgb(var(--surface-soft))]" : "bg-[rgb(var(--surface))]"}`}
                       style={{ borderColor: selected ? "rgb(var(--accent-strong) / 0.5)" : "rgb(var(--line) / 0.82)" }}
                     >
-                      <img src={getPrimaryProductImage(product) || "/stilloak/collection/digital-bundle.svg"} alt={product.title || product.name} className="h-20 w-20 shrink-0 rounded-lg object-cover" />
+                      <img src={getPrimaryProductImage(product) || "/digital-products/previews/personal-budget-system-preview.png"} alt={product.title || product.name} className="h-20 w-20 shrink-0 rounded-lg object-cover" />
                       <span className="min-w-0">
                         <span className="block break-words text-sm font-semibold">{product.title || product.name}</span>
                         <span className="mt-1 block text-xs leading-5 text-muted">{formatCurrency(product.price)} · commission {product.commissionRate || 0}%</span>

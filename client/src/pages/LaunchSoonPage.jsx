@@ -25,12 +25,12 @@ const launchCopy = {
     focus: {
       default: {
         eyebrow: "Netrukus",
-        title: "Skaitmeninė kolekcija ruošiama, o nario naujienos jau atvertos aktyviems nariams.",
+        title: "Nauji skaitmeniniai produktai ruošiami, o nario naujienos jau atvertos aktyviems nariams.",
         text: "Šis puslapis rodo, kas dar ruošiama ir kas jau veikia nario patirtyje.",
       },
       digital: {
-        eyebrow: "Skaitmeninė kolekcija",
-        title: "Skaitmeninė kolekcija ruošiama ramesniam atidarymui.",
+        eyebrow: "Skaitmeniniai produktai",
+        title: "Nauji skaitmeniniai produktai ruošiami ramesniam atidarymui.",
         text: "PDF produktai, rinkiniai ir atsisiuntimo patirtis dar ruošiami prieš pilną atidarymą.",
       },
       journal: {
@@ -41,10 +41,10 @@ const launchCopy = {
     },
     cardsTitle: "Kas ruošiama ir kas jau veikia",
     cardsText:
-      "Skaitmeninė kolekcija dar ruošiama, o nario naujienos jau veikia aktyviems mokamiems planams.",
+      "Nauji skaitmeniniai produktai dar ruošiami, o nario naujienos jau veikia aktyviems mokamiems planams.",
     cards: {
       digital: {
-        eyebrow: "Skaitmeninė kolekcija",
+        eyebrow: "Skaitmeniniai produktai",
         title: "PDF gidai, rinkiniai ir iškart pasiekiami produktai",
         description:
           "Skaitmeninė lentyna dar tvarkoma, kad pirmas atidarymas jaustųsi pilnas, aiškus ir paruoštas pirkimui.",
@@ -66,8 +66,8 @@ const launchCopy = {
     whileWaitingEyebrow: "Kol lauki",
     whileWaitingTitle: "Gyvas sluoksnis vis dar atidarytas.",
     whileWaitingText:
-      "Kol skaitmeninė kolekcija dar ruošiama, gali peržiūrėti pagrindinę kolekciją, narystę, Stilloak nario erdves ir nario naujienas.",
-    browseCollection: "Peržiūrėti kolekciją",
+      "Kol nauji skaitmeniniai produktai dar ruošiami, gali peržiūrėti dabartinius produktus, narystę, Stilloak nario erdves ir nario naujienas.",
+    browseProducts: "Peržiūrėti produktus",
     viewMembership: "Peržiūrėti narystę",
     launchMap: "Paleidimo planas",
     stagingTag: "Ruošiama",
@@ -79,13 +79,13 @@ const launchCopy = {
     focus: {
       default: {
         eyebrow: "Launch soon",
-        title: "Digital Collection is being prepared, and member news is open for active members.",
+        title: "New digital products are being prepared, and member news is open for active members.",
         text: "This page shows what is still being prepared and what already works inside the member experience.",
       },
       digital: {
-        eyebrow: "Digital collection",
-        title: "The digital collection is being prepared for a cleaner launch.",
-        text: "The collection, product framing, and delivery path are being refined before full release.",
+        eyebrow: "Digital products",
+        title: "New digital products are being prepared for a cleaner launch.",
+        text: "Product framing and the delivery path are being refined before full release.",
       },
       journal: {
         eyebrow: "Member news",
@@ -95,10 +95,10 @@ const launchCopy = {
     },
     cardsTitle: "What is being prepared and what is live",
     cardsText:
-      "Digital Collection is still being prepared, while member news is live for active paid plans.",
+      "New digital products are still being prepared, while member news is live for active paid plans.",
     cards: {
       digital: {
-        eyebrow: "Digital collection",
+        eyebrow: "Digital products",
         title: "Printable guides and ready-to-use digital tools",
         description:
           "The digital shelf is being refined so the first release feels complete, premium, and ready to buy.",
@@ -120,8 +120,8 @@ const launchCopy = {
     whileWaitingEyebrow: "While you wait",
     whileWaitingTitle: "The live layer is still open.",
     whileWaitingText:
-      "While Digital Collection is still being prepared, you can browse the main collection, view membership, explore Stilloak, and open member news.",
-    browseCollection: "Browse collection",
+      "While new digital products are still being prepared, you can browse current products, view membership, explore Stilloak, and open member news.",
+    browseProducts: "Browse products",
     viewMembership: "View membership",
     launchMap: "Launch map",
     stagingTag: "In preparation",
@@ -194,8 +194,8 @@ const LaunchSoonPage = ({ focus = "default" }) => {
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-white/72 sm:text-lg">{content.text}</p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/shop" className="button-primary gap-2">
-                {copy.browseCollection}
+              <Link to="/digital-products" className="button-primary gap-2">
+                {copy.browseProducts}
                 <ArrowRight size={16} />
               </Link>
               <Link to="/pricing" className="hero-outline-button">
@@ -320,8 +320,8 @@ const LaunchSoonPage = ({ focus = "default" }) => {
               <p className="mt-2 max-w-3xl text-base leading-7 text-[rgb(98,87,74)]">{copy.whileWaitingText}</p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Link to="/shop" className="button-primary">
-                {copy.browseCollection}
+              <Link to="/digital-products" className="button-primary">
+                {copy.browseProducts}
               </Link>
               <Link to="/pricing" className="button-secondary">
                 {copy.viewMembership}

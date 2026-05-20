@@ -134,7 +134,7 @@ const PublicStorePage = () => {
         <div className="grid gap-4 md:grid-cols-2">
           {products.length ? (
             products.map((product) => {
-              const image = getPrimaryProductImage(product) || "/stilloak/collection/digital-bundle.svg";
+              const image = getPrimaryProductImage(product) || "/digital-products/previews/personal-budget-system-preview.png";
               const title = product.title || product.name;
 
               return (

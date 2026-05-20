@@ -4,7 +4,6 @@ import Layout from "./components/Layout";
 import AdminPreviewLayout from "./components/admin-dashboard/AdminPreviewLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import HomePage from "./pages/HomePage";
-import DigitalLandingPage from "./pages/DigitalLandingPage";
 import DigitalProductsPage from "./pages/DigitalProductsPage";
 import StoryPage from "./pages/StoryPage";
 import LaunchSoonPage from "./pages/LaunchSoonPage";
@@ -12,7 +11,6 @@ import JournalPage from "./pages/JournalPage";
 import JournalArticlePage from "./pages/JournalArticlePage";
 import SavingsStudioDemoPage from "./pages/SavingsStudioDemoPage";
 import MemberAreaPage from "./pages/MemberAreaPage";
-import ShopPage from "./pages/ShopPage";
 import ProductPage from "./pages/ProductPage";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
@@ -53,13 +51,16 @@ const App = () => (
       <Route path="/journal" element={<JournalPage />} />
       <Route path="/journal/:slug" element={<JournalArticlePage />} />
       <Route path="/savings-studio" element={<SavingsStudioDemoPage />} />
-      <Route path="/shop" element={<ShopPage />} />
-      <Route path="/digital" element={<DigitalLandingPage />} />
+      <Route path="/shop" element={<Navigate to="/digital-products" replace />} />
+      <Route path="/collection" element={<Navigate to="/digital-products" replace />} />
+      <Route path="/collections" element={<Navigate to="/digital-products" replace />} />
+      <Route path="/kolekcija" element={<Navigate to="/digital-products" replace />} />
+      <Route path="/digital" element={<Navigate to="/digital-products" replace />} />
       <Route path="/digital-products" element={<DigitalProductsPage />} />
       <Route path="/productivity" element={<Navigate to="/digital-products" replace />} />
       <Route path="/produktyvumas" element={<Navigate to="/digital-products" replace />} />
       <Route path="/productivity-studio" element={<Navigate to="/digital-products" replace />} />
-      <Route path="/digital/collection" element={<LaunchSoonPage focus="digital" />} />
+      <Route path="/digital/collection" element={<Navigate to="/digital-products" replace />} />
       <Route path="/products/:id" element={<ProductPage />} />
       <Route path="/stores/:slug" element={<PublicStorePage />} />
       <Route path="/cart" element={<CartPage />} />

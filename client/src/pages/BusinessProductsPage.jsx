@@ -72,7 +72,7 @@ const BusinessProductsPage = ({ mode = "catalog" }) => {
 
             return (
               <article key={product._id} className="marketing-card min-w-0 overflow-hidden p-0">
-                <img src={getPrimaryProductImage(product) || "/stilloak/collection/digital-bundle.svg"} alt={product.title || product.name} className="h-48 w-full object-cover" />
+                <img src={getPrimaryProductImage(product) || "/digital-products/previews/personal-budget-system-preview.png"} alt={product.title || product.name} className="h-48 w-full object-cover" />
                 <div className="p-5">
                   <div className="flex items-start justify-between gap-3">
                     <h2 className="break-words font-display text-2xl font-bold leading-tight">{product.title || product.name}</h2>

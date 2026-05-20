@@ -190,7 +190,7 @@ const DigitalProductsPage = () => {
         path="/digital-products"
         schema={{
           "@context": "https://schema.org",
-          "@type": "CollectionPage",
+          "@type": "ItemList",
           name: copy.heroTitle,
           description: copy.heroSubtitle,
           url: "https://www.stilloak-studio.com/digital-products",

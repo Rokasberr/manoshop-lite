@@ -158,7 +158,7 @@ const CheckoutSuccessPage = () => {
               <Link to="/profile" className="button-primary">
                 {copy.goToProfile}
               </Link>
-              <Link to="/shop" className="button-secondary">
+              <Link to="/digital-products" className="button-secondary">
                 {copy.continueShopping}
               </Link>
               {order?._id && isPaid && (

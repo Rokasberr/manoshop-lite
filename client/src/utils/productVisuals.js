@@ -1,27 +1,5 @@
-const PRODUCT_VISUAL_MAP = {
-  "StillOak šiltos šviesos stalo šviestuvas": ["/stilloak/collection/budget-clarity.svg"],
-  "Aurora Desk Lamp": ["/stilloak/collection/budget-clarity.svg"],
-  "StillOak Focus belaidės ausinės": ["/stilloak/collection/ai-summaries.svg"],
-  "Studio Headphones X2": ["/stilloak/collection/ai-summaries.svg"],
-  "StillOak kasdienė darbo kuprinė": ["/stilloak/collection/recurring-flow.svg"],
-  "Atlas Carry Backpack": ["/stilloak/collection/recurring-flow.svg"],
-  "StillOak lininis namų komplektas": ["/stilloak/collection/private-archive.svg"],
-  "Linen Relax Set": ["/stilloak/collection/private-archive.svg"],
-  "StillOak keraminis kavos ritualo rinkinys": ["/stilloak/collection/goal-pace.svg"],
-  "Stoneware Brew Kit": ["/stilloak/collection/goal-pace.svg"],
-  "StillOak lengvi miesto sportbačiai": ["/stilloak/collection/monthly-rhythm.svg"],
-  "Motion Sneakers": ["/stilloak/collection/monthly-rhythm.svg"],
-  "Ramių namų plakatų rinkinys": ["/stilloak/collection/digital-bundle.svg"],
-  "Calm Home Poster Bundle": ["/stilloak/collection/digital-bundle.svg"],
-  "Svetainės atnaujinimo mini gidas": ["/stilloak/collection/ai-summaries.svg"],
-  "The Atelier Living Room Guide": ["/stilloak/collection/ai-summaries.svg"],
-  "Sekmadienio savaitės peržiūros planuoklis": ["/stilloak/collection/monthly-rhythm.svg"],
-  "Sunday Reset Ritual Planner": ["/stilloak/collection/monthly-rhythm.svg"],
-  "Namų atnaujinimo skaitmeninis rinkinys": ["/stilloak/collection/digital-bundle.svg"],
-  "Home Edit Bundle": ["/stilloak/collection/digital-bundle.svg"],
-  "Calm Living pilnas skaitmeninis paketas": ["/stilloak/collection/private-archive.svg"],
-  "Calm Living Bundle": ["/stilloak/collection/private-archive.svg"],
-};
+const PRODUCT_VISUAL_MAP = {};
+const DIGITAL_PRODUCT_FALLBACK_IMAGE = "/digital-products/previews/personal-budget-system-preview.png";
 
 const isSeedUnsplashImage = (value) =>
   typeof value === "string" && value.includes("images.unsplash.com");
@@ -91,7 +69,7 @@ export const getProductDisplayImages = (product) => {
   }
 
   if (images.every(isSeedUnsplashImage) && product.productType === "digital") {
-    return ["/stilloak/collection/digital-bundle.svg"];
+    return [DIGITAL_PRODUCT_FALLBACK_IMAGE];
   }
 
   return images;

@@ -206,7 +206,7 @@ const ProfilePage = () => {
               <EmptyState
                 title={copy.noOrdersTitle}
                 description={copy.noOrdersText}
-                actionLabel={copy.viewCollection}
+                actionLabel={copy.viewProducts}
               />
             </div>
           ) : (

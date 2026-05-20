@@ -13,7 +13,6 @@ const Footer = () => {
         { label: copy.links.memberAreas, to: "/pricing#funkcijos" },
         { label: copy.links.membership, to: "/pricing" },
         { label: copy.links.journal, to: "/journal" },
-        { label: copy.links.collection, to: "/shop" },
       ],
     },
     {

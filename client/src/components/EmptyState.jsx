@@ -6,7 +6,7 @@ const EmptyState = ({
   title,
   description,
   actionLabel,
-  actionTo = "/shop",
+  actionTo = "/digital-products",
   onAction,
 }) => {
   const { t } = useLanguage();

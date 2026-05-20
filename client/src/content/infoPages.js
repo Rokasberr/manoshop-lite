@@ -14,7 +14,6 @@ export const clientCareLinks = [
 
 export const houseLinks = [
   { label: "Istorija", to: "/story" },
-  { label: "Kolekcija", to: "/shop" },
   { label: "Narystė", to: "/pricing" },
   { label: "Netrukus", to: "/launch-soon" },
 ];
@@ -55,7 +54,7 @@ export const infoPages = {
         ],
       },
     ],
-    cta: { label: "Peržiūrėti kolekciją", to: "/shop" },
+    cta: { label: "Peržiūrėti skaitmeninius produktus", to: "/digital-products" },
   },
   receiptArchive: {
     title: "Sąskaitų archyvas",
@@ -108,14 +107,14 @@ export const infoPages = {
       {
         heading: "Kaip veikia narystės kaina",
         paragraphs: [
-          "Kai kuriems produktams ar kolekcijoms gali būti taikomi nario tarifai, ankstyvos prieigos langai arba papildomi vertės paketai.",
+          "Kai kuriems produktams ar paslaugoms gali būti taikomi nario tarifai, ankstyvos prieigos langai arba papildomi vertės paketai.",
           "Aktualius planus, įtrauktas naudas ir jų kainas visada rasi narystės puslapyje prieš priimdamas sprendimą.",
         ],
       },
       {
         heading: "Ko tikėtis iš narystės",
         bullets: [
-          "ramesnės, geriau atrinktos kolekcijos patirties",
+          "ramesnės, geriau atrinktos skaitmeninės patirties",
           "ankstesnės prieigos prie naujų pasiūlymų",
           "aiškaus, be triukų pateikto plano",
         ],
@@ -123,7 +122,7 @@ export const infoPages = {
       {
         heading: "Svarbi pastaba",
         paragraphs: [
-          "Narystės kainodara gali būti atnaujinama augant kolekcijai ar paslaugų apimčiai, tačiau nauji tarifai visada aiškiai nurodomi prieš pratęsimą arba naują pirkimą.",
+          "Narystės kainodara gali būti atnaujinama augant produktams ar paslaugų apimčiai, tačiau nauji tarifai visada aiškiai nurodomi prieš pratęsimą arba naują pirkimą.",
         ],
       },
     ],
@@ -244,7 +243,7 @@ export const infoPages = {
         ],
       },
     ],
-    cta: { label: "Peržiūrėti kolekciją", to: "/shop" },
+    cta: { label: "Peržiūrėti skaitmeninius produktus", to: "/digital-products" },
   },
   returns: {
     title: "Grąžinimai",

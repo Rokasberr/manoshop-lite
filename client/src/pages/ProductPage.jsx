@@ -149,8 +149,8 @@ const ProductPage = () => {
       </div>
 
       <div className="panel p-6 sm:p-8">
-        <Link to="/shop" className="eyebrow">
-          Grįžti į kolekciją
+        <Link to="/digital-products" className="eyebrow">
+          Grįžti į produktus
         </Link>
 
         <div className="mt-5 flex flex-wrap items-center gap-3">

@@ -48,7 +48,7 @@ const CheckoutPage = () => {
   }, [hasDigitalProducts]);
 
   if (!cartItems.length) {
-    return <EmptyState title={copy.emptyCartTitle} description={copy.emptyCartText} actionLabel={copy.viewCollection} />;
+    return <EmptyState title={copy.emptyCartTitle} description={copy.emptyCartText} actionLabel={copy.viewProducts} />;
   }
 
   if (STORE_PURCHASES_PAUSED) {
