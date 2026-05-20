@@ -1,5 +1,6 @@
 import { ArrowRight, CheckCircle2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import Seo from "../components/Seo";
 import { useLanguage } from "../context/LanguageContext";
 
 const infoPageCopy = {
@@ -28,6 +29,7 @@ const infoPageCopy = {
 });
 
 const InfoPage = ({ page }) => {
+  const location = useLocation();
   const { language, isLithuanian } = useLanguage();
   const copy = infoPageCopy[language] || infoPageCopy.lt;
 
@@ -37,6 +39,7 @@ const InfoPage = ({ page }) => {
 
   return (
     <div className="space-y-10 pb-6">
+      <Seo title={page.title} description={page.summary} path={page.path || location.pathname} />
       <section className="marketing-dark overflow-hidden rounded-[38px] px-6 py-8 sm:px-10 sm:py-10 lg:px-12 lg:py-12">
         <div className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr]">
           <div>

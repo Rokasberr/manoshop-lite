@@ -1974,7 +1974,7 @@ const SavingsStudioPage = () => {
             <div className="flex flex-wrap gap-2">
               <span className="hero-chip">Asmeninis planas</span>
               <span className="hero-chip">Pilna nario zona</span>
-              <span className="hero-chip">15.99 €/mėn.</span>
+              <span className="hero-chip">14.99 €/mėn.</span>
             </div>
             <h1 className="mt-7 max-w-4xl break-words font-display text-4xl font-bold leading-tight sm:text-6xl lg:text-7xl">
               Stilloak asmeninė darbo erdvė

@@ -31,7 +31,7 @@ const subscriptionPlans = {
     id: "personal",
     legacyId: "asmeninis",
     name: "Asmeninis",
-    price: 15.99,
+    price: 14.99,
     currency: "eur",
     interval: "month",
     description: "Pilna Stilloak patirtis aiskesniems menesiams, tikslams ir privaciam archyvui.",

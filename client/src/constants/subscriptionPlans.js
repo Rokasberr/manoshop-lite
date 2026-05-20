@@ -20,7 +20,7 @@ export const subscriptionPlans = [
   {
     id: "personal",
     name: "Asmeninis",
-    price: 15.99,
+    price: 14.99,
     intervalLabel: "/mėn.",
     description: "Pilna nario erdvė su suvestinėmis, tikslais ir premium resursais.",
     provider: "stripe",

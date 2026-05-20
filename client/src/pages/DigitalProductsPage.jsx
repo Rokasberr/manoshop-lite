@@ -5,6 +5,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import DigitalProductAccessGrid from "../components/DigitalProductAccessGrid";
 import LoadingSpinner from "../components/LoadingSpinner";
+import Seo from "../components/Seo";
 import { getLocalizedDigitalProducts } from "../constants/digitalProducts";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
@@ -183,6 +184,19 @@ const DigitalProductsPage = () => {
 
   return (
     <div className="space-y-10">
+      <Seo
+        title={copy.seoTitle || copy.heroTitle}
+        description={copy.seoDescription || copy.heroSubtitle}
+        path="/digital-products"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: copy.heroTitle,
+          description: copy.heroSubtitle,
+          url: "https://www.stilloak-studio.com/digital-products",
+        }}
+      />
+
       <section className="relative overflow-hidden rounded-lg border border-[#e2ca91]/[0.28] bg-[#071310] p-5 text-white shadow-[0_38px_110px_rgba(0,0,0,0.28)] sm:p-8 lg:p-10">
         <div className="absolute inset-0 z-0 bg-[linear-gradient(135deg,rgba(31,26,23,0.94),rgba(7,19,16,0.96)_56%,rgba(5,10,9,1))]" />
         <div className="pointer-events-none absolute inset-x-8 top-0 z-0 h-px bg-gradient-to-r from-transparent via-[#e2ca91]/[0.72] to-transparent" />

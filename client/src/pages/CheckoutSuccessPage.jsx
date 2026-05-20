@@ -5,6 +5,7 @@ import { Link, useSearchParams } from "react-router-dom";
 
 import LoadingSpinner from "../components/LoadingSpinner";
 import SectionTitle from "../components/SectionTitle";
+import Seo from "../components/Seo";
 import { useCart } from "../context/CartContext";
 import { useLanguage } from "../context/LanguageContext";
 import orderService from "../services/orderService";
@@ -85,6 +86,7 @@ const CheckoutSuccessPage = () => {
 
   return (
     <div className="space-y-8">
+      <Seo title={copy.successTitle} description={copy.successSubtitle} path="/checkout/success" robots="noindex,nofollow" />
       <SectionTitle eyebrow={copy.successEyebrow} title={copy.successTitle} subtitle={copy.successSubtitle} />
 
       <div className="panel mx-auto max-w-3xl p-8 text-center">

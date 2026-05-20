@@ -76,6 +76,7 @@ const App = () => (
       <Route path="/returns" element={<InfoPage page={infoPages.returns} />} />
       <Route path="/privacy" element={<InfoPage page={infoPages.privacy} />} />
       <Route path="/cookie-policy" element={<InfoPage page={infoPages.cookiePolicy} />} />
+      <Route path="/digital-download-policy" element={<InfoPage page={infoPages.digitalDownloadPolicy} />} />
       <Route path="/terms" element={<InfoPage page={infoPages.terms} />} />
 
       <Route element={<ProtectedRoute />}>

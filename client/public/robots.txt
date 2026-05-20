@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /business
+Disallow: /business/
+Disallow: /checkout
+Disallow: /profile
+Disallow: /members
+Disallow: /resources/
+
+Sitemap: https://www.stilloak-studio.com/sitemap.xml

@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router-dom";
 
 import EmptyState from "../components/EmptyState";
 import LoadingSpinner from "../components/LoadingSpinner";
+import Seo from "../components/Seo";
 import { STORE_PURCHASES_PAUSED, STORE_PURCHASES_PAUSED_MESSAGE } from "../constants/storefront";
 import { useCart } from "../context/CartContext";
 import productService from "../services/productService";
@@ -98,6 +99,13 @@ const ProductPage = () => {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_0.92fr]">
+      <Seo
+        title={product.name}
+        description={product.description || "Stilloak Studio product with clear purchase and account access."}
+        path={`/products/${id}`}
+        image={displayImages[0]}
+        type="product"
+      />
       <div className="space-y-4">
         <div className="panel overflow-hidden bg-[rgb(var(--surface-soft))]">
           {selectedImage ? (

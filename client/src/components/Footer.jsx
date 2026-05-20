@@ -32,6 +32,7 @@ const Footer = () => {
         { label: copy.links.returns, to: "/returns" },
         { label: copy.links.privacy, to: "/privacy" },
         { label: copy.links.cookiePolicy, to: "/cookie-policy" },
+        { label: copy.links.digitalDownloadPolicy, to: "/digital-download-policy" },
         { label: copy.links.terms, to: "/terms" },
       ],
     },

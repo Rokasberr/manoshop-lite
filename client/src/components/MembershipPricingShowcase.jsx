@@ -44,7 +44,7 @@ const formatPlanPrice = (value, intervalLabel) => {
   }
 
   const formattedAmount = Number.isInteger(amount) ? String(amount) : amount.toFixed(2);
-  const formattedInterval = intervalLabel ? ` ${intervalLabel.replace("/", "/ ")}` : "";
+  const formattedInterval = intervalLabel || "";
 
   return `€${formattedAmount}${formattedInterval}`;
 };
@@ -55,6 +55,7 @@ const MembershipPricingShowcase = ({
   currentPlanId = "",
   joinLoadingLabel = "Jungiama...",
   currentPlanLabel = "Aktyvus planas",
+  headingLevel = "h1",
 }) => {
   const { language, t } = useLanguage();
   const copy = t("pricing");
@@ -63,6 +64,7 @@ const MembershipPricingShowcase = ({
   const effectiveJoinLoadingLabel = joinLoadingLabel === "Jungiama..." ? copy.joinLoading : joinLoadingLabel;
   const effectiveCurrentPlanLabel = currentPlanLabel === "Aktyvus planas" ? copy.currentPlan : currentPlanLabel;
   const canChoosePlan = typeof onChoosePlan === "function";
+  const HeroHeading = headingLevel === "h2" ? "h2" : "h1";
 
   return (
     <section className="marketing-dark relative isolate min-h-screen overflow-hidden rounded-lg px-4 py-5 sm:px-6 sm:py-7 lg:px-8 lg:py-8">
@@ -89,9 +91,9 @@ const MembershipPricingShowcase = ({
       <div className="mt-10 grid gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-end xl:gap-12">
         <div className="min-w-0">
           <span className="hero-chip">{copy.heroChip}</span>
-          <h1 className="mt-6 max-w-4xl break-words font-display text-4xl font-bold leading-tight sm:text-6xl lg:text-[4.45rem]">
+          <HeroHeading className="mt-6 max-w-4xl break-words font-display text-4xl font-bold leading-tight sm:text-6xl lg:text-[4.45rem]">
             {copy.heroTitle}
-          </h1>
+          </HeroHeading>
           <p className="mt-6 max-w-3xl text-base leading-7 text-white/72 sm:text-lg">
             {copy.heroText}
           </p>

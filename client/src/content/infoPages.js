@@ -279,6 +279,47 @@ export const infoPages = {
     ],
     cta: { label: "Reikia pagalbos?", to: "/private-support" },
   },
+  digitalDownloadPolicy: {
+    title: "Skaitmeninių atsisiuntimų politika",
+    eyebrow: "Pagalba",
+    summary:
+      "Stilloak Studio skaitmeniniai produktai yra mokami Excel failai, kurie tampa pasiekiami paskyroje po sėkmingo apmokėjimo.",
+    lastUpdated: "2026 m. gegužės 20 d.",
+    highlights: [
+      "Failai atsisiunčiami tik prisijungus",
+      "Prieiga suteikiama po sėkmingo apmokėjimo",
+      "Jei failas neveikia, padedame patikrinti prieigą",
+    ],
+    sections: [
+      {
+        heading: "Kaip suteikiama prieiga",
+        paragraphs: [
+          "Skaitmeniniai produktai nėra pateikiami viešais tiesioginiais failų adresais. Įsigijus produktą, atsisiuntimas siejamas su paskyra ir pasiekiamas tik prisijungus.",
+        ],
+      },
+      {
+        heading: "Atsisiuntimas po pirkimo",
+        bullets: [
+          "prisijunkite prie paskyros, su kuria atlikote pirkimą",
+          "atidarykite skaitmeninių produktų katalogą arba profilį",
+          "pasirinkite įsigytą produktą ir atsisiųskite Excel failą",
+        ],
+      },
+      {
+        heading: "Grąžinimai ir pagalba",
+        paragraphs: [
+          "Kadangi skaitmeniniai failai suteikiami iškart po apmokėjimo, jie paprastai nėra grąžinami po prieigos suteikimo. Jei failas sugadintas, neatsidaro arba matote neteisingą produktą, susisiekite su pagalba ir situaciją peržiūrėsime individualiai.",
+        ],
+      },
+      {
+        heading: "Naudojimo ribos",
+        paragraphs: [
+          "Skaitmeniniai produktai skirti asmeniniam naudojimui. Jų negalima perparduoti, viešai platinti ar pateikti kaip savo produkto be raštiško leidimo.",
+        ],
+      },
+    ],
+    cta: { label: "Peržiūrėti skaitmeninius produktus", to: "/digital-products" },
+  },
   privacy: {
     title: "Privatumas",
     eyebrow: "Pagalba",

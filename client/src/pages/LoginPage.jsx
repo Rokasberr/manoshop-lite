@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
+import Seo from "../components/Seo";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import { hasActiveMembership, isAdminUser } from "../utils/membership";
@@ -69,6 +70,7 @@ const LoginPage = () => {
 
   return (
     <div className="mx-auto max-w-5xl">
+      <Seo title={copy.title} description={copy.intro} path="/login" robots="noindex,nofollow" />
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="panel flex flex-col justify-between p-8">
           <div>

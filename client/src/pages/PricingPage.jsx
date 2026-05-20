@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import MembershipPricingShowcase from "../components/MembershipPricingShowcase";
+import Seo from "../components/Seo";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import billingService from "../services/billingService";
@@ -47,6 +48,18 @@ const PricingPage = () => {
 
   return (
     <div className="pb-8">
+      <Seo
+        title={t("pricing.seoTitle")}
+        description={t("pricing.seoDescription")}
+        path="/pricing"
+        schema={{
+          "@context": "https://schema.org",
+          "@type": "OfferCatalog",
+          name: "Stilloak Studio memberships",
+          description: t("pricing.seoDescription"),
+          url: "https://www.stilloak-studio.com/pricing",
+        }}
+      />
       <MembershipPricingShowcase
         onChoosePlan={handleChoosePlan}
         loadingPlanId={loadingPlanId}

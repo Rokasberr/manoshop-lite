@@ -4,6 +4,7 @@ import { Link, useSearchParams } from "react-router-dom";
 
 import LoadingSpinner from "../components/LoadingSpinner";
 import SectionTitle from "../components/SectionTitle";
+import Seo from "../components/Seo";
 import { useLanguage } from "../context/LanguageContext";
 import orderService from "../services/orderService";
 
@@ -49,6 +50,7 @@ const CheckoutCancelPage = () => {
 
   return (
     <div className="space-y-8">
+      <Seo title={copy.cancelTitle} description={copy.cancelSubtitle} path="/checkout/cancel" robots="noindex,nofollow" />
       <SectionTitle eyebrow={copy.cancelEyebrow} title={copy.cancelTitle} subtitle={copy.cancelSubtitle} />
 
       <div className="panel mx-auto max-w-3xl p-8 text-center">
