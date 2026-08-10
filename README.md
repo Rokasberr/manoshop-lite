@@ -1,29 +1,38 @@
 # ManoShop Lite
 
-Premium e-commerce projektas su atskiru `React + Vite` frontend ir `Node.js + Express + MongoDB` backend, Stripe mokėjimais, admin panel ir PDF sąskaitomis.
-
-## Architektūra
+`ManoShop Lite` yra pagrindinis `Stilloak Studio` produktas šiame repozitoriume. Produkcinis kelias šiuo metu yra tik:
 
 ```text
-/client    -> Vite frontend (Vercel)
-/server    -> Express API (Render)
+/client    -> React + Vite frontend
+/server    -> Node.js + Express API
 /database  -> MongoDB seed/connect failai
 ```
 
+`ai-sales-copilot-saas/` yra atskiras, šiuo metu neintegruotas Next.js projektas. Jo nelaikyk pagrindinio `ManoShop Lite` produkcinio deploy dalimi.
+
 ## Kas jau veikia
 
-- JWT autentifikacija su `customer` ir `admin`
-- Produktų CRUD admin dalyje
-- Krepšelis, checkout ir užsakymai
-- Stripe product checkout
-- Stripe subscription checkout
-- PDF sąskaitos
-- Refund / cancel payment admin pusėje
-- MongoDB Atlas integracija
+- JWT autentifikacija su `customer` ir `admin` rolėmis.
+- Produktų CRUD administratoriaus dalyje.
+- Krepšelis, checkout ir užsakymai.
+- Stripe vienkartiniai mokėjimai produktams.
+- Stripe prenumeratos mokamiems planams.
+- PDF sąskaitos.
+- Refund / cancel payment administratoriaus pusėje.
+- MongoDB Atlas integracija.
+- Saving Studio ir Business Studio moduliai.
 
-## Lokalinis paleidimas
+## Narystės Planai
 
-1. Įrašyk priklausomybes:
+- `basic` / Demo: nemokamas internal planas, 0 EUR. Jis nėra siunčiamas į Stripe Checkout.
+- `personal` / Asmeninis: mokamas Stripe planas, 14.99 EUR per mėn.
+- `private_business` / Verslas: mokamas Stripe planas, 44.99 EUR per mėn.
+
+Seni aliasai `bazinis`, `asmeninis` ir `privatus_verslas` paliekami duomenų suderinamumui.
+
+## Lokalinis Paleidimas
+
+1. Įdiek priklausomybes:
 
 ```bash
 npm install
@@ -31,10 +40,10 @@ npm install
 
 2. Susikurk env failus pagal pavyzdžius:
 
-- [server/.env.example](/C:/Users/User/Documents/New project/server/.env.example)
-- [client/.env.example](/C:/Users/User/Documents/New project/client/.env.example)
+- `server/.env.example`
+- `client/.env.example`
 
-3. Jei nori demo duomenų:
+3. Jei reikia demo duomenų:
 
 ```bash
 npm run seed
@@ -46,161 +55,87 @@ npm run seed
 npm run dev
 ```
 
-Frontend: `http://localhost:5173`  
-Backend: `http://localhost:5000`
+Frontend veikia per Vite, backend per Express API.
 
-## Deploy planas
+## Aplinkos Kintamieji
+
+Backend naudoja šiuos kintamųjų pavadinimus:
+
+- `PORT`
+- `NODE_ENV`
+- `TRUST_PROXY`
+- `MONGO_URI`
+- `MONGO_DB_NAME`
+- `JWT_SECRET`
+- `JWT_EXPIRES_IN`
+- `CLIENT_URL`
+- `COMPANY_NAME`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `STRIPE_PRICE_ASMENINIS`
+- `STRIPE_PRICE_PRIVATUS_VERSLAS`
+- `STRIPE_WEBHOOK_TOLERANCE_SECONDS`
+- `STRIPE_DYNAMIC_TAX_BEHAVIOR`
+- `EMAIL_FROM`
+- `EMAIL_LOGO_URL`
+- `BREVO_API_KEY`
+- `BREVO_API_TIMEOUT`
+- `SMTP_HOST`
+- `SMTP_PORT`
+- `SMTP_SECURE`
+- `SMTP_USER`
+- `SMTP_PASS`
+- `BREVO_LAUNCH_SOON_LIST_ID`
+- `SAVINGS_STUDIO_SUMMARY_SCHEDULER_ENABLED`
+- `SAVINGS_STUDIO_SUMMARY_INTERVAL_MINUTES`
+
+Frontend naudoja:
+
+- `VITE_API_URL`
+
+Demo planui Stripe Price ID nereikalingas. Stripe Price ID privalomi tik `Asmeninis` ir `Verslas` planams.
+
+## Deploy Architektūra
 
 Rekomenduojamas variantas:
 
-- Frontend: `Vercel`
-- Backend: `Render`
-- DB: `MongoDB Atlas`
-- Domenai:
-  - `www.manoshop.lt` -> frontend
-  - `api.manoshop.lt` -> backend
+- Frontend: Vercel, root directory `client`.
+- Backend: Render, pagal `render.yaml`.
+- DB: MongoDB Atlas.
+- Stripe webhook: backend kelias `/api/billing/webhook`.
 
-## 1. Backend deploy į Render
+Backend health patikra: `/api/health`.
 
-Repo jau turi [render.yaml](/C:/Users/User/Documents/New project/render.yaml), todėl greičiausias kelias:
+## Stripe Webhook
 
-1. Push’ink repo į `GitHub`.
-2. Render dashboard’e rinkis `New -> Blueprint`.
-3. Nurodyk šitą repo.
-4. Render perskaitys `render.yaml` ir sukurs `manoshop-api` web service.
-5. Per pirmą setup įvesk secret env reikšmes, kurioms pažymėta `sync: false`.
-
-Svarbiausi backend env:
-
-- `MONGO_URI`
-- `CLIENT_URL`
-- `STRIPE_SECRET_KEY`
-- `STRIPE_WEBHOOK_SECRET`
-
-Papildomai:
-
-- `JWT_SECRET` generuojamas automatiškai per `render.yaml`
-- `PORT=10000` ir `NODE_ENV=production` nustatyti blueprint’e
-
-### Render env rekomendacija
-
-`CLIENT_URL` pirmą reikšmę laikyk pagrindiniu produkciniu frontend adresu.
-
-Pavyzdys:
-
-```env
-CLIENT_URL=https://www.manoshop.lt,https://manoshop-frontend.vercel.app,https://*.vercel.app
-```
-
-Tai svarbu, nes:
-
-- CORS dabar palaiko kelis origin’us
-- palaikomi wildcard preview domenai
-- Stripe redirect srautai grįžta į pirmą pagrindinį frontend URL, jei origin nėra tiksliai žinomas
-
-### MongoDB Atlas pastaba
-
-Jei backend po deploy negalės prisijungti prie Atlas, Atlas pusėje patikrink `IP Access List`.
-
-Greitas variantas:
-
-- pridėti `0.0.0.0/0`
-
-Saugesnis variantas:
-
-- susiaurinti prieigą pagal tavo infrastruktūros poreikį
-
-## 2. Frontend deploy į Vercel
-
-Repo jau turi [client/vercel.json](/C:/Users/User/Documents/New project/client/vercel.json), kuris užtikrina SPA route fallback React Router puslapiams.
-
-Vercel žingsniai:
-
-1. `Add New Project`
-2. Importuok tą patį repo
-3. `Root Directory` nustatyk į `client`
-4. Framework preset palik `Vite`
-5. Environment variable:
-
-```env
-VITE_API_URL=https://manoshop-api.onrender.com/api
-```
-
-6. Deploy
-
-Po to Vercel duos URL, pvz.:
-
-```text
-https://manoshop-frontend.vercel.app
-```
-
-Jį pridėk ir į Render `CLIENT_URL`.
-
-## 3. Stripe webhook produkcijoje
-
-Kai backend jau turi savo viešą Render URL arba custom domain, Stripe dashboard’e susikurk produkcinį webhook endpointą:
-
-```text
-https://api.manoshop.lt/api/billing/webhook
-```
-
-arba laikinai:
-
-```text
-https://manoshop-api.onrender.com/api/billing/webhook
-```
-
-Rekomenduojami event’ai šitam projektui:
+Stripe webhook turi likti pagrindinis narystės aktyvavimo šaltinis. Rekomenduojami eventai:
 
 - `checkout.session.completed`
 - `checkout.session.expired`
 - `customer.subscription.updated`
 - `customer.subscription.deleted`
+- `invoice.paid`
+- `invoice.payment_succeeded`
 - `invoice.payment_failed`
+- `charge.refunded`
+- `refund.updated`
 
-Gautą `Signing secret` įrašyk į:
+Po mokėjimo frontend gali kviesti saugų atsarginį sinchronizavimo endpointą, perduodamas tik Stripe Checkout Session ID. Serveris pats patikrina Stripe sesiją ir jos priklausymą prisijungusiam vartotojui.
 
-```env
-STRIPE_WEBHOOK_SECRET=whsec_...
-```
+## Administratoriaus Paskyra
 
-## 4. Custom domain
+Viešų administratoriaus prisijungimo duomenų repozitoriume neturi būti. Administratoriaus paskyra turi būti sukuriama arba nustatoma saugiu, neviešinamu būdu, pavyzdžiui per kontroliuojamą seed, vidinį administravimo procesą arba tiesioginę saugią DB operaciją.
 
-Kai abu deploy’ai veikia:
+Produkcijoje savininkas turi patikrinti, kad administratoriaus paskyros slaptažodis yra unikalus, stiprus ir nėra naudotas jokioje viešoje dokumentacijoje ar demo aplinkoje.
 
-1. Vercel pridėk `www.manoshop.lt`
-2. Render pridėk `api.manoshop.lt`
-3. DNS pusėje nukreipk:
-   - `www` -> Vercel
-   - `api` -> Render
+## Produkcinis Checklist
 
-Po to atnaujink env:
-
-Frontend:
-
-```env
-VITE_API_URL=https://api.manoshop.lt/api
-```
-
-Backend:
-
-```env
-CLIENT_URL=https://www.manoshop.lt,https://manoshop-frontend.vercel.app,https://*.vercel.app
-```
-
-## 5. Produkcinis checklist
-
-- `MongoDB Atlas` prijungtas
-- `Render` backend health veikia per `/api/health`
-- `Vercel` frontend rodo visus route’us be 404
-- `Stripe Secret Key` yra produkcinė arba testinė pagal tavo aplinką
-- `Stripe Webhook Secret` įrašytas iš produkcinio webhook endpointo
-- `CLIENT_URL` rodo tikrus frontend origin’us
-- `VITE_API_URL` rodo tikrą backend `/api` adresą
-
-## Demo admin
-
-Po `npm run seed`:
-
-- El. paštas: `admin@manoshop.lt`
-- Slaptažodis: `Admin123!`
+- `MongoDB Atlas` prijungtas.
+- Backend health endpoint veikia.
+- Frontend SPA route fallback veikia.
+- `CLIENT_URL` leidžia tik realius frontend origin.
+- `VITE_API_URL` rodo į realų backend `/api` adresą.
+- Stripe webhook signing secret nustatytas backend aplinkoje.
+- `Asmeninis` ir `Verslas` Stripe Price ID nustatyti backend aplinkoje.
+- Demo planas aktyvuojamas internal būdu be Stripe.
+- Viešų admin prisijungimo duomenų nėra dokumentacijoje.

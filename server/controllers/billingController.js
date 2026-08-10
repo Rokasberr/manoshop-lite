@@ -20,6 +20,7 @@ const {
   syncUserSubscriptionFromCheckoutSession,
 } = require("../services/stripeMembershipService");
 const { getStripeClient, resolveClientUrl } = require("../utils/stripeClient");
+const { createHttpError } = require("../utils/httpError");
 
 const createPaymentSession = async (req, res) => {
   const { planId, provider = "stripe" } = req.body;
@@ -150,31 +151,94 @@ const syncStripeMembership = async (req, res) => {
   const user = await User.findById(req.user._id).select("-password");
 
   if (!user) {
-    res.status(404);
-    throw new Error("Vartotojas nerastas.");
+    throw createHttpError("Vartotojas nerastas.", 404);
   }
 
   const { sessionId = "" } = req.body || {};
-  let sessionVerified = false;
+  const normalizedSessionId = String(sessionId || "").trim();
 
-  if (sessionId) {
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
-    const expectedUserId = req.user._id.toString();
-    const sessionUserId = session.metadata?.userId || session.client_reference_id || "";
-
-    if (sessionUserId && sessionUserId !== expectedUserId) {
-      res.status(403);
-      throw new Error("Ši Stripe sesija nepriklauso dabartinei paskyrai.");
-    }
-
-    sessionVerified = true;
+  if (!normalizedSessionId) {
+    throw createHttpError("Reikalingas Stripe Checkout Session ID.", 400);
   }
 
-  const currentUser = await User.findById(req.user._id).select("-password");
+  let session;
+
+  try {
+    session = await stripe.checkout.sessions.retrieve(normalizedSessionId, {
+      expand: ["subscription.latest_invoice.payment_intent"],
+    });
+  } catch (_error) {
+    const currentUser = await User.findById(req.user._id).select("-password");
+
+    return res.status(202).json({
+      synced: false,
+      pendingWebhook: true,
+      message: "Mokejimas vis dar apdorojamas. Naryste bus atnaujinta, kai Stripe patvirtins sesija.",
+      subscription: serializeSubscription(currentUser?.subscription || user.subscription),
+    });
+  }
+
+  const expectedUserId = req.user._id.toString();
+  const sessionUserId = session.metadata?.userId || session.client_reference_id || "";
+
+  if (!sessionUserId || sessionUserId !== expectedUserId) {
+    throw createHttpError("Si Stripe sesija nepriklauso dabartinei paskyrai.", 403);
+  }
+
+  if (session.metadata?.checkoutType === "order" || session.metadata?.type === "digital_product") {
+    throw createHttpError("Si Stripe sesija nera narystes apmokejimas.", 400);
+  }
+
+  if (session.mode !== "subscription") {
+    throw createHttpError("Si Stripe sesija nera prenumeratos apmokejimas.", 400);
+  }
+
+  const subscriptionId =
+    typeof session.subscription === "string" ? session.subscription : session.subscription?.id || "";
+
+  if (!subscriptionId) {
+    const currentUser = await User.findById(req.user._id).select("-password");
+
+    return res.status(202).json({
+      synced: false,
+      pendingWebhook: true,
+      message: "Stripe prenumerata dar nepriskirta sesijai. Bandyk dar karta po keliu akimirku.",
+      subscription: serializeSubscription(currentUser?.subscription || user.subscription),
+    });
+  }
+
+  if (session.status !== "complete" || session.payment_status !== "paid") {
+    const currentUser = await User.findById(req.user._id).select("-password");
+
+    return res.status(202).json({
+      synced: false,
+      pendingWebhook: true,
+      message: "Stripe dar nepatvirtino mokejimo. Naryste neaktyvuota.",
+      subscription: serializeSubscription(currentUser?.subscription || user.subscription),
+    });
+  }
+
+  const subscription =
+    typeof session.subscription === "object"
+      ? session.subscription
+      : await stripe.subscriptions.retrieve(subscriptionId, {
+          expand: ["latest_invoice.payment_intent"],
+        });
+  const syncedUser = await syncUserSubscriptionFromCheckoutSession({
+    stripe,
+    session: {
+      ...session,
+      subscription,
+      payment_status: session.payment_status,
+    },
+    fallbackUserId: expectedUserId,
+  });
+  const currentUser = syncedUser || (await User.findById(req.user._id).select("-password"));
 
   res.json({
-    synced: false,
-    pendingWebhook: sessionVerified,
+    synced: Boolean(syncedUser),
+    pendingWebhook: !syncedUser,
+    message: syncedUser ? "Naryste patvirtinta pagal Stripe sesija." : "Mokejimas vis dar apdorojamas.",
     subscription: serializeSubscription(currentUser?.subscription || user.subscription),
   });
 };

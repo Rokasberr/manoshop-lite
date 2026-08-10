@@ -17,9 +17,10 @@ const BillingSuccessPage = () => {
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [statusMessage, setStatusMessage] = useState(copy.checking);
+  const [confirmedProfile, setConfirmedProfile] = useState(null);
   const sessionId = searchParams.get("session_id") || "";
 
-  const isStripeActive = hasActiveMembership(user);
+  const isStripeActive = hasActiveMembership(confirmedProfile || user);
 
   useEffect(() => {
     let cancelled = false;
@@ -30,13 +31,15 @@ const BillingSuccessPage = () => {
         attempts += 1;
 
         try {
-          await billingService.syncStripeMembership(sessionId);
+          const syncResult = await billingService.syncStripeMembership(sessionId);
           const profile = await refreshProfile();
           if (cancelled) {
             return;
           }
 
-          if (hasActiveMembership({ ...(user || {}), subscription: profile?.subscription })) {
+          setConfirmedProfile(profile);
+
+          if (syncResult?.synced && hasActiveMembership(profile)) {
             setStatusMessage(copy.activated);
             setLoading(false);
             setTimeout(() => {
@@ -46,6 +49,8 @@ const BillingSuccessPage = () => {
             }, 1400);
             return;
           }
+
+          setStatusMessage(syncResult?.message || copy.fallback);
         } catch (_error) {
           // Intentionally retry a few times because webhook activation can lag behind the redirect.
         }
@@ -83,9 +88,11 @@ const BillingSuccessPage = () => {
             <h2 className="mt-6 font-display text-4xl font-bold">{statusMessage}</h2>
             <p className="mt-4 text-muted">{copy.saved}</p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <Link to="/members/savings-studio?welcome=membership" className="button-primary">
-                {t("common.buttons.openStudio")}
-              </Link>
+              {isStripeActive ? (
+                <Link to="/members/savings-studio?welcome=membership" className="button-primary">
+                  {t("common.buttons.openStudio")}
+                </Link>
+              ) : null}
               <Link to="/pricing" className="button-secondary">
                 {t("common.buttons.viewMembership")}
               </Link>
