@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 
 const {
+  canUserAccessSavingStudioPro,
   canUserAccessBusinessStudio,
   hasActivePlanStatus,
   normalizePlan,
@@ -49,7 +50,11 @@ const hasActiveMembership = (user) => {
     return true;
   }
 
-  return Boolean(user) && hasActivePlanStatus(user) && normalizePlan(user.subscription?.plan) !== "free";
+  return (
+    Boolean(user) &&
+    hasActivePlanStatus(user) &&
+    ["basic", "personal", "private_business"].includes(normalizePlan(user.subscription?.plan))
+  );
 };
 
 const memberOnly = (req, res, next) => {
@@ -87,6 +92,14 @@ const requireBusinessPlan = (req, res, next) => {
   return next();
 };
 
+const requireSavingsStudioPro = (req, res, next) => {
+  if (!canUserAccessSavingStudioPro(req.user)) {
+    return next(createHttpError("Asmeninis arba Verslas planas reikalingas pilnai Saving Studio prieigai.", 403));
+  }
+
+  return next();
+};
+
 module.exports = {
   requireAuth,
   protect,
@@ -95,4 +108,5 @@ module.exports = {
   hasActiveMembership,
   requirePlan,
   requireBusinessPlan,
+  requireSavingsStudioPro,
 };

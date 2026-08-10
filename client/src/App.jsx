@@ -89,7 +89,7 @@ const App = () => (
         <Route path="/billing/cancel" element={<BillingCancelPage />} />
       </Route>
 
-      <Route element={<ProtectedRoute />}>
+      <Route element={<ProtectedRoute requireMembership />}>
         <Route path="/members/savings-studio" element={<MemberAreaPage />} />
       </Route>
 

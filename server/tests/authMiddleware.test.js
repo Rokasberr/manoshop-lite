@@ -18,11 +18,11 @@ test("adminOnly allows admins and rejects customers", async () => {
   assert.equal(error.statusCode, 403);
 });
 
-test("memberOnly requires paid active or trialing membership", async () => {
+test("memberOnly requires a known active or trialing membership plan", async () => {
   assert.equal(
     hasActiveMembership({
       role: "customer",
-      subscription: { plan: "circle", status: "active" },
+      subscription: { plan: "personal", status: "active" },
     }),
     true
   );
@@ -36,7 +36,14 @@ test("memberOnly requires paid active or trialing membership", async () => {
   assert.equal(
     hasActiveMembership({
       role: "customer",
-      subscription: { plan: "circle", status: "past_due" },
+      subscription: { plan: "personal", status: "past_due" },
+    }),
+    false
+  );
+  assert.equal(
+    hasActiveMembership({
+      role: "customer",
+      subscription: { plan: "circle", status: "active" },
     }),
     false
   );

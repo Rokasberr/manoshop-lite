@@ -14,5 +14,19 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-export default api;
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("manoshop_token");
+      localStorage.removeItem("manoshop_user");
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("manoshop:auth-expired"));
+      }
+    }
 
+    return Promise.reject(error);
+  }
+);
+
+export default api;

@@ -38,7 +38,9 @@ const hasActivePlanStatus = (user) => {
     return true;
   }
 
-  return ACTIVE_PLAN_STATUSES.has(user?.subscription?.status || "inactive");
+  const status = String(user?.subscription?.status || "inactive").trim().toLowerCase();
+
+  return ACTIVE_PLAN_STATUSES.has(status);
 };
 
 const canAccessSavingStudio = (plan) =>

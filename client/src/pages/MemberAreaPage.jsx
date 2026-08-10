@@ -1,5 +1,6 @@
 import {
   ArrowRight,
+  ArrowDownToLine,
   BarChart3,
   BookOpen,
   BriefcaseBusiness,
@@ -17,6 +18,7 @@ import {
   WalletCards,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 
 import { getLocalizedDigitalProducts } from "../constants/digitalProducts";
@@ -24,6 +26,7 @@ import { getLocalizedSubscriptionPlans } from "../constants/subscriptionPlans";
 import { journalArticles } from "../content/journalArticles";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
+import memberResourceService from "../services/memberResourceService";
 import { isAdminUser, normalizePlan } from "../utils/membership";
 import BazinisMemberPage from "./BazinisMemberPage";
 import PrivateBusinessWorkspacePage from "./PrivateBusinessWorkspacePage";
@@ -104,6 +107,23 @@ const businessModules = [
     to: "/business/earnings",
     icon: BarChart3,
   },
+];
+
+const memberResources = [
+  { id: "finansu-aiskumo-starter-kit", title: "Finansų aiškumo starter kit", minPlan: "basic", format: "pdf" },
+  { id: "islaidu-audito-checklist", title: "Išlaidų audito checklist", minPlan: "basic", format: "pdf" },
+  { id: "taupymo-tikslu-planavimo-sablonas", title: "Taupymo tikslų planavimo šablonas", minPlan: "basic", format: "pdf" },
+  { id: "productivity-starter-kit", title: "Productivity starter kit", minPlan: "basic", format: "pdf" },
+  { id: "weekly-planner-pro", title: "Weekly planner pro", minPlan: "basic", format: "pdf" },
+  { id: "habit-tracker", title: "Habit tracker", minPlan: "basic", format: "pdf" },
+  { id: "30-day-productivity-planner", title: "30 day productivity planner", minPlan: "basic", format: "pdf" },
+  { id: "pajamu-ir-islaidu-optimizavimo-planas", title: "Pajamų ir išlaidų optimizavimo planas", minPlan: "personal", format: "pdf" },
+  { id: "premium-finansiniu-tikslu-sistema", title: "Premium finansinių tikslų sistema", minPlan: "personal", format: "pdf" },
+  { id: "skaitmeniniu-produktu-ideju-framework", title: "Skaitmeninių produktų idėjų framework", minPlan: "personal", format: "pdf" },
+  { id: "digital-product-launch-kit", title: "Digital product launch kit", minPlan: "private_business", format: "pdf" },
+  { id: "mini-verslo-paleidimo-blueprint", title: "Mini verslo paleidimo blueprint", minPlan: "private_business", format: "pdf" },
+  { id: "premium-produkto-pasiulymo-framework", title: "Premium produkto pasiūlymo framework", minPlan: "private_business", format: "pdf" },
+  { id: "store-page-copy-kit", title: "Store page copy kit", minPlan: "private_business", format: "pdf" },
 ];
 
 const hasPlanAccess = (planId, requiredPlanId) =>
@@ -384,9 +404,39 @@ const OverviewSection = ({ planId, access, onOpenSection }) => {
   );
 };
 
-const DigitalProductsSection = () => {
+const DigitalProductsSection = ({ planId }) => {
   const { language, t } = useLanguage();
+  const { user } = useAuth();
+  const [downloadLoadingKey, setDownloadLoadingKey] = useState("");
   const publicProducts = getLocalizedDigitalProducts(language).filter((product) => product.isPublic);
+  const canAccessResource = (resource) => isAdminUser(user) || hasPlanAccess(planId, resource.minPlan);
+  const handleMemberResourceDownload = async (resource) => {
+    if (!canAccessResource(resource)) {
+      const planLabel = getTranslatedPlanLabel(t, resource.minPlan);
+      toast.error(`Šiam resursui reikalingas ${planLabel} planas.`);
+      return;
+    }
+
+    try {
+      setDownloadLoadingKey(`${resource.id}:${resource.format}`);
+      await memberResourceService.downloadMemberResource(resource.id, resource.format, `${resource.id}.${resource.format}`);
+    } catch (error) {
+      if (error.response?.status === 403) {
+        const planLabel = getTranslatedPlanLabel(t, resource.minPlan);
+        toast.error(`Šiam resursui reikalingas ${planLabel} planas.`);
+        return;
+      }
+
+      if (error.response?.status === 404) {
+        toast.error("Failas dar nepasiekiamas.");
+        return;
+      }
+
+      toast.error(error.response?.data?.message || "Nepavyko atsisiųsti resurso.");
+    } finally {
+      setDownloadLoadingKey("");
+    }
+  };
 
   return (
     <section className="space-y-5">
@@ -412,6 +462,55 @@ const DigitalProductsSection = () => {
           <Link to="/pricing" className="button-secondary min-h-[3rem] justify-center">
             {t("common.buttons.viewPlans")}
           </Link>
+        </div>
+      </div>
+
+      <div className="panel p-5 sm:p-6">
+        <span className="signal-pill">Nario resursai</span>
+        <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">Apsaugoti PDF atsisiuntimai</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
+          Šie failai pateikiami per nario API. Aukštesnio plano resursai matomi kaip užrakinti, bet tiesioginio viešo failo kelio nėra.
+        </p>
+
+        <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {memberResources.map((resource) => {
+            const isAccessible = canAccessResource(resource);
+            const planLabel = getTranslatedPlanLabel(t, resource.minPlan);
+            const loadingKey = `${resource.id}:${resource.format}`;
+
+            return (
+              <article
+                key={resource.id}
+                className="rounded-lg border bg-[rgb(var(--surface))] p-4"
+                style={{ borderColor: "rgb(var(--line) / 0.82)" }}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="break-words text-sm font-semibold leading-6">{resource.title}</p>
+                    <p className="mt-1 text-xs font-semibold uppercase leading-5 text-muted">
+                      {resource.format.toUpperCase()} · nuo {planLabel}
+                    </p>
+                  </div>
+                  {isAccessible ? <FileText size={18} /> : <LockKeyhole size={18} />}
+                </div>
+                {isAccessible ? (
+                  <button
+                    type="button"
+                    onClick={() => handleMemberResourceDownload(resource)}
+                    disabled={downloadLoadingKey === loadingKey}
+                    className="button-primary mt-4 min-h-[3rem] w-full justify-center gap-2"
+                  >
+                    <ArrowDownToLine size={16} />
+                    {downloadLoadingKey === loadingKey ? "Ruošiama..." : "Atsisiųsti"}
+                  </button>
+                ) : (
+                  <Link to="/pricing" className="button-secondary mt-4 min-h-[3rem] w-full justify-center">
+                    Peržiūrėti planus
+                  </Link>
+                )}
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -592,7 +691,7 @@ const MemberAreaPage = () => {
   const renderActiveSection = () => {
     switch (activeSection) {
       case "digital":
-        return <DigitalProductsSection />;
+        return <DigitalProductsSection planId={effectivePlanId} />;
       case "saving":
         return <SavingStudioSection access={access} />;
       case "journal":
