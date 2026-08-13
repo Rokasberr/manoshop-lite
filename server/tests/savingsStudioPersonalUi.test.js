@@ -54,3 +54,14 @@ test("Saving Studio legacy entries without dates do not crash filters or display
   assert.match(source, /formatEntryDate\(entry\.date\)/);
   assert.match(source, /date: getEntryDateValue\(entry\) \|\| currentDateInput\(\)/);
 });
+
+test("Saving Studio CSV import quality uses server duplicate rows", () => {
+  const source = readPageSource();
+
+  assert.match(source, /const serverDuplicateRows = csvPreviewResult\?\.duplicateRows \|\| \[\]/);
+  assert.match(source, /const duplicateCandidates = serverDuplicateRows\.map\(\(row\) => row\.normalized\)\.filter\(Boolean\)/);
+  assert.match(source, /duplicateCount: csvPreviewResult\?\.duplicateCount \|\| 0/);
+  assert.match(source, /\(csvPreviewResult\?\.duplicateCount \|\| 0\)/);
+  assert.match(source, /Bus importuota: \{csvPreviewResult\.validCount\}/);
+  assert.match(source, /disabled=\{confirmingCsvImport \|\| !csvPreviewResult\.validCount\}/);
+});

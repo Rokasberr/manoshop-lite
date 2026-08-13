@@ -300,14 +300,6 @@ const formatEntryDate = (dateValue) => {
   return dateFormatter.format(parsedDate);
 };
 
-const buildSavingsEntryKey = (entryLike) => {
-  const title = String(entryLike?.title || "").trim().toLowerCase();
-  const date = getEntryDateValue(entryLike);
-  const amount = Number(entryLike?.amount || 0).toFixed(2);
-
-  return `${date}__${amount}__${title}`;
-};
-
 const goalPaceStatusLabel = (status) => {
   if (status === "behind") {
     return "Per lėtas tempas";
@@ -1357,9 +1349,9 @@ const SavingsStudioPage = () => {
   }, [lastBackupDays, lastSummaryTouchDays, profile?.summaryEmailsEnabled, recurringReviewQueue]);
   const lastImportEvent = activityFeed.find((item) => item.action === "entry-import") || null;
   const importIntelligence = useMemo(() => {
-    const existingKeys = new Set(entries.map((entry) => buildSavingsEntryKey(entry)));
     const validRows = csvPreviewResult?.validRows || [];
     const previewRows = csvPreviewResult?.preview || [];
+    const serverDuplicateRows = csvPreviewResult?.duplicateRows || [];
     const monthCounts = validRows.reduce((accumulator, row) => {
       const monthKey = String(row.date || "").slice(0, 7);
       const next = { ...accumulator };
@@ -1373,7 +1365,7 @@ const SavingsStudioPage = () => {
     const monthSpread = Object.entries(monthCounts)
       .map(([monthKey, count]) => ({ monthKey, count, label: formatMonthKeyLabel(monthKey) }))
       .sort((left, right) => right.count - left.count);
-    const duplicateCandidates = validRows.filter((row) => existingKeys.has(buildSavingsEntryKey(row)));
+    const duplicateCandidates = serverDuplicateRows.map((row) => row.normalized).filter(Boolean);
     const invalidReasons = previewRows
       .filter((row) => row.status !== "ok")
       .reduce((accumulator, row) => {
@@ -1386,9 +1378,13 @@ const SavingsStudioPage = () => {
       .map(([reason, count]) => ({ reason, count }))
       .sort((left, right) => right.count - left.count)
       .slice(0, 3);
+    const importPreviewTotal =
+      (csvPreviewResult?.validCount || 0) +
+      (csvPreviewResult?.invalidCount || 0) +
+      (csvPreviewResult?.duplicateCount || 0);
     const importQuality =
-      csvPreviewResult && csvPreviewResult.validCount + csvPreviewResult.invalidCount > 0
-        ? Math.round((csvPreviewResult.validCount / (csvPreviewResult.validCount + csvPreviewResult.invalidCount)) * 100)
+      csvPreviewResult && importPreviewTotal > 0
+        ? Math.round(((csvPreviewResult.validCount || 0) / importPreviewTotal) * 100)
         : null;
 
     return {
@@ -1396,12 +1392,12 @@ const SavingsStudioPage = () => {
       validCount: csvPreviewResult?.validCount || 0,
       invalidCount: csvPreviewResult?.invalidCount || 0,
       duplicateCandidates,
-      duplicateCount: duplicateCandidates.length,
+      duplicateCount: csvPreviewResult?.duplicateCount || 0,
       importQuality,
       monthSpread,
       invalidReasonLeaders,
     };
-  }, [csvPreviewResult, entries]);
+  }, [csvPreviewResult]);
   const strategyCenter = useMemo(() => {
     let score = 0;
 
@@ -4083,7 +4079,9 @@ const SavingsStudioPage = () => {
                     <p className="text-xs uppercase tracking-[0.18em] text-muted">Peržiūra</p>
                     <h3 className="mt-2 text-xl font-semibold">{csvFileName || "CSV failas"}</h3>
                     <p className="mt-2 text-sm text-muted">
-                      Tinkamos eilutės: {csvPreviewResult.validCount} · Netinkamos: {csvPreviewResult.invalidCount}
+                      Bus importuota: {csvPreviewResult.validCount} · Atmesta:{" "}
+                      {(csvPreviewResult.invalidCount || 0) + (csvPreviewResult.duplicateCount || 0)} · Dublikatai:{" "}
+                      {csvPreviewResult.duplicateCount || 0}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-3">
@@ -4112,6 +4110,8 @@ const SavingsStudioPage = () => {
                       className={`rounded-[18px] px-4 py-4 ${
                         row.status === "ok"
                           ? "bg-[rgb(var(--surface-soft))]"
+                          : row.status === "duplicate"
+                          ? "border border-amber-200 bg-amber-50"
                           : "border border-red-200 bg-red-50"
                       }`}
                     >
@@ -4123,10 +4123,14 @@ const SavingsStudioPage = () => {
                               {row.normalized.title} · {money.format(row.normalized.amount)} · {row.normalized.category}
                             </p>
                           ) : (
-                            <p className="mt-1 text-sm text-red-600">{row.error}</p>
+                            <p className={`mt-1 text-sm ${row.status === "duplicate" ? "text-amber-700" : "text-red-600"}`}>
+                              {row.error}
+                            </p>
                           )}
                         </div>
-                        <span className="premium-tag">{row.status === "ok" ? "Tinkama" : "Tikrinti"}</span>
+                        <span className="premium-tag">
+                          {row.status === "ok" ? "Bus importuota" : row.status === "duplicate" ? "Dublikatas" : "Atmesta"}
+                        </span>
                       </div>
                     </div>
                   ))}

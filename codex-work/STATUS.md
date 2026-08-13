@@ -1,6 +1,6 @@
 ﻿# Stilloak Studio autonomous status
 
-PROJECT_STATE: READY_WITH_MANUAL_CHECKS
+PROJECT_STATE: READY_FOR_REVIEW_WITH_MANUAL_BROWSER_CHECKS
 
 ## Dabartinis milestone
 
@@ -8,6 +8,14 @@ Final production readiness audit – lokaliai paruošta, su rankiniu production 
 
 ## Užbaigta
 
+- 2026-08-13 papildomas Asmeninio nario zonos review etapas pradėtas šakoje `codex/personal-member-area-10of10-20260813`: perskaityti `AGENTS.md`, `SPEC.md`, `PLAN.md`, `IMPLEMENT.md` ir ši būsena, inventorizuoti `MemberAreaPage`, `SavingsStudioPage`, Saving Studio helperiai, service sluoksnis, backend route/controller/modeliai, membership guardai ir esami access/UI testai.
+- Sukurtas `codex-work/PERSONAL_MEMBER_AREA.md` su esama būsena, problemomis, įgyvendinimo planu, prieigos matrica, priėmimo kriterijais ir likusiomis rankinėmis patikromis.
+- Saving Studio backend sustiprintas: CSV preview dabar atpažįsta jau egzistuojančius ir tame pačiame CSV pasikartojančius tik visiškai sutampančius `date + amount + title + category` dublikatus, o CSV confirm importuoja tik priimtas eilutes ir grąžina `invalidRows`, `duplicateRows` bei `rejectedCount`.
+- Saving Studio route parametrai sustiprinti `validateObjectId` prieš `entries`, `goals` ir `recurring` update/delete/log controllerius.
+- Finansinių inputų validacija suvienodinta: įrašų, biudžetų, tikslų, recurring ir profilio sumoms taikoma bendra `MAX_MONEY_AMOUNT` riba.
+- Frontend CSV importo kokybės kortelė priderinta prie serverio `duplicateRows` / `duplicateCount`, todėl vartotojas mato kiek bus importuota, kiek atmesta ir kurie dublikatai nebus keliami prieš confirm.
+- Pridėtas `server/tests/savingsStudioImportSecurity.test.js` su CSV preview be DB mutacijos, CSV confirm dublikatų atmetimo, kategorijos skirtumo, title/category normalizavimo, realaus ObjectId middleware ir per didelių sumų regresijomis.
+- `server/tests/savingsStudioPersonalUi.test.js` papildytas statine regresija, kad CSV importo kokybės UI naudotų serverio dublikatų informaciją.
 - Sukurtas autonominio darbo setupas.
 - Sukurtos saugumo taisyklės.
 - Sukurtas pradinis vykdymo planas.
@@ -70,10 +78,45 @@ Final production readiness audit – lokaliai paruošta, su rankiniu production 
 
 ## Vykdoma
 
-- Autonominis etapas 4/6 užbaigtas lokalia release-candidate būsena. Production veiksmai nevykdyti.
+- Papildomas Asmeninio nario zonos review etapas lokaliai paruoštas review, bet galutinis 10/10 statusas paliktas po prisijungusio vartotojo desktop ir mobile smoke testo. Production veiksmai nevykdyti.
 
 ## Validacijos rezultatai
 
+- 2026-08-13 Personal member area papildoma patikra: `node --test server/tests/savingsStudioImportSecurity.test.js` – PASS, 4/4.
+- 2026-08-13 Personal member area papildoma patikra: `node --test server/tests/savingsStudioPersonalUi.test.js` – PASS, 5/5.
+- 2026-08-13 Personal member area papildoma patikra: `npm.cmd run build` – PASS, Vite 8.2.1 build sugeneravo `client/dist`.
+- 2026-08-13 Personal member area final: `npm.cmd run lint` – PASS, patikrinti 99 backend JavaScript failai.
+- 2026-08-13 Personal member area final: `npm.cmd run typecheck` – PASS, TypeScript projekto nėra; backend JavaScript syntax check praėjo 99 failams.
+- 2026-08-13 Personal member area final: `npm.cmd test` – PASS, 88/88 testai praėjo.
+- 2026-08-13 Personal member area final: `npm.cmd run build` – PASS, Vite 8.2.1 build sugeneravo `client/dist`.
+- 2026-08-13 Personal member area final: `npm.cmd audit --audit-level=high` – PASS pagal high/critical kriterijų; liko 2 moderate React Router punktai be automatinio fix.
+- 2026-08-13 Personal member area final: `git diff --check` – PASS, whitespace klaidų nerado; rodomi tik CRLF normalizavimo įspėjimai.
+- 2026-08-13 Personal member area final: statinis secret scan aktyviuose `client/src`, `server` ir `codex-work` failuose – PASS; rasti tik env kintamųjų pavadinimai ir testiniai placeholderiai.
+- 2026-08-13 Personal member area final: browser skill patikra – NOT RUN; šiame seanse per tool discovery nebuvo prieinamas reikalingas `node_repl` vykdymo įrankis, todėl palikta rankiniam authenticated smoke su testine paskyra.
+- 2026-08-13 Personal member area reviewer pass: `node --test server/tests/savingsStudioImportSecurity.test.js` – PASS, 7/7.
+- 2026-08-13 Personal member area reviewer pass: `node --test server/tests/savingsStudioHelpers.test.js` – PASS, 5/5.
+- 2026-08-13 Personal member area reviewer pass: `node --test server/tests/savingsStudioPersonalUi.test.js` – PASS, 5/5.
+- 2026-08-13 Personal member area reviewer pass: `npm.cmd run lint` – PASS, patikrinti 99 backend JavaScript failai.
+- 2026-08-13 Personal member area reviewer pass: `npm.cmd run typecheck` – PASS, backend JavaScript syntax check praėjo 99 failams.
+- 2026-08-13 Personal member area reviewer pass: `npm.cmd test` – PASS, 92/92 testai praėjo.
+- 2026-08-13 Personal member area reviewer pass: `npm.cmd run build` – PASS, Vite 8.2.1 build sugeneravo `client/dist`.
+- 2026-08-13 Personal member area reviewer pass: `npm.cmd audit --audit-level=high` – PASS pagal high/critical kriterijų; liko 2 moderate React Router punktai be automatinio fix.
+- 2026-08-13 Personal member area reviewer pass: `git diff --check` – PASS, whitespace klaidų nerado; rodomi tik CRLF normalizavimo įspėjimai.
+- 2026-08-13 Personal member area reviewer pass: `git status --short` – PASS peržiūrėta, yra tik numatyti necommitinti failai; commit/push nevykdyti.
+- 2026-08-13 Personal member area minimal scope correction: pašalintas reviewer pass metu įvestas naujas income/expense `type` scope iš modelio, parserio, CSV helperių, preview UI ir testų; `server/models/SavingsEntry.js` bei `client/src/components/savings/savingsStudioHelpers.js` turinio diff tuščias.
+- 2026-08-13 Personal member area minimal scope correction: CSV dublikatų fingerprint paliktas pagal esamą duomenų modelį `date + amount + title + category`; title/category normalizuojami trim/lowercase/tarpų sutraukimu, amount iki valiutos reikšmės, date kaip validuotas `YYYY-MM-DD`.
+- 2026-08-13 Personal member area minimal scope correction: `node --test server/tests/savingsStudioImportSecurity.test.js` – PASS, 8/8.
+- 2026-08-13 Personal member area minimal scope correction: `node --test server/tests/savingsStudioHelpers.test.js` – PASS, 4/4.
+- 2026-08-13 Personal member area minimal scope correction: `node --test server/tests/savingsStudioPersonalUi.test.js` – PASS, 5/5.
+- 2026-08-13 Personal member area minimal scope correction final: `npm.cmd run lint` – PASS, patikrinti 99 backend JavaScript failai.
+- 2026-08-13 Personal member area minimal scope correction final: `npm.cmd run typecheck` – PASS, backend JavaScript syntax check praėjo 99 failams.
+- 2026-08-13 Personal member area minimal scope correction final: `npm.cmd test` – PASS, 92/92 testai praėjo.
+- 2026-08-13 Personal member area minimal scope correction final: `npm.cmd run build` – PASS, Vite 8.2.1 build sugeneravo `client/dist`.
+- 2026-08-13 Personal member area minimal scope correction final: `npm.cmd audit --audit-level=high` – PASS pagal high/critical kriterijų; liko 2 moderate React Router punktai be automatinio fix.
+- 2026-08-13 Personal member area minimal scope correction final: `git diff --check` – PASS, whitespace klaidų nerado; rodomi tik CRLF normalizavimo įspėjimai.
+- 2026-08-13 Personal member area minimal scope correction final: `git diff -- server/models/SavingsEntry.js` ir `git diff -- client/src/components/savings/savingsStudioHelpers.js` – PASS, turinio diff tuščias.
+- 2026-08-13 Personal member area minimal scope correction final: statinis secret scan aktyviuose `client/src`, `server` ir `codex-work` failuose – PASS; rasti tik env kintamųjų pavadinimai ir testiniai placeholderiai.
+- 2026-08-13 Personal member area minimal scope correction final: authenticated desktop/mobile smoke – NOT RUN, palikta privalomam rankiniam veiksmui prieš galutinį 10/10 statusą.
 - 2026-08-13 final audit: `npm.cmd run lint` – PASS, patikrinti 98 backend JavaScript failai.
 - 2026-08-13 final audit: `npm.cmd run typecheck` – PASS, TypeScript projekto nėra; backend JavaScript syntax check praėjo 98 failams.
 - 2026-08-13 final audit: `npm.cmd test` – PASS, 83/83 testai praėjo.
