@@ -8,6 +8,9 @@ Final production readiness audit – lokaliai paruošta, su rankiniu production 
 
 ## Užbaigta
 
+- 2026-08-13 skubus Savings Studio production UI hotfix: `AutomationTriggerCard` nebesiremia viewport `sm:flex-row`, `sm:w-auto` ar `sm:shrink-0`, tekstas ir CTA visada dėliojami vertikaliai, CTA lieka `w-full max-w-full`, o lietuviški žodžiai nebėra verčiami lūžti po kelias raides.
+- Automatikos statistikų `Suvestinės / Kopijos / Signalai` grid pervestas į container-width-safe `repeat(auto-fit,minmax(min(100%,13rem),1fr))`, kad siauroje kortelėje būtų vienas skaitomas stulpelis, o platesnėje automatiškai tilptų daugiau.
+- `server/tests/savingsStudioPersonalUi.test.js` regresija dabar tikrina būtent `AutomationTriggerCard` šaltinio bloką: draudžia `sm:flex-row`, `sm:w-auto`, `sm:shrink-0`, saugo `w-full max-w-full` CTA ir auto-fit/minmax statistikų grid be `sm:grid-cols-3`.
 - 2026-08-13 Savings Studio responsive CTA pataisa: automatikos kortelės `Išsiųsk naują suvestinę dabar` mobile režimu dėlioja tekstą ir CTA vertikaliai, mygtukas turi `w-full max-w-full`, tekstas gali lūžti, rodyklė lieka mygtuko viduje, o statistikos `Suvestinės / Kopijos / Signalai` grid saugiai lieka vieno stulpelio iki `sm`.
 - `server/tests/savingsStudioPersonalUi.test.js` papildytas statine regresija, saugančia mobile CTA vertikalų layout, `w-full/max-w-full` elgesį, responsive statistikos grid ir `whitespace-nowrap` nebuvimą ilgame summary mygtuke.
 - 2026-08-13 papildomas Asmeninio nario zonos review etapas pradėtas šakoje `codex/personal-member-area-10of10-20260813`: perskaityti `AGENTS.md`, `SPEC.md`, `PLAN.md`, `IMPLEMENT.md` ir ši būsena, inventorizuoti `MemberAreaPage`, `SavingsStudioPage`, Saving Studio helperiai, service sluoksnis, backend route/controller/modeliai, membership guardai ir esami access/UI testai.
@@ -84,6 +87,13 @@ Final production readiness audit – lokaliai paruošta, su rankiniu production 
 
 ## Validacijos rezultatai
 
+- 2026-08-13 skubus Savings Studio production UI hotfix: `node --test server/tests/savingsStudioPersonalUi.test.js` – PASS, 6/6.
+- 2026-08-13 skubus Savings Studio production UI hotfix: `npm.cmd run lint` – PASS, patikrinti 99 backend JavaScript failai.
+- 2026-08-13 skubus Savings Studio production UI hotfix: `npm.cmd run typecheck` – PASS, backend JavaScript syntax check praėjo 99 failams.
+- 2026-08-13 skubus Savings Studio production UI hotfix: `npm.cmd test` – PASS, 93/93.
+- 2026-08-13 skubus Savings Studio production UI hotfix: `npm.cmd run build` – PASS, Vite 8.2.1 build sugeneravo `client/dist`.
+- 2026-08-13 skubus Savings Studio production UI hotfix: `git diff --check` – PASS, whitespace klaidų nerado; rodomi tik CRLF normalizavimo įspėjimai.
+- 2026-08-13 skubus Savings Studio production UI hotfix: `git status --short` – PASS peržiūrėta, pakeisti tik `client/src/pages/SavingsStudioPage.jsx`, `server/tests/savingsStudioPersonalUi.test.js` ir `codex-work/STATUS.md`.
 - 2026-08-13 Savings Studio responsive CTA pataisa: `node --test server/tests/savingsStudioPersonalUi.test.js` – PASS, 6/6.
 - 2026-08-13 Savings Studio responsive CTA pataisa final: `npm.cmd run lint` – PASS, patikrinti 99 backend JavaScript failai.
 - 2026-08-13 Savings Studio responsive CTA pataisa final: `npm.cmd run typecheck` – PASS, backend JavaScript syntax check praėjo 99 failams.

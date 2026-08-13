@@ -75,14 +75,19 @@ test("Saving Studio automation CTA stays inside mobile cards", () => {
   assert.match(source, /actionLabel: "Siųsti savaitės suvestinę"/);
   assert.match(
     source,
-    /mt-6 grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-3[\s\S]*label="Suvestinės"[\s\S]*label="Kopijos"[\s\S]*label="Signalai"/
+    /mt-6 grid min-w-0 grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,13rem\),1fr\)\)\] gap-4[\s\S]*label="Suvestinės"[\s\S]*label="Kopijos"[\s\S]*label="Signalai"/
   );
-  assert.match(automationCardSource, /flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between/);
+  assert.doesNotMatch(source, /mt-6 grid min-w-0[\s\S]{0,120}sm:grid-cols-3/);
+  assert.match(automationCardSource, /flex min-w-0 flex-col gap-4/);
+  assert.match(automationCardSource, /<div className="min-w-0">/);
   assert.match(
     automationCardSource,
-    /className="button-secondary w-full max-w-full gap-2 whitespace-normal break-words text-center sm:w-auto sm:shrink-0"/
+    /className="button-secondary w-full max-w-full justify-center gap-2 whitespace-normal break-normal text-center"/
   );
-  assert.match(automationCardSource, /<span className="min-w-0 break-words">\{trigger\.actionLabel\}<\/span>/);
+  assert.match(automationCardSource, /<span className="min-w-0 whitespace-normal break-normal">\{trigger\.actionLabel\}<\/span>/);
   assert.match(automationCardSource, /<ArrowUpRight className="shrink-0" size=\{14\} \/>/);
+  assert.doesNotMatch(automationCardSource, /sm:flex-row/);
+  assert.doesNotMatch(automationCardSource, /sm:w-auto/);
+  assert.doesNotMatch(automationCardSource, /sm:shrink-0/);
   assert.doesNotMatch(automationCardSource, /whitespace-nowrap/);
 });
