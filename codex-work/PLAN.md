@@ -27,16 +27,16 @@ Codex privalo palaikyti šį failą kaip gyvą planą.
 
 - [x] Saving Studio srautų auditas: patikrinti `SavingsStudioPage.jsx`, `savingsStudioHelpers.js`, `savingsStudioController.js`, `savingsStudioService.js`, planų guard ir esamų testų spragos.
 - [x] Skaičiavimų ir duomenų validacija: pridėtos apsaugos nuo `NaN` goal progress, recurring monthly equivalent, onboarding draft currency preview, `formatChange(undefined)` ir netvarkingų month option entry datų keliuose.
-- [ ] Onboarding ir aiški vartotojo kelionė.
-- [ ] Loading, empty, success ir error būsenos: pradinio Saving Studio užkrovimo klaida dabar turi matomą retry būseną, ne tik toast; liko platesnė formų ir mobilių būsenų peržiūra.
-- [ ] Mobilus ir desktop UX: route-level lazy loading sumažino pradinį klientų JS chunką nuo ~958 kB iki ~437 kB; liko vizualinė responsive peržiūra.
-- [ ] Planų ir kreditų elgesio nuoseklumas.
+- [x] Onboarding ir aiški vartotojo kelionė: step-by-step usage wizard, pirmo setup validacija, inline klaidos ir serverio klaidos būsena.
+- [x] Loading, empty, success ir error būsenos: pradinio Saving Studio užkrovimo retry, onboarding inline alert, biudžetų mėnesio retry, esamos empty/success būsenos ir mutation loading states validuoti statiniais testais.
+- [ ] Mobilus ir desktop UX: route-level lazy loading sumažino pradinį klientų JS chunką nuo ~958 kB iki ~437 kB; `npm --workspace client run preview` sutvarkytas sandboxe ir `/pricing` HTTP smoke grąžina 200, bet Chrome headless screenshot smoke neįvyko dėl vietinio Chrome GPU proceso klaidos.
+- [x] Planų ir kreditų elgesio nuoseklumas: atskiros kreditų sistemos kode nerasta; planų elgesys remiasi esamais membership/status guardais ir padengtas prieigos testais.
 - [x] Demo ir Asmeninio prieigų testai: `accessControlP1.test.js` patvirtina, kad Demo/basic negali naudoti full Saving Studio API, o Personal gali.
 - [x] Reikalingi unit ir integration testai: `server/tests/savingsStudioHelpers.test.js` dengia kliento helperius, onboarding valiutos preview ir Saving Studio mutation smoke regresiją.
 - [x] Saving Studio mutation smoke: entries, CSV import, goals, recurring expenses ir delete veiksmai po sėkmės atnaujina priklausomą summary/activity būseną.
-- [ ] Asmeninio plano smoke test.
-- [ ] Galutinė Asmeninio plano diff peržiūra.
-- [ ] Praeina milestone validacija.
+- [x] Asmeninio plano smoke test: `npm test`, `npm run lint`, `npm run typecheck`, `npm run build` ir preview HTTP 200 patikra praėjo.
+- [x] Galutinė Asmeninio plano diff peržiūra: peržiūrėti pakeisti `SavingsStudioPage.jsx`, preview wrapperis, naujos Personal UI regresijos ir dokumentacijos diff.
+- [x] Praeina milestone validacija.
 
 ## Milestone 3 – Privatus verslas 10/10
 

@@ -33,17 +33,25 @@ Milestone 2 – Asmeninis 10/10.
 - Išlaidų filtravimas kliente nebekrenta, jei legacy entry neturi `title` arba `notes` reikšmės.
 - Kliento route-level lazy loading įjungtas `client/src/App.jsx`: apsaugoti route guard išliko, o mokamos nario/admin/verslo erdvės kraunamos pagal poreikį.
 - Pradinis Vite JS chunkas sumažėjo nuo ~958 kB iki ~437 kB; `MemberAreaPage` išskirtas į atskirą ~211 kB chunką.
+- Saving Studio onboarding sustiprintas matoma inline klaida: validacijos tekstas išlieka formoje ir naudojamas tiek žingsnio keitimui, tiek galutiniam išsaugojimui.
+- Saving Studio biudžetų mėnesio užkrovimas sustiprintas matoma retry būsena; formos saugojimas blokuojamas, kol biudžetai kraunami.
+- Legacy išlaidų įrašai be `date` nebeturi numušti kliento filtravimo, mėnesio atrankos, datos rodymo ar edit formos.
+- Pridėtas `server/tests/savingsStudioPersonalUi.test.js` su Personal UI regresijomis: onboarding inline error, budget retry state ir legacy date guard.
+- `client` preview scenarijus pervestas į `scripts/preview-client.js`, kad Vite preview veiktų sandboxe be `vite.config.js` bundling prieigos klaidos.
+- `npm --workspace client run preview -- --host 127.0.0.1 --port 4174` lokaliai pakėlė preview serverį; `Invoke-WebRequest http://127.0.0.1:4174/pricing` grąžino HTTP 200 ir React root HTML.
 
 ## Vykdoma
 
-- Milestone 2 tęsiamas: onboarding kelionės, loading/empty/error būsenų, responsive UX ir pilno Asmeninio plano smoke testų peržiūra.
+- Milestone 2 tęsiamas: galutinė Asmeninio plano diff peržiūra ir likusio Chrome vizualinio smoke ribojimo dokumentavimas.
 
 ## Validacijos rezultatai
 
-- `npm run lint` – PASS, patikrinti 90 backend JavaScript failų.
+- `npm run lint` – PASS, patikrintas backend JavaScript syntax/lint rinkinys.
 - `npm run typecheck` – PASS, TypeScript projekto nėra; backend JavaScript syntax check praėjo.
-- `npm test` – PASS, 52/52 serverio ir statinės klientų patikros praėjo.
-- `npm run build` – PASS, Vite build sugeneravo `client/dist`; paskutinio build main JS chunkas ~437.27 kB, `MemberAreaPage` chunkas ~211.18 kB, Vite >500 kB chunk įspėjimo nebeliko.
+- `npm test` – PASS, 55/55 serverio ir statinės klientų patikros praėjo.
+- `npm run build` – PASS, Vite build sugeneravo `client/dist`; paskutinio build main JS chunkas ~437.27 kB, `MemberAreaPage` chunkas ~212.46 kB, Vite >500 kB chunk įspėjimo nėra.
+- `npm --workspace client run preview -- --host 127.0.0.1 --port 4174` + `Invoke-WebRequest /pricing` – PASS, HTTP 200 ir React root HTML.
+- `node --check scripts/preview-client.js` – PASS.
 
 ## Priimti sprendimai
 
@@ -54,14 +62,17 @@ Milestone 2 – Asmeninis 10/10.
 - Checkpoint commitus kuria PowerShell runneris.
 - Kainodaros pataisa bus atliekama maža pakeitimų grupe, tada paleidžiamos visos root validacijos.
 - `client/vite.config.js` paliekamas dev serveriui, o production build naudoja inline Vite wrapperį dėl sandbox prieigos ribojimo.
+- `client` preview komanda taip pat perkelta į inline Vite wrapperį dėl tos pačios sandbox prieigos ribos kaip build; tai nekeičia produkcijos deploy ir lieka lengvai atšaukiama.
 - Milestone 2 state-refresh problema sprendžiama konservatyviai: po sėkmingų Saving Studio mutacijų pakartotinai užkraunami tik susiję API duomenys, nekeičiant backend kontraktų ir nedarant optimistinių finansinių skaičiavimų.
 - Pradinio užkrovimo klaida sprendžiama lokaliu retry UI, nes tai lengvai atšaukiama ir nekeičia autorizacijos ar API elgesio.
 - Kliento bundle rizika sprendžiama route-level `React.lazy` be planų guard architektūros keitimo; `Suspense` fallback naudoja esamą `LoadingSpinner`.
+- Planų ir kreditų peržiūra: atskiro kreditų limito mechanizmo kode nerasta; prieiga kontroliuojama planu ir aktyviu/trialing statusu.
 
 ## Blokatoriai
 
 - Nėra kritinių blokatorių.
-- Nekritinė rizika: liko neatlikta vizualinė responsive Saving Studio peržiūra realiame naršyklės viewport'e.
+- Nekritinė rizika: in-app browser Node REPL įrankis šiame kontekste nepasiekiamas; vietinis Chrome headless krito su GPU proceso klaida, todėl screenshot responsive smoke nebaigtas.
+- Authenticated Personal Studio naršyklinis smoke be testinės paskyros/slaptažodžių neatliktas; backend ir klientų guardai patikrinti statiniais/unit testais.
 
 ## Rankiniai production veiksmai
 
@@ -70,4 +81,4 @@ Milestone 2 – Asmeninis 10/10.
 
 ## Paskutinis atnaujinimas
 
-2026-08-13 – Milestone 2 tęsiamas; Saving Studio mutation state-refresh, initial load retry, helperių `undefined`/legacy data guard ir route-level lazy loading pataisos validuotos su `npm run lint`, `npm run typecheck`, `npm test` ir `npm run build`.
+2026-08-13 – Milestone 2 tęsiamas; onboarding inline error, budget retry state, legacy entry date guard ir sandbox-safe preview wrapper pataisos validuotos su `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, `node --check scripts/preview-client.js` ir preview HTTP 200 smoke. `PROJECT_STATE` paliekamas `IN_PROGRESS`, nes Chrome screenshot smoke ir autentifikuotas naršyklinis Personal flow dar nepatvirtinti.
