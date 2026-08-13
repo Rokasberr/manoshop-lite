@@ -47,7 +47,7 @@ test("subscription checkout uses selected plan Stripe price ID", () => {
   const lineItem = buildSubscriptionLineItem({
     id: "privatus_verslas",
     name: "Privatus verslas",
-    price: 99,
+    price: 44.99,
     currency: "eur",
     interval: "month",
     description: "Plan",
@@ -69,8 +69,8 @@ test("legacy plan aliases normalize to current plan IDs", () => {
 });
 
 test("paid plan prices remain unchanged", () => {
-  assert.equal(getPlanById("personal").price, 24);
-  assert.equal(getPlanById("private_business").price, 99);
+  assert.equal(getPlanById("personal").price, 14.99);
+  assert.equal(getPlanById("private_business").price, 44.99);
 });
 
 test("order checkout line items preserve product totals", () => {

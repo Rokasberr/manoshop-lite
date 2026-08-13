@@ -25,8 +25,8 @@
 ## Narystės Planai
 
 - `basic` / Demo: nemokamas internal planas, 0 EUR. Jis nėra siunčiamas į Stripe Checkout.
-- `personal` / Asmeninis: mokamas Stripe planas, 24 EUR per mėn.
-- `private_business` / Privatus verslas: mokamas Stripe planas, 99 EUR per mėn.
+- `personal` / Asmeninis: mokamas Stripe planas, 14,99 EUR per mėn.
+- `private_business` / Privatus verslas: mokamas Stripe planas, 44,99 EUR per mėn.
 
 Seni aliasai `bazinis`, `asmeninis` ir `privatus_verslas` paliekami duomenų suderinamumui.
 
@@ -148,6 +148,6 @@ Slaptažodžio atkūrimo el. laiškams būtina sukonfigūruoti `EMAIL_FROM` ir v
 - `CLIENT_URL` leidžia tik realius frontend origin.
 - `VITE_API_URL` rodo į realų backend `/api` adresą.
 - Stripe webhook signing secret nustatytas backend aplinkoje.
-- `Asmeninis` ir `Privatus verslas` Stripe Price ID nustatyti backend aplinkoje ir atitinka 24 EUR/mėn. bei 99 EUR/mėn.
+- `Asmeninis` ir `Privatus verslas` Stripe Price ID nustatyti backend aplinkoje ir atitinka 14,99 EUR/mėn. bei 44,99 EUR/mėn.
 - Demo planas aktyvuojamas internal būdu be Stripe.
 - Viešų admin prisijungimo duomenų nėra dokumentacijoje.

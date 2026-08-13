@@ -1,10 +1,10 @@
 ﻿# Stilloak Studio autonomous status
 
-PROJECT_STATE: RELEASE_CANDIDATE_READY
+PROJECT_STATE: READY_WITH_MANUAL_CHECKS
 
 ## Dabartinis milestone
 
-Milestone 5 – Release candidate užbaigtas lokaliai.
+Final production readiness audit – lokaliai paruošta, su rankiniu production redeploy ir Stripe Price ID patikrinimu prieš launch.
 
 ## Užbaigta
 
@@ -16,8 +16,8 @@ Milestone 5 – Release candidate užbaigtas lokaliai.
 - Projekto struktūra patikrinta: root workspace apima `client` ir `server`; `ai-sales-copilot-saas` egzistuoja kaip atskiras papildomas paketas.
 - Rasti validacijos scenarijai: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`.
 - Rasti Excel prototipai: `StillOak_Weekly_Planning_System.xlsx`, `StillOak_Savings_Tracker.xlsx`, `StillOak_Personal_Budget_System.xlsx`.
-- Milestone 1 kainodara sutvarkyta: Demo 0, Asmeninis 24, Privatus verslas 99 serverio ir kliento planų šaltiniuose.
-- Senų membership kainų `14.99` ir `44.99` `client/src` ir `server` skenuose nebeliko.
+- Milestone 1 kainodara sutvarkyta pagal naujausią finalų reikalavimą: Demo 0, Asmeninis 14,99, Privatus verslas 44,99 serverio ir kliento planų šaltiniuose.
+- Senų membership kainų 9/24/99 aktyviuose `client/src` ir `server` narystės šaltiniuose nebeliko.
 - LT `private_business` planas membership kontekste rodomas kaip `Privatus verslas`.
 - Build scenarijus pataisytas per `scripts/build-client.js`, kad Vite build veiktų sandboxe be `vite.config.js` esbuild bundling klaidos.
 - Asmeninio plano Saving Studio skaičiavimų apsauga pradėta: `getGoalProgress` ir `recurringMonthlyEquivalent` nebegrąžina `NaN` su blogais numeric input.
@@ -60,10 +60,10 @@ Milestone 5 – Release candidate užbaigtas lokaliai.
 - `npm audit --audit-level=high --cache .codex-tmp\npm-cache` neberodo high/critical blokatorių; liko 2 moderate React Router punktai, kurių siūlomas taisymas yra breaking `react-router-dom@7.18.2` migracija.
 - Vite 8 build praėjo; preview HTTP smoke su `/pricing` grąžino HTTP 200 ir React root HTML.
 - Milestone 4 uždarytas: globalus keyboard skip-link pridėtas į `Layout`, `main` turi `id="main-content"`, o `server/tests/clientRoutesP1.test.js` saugo layout accessibility regresiją.
-- README kainos pataisytos pagal patvirtintus planus: Asmeninis 24 EUR/mėn., Privatus verslas 99 EUR/mėn.
+- README kainos pataisytos pagal patvirtintus planus: Asmeninis 14,99 EUR/mėn., Privatus verslas 44,99 EUR/mėn.
 - Parengtas `codex-work/RELEASE_CHECKLIST.md` su lokalaus RC paleidimo, validacijos, narystės, kritinių srautų, rankinio production launch ir likusių rizikų sąrašu.
 - Finalinė diff peržiūra atlikta: peržiūrėti Business revenue, public checkout limiter, Site Builder ID validation, Business Orders invoice, Business Dashboard, Vite wrapper, dependency ir dokumentacijos pakeitimai.
-- Kainų skenas patvirtino, kad `14.99` ir `44.99` nebeliko `client/src`, `server`, `README.md` ar `codex-work/RELEASE_CHECKLIST.md`.
+- Kainų skenas patvirtino, kad aktyviuose membership paviršiuose įtvirtintos 0, 14,99 ir 44,99 kainos.
 - Finalinė validacija praėjo: audit high/critical, syntax wrappers, lint, typecheck, test, build ir preview HTTP smoke.
 - Ankstesnio Codex review P2 auth recovery pastabos sutvarkytos: production env reikalauja `EMAIL_FROM` ir Brevo arba pilno SMTP kelio, forgot-password viešas atsakymas neatskleidžia paskyros, siuntimo klaidos saugiai logginamos be jautrių duomenų ir sąlyginiu update išvalo tik konkrečios užklausos tokeną.
 - Reset tokeno panaudojimas pervestas į vieną atominį `findOneAndUpdate` pagal tokeno hash ir galiojimą; tuo pačiu veiksmu nustatomas bcrypt slaptažodžio hash, išvalomi reset laukai, nustatomas `passwordChangedAt` ir padidinamas `authVersion`, neliečiant rolės ar prenumeratos.
@@ -74,6 +74,18 @@ Milestone 5 – Release candidate užbaigtas lokaliai.
 
 ## Validacijos rezultatai
 
+- 2026-08-13 final audit: `npm.cmd run lint` – PASS, patikrinti 98 backend JavaScript failai.
+- 2026-08-13 final audit: `npm.cmd run typecheck` – PASS, TypeScript projekto nėra; backend JavaScript syntax check praėjo 98 failams.
+- 2026-08-13 final audit: `npm.cmd test` – PASS, 83/83 testai praėjo.
+- 2026-08-13 final audit: `npm.cmd run build` – PASS, Vite 8.2.1 build sugeneravo `client/dist`; main JS chunkas ~236.15 kB, `MemberAreaPage` chunkas ~215.83 kB.
+- 2026-08-13 final audit: `npm.cmd audit --audit-level=high` – PASS pagal high/critical kriterijų; liko 2 moderate React Router punktai be automatinio fix.
+- 2026-08-13 final audit: `git diff --check` – PASS, whitespace klaidų nerado; rodomi tik CRLF normalizavimo įspėjimai.
+- 2026-08-13 final audit: tikslinis `node --test server/tests/membershipPricing.test.js server/tests/stripeCheckoutService.test.js` – PASS, 10/10.
+- 2026-08-13 final audit: lokalus `npm --workspace client run preview -- --host 127.0.0.1 --port 4174` HTTP smoke – PASS; `/`, `/pricing`, `/login`, `/register`, `/contact`, `/terms`, `/privacy`, `/cookie-policy`, `/returns` ir nežinomas SPA route grąžino HTTP 200 su React root.
+- 2026-08-13 final audit: viešas `https://manoshop-api.onrender.com/api/health` – PASS, HTTP 200 OK su production saugumo headeriais.
+- 2026-08-13 final audit: vieši `https://www.stilloak-studio.com`, `/pricing`, `/login`, `/register` – PASS HTTP 200, bet production JS assetas dar turi seną 24/99 kainodaros deploy.
+- 2026-08-13 final audit: `git add ...` – FAIL dėl `.git/index.lock` permission denied; commit ir push nevykdyti.
+
 - `npm.cmd run lint` – PASS, patikrinti 97 backend JavaScript failai.
 - `npm.cmd run typecheck` – PASS, TypeScript projekto nėra; backend JavaScript syntax check praėjo 97 failams.
 - `npm.cmd test` – PASS, 80/80 serverio ir statinės klientų patikros praėjo.
@@ -83,7 +95,7 @@ Milestone 5 – Release candidate užbaigtas lokaliai.
 - `node` orchestrated Chrome headless screenshot smoke – FAIL dėl vietinio Chromium GPU proceso klaidos `GPU process isn't usable`; produkto HTTP preview buvo pasiekiamas.
 - `node` orchestrated Edge headless screenshot smoke – FAIL dėl vietinio Chromium headless proceso klaidos su izoliuotu profiliu; produkto HTTP preview buvo pasiekiamas.
 - `npm.cmd audit --audit-level=high` – PASS pagal high/critical kriterijų; liko 2 moderate React Router punktai be automatinio fix.
-- `node -e` kainų regresijos skenas – PASS, `14.99` / `44.99` nerasta produkto kode ar release dokumentuose.
+- Kainų regresijos skenas – PASS, aktyvūs membership paviršiai saugomi nuo 9/24/99 kainų grįžimo.
 - `npm run build` po Vite 8 migracijos – PASS; Vite 8.2.1 build main JS chunkas ~280.72 kB, `MemberAreaPage` chunkas ~215.80 kB.
 - `node --check scripts/build-client.js` ir `node --check scripts/preview-client.js` – PASS.
 - Vite 8 preview HTTP smoke per Node orchestration – PASS, `/pricing` HTTP 200 ir React root HTML.
@@ -113,14 +125,19 @@ Milestone 5 – Release candidate užbaigtas lokaliai.
 
 ## Blokatoriai
 
-- Kritinių blokatorių release-candidate būsenai nėra.
+- Kritinių lokalaus kodo blokatorių release-candidate būsenai nėra.
+- Production launch blokatorius iki rankinio veiksmo: viešas frontend deploy dar pateikia seną JS assetą su 24/99 kainomis; reikalingas naujas frontend deploy po šių pakeitimų.
+- Git blokatorius šiame sandboxe: `.git` rašymas neleidžiamas, todėl commit/push turi atlikti operatorius arba PowerShell runneris.
 - Nekritinė rizika: in-app browser Node REPL įrankis šiame kontekste nepasiekiamas; vietinis Chrome/Edge headless krito su GPU proceso klaida, todėl screenshot responsive smoke nebaigtas. Responsive layout regresija padengta statiniu testu.
 - Authenticated Personal Studio naršyklinis smoke be testinės paskyros/slaptažodžių neatliktas; backend ir klientų guardai patikrinti statiniais/unit testais.
 - Nekritinė dependency rizika: 2 moderate React Router audit punktai lieka iki owner-approved `react-router-dom@7` migracijos.
 
 ## Rankiniai production veiksmai
 
-- Stripe Live nejungti autonomiškai; prieš launch rankiniu būdu patvirtinti `STRIPE_PRICE_ASMENINIS` ir `STRIPE_PRICE_PRIVATUS_VERSLAS`, kad jie atitinka 24 EUR/mėn. ir 99 EUR/mėn.
+- Atlikti frontend production deploy tik po review/commit; po deploy pakartoti viešo asseto kainų skeną ir vizualiai patikrinti `/pricing`.
+- Stripe Dashboard rankiniu būdu patvirtinti, kad `STRIPE_PRICE_ASMENINIS` yra 14,99 EUR/mėn., o `STRIPE_PRICE_PRIVATUS_VERSLAS` yra 44,99 EUR/mėn.; realių mokėjimų šiame audite nevykdyta.
+- Render aplinkoje patvirtinti `CLIENT_URL`, CORS, Stripe webhook secret, Brevo/SMTP ir MongoDB kintamųjų pavadinimus neatskleidžiant reikšmių.
+- Stripe Live nejungti autonomiškai; prieš launch rankiniu būdu patvirtinti `STRIPE_PRICE_ASMENINIS` ir `STRIPE_PRICE_PRIVATUS_VERSLAS`, kad jie atitinka 14,99 EUR/mėn. ir 44,99 EUR/mėn.
 - Production deploy, domenas, DNS, live mokėjimai ir produkcinė DB lieka žmogaus patvirtinimui.
 - Vykdyti `codex-work/RELEASE_CHECKLIST.md` production sąrašą prieš bet kokį live launch.
 
@@ -131,3 +148,4 @@ Milestone 5 – Release candidate užbaigtas lokaliai.
 2026-08-13 – Milestone 5 uždarytas. README ir `codex-work/RELEASE_CHECKLIST.md` atnaujinti, finalinis kainų/narystės skenas praėjo, `npm audit --audit-level=high`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, wrapper syntax check ir `/pricing` preview smoke praėjo. `PROJECT_STATE: RELEASE_CANDIDATE_READY`.
 2026-08-13 – RC auth recovery blockeris sutvarkytas. Pridėtas saugus slaptažodžio atkūrimo srautas: generic forgot-password atsakymas, hashintas vienkartinis tokenas su 15 min. TTL, reset-password su esama slaptažodžio politika, `authVersion` senų JWT sesijų invalidavimui, Brevo/SMTP reset laiškas, vieši LT frontend puslapiai ir avarinis `owner:recover-password` CLI be slaptažodžio argumentų. Production DB, `.env`, Stripe, išorinės paskyros ir realūs el. laiškai neliesti. Validuota su `npm.cmd run lint`, `npm.cmd run typecheck`, `npm.cmd test` (72/72), `npm.cmd run build` ir `git diff --check` (tik CRLF normalizavimo įspėjimai).
 2026-08-13 – Ankstesnio Codex review P2 auth recovery pastabos ištaisytos. Forgot-password siuntimo rezultatas dabar viduje tikslus, siuntimo gedimas išvalo tik tos užklausos aktyvų tokeną ir nepašalina naujesnio tokeno, o reset-password tokenas panaudojamas vienu atominiu DB update. Pridėti env, siuntimo patikimumo, senos/naujos užklausos lenktynių, concurrent reset, bcrypt, `authVersion`, role/subscription ir expired/reused tokenų regresijos testai. Validuota su `npm.cmd run lint`, `npm.cmd run typecheck`, `npm.cmd test` (80/80), `npm.cmd run build`, `npm.cmd audit --audit-level=high` ir `git diff --check`.
+2026-08-13 – Final production readiness auditas atliktas šakoje `codex/final-production-audit-20260813`. Kainodara pervesta į galutinę 0 / 14,99 / 44,99 schemą serverio ir kliento planų konfigūracijose, viešuose SEO tekstuose, Saving Studio hero žymoje, admin Instagram šablonuose, README, SPEC, PLAN, AGENTS ir release checklist. Pridėtas `server/tests/membershipPricing.test.js`, kuris saugo serverio, kliento ir aktyvių membership paviršių kainas nuo 9/24/99 grįžimo. Viešas API `/api/health` atsakė 200 OK; viešo frontend assetuose dar matomas senas deploy su 24/99 kainomis, todėl production frontend redeploy lieka rankinis veiksmas. Galutinė išvada: READY WITH MANUAL CHECKS.

@@ -10,13 +10,13 @@ Codex privalo palaikyti šį failą kaip gyvą planą.
 - [x] Surasti klientų ir serverio planų guard mechanizmai: `server/config/planAccess.js`, `server/middleware/authMiddleware.js`, `server/routes/savingsStudioRoutes.js`, `server/routes/businessRoutes.js`, `client/src/utils/membership.js`, `client/src/components/ProtectedRoute.jsx`, `client/src/pages/MemberAreaPage.jsx`.
 - [x] Surasti testų, lint, typecheck ir build scenarijai: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`.
 - [x] Įvertinti esami Excel arba finansų prototipai: `server/protected-digital-products/excel/*.xlsx`, įskaitant Savings Tracker ir Personal Budget System.
-- [x] Užfiksuotos dabartinės klaidos ir rizikos: senos kainos 14.99/44.99 klientui, serveriui, SEO tekstams ir admin Instagram šablonams.
+- [x] Užfiksuotos dabartinės klaidos ir rizikos: senos kainos 24/99 klientui, serveriui, SEO tekstams, dokumentacijai ir admin Instagram šablonams.
 - [x] Į PLAN.md įrašytos konkrečios rastos komandos ir priėmimo kriterijai.
 
 ## Milestone 1 – Bendras production pagrindas
 
-- [x] Centralizuota teisinga kainodara: Demo 0, Asmeninis 24, Privatus verslas 99.
-- [x] Pašalintos senos arba neteisingos kainos: `14.99` ir `44.99` neliko `client/src` arba `server` membership šaltiniuose.
+- [x] Centralizuota teisinga kainodara: Demo 0, Asmeninis 14,99, Privatus verslas 44,99.
+- [x] Pašalintos senos arba neteisingos kainos: aktyviuose membership šaltiniuose nebeliko 24/99 kainų.
 - [x] Sutvarkytas planų pavadinimų nuoseklumas: LT planas `private_business` rodomas kaip `Privatus verslas`.
 - [x] Patikrinta autentifikacija ir sesijos valdymas: padengta esamais auth, billing sync ir protected route testais.
 - [x] Patikrinti backend planų guard: Demo negali pasiekti full Saving Studio ar Business Studio, Asmeninis negali pasiekti Business Studio.
@@ -69,7 +69,7 @@ Pradėti tik užbaigus Milestone 2.
 ## Milestone 5 – Release candidate
 
 - [x] Galutinė viso diff peržiūra: peržiūrėti finansiniai Business pakeitimai, public checkout limiteris, invoice UI, dashboard panels, Vite wrapperiai, dependency pakeitimai ir dokumentacijos diff; `git diff --check` nerado whitespace klaidų.
-- [x] Patikrintos kainos ir narystės: Demo 0, Asmeninis 24, Privatus verslas 99 patvirtinti kliento/serverio šaltiniuose, README ir release checklist; `14.99` / `44.99` nebeliko produkto kode ar release dokumentuose.
+- [x] Patikrintos kainos ir narystės: Demo 0, Asmeninis 14,99, Privatus verslas 44,99 patvirtinti kliento/serverio šaltiniuose, README ir release checklist; aktyvūs membership paviršiai saugomi regresiniu testu nuo 9/24/99 grįžimo.
 - [x] Patikrinti pagrindiniai vartotojų srautai: auth/access, billing sync, Stripe webhook, Saving Studio, Business Dashboard/Orders/Site Builder/store checkout, invoice ir admin analytics guardai padengti 63/63 testais; `/pricing` preview smoke grąžino HTTP 200.
 - [x] Atnaujinta projekto dokumentacija: README kainos ir production checklist pataisyti pagal patvirtintas kainas.
 - [x] Parengtas lokalus paleidimo vadovas: `codex-work/RELEASE_CHECKLIST.md` dokumentuoja local RC setup, Node versiją, env, seed, dev, validation ir preview smoke komandas.

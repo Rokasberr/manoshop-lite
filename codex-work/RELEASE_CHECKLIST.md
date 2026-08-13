@@ -52,8 +52,8 @@ Open `http://127.0.0.1:4174/pricing` and confirm the React root renders.
 ## Membership and price gates
 
 - Demo / `basic`: 0 EUR, internal activation, no Stripe Checkout subscription.
-- Asmeninis / `personal`: 24 EUR per month, Stripe subscription.
-- Privatus verslas / `private_business`: 99 EUR per month, Stripe subscription.
+- Asmeninis / `personal`: 14,99 EUR per month, Stripe subscription.
+- Privatus verslas / `private_business`: 44,99 EUR per month, Stripe subscription.
 - Demo users must not access full Saving Studio or Business Studio APIs.
 - Asmeninis users must access full Saving Studio but not Business Studio.
 - Privatus verslas users must access Business Studio.
@@ -80,8 +80,8 @@ Open `http://127.0.0.1:4174/pricing` and confirm the React root renders.
 - If emergency owner password recovery is needed, run only after confirming the target database and email:
   `npm run owner:recover-password -- --target-email=owner@example.com --confirm-email=owner@example.com`
 - Owner verifies Stripe Live mode is intentionally enabled only after final approval.
-- Owner verifies `STRIPE_PRICE_ASMENINIS` is 24 EUR per month.
-- Owner verifies `STRIPE_PRICE_PRIVATUS_VERSLAS` is 99 EUR per month.
+- Owner verifies `STRIPE_PRICE_ASMENINIS` is 14,99 EUR per month.
+- Owner verifies `STRIPE_PRICE_PRIVATUS_VERSLAS` is 44,99 EUR per month.
 - Owner configures Stripe webhook `/api/billing/webhook` and validates signing secret.
 - Owner performs one real low-risk payment path only after Stripe Live approval.
 - Owner verifies email provider credentials and sender identity.
