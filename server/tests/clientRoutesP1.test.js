@@ -32,3 +32,11 @@ test("client clears stale auth state on API 401 responses", () => {
   assert.match(apiSource, /manoshop:auth-expired/);
   assert.match(authContextSource, /addEventListener\("manoshop:auth-expired"/);
 });
+
+test("client layout keeps keyboard skip link to main content", () => {
+  const layoutSource = fs.readFileSync(path.join(root, "client", "src", "components", "Layout.jsx"), "utf8");
+
+  assert.match(layoutSource, /href="#main-content"/);
+  assert.match(layoutSource, /focus:not-sr-only/);
+  assert.match(layoutSource, /<main id="main-content"/);
+});

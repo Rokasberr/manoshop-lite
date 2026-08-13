@@ -25,8 +25,8 @@
 ## Narystės Planai
 
 - `basic` / Demo: nemokamas internal planas, 0 EUR. Jis nėra siunčiamas į Stripe Checkout.
-- `personal` / Asmeninis: mokamas Stripe planas, 14.99 EUR per mėn.
-- `private_business` / Verslas: mokamas Stripe planas, 44.99 EUR per mėn.
+- `personal` / Asmeninis: mokamas Stripe planas, 24 EUR per mėn.
+- `private_business` / Privatus verslas: mokamas Stripe planas, 99 EUR per mėn.
 
 Seni aliasai `bazinis`, `asmeninis` ir `privatus_verslas` paliekami duomenų suderinamumui.
 
@@ -93,7 +93,7 @@ Frontend naudoja:
 
 - `VITE_API_URL`
 
-Demo planui Stripe Price ID nereikalingas. Stripe Price ID privalomi tik `Asmeninis` ir `Verslas` planams.
+Demo planui Stripe Price ID nereikalingas. Stripe Price ID privalomi tik `Asmeninis` ir `Privatus verslas` planams.
 
 ## Deploy Architektūra
 
@@ -136,6 +136,6 @@ Produkcijoje savininkas turi patikrinti, kad administratoriaus paskyros slaptaž
 - `CLIENT_URL` leidžia tik realius frontend origin.
 - `VITE_API_URL` rodo į realų backend `/api` adresą.
 - Stripe webhook signing secret nustatytas backend aplinkoje.
-- `Asmeninis` ir `Verslas` Stripe Price ID nustatyti backend aplinkoje.
+- `Asmeninis` ir `Privatus verslas` Stripe Price ID nustatyti backend aplinkoje ir atitinka 24 EUR/mėn. bei 99 EUR/mėn.
 - Demo planas aktyvuojamas internal būdu be Stripe.
 - Viešų admin prisijungimo duomenų nėra dokumentacijoje.

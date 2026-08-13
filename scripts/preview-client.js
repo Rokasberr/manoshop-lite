@@ -1,6 +1,8 @@
 const path = require("path");
+const { pathToFileURL } = require("url");
 
 const root = path.resolve(__dirname, "..", "client");
+const importClientPackage = (packageName) => import(pathToFileURL(require.resolve(packageName, { paths: [root] })).href);
 
 const getArgValue = (name, fallback) => {
   const inlinePrefix = `--${name}=`;
@@ -20,7 +22,10 @@ const getArgValue = (name, fallback) => {
 };
 
 const runPreview = async () => {
-  const [{ preview }, react] = await Promise.all([import("vite"), import("@vitejs/plugin-react")]);
+  const [{ preview }, react] = await Promise.all([
+    importClientPackage("vite"),
+    importClientPackage("@vitejs/plugin-react"),
+  ]);
   const host = getArgValue("host", "127.0.0.1");
   const port = Number(getArgValue("port", "4173"));
 
