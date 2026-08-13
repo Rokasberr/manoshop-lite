@@ -14,6 +14,7 @@ import { Link } from "react-router-dom";
 
 import EmptyState from "../components/EmptyState";
 import LoadingSpinner from "../components/LoadingSpinner";
+import StatusBadge from "../components/admin/StatusBadge";
 import businessService from "../services/businessService";
 import { formatCurrency } from "../utils/currency";
 
@@ -103,6 +104,7 @@ const BusinessDashboardPage = () => {
 
   const totals = dashboard?.totals || {};
   const store = dashboard?.store;
+  const recentOrders = dashboard?.recentOrders || [];
 
   return (
     <div className="space-y-8">
@@ -188,6 +190,82 @@ const BusinessDashboardPage = () => {
             </Link>
           );
         })}
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
+        <div className="panel p-5 sm:p-7">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <span className="signal-pill">Paskutiniai uzsakymai</span>
+              <h2 className="mt-3 break-words font-display text-3xl font-bold leading-tight">Naujausia store eiga</h2>
+              <p className="mt-2 text-sm leading-7 text-muted">
+                Rodomi naujausi checkout irasai. Pajamu korteles virsuje skaiciuoja tik apmoketus uzsakymus.
+              </p>
+            </div>
+            <Link to="/business/orders" className="button-secondary justify-center gap-2">
+              Visi uzsakymai
+              <ArrowUpRight size={16} />
+            </Link>
+          </div>
+
+          <div className="mt-6 grid gap-3">
+            {recentOrders.length ? (
+              recentOrders.slice(0, 5).map((order) => (
+                <div
+                  key={order._id}
+                  className="flex flex-col gap-3 rounded-lg border bg-[rgb(var(--surface))] p-4 sm:flex-row sm:items-center sm:justify-between"
+                  style={{ borderColor: "rgb(var(--line) / 0.82)" }}
+                >
+                  <div className="min-w-0">
+                    <p className="break-words text-sm font-semibold">{order.product?.title || order.product?.name || order.items?.[0]?.name || "Produktas"}</p>
+                    <p className="mt-1 text-xs leading-5 text-muted">{order.buyerEmail || order.customerEmail || "Pirkejas nenurodytas"}</p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3 sm:justify-end">
+                    <span className="text-sm font-semibold">{formatCurrency(order.price || order.totalPrice)}</span>
+                    <StatusBadge status={order.paymentStatus || "pending"} />
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="member-empty-state rounded-lg p-6 text-center text-sm text-muted">
+                Uzakymu dar nera. Kai klientas pirks per publikuota store, naujausi irasai atsiras cia.
+              </div>
+            )}
+          </div>
+        </div>
+
+        <aside className="panel p-5 sm:p-7">
+          <span className="signal-pill">Store busena</span>
+          <h2 className="mt-3 break-words font-display text-3xl font-bold leading-tight">
+            {store ? store.name : "Store dar nesukurtas"}
+          </h2>
+          <p className="mt-3 text-sm leading-7 text-muted">
+            {store
+              ? "Publikavimas, slug ir produktu pasirinkimas valdomi per Site Builder."
+              : "Pirmas verslo veiksmas yra susikurti store profili ir pasirinkti perpardavimui leidziamus produktus."}
+          </p>
+
+          <div className="mt-6 grid gap-3">
+            <div className="rounded-lg border bg-[rgb(var(--surface))] p-4" style={{ borderColor: "rgb(var(--line) / 0.82)" }}>
+              <p className="text-xs font-semibold uppercase leading-5 text-muted">Publikavimas</p>
+              <p className="mt-2 text-lg font-semibold">{store?.isPublished ? "Publikuota" : "Nepublikuota"}</p>
+            </div>
+            <div className="rounded-lg border bg-[rgb(var(--surface))] p-4" style={{ borderColor: "rgb(var(--line) / 0.82)" }}>
+              <p className="text-xs font-semibold uppercase leading-5 text-muted">Produktai store</p>
+              <p className="mt-2 text-lg font-semibold">{store?.selectedProducts?.length || 0}</p>
+            </div>
+            {store?.slug ? (
+              <Link to={`/stores/${store.slug}`} className="button-secondary justify-center gap-2">
+                Atidaryti publika
+                <Store size={16} />
+              </Link>
+            ) : null}
+            <Link to="/business/site-builder" className="button-primary justify-center gap-2">
+              Tvarkyti Site Builder
+              <Settings size={16} />
+            </Link>
+          </div>
+        </aside>
       </section>
     </div>
   );

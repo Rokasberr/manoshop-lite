@@ -42,9 +42,39 @@ const profile = async () => {
   }
 };
 
+const forgotPassword = async (payload) => {
+  try {
+    const { data } = await api.post("/auth/forgot-password", payload);
+    return data;
+  } catch (error) {
+    if (error.response?.status !== 404) {
+      throw error;
+    }
+
+    const { data } = await api.post("/forgot-password", payload);
+    return data;
+  }
+};
+
+const resetPassword = async (payload) => {
+  try {
+    const { data } = await api.post("/auth/reset-password", payload);
+    return data;
+  } catch (error) {
+    if (error.response?.status !== 404) {
+      throw error;
+    }
+
+    const { data } = await api.post("/reset-password", payload);
+    return data;
+  }
+};
+
 export default {
+  forgotPassword,
   register,
   login,
   profile,
+  resetPassword,
 };
 

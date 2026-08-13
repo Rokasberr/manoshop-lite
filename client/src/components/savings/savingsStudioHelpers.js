@@ -37,8 +37,14 @@ export const dateFormatter = new Intl.DateTimeFormat("lt-LT", {
   year: "numeric",
 });
 
+const toFiniteNumber = (value, fallback = 0) => {
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) ? numericValue : fallback;
+};
+
 export const currentDateInput = () => new Date().toISOString().slice(0, 10);
 export const currentMonthKey = () => new Date().toISOString().slice(0, 7);
+const isMonthKey = (value) => /^\d{4}-\d{2}$/.test(String(value || ""));
 
 export const emptyEntry = (categories = DEFAULT_CATEGORIES) => ({
   title: "",
@@ -64,14 +70,32 @@ export const emptyRecurringExpense = (categories = DEFAULT_CATEGORIES) => ({
   notes: "",
 });
 
-export const monthLabel = (monthKey) =>
-  new Intl.DateTimeFormat("lt-LT", {
+export const monthLabel = (monthKey) => {
+  const normalizedMonthKey = String(monthKey || "").trim();
+
+  if (!isMonthKey(normalizedMonthKey)) {
+    return "Šis mėnuo";
+  }
+
+  const parsedDate = new Date(`${normalizedMonthKey}-01T00:00:00`);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "Šis mėnuo";
+  }
+
+  return new Intl.DateTimeFormat("lt-LT", {
     month: "short",
     year: "numeric",
-  }).format(new Date(`${monthKey}-01T00:00:00`));
+  }).format(parsedDate);
+};
 
-export const buildMonthOptions = (entries) => {
-  const months = new Set(entries.map((entry) => entry.date.slice(0, 7)));
+export const buildMonthOptions = (entries = []) => {
+  const safeEntries = Array.isArray(entries) ? entries : [];
+  const months = new Set(
+    safeEntries
+      .map((entry) => String(entry?.date || "").slice(0, 7))
+      .filter(isMonthKey)
+  );
   months.add(new Date().toISOString().slice(0, 7));
 
   return [
@@ -87,12 +111,14 @@ export const buildMonthOptions = (entries) => {
 };
 
 export const formatChange = (change) => {
-  if (change === null || Number.isNaN(change)) {
+  const numericChange = Number(change);
+
+  if (!Number.isFinite(numericChange)) {
     return "Pirmas pilnas mėnuo";
   }
 
-  const prefix = change > 0 ? "+" : "";
-  return `${prefix}${change}% prieš praeitą mėnesį`;
+  const prefix = numericChange > 0 ? "+" : "";
+  return `${prefix}${numericChange}% prieš praeitą mėnesį`;
 };
 
 export const getBudgetStatus = ({ spent, limitAmount }) => {
@@ -112,10 +138,10 @@ export const getBudgetStatus = ({ spent, limitAmount }) => {
 };
 
 export const getGoalProgress = (goal) => {
-  const targetAmount = Number(goal.targetAmount || 0);
-  const currentAmount = Number(goal.currentAmount || 0);
+  const targetAmount = toFiniteNumber(goal.targetAmount);
+  const currentAmount = Math.max(toFiniteNumber(goal.currentAmount), 0);
 
-  if (!targetAmount) {
+  if (targetAmount <= 0) {
     return {
       progress: 0,
       remaining: 0,
@@ -123,19 +149,21 @@ export const getGoalProgress = (goal) => {
     };
   }
 
+  const remaining = Math.max(targetAmount - currentAmount, 0);
+
   return {
-    progress: Math.min((currentAmount / targetAmount) * 100, 100),
-    remaining: Number((targetAmount - currentAmount).toFixed(2)),
+    progress: Math.min(Math.max((currentAmount / targetAmount) * 100, 0), 100),
+    remaining: Number(remaining.toFixed(2)),
     complete: currentAmount >= targetAmount,
   };
 };
 
 export const recurringMonthlyEquivalent = (expense) => {
-  const amount = Number(expense.amount || 0);
+  const amount = Math.max(toFiniteNumber(expense.amount), 0);
 
   switch (expense.frequency) {
     case "weekly":
-      return Number((((amount * 52) / 12) || 0).toFixed(2));
+      return Number(((amount * 52) / 12).toFixed(2));
     case "quarterly":
       return Number((amount / 3).toFixed(2));
     case "yearly":

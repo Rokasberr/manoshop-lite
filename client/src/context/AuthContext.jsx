@@ -86,6 +86,20 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem(userKey);
   }, []);
 
+  useEffect(() => {
+    const handleAuthExpired = () => {
+      setToken(null);
+      setUser(null);
+      setIsCheckingAuth(false);
+    };
+
+    window.addEventListener("manoshop:auth-expired", handleAuthExpired);
+
+    return () => {
+      window.removeEventListener("manoshop:auth-expired", handleAuthExpired);
+    };
+  }, []);
+
   const value = {
     user,
     token,

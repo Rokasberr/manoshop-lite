@@ -1,7 +1,7 @@
 const express = require("express");
 
 const asyncHandler = require("../middleware/asyncHandler");
-const { protect, memberOnly } = require("../middleware/authMiddleware");
+const { protect, requireSavingsStudioPro } = require("../middleware/authMiddleware");
 const { createWindowRateLimiter } = require("../middleware/rateLimit");
 const {
   getSavingsMeta,
@@ -58,31 +58,33 @@ const backupLimiter = createWindowRateLimiter({
   message: "Backup eksportų limitas laikinai pasiektas.",
 });
 
-router.get("/meta", protect, memberOnly, asyncHandler(getSavingsMeta));
-router.get("/profile", protect, memberOnly, asyncHandler(getSavingsProfile));
-router.put("/profile", protect, memberOnly, mutationLimiter, asyncHandler(updateSavingsProfile));
-router.put("/email-settings", protect, memberOnly, mutationLimiter, asyncHandler(updateSavingsEmailSettings));
-router.get("/budgets", protect, memberOnly, asyncHandler(getSavingsBudgets));
-router.put("/budgets", protect, memberOnly, mutationLimiter, asyncHandler(upsertSavingsBudgets));
-router.get("/entries", protect, memberOnly, asyncHandler(getSavingsEntries));
-router.post("/entries", protect, memberOnly, mutationLimiter, asyncHandler(createSavingsEntry));
-router.post("/entries/import-preview", protect, memberOnly, importLimiter, asyncHandler(previewSavingsEntriesImport));
-router.post("/entries/import", protect, memberOnly, importLimiter, asyncHandler(importSavingsEntries));
-router.put("/entries/:entryId", protect, memberOnly, mutationLimiter, asyncHandler(updateSavingsEntry));
-router.delete("/entries/:entryId", protect, memberOnly, mutationLimiter, asyncHandler(deleteSavingsEntry));
-router.get("/goals", protect, memberOnly, asyncHandler(getSavingsGoals));
-router.post("/goals", protect, memberOnly, mutationLimiter, asyncHandler(createSavingsGoal));
-router.put("/goals/:goalId", protect, memberOnly, mutationLimiter, asyncHandler(updateSavingsGoal));
-router.delete("/goals/:goalId", protect, memberOnly, mutationLimiter, asyncHandler(deleteSavingsGoal));
-router.get("/recurring", protect, memberOnly, asyncHandler(getRecurringExpenses));
-router.post("/recurring", protect, memberOnly, mutationLimiter, asyncHandler(createRecurringExpense));
-router.post("/recurring/:recurringId/log", protect, memberOnly, mutationLimiter, asyncHandler(logRecurringExpenseAsEntry));
-router.put("/recurring/:recurringId", protect, memberOnly, mutationLimiter, asyncHandler(updateRecurringExpense));
-router.delete("/recurring/:recurringId", protect, memberOnly, mutationLimiter, asyncHandler(deleteRecurringExpense));
-router.get("/summary", protect, memberOnly, asyncHandler(getSavingsSummary));
-router.get("/activity", protect, memberOnly, asyncHandler(getSavingsActivity));
-router.get("/summary-export", protect, memberOnly, asyncHandler(downloadSavingsSummaryDocument));
-router.get("/backup", protect, memberOnly, backupLimiter, asyncHandler(exportSavingsBackup));
-router.post("/summary-email", protect, memberOnly, emailLimiter, asyncHandler(sendSavingsSummaryEmailNow));
+router.use(protect, requireSavingsStudioPro);
+
+router.get("/meta", asyncHandler(getSavingsMeta));
+router.get("/profile", asyncHandler(getSavingsProfile));
+router.put("/profile", mutationLimiter, asyncHandler(updateSavingsProfile));
+router.put("/email-settings", mutationLimiter, asyncHandler(updateSavingsEmailSettings));
+router.get("/budgets", asyncHandler(getSavingsBudgets));
+router.put("/budgets", mutationLimiter, asyncHandler(upsertSavingsBudgets));
+router.get("/entries", asyncHandler(getSavingsEntries));
+router.post("/entries", mutationLimiter, asyncHandler(createSavingsEntry));
+router.post("/entries/import-preview", importLimiter, asyncHandler(previewSavingsEntriesImport));
+router.post("/entries/import", importLimiter, asyncHandler(importSavingsEntries));
+router.put("/entries/:entryId", mutationLimiter, asyncHandler(updateSavingsEntry));
+router.delete("/entries/:entryId", mutationLimiter, asyncHandler(deleteSavingsEntry));
+router.get("/goals", asyncHandler(getSavingsGoals));
+router.post("/goals", mutationLimiter, asyncHandler(createSavingsGoal));
+router.put("/goals/:goalId", mutationLimiter, asyncHandler(updateSavingsGoal));
+router.delete("/goals/:goalId", mutationLimiter, asyncHandler(deleteSavingsGoal));
+router.get("/recurring", asyncHandler(getRecurringExpenses));
+router.post("/recurring", mutationLimiter, asyncHandler(createRecurringExpense));
+router.post("/recurring/:recurringId/log", mutationLimiter, asyncHandler(logRecurringExpenseAsEntry));
+router.put("/recurring/:recurringId", mutationLimiter, asyncHandler(updateRecurringExpense));
+router.delete("/recurring/:recurringId", mutationLimiter, asyncHandler(deleteRecurringExpense));
+router.get("/summary", asyncHandler(getSavingsSummary));
+router.get("/activity", asyncHandler(getSavingsActivity));
+router.get("/summary-export", asyncHandler(downloadSavingsSummaryDocument));
+router.get("/backup", backupLimiter, asyncHandler(exportSavingsBackup));
+router.post("/summary-email", emailLimiter, asyncHandler(sendSavingsSummaryEmailNow));
 
 module.exports = router;

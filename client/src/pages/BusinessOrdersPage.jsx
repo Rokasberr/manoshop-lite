@@ -1,16 +1,19 @@
-import { BarChart3 } from "lucide-react";
+import { BarChart3, Download } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import toast from "react-hot-toast";
 
 import EmptyState from "../components/EmptyState";
 import LoadingSpinner from "../components/LoadingSpinner";
 import StatusBadge from "../components/admin/StatusBadge";
 import businessService from "../services/businessService";
+import orderService from "../services/orderService";
 import { formatCurrency } from "../utils/currency";
 
 const BusinessOrdersPage = ({ mode = "orders" }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [downloadingInvoiceId, setDownloadingInvoiceId] = useState("");
 
   useEffect(() => {
     const loadOrders = async () => {
@@ -29,7 +32,7 @@ const BusinessOrdersPage = ({ mode = "orders" }) => {
 
   const totals = useMemo(
     () =>
-      orders.reduce(
+      orders.filter((order) => order.paymentStatus === "paid").reduce(
         (summary, order) => ({
           revenue: summary.revenue + Number(order.price || order.totalPrice || 0),
           platformCommission: summary.platformCommission + Number(order.platformCommission || 0),
@@ -49,6 +52,19 @@ const BusinessOrdersPage = ({ mode = "orders" }) => {
   }
 
   const isEarnings = mode === "earnings";
+  const pendingOrdersCount = orders.filter((order) => order.paymentStatus && order.paymentStatus !== "paid").length;
+
+  const handleDownloadInvoice = async (order) => {
+    try {
+      setDownloadingInvoiceId(order._id);
+      await orderService.downloadInvoice(order._id, order.invoice?.number || `invoice-${order._id}`);
+      toast.success("PDF saskaita atsisiusta.");
+    } catch (downloadError) {
+      toast.error(downloadError.response?.data?.message || "Nepavyko atsisiusti PDF saskaitos.");
+    } finally {
+      setDownloadingInvoiceId("");
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -58,13 +74,16 @@ const BusinessOrdersPage = ({ mode = "orders" }) => {
           {isEarnings ? "Pajamu ir commission apzvalga" : "Store uzsakymai"}
         </h1>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
-          Skaiciavimai ateina is backend: produkto kaina, commissionRate, platformCommission ir sellerEarnings nera imami is frontend.
+          Skaiciavimai rodo tik apmoketus uzsakymus. Pending, failed, canceled ir refunded checkout irasai lieka lenteleje kaip eiga, bet nera traukiami i pajamas.
+        </p>
+        <p className="mt-3 max-w-3xl text-xs font-semibold uppercase leading-5 text-muted">
+          Ismokejimai MVP etape yra rankinis procesas, be automatiniu payout veiksmu.
         </p>
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
         {[
-          ["Bendra suma", totals.revenue],
+          ["Patvirtintos pajamos", totals.revenue],
           ["Stilloak commission", totals.platformCommission],
           ["Seller earnings", totals.sellerEarnings],
         ].map(([label, value]) => (
@@ -78,6 +97,11 @@ const BusinessOrdersPage = ({ mode = "orders" }) => {
 
       {orders.length ? (
         <section className="panel overflow-hidden p-0">
+          {pendingOrdersCount ? (
+            <div className="border-b px-5 py-4 text-sm leading-6 text-muted" style={{ borderColor: "rgb(var(--line) / 0.72)" }}>
+              {pendingOrdersCount} neapmoketi arba neuzbaigti uzsakymai rodomi audito lenteleje, bet neitraukti i pajamu korteles.
+            </div>
+          ) : null}
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-sm">
               <thead>
@@ -88,6 +112,7 @@ const BusinessOrdersPage = ({ mode = "orders" }) => {
                   <th className="p-4 font-semibold">Commission</th>
                   <th className="p-4 font-semibold">Seller earnings</th>
                   <th className="p-4 font-semibold">Mokejimas</th>
+                  <th className="p-4 font-semibold">Saskaita</th>
                   <th className="p-4 font-semibold">Data</th>
                 </tr>
               </thead>
@@ -100,6 +125,21 @@ const BusinessOrdersPage = ({ mode = "orders" }) => {
                     <td className="p-4">{formatCurrency(order.platformCommission)} ({order.commissionRate || 0}%)</td>
                     <td className="p-4 font-semibold">{formatCurrency(order.sellerEarnings)}</td>
                     <td className="p-4"><StatusBadge status={order.paymentStatus || "pending"} /></td>
+                    <td className="p-4">
+                      {order.paymentStatus === "paid" ? (
+                        <button
+                          type="button"
+                          onClick={() => handleDownloadInvoice(order)}
+                          disabled={downloadingInvoiceId === order._id}
+                          className="button-secondary gap-2 px-3 py-2 disabled:opacity-60"
+                        >
+                          <Download size={14} />
+                          {downloadingInvoiceId === order._id ? "Siunciama..." : "PDF"}
+                        </button>
+                      ) : (
+                        <span className="text-xs font-semibold uppercase text-muted">po apmokejimo</span>
+                      )}
+                    </td>
                     <td className="p-4 text-muted">{new Date(order.createdAt).toLocaleDateString("lt-LT")}</td>
                   </tr>
                 ))}

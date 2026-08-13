@@ -1,4 +1,4 @@
-export const memberAccessStatuses = ["active", "trialing", "past_due"];
+export const memberAccessStatuses = ["active", "trialing"];
 
 export const planAliases = {
   guest: "free",
@@ -16,7 +16,7 @@ export const planDisplayNames = {
   free: "Be aktyvios narystės",
   basic: "Demo versija",
   personal: "Asmeninis",
-  private_business: "Verslas",
+  private_business: "Privatus verslas",
 };
 
 export const normalizePlan = (plan = "") => {
@@ -59,9 +59,9 @@ export const hasActiveMembership = (user) => {
   }
 
   const plan = normalizePlan(user.subscription?.plan || "free");
-  const status = user.subscription?.status || "inactive";
+  const status = String(user.subscription?.status || "inactive").trim().toLowerCase();
 
-  return plan !== "free" && memberAccessStatuses.includes(status);
+  return ["basic", "personal", "private_business"].includes(plan) && memberAccessStatuses.includes(status);
 };
 
 export const canAccessSavingStudio = (plan) =>

@@ -6,26 +6,38 @@ const {
   buildOrderLineItems,
   buildSubscriptionLineItem,
 } = require("../services/stripeCheckoutService");
+const { getPlanById, normalizePlanId } = require("../config/subscriptionPlans");
+const { validateBillingSessionPayload } = require("../middleware/requestValidation");
 
-test("subscription checkout uses configured Stripe price IDs", () => {
-  const originalValue = process.env.STRIPE_PRICE_BAZINIS;
-  process.env.STRIPE_PRICE_BAZINIS = "price_test_bazinis";
-
-  const lineItem = buildSubscriptionLineItem({
-    id: "bazinis",
-    name: "Demo versija",
-    price: 5.99,
-    currency: "eur",
-    interval: "month",
-    stripePriceEnv: "STRIPE_PRICE_BAZINIS",
+const runMiddleware = (middleware, body) =>
+  new Promise((resolve) => {
+    const req = { body: { ...body } };
+    middleware(req, {}, (error) => resolve({ error, req }));
   });
 
-  assert.deepEqual(lineItem, { price: "price_test_bazinis", quantity: 1 });
+test("Demo plan is internal and does not require a Stripe price ID", () => {
+  const originalValue = process.env.STRIPE_PRICE_BAZINIS;
+  delete process.env.STRIPE_PRICE_BAZINIS;
+
+  const plan = getPlanById("basic");
+
+  assert.equal(plan.provider, "internal");
+  assert.equal(plan.price, 0);
+  assert.equal(plan.priceId, "");
   if (originalValue === undefined) {
     delete process.env.STRIPE_PRICE_BAZINIS;
   } else {
     process.env.STRIPE_PRICE_BAZINIS = originalValue;
   }
+});
+
+test("Demo plan cannot create a Stripe subscription checkout", async () => {
+  const result = await runMiddleware(validateBillingSessionPayload, {
+    planId: "basic",
+    provider: "stripe",
+  });
+
+  assert.equal(result.error.statusCode, 400);
 });
 
 test("subscription checkout uses selected plan Stripe price ID", () => {
@@ -34,8 +46,8 @@ test("subscription checkout uses selected plan Stripe price ID", () => {
 
   const lineItem = buildSubscriptionLineItem({
     id: "privatus_verslas",
-    name: "Verslas",
-    price: 44.99,
+    name: "Privatus verslas",
+    price: 99,
     currency: "eur",
     interval: "month",
     description: "Plan",
@@ -48,6 +60,17 @@ test("subscription checkout uses selected plan Stripe price ID", () => {
   } else {
     process.env.STRIPE_PRICE_PRIVATUS_VERSLAS = originalValue;
   }
+});
+
+test("legacy plan aliases normalize to current plan IDs", () => {
+  assert.equal(normalizePlanId("bazinis"), "basic");
+  assert.equal(normalizePlanId("asmeninis"), "personal");
+  assert.equal(normalizePlanId("privatus_verslas"), "private_business");
+});
+
+test("paid plan prices remain unchanged", () => {
+  assert.equal(getPlanById("personal").price, 24);
+  assert.equal(getPlanById("private_business").price, 99);
 });
 
 test("order checkout line items preserve product totals", () => {

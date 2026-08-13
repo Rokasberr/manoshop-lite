@@ -44,18 +44,37 @@ const serializeStore = (store) => {
   };
 };
 
+const calculatePaidOrderTotals = (orders = []) =>
+  orders
+    .filter((order) => order?.paymentStatus === "paid")
+    .reduce(
+      (summary, order) => ({
+        orders: summary.orders + 1,
+        revenue: summary.revenue + Number(order.price || order.totalPrice || 0),
+        platformCommission: summary.platformCommission + Number(order.platformCommission || 0),
+        sellerEarnings: summary.sellerEarnings + Number(order.sellerEarnings || 0),
+      }),
+      { orders: 0, revenue: 0, platformCommission: 0, sellerEarnings: 0 }
+    );
+
 const validateStorePayload = async ({ payload, ownerId, existingStoreId = null }) => {
   const name = String(payload.name || "").trim();
   const slug = normalizeSlug(payload.slug || name);
   const headline = String(payload.headline || "").trim();
   const description = String(payload.description || "").trim();
   const theme = ["oak", "sage", "linen", "charcoal"].includes(payload.theme) ? payload.theme : "oak";
-  const selectedProductIds = Array.isArray(payload.selectedProducts)
-    ? [...new Set(payload.selectedProducts.map(String).filter((id) => mongoose.Types.ObjectId.isValid(id)))]
+  const selectedProductValues = Array.isArray(payload.selectedProducts)
+    ? payload.selectedProducts.map((id) => String(id || "").trim())
     : [];
+  const invalidSelectedProducts = selectedProductValues.filter((id) => !mongoose.Types.ObjectId.isValid(id));
+  const selectedProductIds = [...new Set(selectedProductValues)];
 
   if (!name) {
     throw createHttpError("Ivesk svetaines pavadinima.", 400);
+  }
+
+  if (invalidSelectedProducts.length) {
+    throw createHttpError("Store produkto identifikatoriai netinkami.", 400);
   }
 
   if (!slug || slug.length < 3 || slug.length > 80 || !slugPattern.test(slug)) {
@@ -97,25 +116,16 @@ const validateStorePayload = async ({ payload, ownerId, existingStoreId = null }
 };
 
 const getBusinessDashboard = async (req, res) => {
-  const [store, orders] = await Promise.all([
+  const [store, paidOrders, recentOrders] = await Promise.all([
     Store.findOne({ owner: req.user._id }).populate("selectedProducts"),
+    Order.find({ storeOwner: req.user._id, paymentStatus: "paid" }),
     Order.find({ storeOwner: req.user._id }).sort({ createdAt: -1 }).limit(8).populate("product"),
   ]);
 
-  const totals = orders.reduce(
-    (summary, order) => ({
-      orders: summary.orders + 1,
-      revenue: summary.revenue + Number(order.price || order.totalPrice || 0),
-      platformCommission: summary.platformCommission + Number(order.platformCommission || 0),
-      sellerEarnings: summary.sellerEarnings + Number(order.sellerEarnings || 0),
-    }),
-    { orders: 0, revenue: 0, platformCommission: 0, sellerEarnings: 0 }
-  );
-
   res.json({
     store: store ? serializeStore(store) : null,
-    totals,
-    recentOrders: orders,
+    totals: calculatePaidOrderTotals(paidOrders),
+    recentOrders,
   });
 };
 
@@ -327,19 +337,13 @@ const getAdminBusinessAnalytics = async (_req, res) => {
     .populate("product")
     .sort({ createdAt: -1 });
 
-  const totals = orders.reduce(
-    (summary, order) => ({
-      revenue: summary.revenue + Number(order.price || order.totalPrice || 0),
-      platformCommission: summary.platformCommission + Number(order.platformCommission || 0),
-      sellerEarnings: summary.sellerEarnings + Number(order.sellerEarnings || 0),
-    }),
-    { revenue: 0, platformCommission: 0, sellerEarnings: 0 }
-  );
+  const totals = calculatePaidOrderTotals(orders);
 
   res.json({ totals, orders });
 };
 
 module.exports = {
+  calculatePaidOrderTotals,
   createStoreCheckoutSession,
   getAdminBusinessAnalytics,
   getBusinessDashboard,

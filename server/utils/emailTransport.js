@@ -29,6 +29,12 @@ const isEmailTransportConfigured = () => {
   return Boolean(host && port && from);
 };
 
+const isFullEmailTransportConfigured = () => {
+  const { host, port, from, user, pass } = getTransportConfig();
+  const secureFlag = process.env.SMTP_SECURE;
+  return Boolean(host && port && from && user && pass && String(secureFlag || "").trim());
+};
+
 const normalizeEmailTransportError = (error) => {
   const message = String(error?.message || "");
   const response = String(error?.response || "");
@@ -108,6 +114,7 @@ const getEmailTransport = () => {
 module.exports = {
   getEmailTransport,
   getTransportConfig,
+  isFullEmailTransportConfigured,
   isEmailTransportConfigured,
   normalizeEmailTransportError,
 };

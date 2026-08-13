@@ -19,7 +19,7 @@
   TrendingUp,
   WalletCards,
 } from "lucide-react";
-import { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
+import { startTransition, useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { useSearchParams } from "react-router-dom";
 
@@ -162,6 +162,49 @@ const roundScenarioAmount = (value) => {
   return Math.ceil(numericValue / 10) * 10;
 };
 
+const parseDecimalInput = (value, fallback = 0) => {
+  const numericValue = Number(String(value || "").replace(",", "."));
+  return Number.isFinite(numericValue) ? numericValue : fallback;
+};
+
+const formatDraftCurrency = (value) => money.format(parseDecimalInput(value));
+
+const getOnboardingStepError = ({ budgetInputs, profileForm, step }) => {
+  if (step === 0) {
+    const monthlyIncome = parseDecimalInput(profileForm.monthlyIncome, NaN);
+    const monthlySavingsTarget = parseDecimalInput(profileForm.monthlySavingsTarget, NaN);
+
+    if (!Number.isFinite(monthlyIncome) || monthlyIncome <= 0) {
+      return "Įvesk mėnesio pajamas, kad setup būtų prasmingas.";
+    }
+
+    if (!Number.isFinite(monthlySavingsTarget) || monthlySavingsTarget < 0) {
+      return "Įvesk galiojantį mėnesio taupymo tikslą.";
+    }
+  }
+
+  if (step === 1) {
+    const hasAnyBudget = ONBOARDING_BUDGET_CATEGORIES.some((category) => {
+      const amount = parseDecimalInput(budgetInputs[category], NaN);
+      return Number.isFinite(amount) && amount > 0;
+    });
+
+    if (!profileForm.primaryFocus) {
+      return "Pasirink pagrindinį fokusą.";
+    }
+
+    if (!hasAnyBudget) {
+      return "Įrašyk bent vieną pirmą biudžeto ribą.";
+    }
+  }
+
+  return "";
+};
+
+const getOnboardingCompletionError = ({ budgetInputs, profileForm }) =>
+  getOnboardingStepError({ budgetInputs, profileForm, step: 0 }) ||
+  getOnboardingStepError({ budgetInputs, profileForm, step: 1 });
+
 const formatFutureMonthLabel = (monthsAhead) => {
   if (!Number.isFinite(monthsAhead) || monthsAhead <= 0) {
     return "dabar";
@@ -239,9 +282,27 @@ const daysSinceDate = (dateValue) => {
   return Math.max(Math.floor((Date.now() - timestamp) / 86400000), 0);
 };
 
+const getEntryDateValue = (entry) => String(entry?.date || "").trim();
+
+const formatEntryDate = (dateValue) => {
+  const normalizedDate = getEntryDateValue({ date: dateValue });
+
+  if (!normalizedDate) {
+    return "Data nenurodyta";
+  }
+
+  const parsedDate = new Date(`${normalizedDate}T00:00:00`);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "Data nenurodyta";
+  }
+
+  return dateFormatter.format(parsedDate);
+};
+
 const buildSavingsEntryKey = (entryLike) => {
   const title = String(entryLike?.title || "").trim().toLowerCase();
-  const date = String(entryLike?.date || "").trim();
+  const date = getEntryDateValue(entryLike);
   const amount = Number(entryLike?.amount || 0).toFixed(2);
 
   return `${date}__${amount}__${title}`;
@@ -443,9 +504,13 @@ const SavingsStudioPage = () => {
     month: "all",
   });
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [loadingBudgets, setLoadingBudgets] = useState(false);
+  const [budgetLoadError, setBudgetLoadError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [savingBudgets, setSavingBudgets] = useState(false);
   const [savingOnboarding, setSavingOnboarding] = useState(false);
+  const [onboardingError, setOnboardingError] = useState("");
   const [savingGoal, setSavingGoal] = useState(false);
   const [savingRecurring, setSavingRecurring] = useState(false);
   const [savingEmailSettings, setSavingEmailSettings] = useState(false);
@@ -468,90 +533,100 @@ const SavingsStudioPage = () => {
   const deferredSearch = useDeferredValue(filters.search.trim().toLowerCase());
   const selectedBudgetMonth = filters.month === "all" ? currentMonthKey() : filters.month;
 
-  useEffect(() => {
-    const loadStudio = async () => {
-      try {
-        setLoading(true);
+  const loadStudio = useCallback(async () => {
+    try {
+      setLoading(true);
+      setLoadError("");
 
-        const [metaResult, profileResult, entriesResult, summaryResult, budgetsResult, goalsResult, recurringResult, activityResult] =
-          await Promise.all([
-            savingsStudioService.getMeta(),
-            savingsStudioService.getProfile(),
-            savingsStudioService.getEntries(),
-            savingsStudioService.getSummary(),
-            savingsStudioService.getBudgets(currentMonthKey()),
-            savingsStudioService.getGoals(),
-            savingsStudioService.getRecurringExpenses(),
-            savingsStudioService.getActivity(),
-          ]);
+      const [metaResult, profileResult, entriesResult, summaryResult, budgetsResult, goalsResult, recurringResult, activityResult] =
+        await Promise.all([
+          savingsStudioService.getMeta(),
+          savingsStudioService.getProfile(),
+          savingsStudioService.getEntries(),
+          savingsStudioService.getSummary(),
+          savingsStudioService.getBudgets(currentMonthKey()),
+          savingsStudioService.getGoals(),
+          savingsStudioService.getRecurringExpenses(),
+          savingsStudioService.getActivity(),
+        ]);
 
-        startTransition(() => {
-          const apiCategories = metaResult.categories?.length ? metaResult.categories : DEFAULT_CATEGORIES;
-          const apiFocusOptions = metaResult.focusOptions?.length
-            ? metaResult.focusOptions
-            : DEFAULT_FOCUS_OPTIONS;
-          const apiRecurringFrequencies = metaResult.recurringFrequencies?.length
-            ? metaResult.recurringFrequencies
-            : DEFAULT_RECURRING_FREQUENCIES;
+      startTransition(() => {
+        const apiCategories = metaResult.categories?.length ? metaResult.categories : DEFAULT_CATEGORIES;
+        const apiFocusOptions = metaResult.focusOptions?.length
+          ? metaResult.focusOptions
+          : DEFAULT_FOCUS_OPTIONS;
+        const apiRecurringFrequencies = metaResult.recurringFrequencies?.length
+          ? metaResult.recurringFrequencies
+          : DEFAULT_RECURRING_FREQUENCIES;
 
-          setCategories(apiCategories);
-          setFocusOptions(apiFocusOptions);
-          setRecurringFrequencies(apiRecurringFrequencies);
-          setProfile(profileResult.profile || null);
-          setActivity(activityResult.activity || []);
-          setProfileForm({
-            monthlyIncome: profileResult.profile?.monthlyIncome ? String(profileResult.profile.monthlyIncome) : "",
-            monthlySavingsTarget: profileResult.profile?.monthlySavingsTarget
-              ? String(profileResult.profile.monthlySavingsTarget)
-              : "",
-            primaryFocus: profileResult.profile?.primaryFocus || apiFocusOptions[0] || "",
-          });
-          setEmailSettingsForm({
-            summaryEmailsEnabled: Boolean(profileResult.profile?.summaryEmailsEnabled),
-            summaryEmailFrequency: profileResult.profile?.summaryEmailFrequency || "weekly",
-          });
-          setEntries(entriesResult.entries || []);
-          setSummary(summaryResult.summary || null);
-          setBudgets(budgetsResult.budgets || []);
-          setBudgetInputs(
-            Object.fromEntries((budgetsResult.budgets || []).map((budget) => [budget.category, String(budget.limitAmount)]))
-          );
-          setGoals(goalsResult.goals || []);
-          setRecurringExpenses(recurringResult.recurringExpenses || []);
-          setRecurringForm(emptyRecurringExpense(apiCategories));
-          setEntryForm((current) => ({
-            ...current,
-            category: current.category || apiCategories[1] || apiCategories[0] || "Maistas",
-            date: current.date || currentDateInput(),
-          }));
+        setCategories(apiCategories);
+        setFocusOptions(apiFocusOptions);
+        setRecurringFrequencies(apiRecurringFrequencies);
+        setProfile(profileResult.profile || null);
+        setActivity(activityResult.activity || []);
+        setProfileForm({
+          monthlyIncome: profileResult.profile?.monthlyIncome ? String(profileResult.profile.monthlyIncome) : "",
+          monthlySavingsTarget: profileResult.profile?.monthlySavingsTarget
+            ? String(profileResult.profile.monthlySavingsTarget)
+            : "",
+          primaryFocus: profileResult.profile?.primaryFocus || apiFocusOptions[0] || "",
         });
-      } catch (error) {
-        toast.error(error.response?.data?.message || "Nepavyko užkrauti Stilloak.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadStudio();
+        setEmailSettingsForm({
+          summaryEmailsEnabled: Boolean(profileResult.profile?.summaryEmailsEnabled),
+          summaryEmailFrequency: profileResult.profile?.summaryEmailFrequency || "weekly",
+        });
+        setEntries(entriesResult.entries || []);
+        setSummary(summaryResult.summary || null);
+        setBudgets(budgetsResult.budgets || []);
+        setBudgetInputs(
+          Object.fromEntries((budgetsResult.budgets || []).map((budget) => [budget.category, String(budget.limitAmount)]))
+        );
+        setGoals(goalsResult.goals || []);
+        setRecurringExpenses(recurringResult.recurringExpenses || []);
+        setRecurringForm(emptyRecurringExpense(apiCategories));
+        setEntryForm((current) => ({
+          ...current,
+          category: current.category || apiCategories[1] || apiCategories[0] || "Maistas",
+          date: current.date || currentDateInput(),
+        }));
+      });
+    } catch (error) {
+      const message = error.response?.data?.message || "Nepavyko užkrauti Stilloak.";
+      setLoadError(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
-    const loadBudgets = async () => {
-      try {
-        const budgetResult = await savingsStudioService.getBudgets(selectedBudgetMonth);
-        setBudgets(budgetResult.budgets || []);
-        setBudgetInputs(
-          Object.fromEntries((budgetResult.budgets || []).map((budget) => [budget.category, String(budget.limitAmount)]))
-        );
-      } catch (error) {
-        toast.error(error.response?.data?.message || "Nepavyko užkrauti biudžetų.");
-      }
-    };
+    loadStudio();
+  }, [loadStudio]);
 
-    if (!loading) {
-      loadBudgets();
+  const loadBudgetsForMonth = useCallback(async (monthKey) => {
+    try {
+      setLoadingBudgets(true);
+      setBudgetLoadError("");
+
+      const budgetResult = await savingsStudioService.getBudgets(monthKey);
+      setBudgets(budgetResult.budgets || []);
+      setBudgetInputs(
+        Object.fromEntries((budgetResult.budgets || []).map((budget) => [budget.category, String(budget.limitAmount)]))
+      );
+    } catch (error) {
+      const message = error.response?.data?.message || "Nepavyko užkrauti biudžetų.";
+      setBudgetLoadError(message);
+      toast.error(message);
+    } finally {
+      setLoadingBudgets(false);
     }
-  }, [loading, selectedBudgetMonth]);
+  }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      loadBudgetsForMonth(selectedBudgetMonth);
+    }
+  }, [loadBudgetsForMonth, loading, selectedBudgetMonth]);
 
   useEffect(() => {
     if (searchParams.get("welcome") === "membership") {
@@ -580,13 +655,16 @@ const SavingsStudioPage = () => {
   const filteredEntries = useMemo(
     () =>
       entries.filter((entry) => {
+        const entryTitle = String(entry.title || "").toLowerCase();
+        const entryNotes = String(entry.notes || "").toLowerCase();
+        const entryDate = getEntryDateValue(entry);
         const matchesSearch =
           !deferredSearch ||
-          entry.title.toLowerCase().includes(deferredSearch) ||
-          entry.notes.toLowerCase().includes(deferredSearch);
+          entryTitle.includes(deferredSearch) ||
+          entryNotes.includes(deferredSearch);
         const matchesCategory =
           filters.category === "Visos kategorijos" || entry.category === filters.category;
-        const matchesMonth = filters.month === "all" || entry.date.startsWith(filters.month);
+        const matchesMonth = filters.month === "all" || entryDate.startsWith(filters.month);
 
         return matchesSearch && matchesCategory && matchesMonth;
       }),
@@ -594,7 +672,7 @@ const SavingsStudioPage = () => {
   );
 
   const filteredTotal = filteredEntries.reduce((sum, entry) => sum + Number(entry.amount), 0);
-  const selectedMonthEntries = entries.filter((entry) => entry.date.startsWith(selectedBudgetMonth));
+  const selectedMonthEntries = entries.filter((entry) => getEntryDateValue(entry).startsWith(selectedBudgetMonth));
   const recurringByCategory = useMemo(
     () =>
       summary?.recurringByCategory ||
@@ -1386,6 +1464,11 @@ const SavingsStudioPage = () => {
     });
   };
 
+  const refreshSummary = async () => {
+    const summaryResult = await savingsStudioService.getSummary();
+    setSummary(summaryResult.summary || null);
+  };
+
   const refreshGoals = async () => {
     const goalResult = await savingsStudioService.getGoals();
     setGoals(goalResult.goals || []);
@@ -1411,6 +1494,7 @@ const SavingsStudioPage = () => {
 
   const handleProfileChange = (event) => {
     const { name, value } = event.target;
+    setOnboardingError("");
     setProfileForm((current) => ({
       ...current,
       [name]: value,
@@ -1442,6 +1526,7 @@ const SavingsStudioPage = () => {
   };
 
   const handleBudgetInputChange = (category, value) => {
+    setOnboardingError("");
     setBudgetInputs((current) => ({
       ...current,
       [category]: value,
@@ -1449,54 +1534,40 @@ const SavingsStudioPage = () => {
   };
 
   const handleNextOnboardingStep = () => {
-    if (onboardingStep === 0) {
-      const monthlyIncome = Number(String(profileForm.monthlyIncome || "0").replace(",", "."));
-      const monthlySavingsTarget = Number(String(profileForm.monthlySavingsTarget || "0").replace(",", "."));
+    const validationError = getOnboardingStepError({ budgetInputs, profileForm, step: onboardingStep });
 
-      if (!Number.isFinite(monthlyIncome) || monthlyIncome <= 0) {
-        toast.error("Įvesk mėnesio pajamas, kad setup būtų prasmingas.");
-        return;
-      }
-
-      if (!Number.isFinite(monthlySavingsTarget) || monthlySavingsTarget < 0) {
-        toast.error("Įvesk galiojantį mėnesio taupymo tikslą.");
-        return;
-      }
+    if (validationError) {
+      setOnboardingError(validationError);
+      toast.error(validationError);
+      return;
     }
 
-    if (onboardingStep === 1) {
-      const hasAnyBudget = ONBOARDING_BUDGET_CATEGORIES.some((category) => {
-        const amount = Number(String(budgetInputs[category] || "0").replace(",", "."));
-        return Number.isFinite(amount) && amount > 0;
-      });
-
-      if (!profileForm.primaryFocus) {
-        toast.error("Pasirink pagrindinį fokusą.");
-        return;
-      }
-
-      if (!hasAnyBudget) {
-        toast.error("Įrašyk bent vieną pirmą biudžeto ribą.");
-        return;
-      }
-    }
-
+    setOnboardingError("");
     setOnboardingStep((current) => Math.min(current + 1, ONBOARDING_STEPS.length - 1));
   };
 
   const handlePreviousOnboardingStep = () => {
+    setOnboardingError("");
     setOnboardingStep((current) => Math.max(current - 1, 0));
   };
 
   const handleSaveOnboarding = async (event) => {
     event.preventDefault();
+    const validationError = getOnboardingCompletionError({ budgetInputs, profileForm });
+
+    if (validationError) {
+      setOnboardingError(validationError);
+      toast.error(validationError);
+      return;
+    }
+
     setSavingOnboarding(true);
 
     try {
-      const [profileResult] = await Promise.all([
+      const [profileResult, budgetResult] = await Promise.all([
         savingsStudioService.updateProfile({
-          monthlyIncome: Number(String(profileForm.monthlyIncome || "0").replace(",", ".")),
-          monthlySavingsTarget: Number(String(profileForm.monthlySavingsTarget || "0").replace(",", ".")),
+          monthlyIncome: parseDecimalInput(profileForm.monthlyIncome),
+          monthlySavingsTarget: parseDecimalInput(profileForm.monthlySavingsTarget),
           primaryFocus: profileForm.primaryFocus,
           onboardingCompleted: true,
         }),
@@ -1504,15 +1575,23 @@ const SavingsStudioPage = () => {
           month: currentMonthKey(),
           budgets: ONBOARDING_BUDGET_CATEGORIES.map((category) => ({
             category,
-            limitAmount: Number(String(budgetInputs[category] || "0").replace(",", ".")),
+            limitAmount: parseDecimalInput(budgetInputs[category], NaN),
           })).filter((budget) => Number.isFinite(budget.limitAmount) && budget.limitAmount > 0),
         }),
       ]);
 
       setProfile(profileResult.profile);
+      setBudgets(budgetResult.budgets || []);
+      setBudgetInputs(
+        Object.fromEntries((budgetResult.budgets || []).map((budget) => [budget.category, String(budget.limitAmount)]))
+      );
+      await refreshSummary();
+      setOnboardingError("");
       toast.success("Pirmasis Stilloak setup baigtas.");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Nepavyko užbaigti pirmojo setup.");
+      const message = error.response?.data?.message || "Nepavyko užbaigti pirmojo setup.";
+      setOnboardingError(message);
+      toast.error(message);
     } finally {
       setSavingOnboarding(false);
     }
@@ -1526,7 +1605,7 @@ const SavingsStudioPage = () => {
       const budgetsPayload = categories
         .map((category) => ({
           category,
-          limitAmount: Number(String(budgetInputs[category] || "").replace(",", ".")),
+          limitAmount: parseDecimalInput(budgetInputs[category], NaN),
         }))
         .filter((budget) => Number.isFinite(budget.limitAmount) && budget.limitAmount > 0);
 
@@ -1539,6 +1618,7 @@ const SavingsStudioPage = () => {
       setBudgetInputs(
         Object.fromEntries((budgetResult.budgets || []).map((budget) => [budget.category, String(budget.limitAmount)]))
       );
+      await refreshSummary();
       toast.success("Biudžetai atnaujinti.");
     } catch (error) {
       toast.error(error.response?.data?.message || "Nepavyko išsaugoti biudžetų.");
@@ -1613,7 +1693,7 @@ const SavingsStudioPage = () => {
         await savingsStudioService.createEntry(entryForm);
       }
 
-      await refreshSummaryAndEntries();
+      await Promise.all([refreshSummaryAndEntries(), refreshActivity()]);
       setEntryForm(emptyEntry(categories));
       setEditingId("");
       toast.success(editingId ? "Išlaida atnaujinta." : "Išlaida išsaugota.");
@@ -1635,7 +1715,7 @@ const SavingsStudioPage = () => {
         await savingsStudioService.createGoal(goalForm);
       }
 
-      await refreshGoals();
+      await Promise.all([refreshGoals(), refreshSummary(), refreshActivity()]);
       setGoalForm(emptyGoal());
       setEditingGoalId("");
       toast.success(editingGoalId ? "Tikslas atnaujintas." : "Tikslas pridėtas.");
@@ -1657,7 +1737,7 @@ const SavingsStudioPage = () => {
         await savingsStudioService.createRecurringExpense(recurringForm);
       }
 
-      await refreshRecurring();
+      await Promise.all([refreshRecurring(), refreshSummary(), refreshActivity()]);
       setRecurringForm(emptyRecurringExpense(categories));
       setEditingRecurringId("");
       toast.success(editingRecurringId ? "Pasikartojanti išlaida atnaujinta." : "Pasikartojanti išlaida pridėta.");
@@ -1675,7 +1755,7 @@ const SavingsStudioPage = () => {
       await savingsStudioService.logRecurringExpense(recurringExpense._id, {
         month: currentMonthKey(),
       });
-      await Promise.all([refreshRecurring(), refreshSummaryAndEntries()]);
+      await Promise.all([refreshRecurring(), refreshSummaryAndEntries(), refreshActivity()]);
       toast.success("Pasikartojanti išlaida įtraukta į šio mėnesio įrašus.");
     } catch (error) {
       toast.error(error.response?.data?.message || "Nepavyko įtraukti pasikartojančios išlaidos.");
@@ -1726,7 +1806,7 @@ const SavingsStudioPage = () => {
       const result = await savingsStudioService.importEntries({
         rows: csvPreviewResult.validRows,
       });
-      await refreshSummaryAndEntries();
+      await Promise.all([refreshSummaryAndEntries(), refreshActivity()]);
       setCsvPreviewResult(null);
       setCsvFileName("");
       toast.success(`Importuota ${result.importedCount} įrašų.`);
@@ -1781,7 +1861,7 @@ const SavingsStudioPage = () => {
 
     try {
       await savingsStudioService.deleteEntry(entryId);
-      await refreshSummaryAndEntries();
+      await Promise.all([refreshSummaryAndEntries(), refreshActivity()]);
       toast.success("Išlaida ištrinta.");
     } catch (error) {
       toast.error(error.response?.data?.message || "Nepavyko ištrinti išlaidos.");
@@ -1801,7 +1881,7 @@ const SavingsStudioPage = () => {
 
     try {
       await savingsStudioService.deleteGoal(goalId);
-      await refreshGoals();
+      await Promise.all([refreshGoals(), refreshSummary(), refreshActivity()]);
       toast.success("Taupymo tikslas ištrintas.");
     } catch (error) {
       toast.error(error.response?.data?.message || "Nepavyko ištrinti tikslo.");
@@ -1821,7 +1901,7 @@ const SavingsStudioPage = () => {
 
     try {
       await savingsStudioService.deleteRecurringExpense(recurringId);
-      await refreshRecurring();
+      await Promise.all([refreshRecurring(), refreshSummary(), refreshActivity()]);
       toast.success("Pasikartojanti išlaida ištrinta.");
     } catch (error) {
       toast.error(error.response?.data?.message || "Nepavyko ištrinti pasikartojančios išlaidos.");
@@ -1833,11 +1913,11 @@ const SavingsStudioPage = () => {
   const handleEdit = (entry) => {
     setEditingId(entry._id);
     setEntryForm({
-      title: entry.title,
-      amount: String(entry.amount),
-      category: entry.category,
-      date: entry.date,
-      notes: entry.notes,
+      title: entry.title || "",
+      amount: entry.amount === undefined || entry.amount === null ? "" : String(entry.amount),
+      category: entry.category || categories[1] || categories[0] || "Maistas",
+      date: getEntryDateValue(entry) || currentDateInput(),
+      notes: entry.notes || "",
     });
 
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1884,6 +1964,24 @@ const SavingsStudioPage = () => {
 
   if (loading) {
     return <LoadingSpinner fullScreen />;
+  }
+
+  if (loadError) {
+    return (
+      <div className="member-workspace member-workspace-personal">
+        <section className="panel mx-auto max-w-3xl p-6 text-center sm:p-8">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">
+            <AlertTriangle size={22} />
+          </div>
+          <p className="mt-5 text-xs font-semibold uppercase tracking-[0.24em] text-muted">Saving Studio neatsidarė</p>
+          <h1 className="mt-3 font-display text-3xl font-bold leading-tight">Nepavyko užkrauti asmeninės darbo erdvės</h1>
+          <p className="mt-4 text-sm leading-6 text-muted">{loadError}</p>
+          <button type="button" className="button-primary mt-6" onClick={loadStudio}>
+            Bandyti dar kartą
+          </button>
+        </section>
+      </div>
+    );
   }
 
   const usageWizardCurrentStep = USAGE_WIZARD_STEPS[usageWizardStep];
@@ -1974,7 +2072,7 @@ const SavingsStudioPage = () => {
             <div className="flex flex-wrap gap-2">
               <span className="hero-chip">Asmeninis planas</span>
               <span className="hero-chip">Pilna nario zona</span>
-              <span className="hero-chip">14.99 €/mėn.</span>
+              <span className="hero-chip">24 €/mėn.</span>
             </div>
             <h1 className="mt-7 max-w-4xl break-words font-display text-4xl font-bold leading-tight sm:text-6xl lg:text-7xl">
               Stilloak asmeninė darbo erdvė
@@ -2116,6 +2214,12 @@ const SavingsStudioPage = () => {
             </div>
 
             <form className="space-y-4" onSubmit={handleSaveOnboarding}>
+              {onboardingError ? (
+                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+                  {onboardingError}
+                </div>
+              ) : null}
+
               {onboardingStep === 0 ? (
                 <div className="space-y-4">
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -2193,13 +2297,13 @@ const SavingsStudioPage = () => {
                       <div>
                         <p className="text-sm font-semibold text-muted">Mėnesio pajamos</p>
                         <p className="mt-1 text-lg font-semibold">
-                          {money.format(Number(String(profileForm.monthlyIncome || "0").replace(",", ".")))}
+                          {formatDraftCurrency(profileForm.monthlyIncome)}
                         </p>
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-muted">Taupymo tikslas</p>
                         <p className="mt-1 text-lg font-semibold">
-                          {money.format(Number(String(profileForm.monthlySavingsTarget || "0").replace(",", ".")))}
+                          {formatDraftCurrency(profileForm.monthlySavingsTarget)}
                         </p>
                       </div>
                     </div>
@@ -2212,7 +2316,7 @@ const SavingsStudioPage = () => {
                         <div key={category} className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
                           <p className="text-sm font-semibold text-muted">{category}</p>
                           <p className="mt-1 text-base font-semibold">
-                            {money.format(Number(String(budgetInputs[category] || "0").replace(",", ".")))}
+                            {formatDraftCurrency(budgetInputs[category])}
                           </p>
                         </div>
                       ))}
@@ -2823,7 +2927,7 @@ const SavingsStudioPage = () => {
                     <div className="text-left lg:text-right">
                       <p className="text-2xl font-semibold">{money.format(entry.amount)}</p>
                       <p className="mt-1 text-sm text-muted">
-                        {dateFormatter.format(new Date(`${entry.date}T00:00:00`))}
+                        {formatEntryDate(entry.date)}
                       </p>
                     </div>
                   </div>
@@ -2867,6 +2971,22 @@ const SavingsStudioPage = () => {
               <Target size={20} style={{ color: "rgb(var(--accent))" }} />
             </div>
 
+            {budgetLoadError ? (
+              <div className="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-4 text-sm text-red-700" role="alert">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p>{budgetLoadError}</p>
+                  <button
+                    type="button"
+                    className="button-secondary justify-center"
+                    onClick={() => loadBudgetsForMonth(selectedBudgetMonth)}
+                    disabled={loadingBudgets}
+                  >
+                    {loadingBudgets ? "Kraunama..." : "Bandyti dar kartą"}
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
             <form className="mt-6 space-y-4" onSubmit={handleSaveBudgets}>
               {categories.map((category) => (
                 <label key={category} className="block space-y-2">
@@ -2881,9 +3001,9 @@ const SavingsStudioPage = () => {
                 </label>
               ))}
 
-              <button type="submit" className="button-primary w-full gap-2" disabled={savingBudgets}>
+              <button type="submit" className="button-primary w-full gap-2" disabled={savingBudgets || loadingBudgets}>
                 <Target size={16} />
-                {savingBudgets ? "Saugoma..." : `Išsaugoti ${selectedBudgetMonth} biudžetus`}
+                {savingBudgets ? "Saugoma..." : loadingBudgets ? "Kraunama biudžetus..." : `Išsaugoti ${selectedBudgetMonth} biudžetus`}
               </button>
             </form>
           </div>

@@ -53,7 +53,7 @@ const common = {
       free: "Be aktyvios narystės",
       basic: "Demo versija",
       personal: "Asmeninis",
-      private_business: "Verslas",
+      private_business: "Privatus verslas",
     },
     productLabels: {
       price: "Kaina",
@@ -549,7 +549,7 @@ export const translations = {
       heroCardEyebrow: "Kas viduje",
       heroCards: [
         { title: "Excel produktai", text: "Biudžeto, taupymo ir savaitės planavimo modeliai su aiškia struktūra." },
-        { title: "Nario erdvės", text: "Demo, Asmeninis ir Verslas planai skirtingiems darbo etapams." },
+        { title: "Nario erdvės", text: "Demo, Asmeninis ir Privatus verslas planai skirtingiems darbo etapams." },
         { title: "Praktinė sistema", text: "Mažiau chaoso, daugiau aiškių mėnesio, tikslų ir veiksmų sprendimų." },
       ],
       digitalEyebrow: "Skaitmeniniai produktai",
@@ -564,7 +564,7 @@ export const translations = {
         { title: "Aiški struktūra", text: "Produktai sukurti taip, kad vartotojas greitai suprastų, ką pildyti ir ką stebėti." },
         { title: "Praktiškas dizainas", text: "Kortelės, dashboardai ir lentelės orientuoti į naudojimą, ne į dekorą." },
         { title: "Atskiri pirkimai", text: "Skaitmeniniai produktai nėra automatiškai nemokami Demo plane, todėl prieiga išlieka aiški." },
-        { title: "Planai pagal etapą", text: "Demo skirtas pradžiai, Asmeninis asmeninei sistemai, Verslas verslo zonoms." },
+      { title: "Planai pagal etapą", text: "Demo skirtas pradžiai, Asmeninis asmeninei sistemai, Privatus verslas verslo zonoms." },
       ],
       howEyebrow: "Kaip veikia",
       howTitle: "Paprastas kelias nuo peržiūros iki naudojimo",
@@ -585,14 +585,14 @@ export const translations = {
       finalCta: "Atidaryti skaitmeninius produktus",
     },
     pricing: {
-      seoTitle: "Stilloak Studio narystės | Demo, Asmeninis ir Verslas",
+      seoTitle: "Stilloak Studio narystės | Demo, Asmeninis ir Privatus verslas",
       seoDescription:
-        "Pasirinkite nemokamą Demo versiją, Asmeninį planą už €14.99/mėn. arba Verslas planą už €44.99/mėn. aiškesniems finansams ir verslo įrankiams.",
+        "Pasirinkite nemokamą Demo versiją, Asmeninį planą už €24/mėn. arba Privatus verslas planą už €99/mėn. aiškesniems finansams ir verslo įrankiams.",
       nav: ["Funkcijos", "Narystės", "Rinkiniai", "Atsiliepimai"],
       heroChip: "Stilloak Studio narystė",
       heroTitle: "Pasirink nario erdvę pagal savo etapą.",
       heroText:
-        "Demo versija padeda susipažinti su Saving Studio, Asmeninis atrakina pilną nario erdvę, o Verslas suteikia strateginę verslo erdvę augimui.",
+        "Demo versija padeda susipažinti su Saving Studio, Asmeninis atrakina pilną nario erdvę, o Privatus verslas suteikia strateginę verslo erdvę augimui.",
       viewMemberships: "Peržiūrėti narystes",
       viewZones: "Pamatyti nario zonas",
       trustLine: "Demo versija be kortelės · Mokami planai atšaukiami bet kada · Aiškūs planų skirtumai · Jokių paslėptų mokesčių",
@@ -616,7 +616,7 @@ export const translations = {
         },
         private_business: {
           eyebrow: "Strateginis lygis",
-          cta: "Pasirinkti Verslas",
+          cta: "Pasirinkti Privatus verslas",
           comparison: "Verslo įrankiams, svetainei, produktams ir pajamų apžvalgai.",
           kitName: "Stilloak Business Kit",
         },
@@ -636,7 +636,7 @@ export const translations = {
           { label: "Nario naujienos", value: "5", note: "ramūs atnaujinimai" },
           { label: "Strategijos lenta", value: "30 d.", note: "augimo kryptis" },
         ],
-        zones: ["Demo versija", "Asmeninis", "Verslas"],
+        zones: ["Demo versija", "Asmeninis", "Privatus verslas"],
         zoneLabel: "Zona {number}",
       },
       kits: {
@@ -681,10 +681,10 @@ export const translations = {
         features: ["Pilna nario zona", "Mėnesio suvestinės", "Tikslų progreso kortelės", "Nario naujienos", "Stilloak Growth Kit", "Premium resursai"],
       },
       private_business: {
-        name: "Verslas",
+        name: "Privatus verslas",
         subtitle: "Verslo įrankiai, svetainės zona, produktai, užsakymai ir pajamų apžvalga vienoje vietoje.",
         description: "Verslo įrankiai, svetainės zona, produktai, užsakymai ir pajamų apžvalga vienoje vietoje.",
-        badge: "Verslas",
+        badge: "Privatus verslas",
         features: ["Viskas iš Asmeninio plano", "Business Studio prieiga", "Svetainės ir produktų zona", "Užsakymų ir pajamų apžvalga", "Verslo šablonai ir skaitmeniniai ištekliai", "Prioritetinė patirtis"],
       },
     },
@@ -811,6 +811,7 @@ export const translations = {
         loading: "Jungiama...",
         newMember: "Naujas narys?",
         createAccount: "Sukurti paskyrą",
+        forgotPassword: "Pamiršai slaptažodį?",
       },
       register: {
         required: "Užpildyk visus laukus.",
@@ -834,6 +835,37 @@ export const translations = {
         loading: "Kuriama...",
         hasAccount: "Jau turi paskyrą?",
         signIn: "Prisijungti",
+      },
+      passwordRecovery: {
+        forgot: {
+          eyebrow: "slaptažodžio atkūrimas",
+          title: "Atkurk prieigą prie paskyros",
+          intro:
+            "Įvesk paskyros el. paštą. Jei paskyra egzistuoja, atsiųsime vienkartinę nuorodą naujam slaptažodžiui sukurti.",
+          required: "Įvesk el. pašto adresą.",
+          success:
+            "Jei paskyra su šiuo el. paštu egzistuoja, išsiuntėme slaptažodžio atkūrimo nuorodą.",
+          fail: "Nepavyko pradėti slaptažodžio atkūrimo. Bandyk dar kartą vėliau.",
+          email: "El. paštas",
+          submit: "Siųsti atkūrimo nuorodą",
+          loading: "Siunčiama...",
+          backToLogin: "Grįžti į prisijungimą",
+        },
+        reset: {
+          eyebrow: "naujas slaptažodis",
+          title: "Sukurk naują slaptažodį",
+          intro: "Įvesk naują slaptažodį. Nuoroda galioja trumpai ir veikia tik vieną kartą.",
+          missingToken: "Slaptažodžio atkūrimo nuoroda neteisinga arba pasibaigusi.",
+          passwordLength: "Slaptažodis turi būti bent 6 simbolių.",
+          passwordMismatch: "Slaptažodžiai nesutampa.",
+          success: "Slaptažodis atnaujintas. Dabar gali prisijungti.",
+          fail: "Nepavyko atnaujinti slaptažodžio. Bandyk dar kartą.",
+          password: "Naujas slaptažodis",
+          confirmPassword: "Pakartok naują slaptažodį",
+          submit: "Atnaujinti slaptažodį",
+          loading: "Atnaujinama...",
+          backToLogin: "Grįžti į prisijungimą",
+        },
       },
     },
     profile: {
@@ -1033,13 +1065,13 @@ export const translations = {
       accountCurrentPlan: "Dabartinis planas",
       openProfile: "Atidaryti profilį",
       changePlanTitle: "Keiskite planą tada, kai reikia daugiau.",
-      changePlanText: "Demo versija skirta Saving Studio peržiūrai, Asmeninis atrakina pilną Saving Studio, o Verslas prideda verslo zonas.",
+      changePlanText: "Demo versija skirta Saving Studio peržiūrai, Asmeninis atrakina pilną Saving Studio, o Privatus verslas prideda verslo zonas.",
       chooseAnotherLevel: "Pasirinkite kitą lygį",
-      chooseAnotherText: "Kiekvienas planas turi aiškią paskirtį: Demo Saving Studio pradžiai, Asmeninis pilnai asmeninei sistemai, Verslas verslo valdymui.",
+      chooseAnotherText: "Kiekvienas planas turi aiškią paskirtį: Demo Saving Studio pradžiai, Asmeninis pilnai asmeninei sistemai, Privatus verslas verslo valdymui.",
     },
     protected: {
       businessEyebrow: "Verslas",
-      businessTitle: "Business Studio prieinama tik Verslas plano nariams",
+      businessTitle: "Business Studio prieinama tik Privatus verslas plano nariams",
       businessText: "Saving Studio lieka pasiekiama pagal tavo narystę, bet Site Builder, My Store, Orders ir Earnings yra papildoma verslo zona.",
       backToSaving: "Grįžti į Saving Studio",
     },
@@ -1210,7 +1242,7 @@ translations.en = mergeLocale(translations.lt, {
   pricing: {
     seoTitle: "Stilloak Studio memberships | Demo, Personal, and Business",
     seoDescription:
-      "Choose the free Demo version, Personal membership for €14.99/month, or Business for €44.99/month for clearer finance and business tools.",
+      "Choose the free Demo version, Personal membership for €24/month, or Private Business for €99/month for clearer finance and business tools.",
     nav: ["Features", "Memberships", "Kits", "Reviews"],
     heroChip: "Stilloak Studio membership",
     heroTitle: "Choose the member space for your current stage.",
@@ -1383,6 +1415,7 @@ translations.en = mergeLocale(translations.lt, {
       loading: "Signing in...",
       newMember: "New member?",
       createAccount: "Create account",
+      forgotPassword: "Forgot password?",
     },
     register: {
       required: "Fill in all fields.",
@@ -1406,6 +1439,36 @@ translations.en = mergeLocale(translations.lt, {
       loading: "Creating...",
       hasAccount: "Already have an account?",
       signIn: "Sign in",
+    },
+    passwordRecovery: {
+      forgot: {
+        eyebrow: "password recovery",
+        title: "Recover account access",
+        intro:
+          "Enter your account email. If an account exists, we will send a one-time link to create a new password.",
+        required: "Enter your email address.",
+        success: "If an account with this email exists, we sent a password recovery link.",
+        fail: "Could not start password recovery. Try again later.",
+        email: "Email",
+        submit: "Send recovery link",
+        loading: "Sending...",
+        backToLogin: "Back to sign in",
+      },
+      reset: {
+        eyebrow: "new password",
+        title: "Create a new password",
+        intro: "Enter a new password. The link is short-lived and works only once.",
+        missingToken: "The password recovery link is invalid or expired.",
+        passwordLength: "Password must be at least 6 characters.",
+        passwordMismatch: "Passwords do not match.",
+        success: "Password updated. You can sign in now.",
+        fail: "Could not update password. Try again.",
+        password: "New password",
+        confirmPassword: "Repeat new password",
+        submit: "Update password",
+        loading: "Updating...",
+        backToLogin: "Back to sign in",
+      },
     },
   },
   profile: {
@@ -1735,7 +1798,7 @@ translations.pl = mergeLocale(translations.en, {
   pricing: {
     seoTitle: "Członkostwa Stilloak Studio | Demo, Osobisty i Biznes",
     seoDescription:
-      "Wybierz darmową wersję Demo, plan Osobisty za €14.99/mies. albo Biznes za €44.99/mies. dla jaśniejszych finansów i narzędzi biznesowych.",
+      "Wybierz darmową wersję Demo, plan Osobisty za €24/mies. albo Prywatny biznes za €99/mies. dla jaśniejszych finansów i narzędzi biznesowych.",
     nav: ["Funkcje", "Członkostwa", "Zestawy", "Opinie"],
     heroChip: "Członkostwo Stilloak Studio",
     heroTitle: "Wybierz strefę członka dla swojego etapu.",
@@ -2035,7 +2098,7 @@ translations.de = mergeLocale(translations.en, {
   pricing: {
     seoTitle: "Stilloak Studio Mitgliedschaften | Demo, Persönlich und Business",
     seoDescription:
-      "Wählen Sie die kostenlose Demo-Version, Persönlich für €14.99/Monat oder Business für €44.99/Monat für klarere Finanzen und Business-Tools.",
+      "Wählen Sie die kostenlose Demo-Version, Persönlich für €24/Monat oder Private Business für €99/Monat für klarere Finanzen und Business-Tools.",
     nav: ["Funktionen", "Mitgliedschaften", "Kits", "Stimmen"],
     heroChip: "Stilloak Studio Mitgliedschaft",
     heroTitle: "Wählen Sie den Mitgliederbereich für Ihre aktuelle Phase.",
@@ -2363,7 +2426,7 @@ translations.fr = mergeLocale(translations.en, {
   pricing: {
     seoTitle: "Abonnements Stilloak Studio | Démo, Personnel et Business",
     seoDescription:
-      "Choisissez la Démo gratuite, Personnel à €14.99/mois ou Business à €44.99/mois pour plus de clarté financière et des outils business.",
+      "Choisissez la Démo gratuite, Personnel à €24/mois ou Private Business à €99/mois pour plus de clarté financière et des outils business.",
     nav: ["Fonctions", "Abonnements", "Kits", "Avis"],
     heroChip: "Abonnement Stilloak Studio",
     heroTitle: "Choisissez l’espace membre adapté à votre étape.",
@@ -2654,7 +2717,7 @@ translations.es = mergeLocale(translations.en, {
   pricing: {
     seoTitle: "Membresías Stilloak Studio | Demo, Personal y Business",
     seoDescription:
-      "Elige la versión Demo gratuita, Personal por €14.99/mes o Business por €44.99/mes para finanzas más claras y herramientas de negocio.",
+      "Elige la versión Demo gratuita, Personal por €24/mes o Private Business por €99/mes para finanzas más claras y herramientas de negocio.",
     nav: ["Funciones", "Membresías", "Kits", "Opiniones"],
     heroChip: "Membresía Stilloak Studio",
     heroTitle: "Elige el espacio de miembro para tu etapa.",
