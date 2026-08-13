@@ -92,11 +92,12 @@ Neapsiribok vien analize – realiai įgyvendink, tikrink, taisyk ir atnaujink p
         $reportName = "stilloak-run-{0}-{1}.md" -f $run, (Get-Date -Format "yyyyMMdd-HHmmss")
         $latestReport = Join-Path $reportDirectory $reportName
 
-        & $codexExecutable exec `
-            --sandbox workspace-write `
+        & $codexExecutable `
             --ask-for-approval never `
+            --sandbox workspace-write `
             -c 'model_reasoning_effort="high"' `
             -c 'sandbox_workspace_write.network_access=false' `
+            exec `
             -o $latestReport `
             $runPrompt
 
@@ -218,4 +219,5 @@ Write-Host "$runnerRoot\codex-work\STATUS.md"
 Write-Host ""
 Write-Host "Paskutinė Codex ataskaita:"
 Write-Host "$runnerRoot\codex-work\LAST_RUN_REPORT.md"
+
 
