@@ -92,14 +92,14 @@ Neapsiribok vien analize – realiai įgyvendink, tikrink, taisyk ir atnaujink p
         $reportName = "stilloak-run-{0}-{1}.md" -f $run, (Get-Date -Format "yyyyMMdd-HHmmss")
         $latestReport = Join-Path $reportDirectory $reportName
 
-        & $codexExecutable `
+        $runPrompt | & $codexExecutable `
             --ask-for-approval never `
             --sandbox workspace-write `
             -c 'model_reasoning_effort="high"' `
             -c 'sandbox_workspace_write.network_access=false' `
             exec `
             -o $latestReport `
-            $runPrompt
+            "Use the complete Stilloak Studio task specification supplied through stdin. Start immediately. Inspect the repository, update codex-work/PLAN.md and codex-work/STATUS.md, implement the first unfinished milestone, run validations, repair failures and continue autonomously. Do not ask the user for another task."
 
         $codexExitCode = $LASTEXITCODE
         $safetyStop = $false
@@ -219,5 +219,6 @@ Write-Host "$runnerRoot\codex-work\STATUS.md"
 Write-Host ""
 Write-Host "Paskutinė Codex ataskaita:"
 Write-Host "$runnerRoot\codex-work\LAST_RUN_REPORT.md"
+
 
 
