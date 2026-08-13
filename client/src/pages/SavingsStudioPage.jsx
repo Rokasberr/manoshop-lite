@@ -2579,7 +2579,7 @@ const SavingsStudioPage = () => {
             <Repeat size={20} style={{ color: "rgb(var(--accent))" }} />
           </div>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <div className="mt-6 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
             <ForecastMetricTile
               label="Per mėnesį"
               value={money.format(recurringMonthlyTotal)}
@@ -2605,8 +2605,8 @@ const SavingsStudioPage = () => {
             {recurringForecastItems.length ? (
               recurringForecastItems.slice(0, 3).map((expense) => (
                 <div key={expense._id} className="soft-card rounded-[24px] p-5">
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div>
+                  <div className="flex min-w-0 flex-col gap-4">
+                    <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-3">
                         <h3 className="text-lg font-semibold">{expense.title}</h3>
                         <span className="premium-tag">{expense.category}</span>
@@ -2618,7 +2618,7 @@ const SavingsStudioPage = () => {
                       </p>
                     </div>
 
-                    <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3 text-left sm:min-w-[180px] sm:text-right">
+                    <div className="w-full max-w-full rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3 text-left">
                       <p className="text-xs uppercase tracking-[0.18em] text-muted">Metinė našta</p>
                       <p className="mt-2 text-lg font-semibold">{money.format(expense.annualEquivalent)}</p>
                     </div>
@@ -2674,7 +2674,7 @@ const SavingsStudioPage = () => {
             <CalendarRange size={20} style={{ color: "rgb(var(--accent))" }} />
           </div>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <div className="mt-6 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
             <ForecastMetricTile
               label="Lyginamas mėnuo"
               value={comparisonMonthLabel}
@@ -3577,7 +3577,7 @@ const SavingsStudioPage = () => {
             <Target size={20} style={{ color: "rgb(var(--accent))" }} />
           </div>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <div className="mt-6 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
             <ForecastMetricTile
               label="Aktyvūs tikslai"
               value={String(goalStrategyBoard.length)}
@@ -3624,7 +3624,7 @@ const SavingsStudioPage = () => {
             <Repeat size={20} style={{ color: "rgb(var(--accent))" }} />
           </div>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <div className="mt-6 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
             <ForecastMetricTile
               label="Per ketvirtį"
               value={money.format(recurringQuarterlyTotal)}
@@ -3786,7 +3786,7 @@ const SavingsStudioPage = () => {
             <PiggyBank size={20} style={{ color: "rgb(var(--accent))" }} />
           </div>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-4">
+          <div className="mt-6 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
             <ForecastMetricTile
               label="Aiškumo balas"
               value={`${strategyCenter.score}/100`}
@@ -3845,7 +3845,7 @@ const SavingsStudioPage = () => {
             <Download size={20} style={{ color: "rgb(var(--accent))" }} />
           </div>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <div className="mt-6 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
             <ForecastMetricTile
               label="Paskutinis importas"
               value={lastImportEvent?.timestamp || "Dar nebuvo"}
@@ -4243,10 +4243,10 @@ const ActionPriorityRow = ({ action, index, onOpen }) => {
 };
 
 const ForecastMetricTile = ({ hint, label, value }) => (
-  <div className="soft-card rounded-[24px] p-5">
-    <p className="text-xs uppercase tracking-[0.18em] text-muted">{label}</p>
-    <p className="mt-3 text-2xl font-semibold">{value}</p>
-    <p className="mt-2 text-sm leading-6 text-muted">{hint}</p>
+  <div className="soft-card min-w-0 max-w-full rounded-[24px] p-5">
+    <p className="max-w-full whitespace-normal break-words text-xs uppercase tracking-[0.18em] text-muted">{label}</p>
+    <p className="mt-3 max-w-full whitespace-normal break-normal text-2xl font-semibold">{value}</p>
+    <p className="mt-2 max-w-full whitespace-normal break-words text-sm leading-6 text-muted">{hint}</p>
   </div>
 );
 
@@ -4295,8 +4295,8 @@ const GoalScenarioCard = ({ scenario }) => (
 
 const CategoryShiftCard = ({ currentMonthLabel, item, onOpen, previousMonthLabel }) => (
   <div className="soft-card rounded-[24px] p-5">
-    <div className="flex items-start justify-between gap-4">
-      <div>
+    <div className="flex min-w-0 flex-col gap-4">
+      <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-3">
           <h3 className="text-lg font-semibold">{item.category}</h3>
           <span
@@ -4316,7 +4316,7 @@ const CategoryShiftCard = ({ currentMonthLabel, item, onOpen, previousMonthLabel
           {money.format(item.previousTotal)}.
         </p>
       </div>
-      <div className="text-right">
+      <div className="min-w-0 text-left">
         <p
           className={`text-lg font-semibold ${
             item.delta > 0 ? "text-red-600" : item.delta < 0 ? "text-emerald-700" : ""
@@ -4357,17 +4357,21 @@ const ActivityTimelineItem = ({ item, onOpen }) => {
 
   return (
     <div className={`rounded-[24px] border p-5 ${toneClasses[item.tone] || toneClasses.info}`}>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
+      <div className="flex min-w-0 flex-col gap-4">
+        <div className="min-w-0">
           <p className="text-xs uppercase tracking-[0.18em] text-muted">{item.timestamp}</p>
           <h3 className="mt-2 text-lg font-semibold">{item.title}</h3>
           <p className="mt-2 text-sm leading-6 text-muted">{item.body}</p>
         </div>
 
         {item.ctaLabel ? (
-          <button type="button" className="button-secondary gap-2 sm:shrink-0" onClick={() => onOpen?.(item)}>
-            {item.ctaLabel}
-            <ArrowUpRight size={14} />
+          <button
+            type="button"
+            className="button-secondary w-full max-w-full justify-center gap-2 whitespace-normal break-normal text-center"
+            onClick={() => onOpen?.(item)}
+          >
+            <span className="min-w-0 whitespace-normal break-normal">{item.ctaLabel}</span>
+            <ArrowUpRight className="shrink-0" size={14} />
           </button>
         ) : null}
       </div>
@@ -4384,8 +4388,8 @@ const GoalStrategyCard = ({ goal, onOpen }) => {
 
   return (
     <div className="soft-card rounded-[24px] p-5">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
+      <div className="flex min-w-0 flex-col gap-4">
+        <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-3">
             <h3 className="text-lg font-semibold">{goal.title}</h3>
             <span className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${priorityClasses[goal.priority] || priorityClasses.steady}`}>
@@ -4394,13 +4398,17 @@ const GoalStrategyCard = ({ goal, onOpen }) => {
           </div>
           <p className="mt-2 text-sm leading-6 text-muted">{goal.strategyNote}</p>
         </div>
-        <button type="button" className="button-secondary gap-2 sm:shrink-0" onClick={onOpen}>
-          Peržiūrėti tikslą
-          <ArrowUpRight size={14} />
+        <button
+          type="button"
+          className="button-secondary w-full max-w-full justify-center gap-2 whitespace-normal break-normal text-center"
+          onClick={onOpen}
+        >
+          <span className="min-w-0 whitespace-normal break-normal">Peržiūrėti tikslą</span>
+          <ArrowUpRight className="shrink-0" size={14} />
         </button>
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+      <div className="mt-4 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))] gap-3">
         <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
           <p className="text-xs uppercase tracking-[0.18em] text-muted">Liko sukaupti</p>
           <p className="mt-2 text-lg font-semibold">{money.format(goal.remaining)}</p>
@@ -4433,8 +4441,8 @@ const RecurringReviewCard = ({ expense, onOpen }) => {
 
   return (
     <div className="soft-card rounded-[24px] p-5">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
+      <div className="flex min-w-0 flex-col gap-4">
+        <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-3">
             <h3 className="text-lg font-semibold">{expense.title}</h3>
             <span className="premium-tag">{expense.category}</span>
@@ -4444,13 +4452,17 @@ const RecurringReviewCard = ({ expense, onOpen }) => {
           </div>
           <p className="mt-2 text-sm leading-6 text-muted">{expense.note}</p>
         </div>
-        <button type="button" className="button-secondary gap-2 sm:shrink-0" onClick={onOpen}>
-          Rodyti kategoriją
-          <ArrowUpRight size={14} />
+        <button
+          type="button"
+          className="button-secondary w-full max-w-full justify-center gap-2 whitespace-normal break-normal text-center"
+          onClick={onOpen}
+        >
+          <span className="min-w-0 whitespace-normal break-normal">Rodyti kategoriją</span>
+          <ArrowUpRight className="shrink-0" size={14} />
         </button>
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+      <div className="mt-4 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))] gap-3">
         <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
           <p className="text-xs uppercase tracking-[0.18em] text-muted">Per mėn.</p>
           <p className="mt-2 text-lg font-semibold">{money.format(expense.monthlyEquivalent)}</p>
@@ -4484,21 +4496,29 @@ const SummaryArchiveItem = ({ item, onDownload, onSend }) => {
 
   return (
     <div className="rounded-[20px] bg-[rgb(var(--surface-soft))] px-4 py-4">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
+      <div className="flex min-w-0 flex-col gap-4">
+        <div className="min-w-0">
           <p className="text-xs uppercase tracking-[0.18em] text-muted">{item.timestamp}</p>
           <h3 className="mt-2 text-base font-semibold">{item.title}</h3>
           <p className="mt-2 text-sm leading-6 text-muted">{item.body}</p>
         </div>
         {!isBackup ? (
-          <div className="flex flex-wrap gap-2 sm:shrink-0">
-            <button type="button" className="button-secondary gap-2" onClick={() => onDownload(frequency)}>
-              <Download size={14} />
-              Atsisiųsti vėl
+          <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))] gap-2">
+            <button
+              type="button"
+              className="button-secondary w-full max-w-full justify-center gap-2 whitespace-normal break-normal text-center"
+              onClick={() => onDownload(frequency)}
+            >
+              <Download className="shrink-0" size={14} />
+              <span className="min-w-0 whitespace-normal break-normal">Atsisiųsti vėl</span>
             </button>
-            <button type="button" className="button-secondary gap-2" onClick={() => onSend(frequency)}>
-              <Mail size={14} />
-              Siųsti dar kartą
+            <button
+              type="button"
+              className="button-secondary w-full max-w-full justify-center gap-2 whitespace-normal break-normal text-center"
+              onClick={() => onSend(frequency)}
+            >
+              <Mail className="shrink-0" size={14} />
+              <span className="min-w-0 whitespace-normal break-normal">Siųsti dar kartą</span>
             </button>
           </div>
         ) : null}

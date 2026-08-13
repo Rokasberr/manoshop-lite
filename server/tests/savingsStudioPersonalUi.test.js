@@ -8,6 +8,27 @@ const pagePath = path.join(root, "client", "src", "pages", "SavingsStudioPage.js
 
 const readPageSource = () => fs.readFileSync(pagePath, "utf8");
 
+const extractBetween = (source, startMarker, endMarker) => {
+  const startIndex = source.indexOf(startMarker);
+  assert.notEqual(startIndex, -1, `Missing start marker: ${startMarker}`);
+  const endIndex = source.indexOf(endMarker, startIndex);
+  assert.notEqual(endIndex, -1, `Missing end marker after ${startMarker}: ${endMarker}`);
+  return source.slice(startIndex, endIndex);
+};
+
+const extractComponentSource = (source, componentName, nextComponentName) =>
+  extractBetween(source, `const ${componentName} = `, `const ${nextComponentName} = `);
+
+const extractPreviousDivBlock = (source, marker) => {
+  const markerIndex = source.indexOf(marker);
+  assert.notEqual(markerIndex, -1, `Missing marker: ${marker}`);
+  const startIndex = source.lastIndexOf('<div className="mt-6', markerIndex);
+  assert.notEqual(startIndex, -1, `Missing metric grid before marker: ${marker}`);
+  const endIndex = source.indexOf("</div>", markerIndex);
+  assert.notEqual(endIndex, -1, `Missing metric grid close after marker: ${marker}`);
+  return source.slice(startIndex, endIndex);
+};
+
 test("Saving Studio keeps a mobile-first responsive shell", () => {
   const indexSource = fs.readFileSync(path.join(root, "client", "index.html"), "utf8");
   const layoutSource = fs.readFileSync(path.join(root, "client", "src", "components", "Layout.jsx"), "utf8");
@@ -90,4 +111,47 @@ test("Saving Studio automation CTA stays inside mobile cards", () => {
   assert.doesNotMatch(automationCardSource, /sm:w-auto/);
   assert.doesNotMatch(automationCardSource, /sm:shrink-0/);
   assert.doesNotMatch(automationCardSource, /whitespace-nowrap/);
+});
+
+test("Goal strategy metrics use a container-safe grid", () => {
+  const source = readPageSource();
+  const goalStrategyMetricsSource = extractPreviousDivBlock(source, "value={String(goalStrategyBoard.length)}");
+
+  assert.match(goalStrategyMetricsSource, /grid min-w-0 grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,13rem\),1fr\)\)\] gap-4/);
+  assert.match(goalStrategyMetricsSource, /label="Aktyvūs tikslai"/);
+  assert.match(goalStrategyMetricsSource, /label="Fokusuoti dabar"/);
+  assert.match(goalStrategyMetricsSource, /label="Didžiausias mėn\. tempas"/);
+  assert.doesNotMatch(goalStrategyMetricsSource, /sm:grid-cols-3/);
+});
+
+test("ForecastMetricTile allows labels, values, and hints to wrap inside narrow cards", () => {
+  const source = readPageSource();
+  const metricTileSource = extractComponentSource(source, "ForecastMetricTile", "GoalScenarioCard");
+
+  assert.match(metricTileSource, /soft-card min-w-0 max-w-full rounded-\[24px\] p-5/);
+  assert.match(metricTileSource, /max-w-full whitespace-normal break-words text-xs/);
+  assert.match(metricTileSource, /mt-3 max-w-full whitespace-normal break-normal text-2xl font-semibold/);
+  assert.match(metricTileSource, /mt-2 max-w-full whitespace-normal break-words text-sm leading-6 text-muted/);
+  assert.doesNotMatch(metricTileSource, /whitespace-nowrap/);
+  assert.doesNotMatch(metricTileSource, /overflow-hidden/);
+});
+
+test("Summary archive actions stay inside narrow cards", () => {
+  const source = readPageSource();
+  const summaryArchiveSource = extractComponentSource(source, "SummaryArchiveItem", "CoachSignalCard");
+
+  assert.match(summaryArchiveSource, /flex min-w-0 flex-col gap-4/);
+  assert.match(summaryArchiveSource, /<div className="min-w-0">/);
+  assert.match(
+    summaryArchiveSource,
+    /grid w-full grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,10rem\),1fr\)\)\] gap-2/
+  );
+  assert.match(summaryArchiveSource, /className="button-secondary w-full max-w-full justify-center gap-2 whitespace-normal break-normal text-center"/);
+  assert.match(summaryArchiveSource, /<span className="min-w-0 whitespace-normal break-normal">Atsisiųsti vėl<\/span>/);
+  assert.match(summaryArchiveSource, /<span className="min-w-0 whitespace-normal break-normal">Siųsti dar kartą<\/span>/);
+  assert.match(summaryArchiveSource, /<Download className="shrink-0" size=\{14\} \/>/);
+  assert.match(summaryArchiveSource, /<Mail className="shrink-0" size=\{14\} \/>/);
+  assert.doesNotMatch(summaryArchiveSource, /sm:flex-row/);
+  assert.doesNotMatch(summaryArchiveSource, /sm:shrink-0/);
+  assert.doesNotMatch(summaryArchiveSource, /whitespace-nowrap/);
 });
