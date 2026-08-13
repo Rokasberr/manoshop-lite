@@ -44,6 +44,7 @@ const toFiniteNumber = (value, fallback = 0) => {
 
 export const currentDateInput = () => new Date().toISOString().slice(0, 10);
 export const currentMonthKey = () => new Date().toISOString().slice(0, 7);
+const isMonthKey = (value) => /^\d{4}-\d{2}$/.test(String(value || ""));
 
 export const emptyEntry = (categories = DEFAULT_CATEGORIES) => ({
   title: "",
@@ -69,14 +70,32 @@ export const emptyRecurringExpense = (categories = DEFAULT_CATEGORIES) => ({
   notes: "",
 });
 
-export const monthLabel = (monthKey) =>
-  new Intl.DateTimeFormat("lt-LT", {
+export const monthLabel = (monthKey) => {
+  const normalizedMonthKey = String(monthKey || "").trim();
+
+  if (!isMonthKey(normalizedMonthKey)) {
+    return "Šis mėnuo";
+  }
+
+  const parsedDate = new Date(`${normalizedMonthKey}-01T00:00:00`);
+
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "Šis mėnuo";
+  }
+
+  return new Intl.DateTimeFormat("lt-LT", {
     month: "short",
     year: "numeric",
-  }).format(new Date(`${monthKey}-01T00:00:00`));
+  }).format(parsedDate);
+};
 
-export const buildMonthOptions = (entries) => {
-  const months = new Set(entries.map((entry) => entry.date.slice(0, 7)));
+export const buildMonthOptions = (entries = []) => {
+  const safeEntries = Array.isArray(entries) ? entries : [];
+  const months = new Set(
+    safeEntries
+      .map((entry) => String(entry?.date || "").slice(0, 7))
+      .filter(isMonthKey)
+  );
   months.add(new Date().toISOString().slice(0, 7));
 
   return [
@@ -92,12 +111,14 @@ export const buildMonthOptions = (entries) => {
 };
 
 export const formatChange = (change) => {
-  if (change === null || Number.isNaN(change)) {
+  const numericChange = Number(change);
+
+  if (!Number.isFinite(numericChange)) {
     return "Pirmas pilnas mėnuo";
   }
 
-  const prefix = change > 0 ? "+" : "";
-  return `${prefix}${change}% prieš praeitą mėnesį`;
+  const prefix = numericChange > 0 ? "+" : "";
+  return `${prefix}${numericChange}% prieš praeitą mėnesį`;
 };
 
 export const getBudgetStatus = ({ spent, limitAmount }) => {

@@ -19,7 +19,7 @@
   TrendingUp,
   WalletCards,
 } from "lucide-react";
-import { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
+import { startTransition, useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { useSearchParams } from "react-router-dom";
 
@@ -450,6 +450,7 @@ const SavingsStudioPage = () => {
     month: "all",
   });
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [savingBudgets, setSavingBudgets] = useState(false);
   const [savingOnboarding, setSavingOnboarding] = useState(false);
@@ -475,72 +476,75 @@ const SavingsStudioPage = () => {
   const deferredSearch = useDeferredValue(filters.search.trim().toLowerCase());
   const selectedBudgetMonth = filters.month === "all" ? currentMonthKey() : filters.month;
 
-  useEffect(() => {
-    const loadStudio = async () => {
-      try {
-        setLoading(true);
+  const loadStudio = useCallback(async () => {
+    try {
+      setLoading(true);
+      setLoadError("");
 
-        const [metaResult, profileResult, entriesResult, summaryResult, budgetsResult, goalsResult, recurringResult, activityResult] =
-          await Promise.all([
-            savingsStudioService.getMeta(),
-            savingsStudioService.getProfile(),
-            savingsStudioService.getEntries(),
-            savingsStudioService.getSummary(),
-            savingsStudioService.getBudgets(currentMonthKey()),
-            savingsStudioService.getGoals(),
-            savingsStudioService.getRecurringExpenses(),
-            savingsStudioService.getActivity(),
-          ]);
+      const [metaResult, profileResult, entriesResult, summaryResult, budgetsResult, goalsResult, recurringResult, activityResult] =
+        await Promise.all([
+          savingsStudioService.getMeta(),
+          savingsStudioService.getProfile(),
+          savingsStudioService.getEntries(),
+          savingsStudioService.getSummary(),
+          savingsStudioService.getBudgets(currentMonthKey()),
+          savingsStudioService.getGoals(),
+          savingsStudioService.getRecurringExpenses(),
+          savingsStudioService.getActivity(),
+        ]);
 
-        startTransition(() => {
-          const apiCategories = metaResult.categories?.length ? metaResult.categories : DEFAULT_CATEGORIES;
-          const apiFocusOptions = metaResult.focusOptions?.length
-            ? metaResult.focusOptions
-            : DEFAULT_FOCUS_OPTIONS;
-          const apiRecurringFrequencies = metaResult.recurringFrequencies?.length
-            ? metaResult.recurringFrequencies
-            : DEFAULT_RECURRING_FREQUENCIES;
+      startTransition(() => {
+        const apiCategories = metaResult.categories?.length ? metaResult.categories : DEFAULT_CATEGORIES;
+        const apiFocusOptions = metaResult.focusOptions?.length
+          ? metaResult.focusOptions
+          : DEFAULT_FOCUS_OPTIONS;
+        const apiRecurringFrequencies = metaResult.recurringFrequencies?.length
+          ? metaResult.recurringFrequencies
+          : DEFAULT_RECURRING_FREQUENCIES;
 
-          setCategories(apiCategories);
-          setFocusOptions(apiFocusOptions);
-          setRecurringFrequencies(apiRecurringFrequencies);
-          setProfile(profileResult.profile || null);
-          setActivity(activityResult.activity || []);
-          setProfileForm({
-            monthlyIncome: profileResult.profile?.monthlyIncome ? String(profileResult.profile.monthlyIncome) : "",
-            monthlySavingsTarget: profileResult.profile?.monthlySavingsTarget
-              ? String(profileResult.profile.monthlySavingsTarget)
-              : "",
-            primaryFocus: profileResult.profile?.primaryFocus || apiFocusOptions[0] || "",
-          });
-          setEmailSettingsForm({
-            summaryEmailsEnabled: Boolean(profileResult.profile?.summaryEmailsEnabled),
-            summaryEmailFrequency: profileResult.profile?.summaryEmailFrequency || "weekly",
-          });
-          setEntries(entriesResult.entries || []);
-          setSummary(summaryResult.summary || null);
-          setBudgets(budgetsResult.budgets || []);
-          setBudgetInputs(
-            Object.fromEntries((budgetsResult.budgets || []).map((budget) => [budget.category, String(budget.limitAmount)]))
-          );
-          setGoals(goalsResult.goals || []);
-          setRecurringExpenses(recurringResult.recurringExpenses || []);
-          setRecurringForm(emptyRecurringExpense(apiCategories));
-          setEntryForm((current) => ({
-            ...current,
-            category: current.category || apiCategories[1] || apiCategories[0] || "Maistas",
-            date: current.date || currentDateInput(),
-          }));
+        setCategories(apiCategories);
+        setFocusOptions(apiFocusOptions);
+        setRecurringFrequencies(apiRecurringFrequencies);
+        setProfile(profileResult.profile || null);
+        setActivity(activityResult.activity || []);
+        setProfileForm({
+          monthlyIncome: profileResult.profile?.monthlyIncome ? String(profileResult.profile.monthlyIncome) : "",
+          monthlySavingsTarget: profileResult.profile?.monthlySavingsTarget
+            ? String(profileResult.profile.monthlySavingsTarget)
+            : "",
+          primaryFocus: profileResult.profile?.primaryFocus || apiFocusOptions[0] || "",
         });
-      } catch (error) {
-        toast.error(error.response?.data?.message || "Nepavyko užkrauti Stilloak.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadStudio();
+        setEmailSettingsForm({
+          summaryEmailsEnabled: Boolean(profileResult.profile?.summaryEmailsEnabled),
+          summaryEmailFrequency: profileResult.profile?.summaryEmailFrequency || "weekly",
+        });
+        setEntries(entriesResult.entries || []);
+        setSummary(summaryResult.summary || null);
+        setBudgets(budgetsResult.budgets || []);
+        setBudgetInputs(
+          Object.fromEntries((budgetsResult.budgets || []).map((budget) => [budget.category, String(budget.limitAmount)]))
+        );
+        setGoals(goalsResult.goals || []);
+        setRecurringExpenses(recurringResult.recurringExpenses || []);
+        setRecurringForm(emptyRecurringExpense(apiCategories));
+        setEntryForm((current) => ({
+          ...current,
+          category: current.category || apiCategories[1] || apiCategories[0] || "Maistas",
+          date: current.date || currentDateInput(),
+        }));
+      });
+    } catch (error) {
+      const message = error.response?.data?.message || "Nepavyko užkrauti Stilloak.";
+      setLoadError(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    loadStudio();
+  }, [loadStudio]);
 
   useEffect(() => {
     const loadBudgets = async () => {
@@ -587,10 +591,12 @@ const SavingsStudioPage = () => {
   const filteredEntries = useMemo(
     () =>
       entries.filter((entry) => {
+        const entryTitle = String(entry.title || "").toLowerCase();
+        const entryNotes = String(entry.notes || "").toLowerCase();
         const matchesSearch =
           !deferredSearch ||
-          entry.title.toLowerCase().includes(deferredSearch) ||
-          entry.notes.toLowerCase().includes(deferredSearch);
+          entryTitle.includes(deferredSearch) ||
+          entryNotes.includes(deferredSearch);
         const matchesCategory =
           filters.category === "Visos kategorijos" || entry.category === filters.category;
         const matchesMonth = filters.month === "all" || entry.date.startsWith(filters.month);
@@ -1393,6 +1399,11 @@ const SavingsStudioPage = () => {
     });
   };
 
+  const refreshSummary = async () => {
+    const summaryResult = await savingsStudioService.getSummary();
+    setSummary(summaryResult.summary || null);
+  };
+
   const refreshGoals = async () => {
     const goalResult = await savingsStudioService.getGoals();
     setGoals(goalResult.goals || []);
@@ -1500,7 +1511,7 @@ const SavingsStudioPage = () => {
     setSavingOnboarding(true);
 
     try {
-      const [profileResult] = await Promise.all([
+      const [profileResult, budgetResult] = await Promise.all([
         savingsStudioService.updateProfile({
           monthlyIncome: parseDecimalInput(profileForm.monthlyIncome),
           monthlySavingsTarget: parseDecimalInput(profileForm.monthlySavingsTarget),
@@ -1517,6 +1528,11 @@ const SavingsStudioPage = () => {
       ]);
 
       setProfile(profileResult.profile);
+      setBudgets(budgetResult.budgets || []);
+      setBudgetInputs(
+        Object.fromEntries((budgetResult.budgets || []).map((budget) => [budget.category, String(budget.limitAmount)]))
+      );
+      await refreshSummary();
       toast.success("Pirmasis Stilloak setup baigtas.");
     } catch (error) {
       toast.error(error.response?.data?.message || "Nepavyko užbaigti pirmojo setup.");
@@ -1546,6 +1562,7 @@ const SavingsStudioPage = () => {
       setBudgetInputs(
         Object.fromEntries((budgetResult.budgets || []).map((budget) => [budget.category, String(budget.limitAmount)]))
       );
+      await refreshSummary();
       toast.success("Biudžetai atnaujinti.");
     } catch (error) {
       toast.error(error.response?.data?.message || "Nepavyko išsaugoti biudžetų.");
@@ -1620,7 +1637,7 @@ const SavingsStudioPage = () => {
         await savingsStudioService.createEntry(entryForm);
       }
 
-      await refreshSummaryAndEntries();
+      await Promise.all([refreshSummaryAndEntries(), refreshActivity()]);
       setEntryForm(emptyEntry(categories));
       setEditingId("");
       toast.success(editingId ? "Išlaida atnaujinta." : "Išlaida išsaugota.");
@@ -1642,7 +1659,7 @@ const SavingsStudioPage = () => {
         await savingsStudioService.createGoal(goalForm);
       }
 
-      await refreshGoals();
+      await Promise.all([refreshGoals(), refreshSummary(), refreshActivity()]);
       setGoalForm(emptyGoal());
       setEditingGoalId("");
       toast.success(editingGoalId ? "Tikslas atnaujintas." : "Tikslas pridėtas.");
@@ -1664,7 +1681,7 @@ const SavingsStudioPage = () => {
         await savingsStudioService.createRecurringExpense(recurringForm);
       }
 
-      await refreshRecurring();
+      await Promise.all([refreshRecurring(), refreshSummary(), refreshActivity()]);
       setRecurringForm(emptyRecurringExpense(categories));
       setEditingRecurringId("");
       toast.success(editingRecurringId ? "Pasikartojanti išlaida atnaujinta." : "Pasikartojanti išlaida pridėta.");
@@ -1682,7 +1699,7 @@ const SavingsStudioPage = () => {
       await savingsStudioService.logRecurringExpense(recurringExpense._id, {
         month: currentMonthKey(),
       });
-      await Promise.all([refreshRecurring(), refreshSummaryAndEntries()]);
+      await Promise.all([refreshRecurring(), refreshSummaryAndEntries(), refreshActivity()]);
       toast.success("Pasikartojanti išlaida įtraukta į šio mėnesio įrašus.");
     } catch (error) {
       toast.error(error.response?.data?.message || "Nepavyko įtraukti pasikartojančios išlaidos.");
@@ -1733,7 +1750,7 @@ const SavingsStudioPage = () => {
       const result = await savingsStudioService.importEntries({
         rows: csvPreviewResult.validRows,
       });
-      await refreshSummaryAndEntries();
+      await Promise.all([refreshSummaryAndEntries(), refreshActivity()]);
       setCsvPreviewResult(null);
       setCsvFileName("");
       toast.success(`Importuota ${result.importedCount} įrašų.`);
@@ -1788,7 +1805,7 @@ const SavingsStudioPage = () => {
 
     try {
       await savingsStudioService.deleteEntry(entryId);
-      await refreshSummaryAndEntries();
+      await Promise.all([refreshSummaryAndEntries(), refreshActivity()]);
       toast.success("Išlaida ištrinta.");
     } catch (error) {
       toast.error(error.response?.data?.message || "Nepavyko ištrinti išlaidos.");
@@ -1808,7 +1825,7 @@ const SavingsStudioPage = () => {
 
     try {
       await savingsStudioService.deleteGoal(goalId);
-      await refreshGoals();
+      await Promise.all([refreshGoals(), refreshSummary(), refreshActivity()]);
       toast.success("Taupymo tikslas ištrintas.");
     } catch (error) {
       toast.error(error.response?.data?.message || "Nepavyko ištrinti tikslo.");
@@ -1828,7 +1845,7 @@ const SavingsStudioPage = () => {
 
     try {
       await savingsStudioService.deleteRecurringExpense(recurringId);
-      await refreshRecurring();
+      await Promise.all([refreshRecurring(), refreshSummary(), refreshActivity()]);
       toast.success("Pasikartojanti išlaida ištrinta.");
     } catch (error) {
       toast.error(error.response?.data?.message || "Nepavyko ištrinti pasikartojančios išlaidos.");
@@ -1891,6 +1908,24 @@ const SavingsStudioPage = () => {
 
   if (loading) {
     return <LoadingSpinner fullScreen />;
+  }
+
+  if (loadError) {
+    return (
+      <div className="member-workspace member-workspace-personal">
+        <section className="panel mx-auto max-w-3xl p-6 text-center sm:p-8">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-red-600">
+            <AlertTriangle size={22} />
+          </div>
+          <p className="mt-5 text-xs font-semibold uppercase tracking-[0.24em] text-muted">Saving Studio neatsidarė</p>
+          <h1 className="mt-3 font-display text-3xl font-bold leading-tight">Nepavyko užkrauti asmeninės darbo erdvės</h1>
+          <p className="mt-4 text-sm leading-6 text-muted">{loadError}</p>
+          <button type="button" className="button-primary mt-6" onClick={loadStudio}>
+            Bandyti dar kartą
+          </button>
+        </section>
+      </div>
+    );
   }
 
   const usageWizardCurrentStep = USAGE_WIZARD_STEPS[usageWizardStep];
