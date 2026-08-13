@@ -54,3 +54,35 @@ test("Saving Studio legacy entries without dates do not crash filters or display
   assert.match(source, /formatEntryDate\(entry\.date\)/);
   assert.match(source, /date: getEntryDateValue\(entry\) \|\| currentDateInput\(\)/);
 });
+
+test("Saving Studio CSV import quality uses server duplicate rows", () => {
+  const source = readPageSource();
+
+  assert.match(source, /const serverDuplicateRows = csvPreviewResult\?\.duplicateRows \|\| \[\]/);
+  assert.match(source, /const duplicateCandidates = serverDuplicateRows\.map\(\(row\) => row\.normalized\)\.filter\(Boolean\)/);
+  assert.match(source, /duplicateCount: csvPreviewResult\?\.duplicateCount \|\| 0/);
+  assert.match(source, /\(csvPreviewResult\?\.duplicateCount \|\| 0\)/);
+  assert.match(source, /Bus importuota: \{csvPreviewResult\.validCount\}/);
+  assert.match(source, /disabled=\{confirmingCsvImport \|\| !csvPreviewResult\.validCount\}/);
+});
+
+test("Saving Studio automation CTA stays inside mobile cards", () => {
+  const source = readPageSource();
+  const automationCardMatch = source.match(/const AutomationTriggerCard = \(\{ onRun, trigger \}\) => \{[\s\S]*?const ImportInsightCard/);
+  assert.ok(automationCardMatch);
+  const automationCardSource = automationCardMatch[0];
+
+  assert.match(source, /actionLabel: "Siųsti savaitės suvestinę"/);
+  assert.match(
+    source,
+    /mt-6 grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-3[\s\S]*label="Suvestinės"[\s\S]*label="Kopijos"[\s\S]*label="Signalai"/
+  );
+  assert.match(automationCardSource, /flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between/);
+  assert.match(
+    automationCardSource,
+    /className="button-secondary w-full max-w-full gap-2 whitespace-normal break-words text-center sm:w-auto sm:shrink-0"/
+  );
+  assert.match(automationCardSource, /<span className="min-w-0 break-words">\{trigger\.actionLabel\}<\/span>/);
+  assert.match(automationCardSource, /<ArrowUpRight className="shrink-0" size=\{14\} \/>/);
+  assert.doesNotMatch(automationCardSource, /whitespace-nowrap/);
+});

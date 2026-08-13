@@ -36,6 +36,7 @@ const RECURRING_FREQUENCIES = [
 
 const MAX_TEXT_LENGTH = 80;
 const MAX_NOTES_LENGTH = 240;
+const MAX_MONEY_AMOUNT = 100000000;
 const MAX_IMPORT_ROWS = 300;
 const MAX_BACKUP_AUDIT_ROWS = 200;
 const MAX_ACTIVITY_ROWS = 36;
@@ -122,6 +123,10 @@ const parseEntryInput = (input) => {
     throw createHttpError("Suma turi būti didesnė už 0.");
   }
 
+  if (amount > MAX_MONEY_AMOUNT) {
+    throw createHttpError("Įvesta suma per didelė.");
+  }
+
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(new Date(`${date}T00:00:00`).getTime())) {
     throw createHttpError("Įvesk galiojančią išlaidų datą.");
   }
@@ -156,6 +161,10 @@ const parseBudgetPayload = (input) => {
     }
   }
 
+  if (normalizedBudgets.some((budget) => budget.limitAmount > MAX_MONEY_AMOUNT)) {
+    throw createHttpError("Įvesta suma per didelė.");
+  }
+
   if (normalizedBudgets.length > CATEGORIES.length) {
     throw createHttpError("Biudžetų eilučių per daug vienam mėnesiui.");
   }
@@ -188,6 +197,10 @@ const parseGoalInput = (input) => {
     throw createHttpError("Tikslo suma turi būti didesnė už 0.");
   }
 
+  if (targetAmount > MAX_MONEY_AMOUNT || currentAmount > MAX_MONEY_AMOUNT) {
+    throw createHttpError("Įvesta suma per didelė.");
+  }
+
   if (!Number.isFinite(currentAmount) || currentAmount < 0) {
     throw createHttpError("Dabartinė sukaupta suma negali būti neigiama.");
   }
@@ -211,6 +224,10 @@ const parseRecurringInput = (input) => {
   const category = String(input.category || "").trim();
   const frequency = String(input.frequency || "monthly").trim();
   const amount = Number(input.amount);
+
+  if (amount > MAX_MONEY_AMOUNT) {
+    throw createHttpError("Įvesta suma per didelė.");
+  }
 
   if (title.length < 2) {
     throw createHttpError("Pasikartojančios išlaidos pavadinimui reikia bent 2 simbolių.");
@@ -251,7 +268,7 @@ const parseProfileInput = (input) => {
     throw createHttpError("Mėnesio pajamos negali būti neigiamos.");
   }
 
-  if (monthlyIncome > 100000000 || monthlySavingsTarget > 100000000) {
+  if (monthlyIncome > MAX_MONEY_AMOUNT || monthlySavingsTarget > MAX_MONEY_AMOUNT) {
     throw createHttpError("Įvesta suma per didelė.");
   }
 
@@ -289,6 +306,53 @@ const buildImportSource = ({ system = "", entryId = "" } = {}) => ({
   system: String(system || "").trim(),
   entryId: String(entryId || "").trim(),
 });
+
+const normalizeFingerprintText = (value) =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+
+const buildEntryFingerprint = (entry) => {
+  const title = normalizeFingerprintText(entry?.title);
+  const amount = Number(entry?.amount || 0).toFixed(2);
+  const date = String(entry?.date || "").trim();
+  const category = normalizeFingerprintText(entry?.category);
+
+  return `${date}__${amount}__${title}__${category}`;
+};
+
+const findDuplicateImportedRows = async ({ rows, userId }) => {
+  if (!rows.length) {
+    return {
+      duplicateFingerprints: new Set(),
+      inputDuplicateIndexes: new Set(),
+    };
+  }
+
+  const existingEntries = await SavingsEntry.find({
+    user: userId,
+    date: { $in: [...new Set(rows.map((row) => row.date))] },
+  }).select("title amount date category");
+  const duplicateFingerprints = new Set(existingEntries.map(buildEntryFingerprint));
+  const seenInputFingerprints = new Set();
+  const inputDuplicateIndexes = new Set();
+
+  rows.forEach((row, index) => {
+    const fingerprint = buildEntryFingerprint(row);
+
+    if (seenInputFingerprints.has(fingerprint)) {
+      inputDuplicateIndexes.add(index);
+    }
+
+    seenInputFingerprints.add(fingerprint);
+  });
+
+  return {
+    duplicateFingerprints,
+    inputDuplicateIndexes,
+  };
+};
 
 const recurringToMonthlyEquivalent = (expense) => {
   const amount = Number(expense.amount || 0);
@@ -892,7 +956,7 @@ const previewSavingsEntriesImport = async (req, res) => {
     throw createHttpError(`Vienu kartu galima preview'inti iki ${MAX_IMPORT_ROWS} eilučių.`);
   }
 
-  const preview = rows.map((row, index) => {
+  const parsedPreview = rows.map((row, index) => {
     try {
       return {
         rowNumber: index + 1,
@@ -914,15 +978,47 @@ const previewSavingsEntriesImport = async (req, res) => {
     }
   });
 
+  const parsedRows = parsedPreview.filter((entry) => entry.status === "ok").map((entry) => entry.normalized);
+  const { duplicateFingerprints, inputDuplicateIndexes } = await findDuplicateImportedRows({
+    rows: parsedRows,
+    userId: req.user._id,
+  });
+  let validRowIndex = 0;
+  const preview = parsedPreview.map((entry) => {
+    if (entry.status !== "ok") {
+      return entry;
+    }
+
+    const normalized = entry.normalized;
+    const isDuplicate =
+      duplicateFingerprints.has(buildEntryFingerprint(normalized)) || inputDuplicateIndexes.has(validRowIndex);
+
+    validRowIndex += 1;
+
+    if (!isDuplicate) {
+      return entry;
+    }
+
+    return {
+      rowNumber: entry.rowNumber,
+      status: "duplicate",
+      error: "Toks įrašas jau yra arba kartojasi šiame CSV.",
+      normalized,
+    };
+  });
+
   const validRows = preview.filter((entry) => entry.status === "ok").map((entry) => entry.normalized);
   const invalidRows = preview.filter((entry) => entry.status === "error");
+  const duplicateRows = preview.filter((entry) => entry.status === "duplicate");
 
   res.json({
     totalRows: rows.length,
     validCount: validRows.length,
     invalidCount: invalidRows.length,
+    duplicateCount: duplicateRows.length,
     validRows,
     invalidRows,
+    duplicateRows,
     preview: preview.slice(0, 20),
   });
 };
@@ -938,14 +1034,63 @@ const importSavingsEntries = async (req, res) => {
     throw createHttpError(`Vienu kartu galima importuoti iki ${MAX_IMPORT_ROWS} eilučių.`);
   }
 
-  const parsedRows = rows.map((row) => parseEntryInput(row));
-  const importedEntries = await SavingsEntry.insertMany(
-    parsedRows.map((entry) => ({
-      user: req.user._id,
-      ...entry,
-      importSource: buildImportSource({ system: "csv-upload" }),
-    }))
-  );
+  const parsedPreview = rows.map((row, index) => {
+    try {
+      return {
+        rowNumber: index + 1,
+        status: "ok",
+        normalized: parseEntryInput(row),
+      };
+    } catch (error) {
+      return {
+        rowNumber: index + 1,
+        status: "error",
+        error: error.message,
+      };
+    }
+  });
+  const parsedRows = parsedPreview.filter((entry) => entry.status === "ok").map((entry) => entry.normalized);
+  const { duplicateFingerprints, inputDuplicateIndexes } = await findDuplicateImportedRows({
+    rows: parsedRows,
+    userId: req.user._id,
+  });
+  const acceptedRows = [];
+  const duplicateRows = [];
+  let validRowIndex = 0;
+
+  parsedPreview.forEach((entry) => {
+    if (entry.status !== "ok") {
+      return;
+    }
+
+    const normalized = entry.normalized;
+    const isDuplicate =
+      duplicateFingerprints.has(buildEntryFingerprint(normalized)) || inputDuplicateIndexes.has(validRowIndex);
+
+    validRowIndex += 1;
+
+    if (isDuplicate) {
+      duplicateRows.push({
+        rowNumber: entry.rowNumber,
+        status: "duplicate",
+        error: "Toks įrašas jau yra arba kartojasi šiame CSV.",
+        normalized,
+      });
+      return;
+    }
+
+    acceptedRows.push(normalized);
+  });
+  const invalidRows = parsedPreview.filter((entry) => entry.status === "error");
+  const importedEntries = acceptedRows.length
+    ? await SavingsEntry.insertMany(
+        acceptedRows.map((entry) => ({
+          user: req.user._id,
+          ...entry,
+          importSource: buildImportSource({ system: "csv-upload" }),
+        }))
+      )
+    : [];
 
   await logSavingsAuditSafe({
     userId: req.user._id,
@@ -959,6 +1104,9 @@ const importSavingsEntries = async (req, res) => {
   res.status(201).json({
     importedCount: importedEntries.length,
     entries: importedEntries,
+    rejectedCount: invalidRows.length + duplicateRows.length,
+    invalidRows,
+    duplicateRows,
   });
 };
 

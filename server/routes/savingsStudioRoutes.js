@@ -3,6 +3,7 @@ const express = require("express");
 const asyncHandler = require("../middleware/asyncHandler");
 const { protect, requireSavingsStudioPro } = require("../middleware/authMiddleware");
 const { createWindowRateLimiter } = require("../middleware/rateLimit");
+const { validateObjectId } = require("../middleware/requestValidation");
 const {
   getSavingsMeta,
   getSavingsProfile,
@@ -70,17 +71,17 @@ router.get("/entries", asyncHandler(getSavingsEntries));
 router.post("/entries", mutationLimiter, asyncHandler(createSavingsEntry));
 router.post("/entries/import-preview", importLimiter, asyncHandler(previewSavingsEntriesImport));
 router.post("/entries/import", importLimiter, asyncHandler(importSavingsEntries));
-router.put("/entries/:entryId", mutationLimiter, asyncHandler(updateSavingsEntry));
-router.delete("/entries/:entryId", mutationLimiter, asyncHandler(deleteSavingsEntry));
+router.put("/entries/:entryId", mutationLimiter, validateObjectId("entryId"), asyncHandler(updateSavingsEntry));
+router.delete("/entries/:entryId", mutationLimiter, validateObjectId("entryId"), asyncHandler(deleteSavingsEntry));
 router.get("/goals", asyncHandler(getSavingsGoals));
 router.post("/goals", mutationLimiter, asyncHandler(createSavingsGoal));
-router.put("/goals/:goalId", mutationLimiter, asyncHandler(updateSavingsGoal));
-router.delete("/goals/:goalId", mutationLimiter, asyncHandler(deleteSavingsGoal));
+router.put("/goals/:goalId", mutationLimiter, validateObjectId("goalId"), asyncHandler(updateSavingsGoal));
+router.delete("/goals/:goalId", mutationLimiter, validateObjectId("goalId"), asyncHandler(deleteSavingsGoal));
 router.get("/recurring", asyncHandler(getRecurringExpenses));
 router.post("/recurring", mutationLimiter, asyncHandler(createRecurringExpense));
-router.post("/recurring/:recurringId/log", mutationLimiter, asyncHandler(logRecurringExpenseAsEntry));
-router.put("/recurring/:recurringId", mutationLimiter, asyncHandler(updateRecurringExpense));
-router.delete("/recurring/:recurringId", mutationLimiter, asyncHandler(deleteRecurringExpense));
+router.post("/recurring/:recurringId/log", mutationLimiter, validateObjectId("recurringId"), asyncHandler(logRecurringExpenseAsEntry));
+router.put("/recurring/:recurringId", mutationLimiter, validateObjectId("recurringId"), asyncHandler(updateRecurringExpense));
+router.delete("/recurring/:recurringId", mutationLimiter, validateObjectId("recurringId"), asyncHandler(deleteRecurringExpense));
 router.get("/summary", asyncHandler(getSavingsSummary));
 router.get("/activity", asyncHandler(getSavingsActivity));
 router.get("/summary-export", asyncHandler(downloadSavingsSummaryDocument));
