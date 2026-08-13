@@ -65,6 +65,8 @@ Milestone 5 – Release candidate užbaigtas lokaliai.
 - Finalinė diff peržiūra atlikta: peržiūrėti Business revenue, public checkout limiter, Site Builder ID validation, Business Orders invoice, Business Dashboard, Vite wrapper, dependency ir dokumentacijos pakeitimai.
 - Kainų skenas patvirtino, kad `14.99` ir `44.99` nebeliko `client/src`, `server`, `README.md` ar `codex-work/RELEASE_CHECKLIST.md`.
 - Finalinė validacija praėjo: audit high/critical, syntax wrappers, lint, typecheck, test, build ir preview HTTP smoke.
+- Ankstesnio Codex review P2 auth recovery pastabos sutvarkytos: production env reikalauja `EMAIL_FROM` ir Brevo arba pilno SMTP kelio, forgot-password viešas atsakymas neatskleidžia paskyros, siuntimo klaidos saugiai logginamos be jautrių duomenų ir sąlyginiu update išvalo tik konkrečios užklausos tokeną.
+- Reset tokeno panaudojimas pervestas į vieną atominį `findOneAndUpdate` pagal tokeno hash ir galiojimą; tuo pačiu veiksmu nustatomas bcrypt slaptažodžio hash, išvalomi reset laukai, nustatomas `passwordChangedAt` ir padidinamas `authVersion`, neliečiant rolės ar prenumeratos.
 
 ## Vykdoma
 
@@ -72,15 +74,15 @@ Milestone 5 – Release candidate užbaigtas lokaliai.
 
 ## Validacijos rezultatai
 
-- `npm run lint` – PASS, patikrinti 92 backend JavaScript failai.
-- `npm run typecheck` – PASS, TypeScript projekto nėra; backend JavaScript syntax check praėjo 92 failams.
-- `npm test` – PASS, 63/63 serverio ir statinės klientų patikros praėjo.
-- `npm run build` – PASS, Vite 8.2.1 build sugeneravo `client/dist`; finalinio build main JS chunkas ~280.72 kB, `MemberAreaPage` chunkas ~215.80 kB, Vite >500 kB chunk įspėjimo nėra.
+- `npm.cmd run lint` – PASS, patikrinti 97 backend JavaScript failai.
+- `npm.cmd run typecheck` – PASS, TypeScript projekto nėra; backend JavaScript syntax check praėjo 97 failams.
+- `npm.cmd test` – PASS, 80/80 serverio ir statinės klientų patikros praėjo.
+- `npm.cmd run build` – PASS, Vite 8.2.1 build sugeneravo `client/dist`; finalinio build main JS chunkas ~236.12 kB, `MemberAreaPage` chunkas ~215.82 kB, Vite >500 kB chunk įspėjimo nėra.
 - `npm --workspace client run preview -- --host 127.0.0.1 --port 4174` + `Invoke-WebRequest /pricing` – PASS, HTTP 200 ir React root HTML.
 - `node --check scripts/preview-client.js` – PASS.
 - `node` orchestrated Chrome headless screenshot smoke – FAIL dėl vietinio Chromium GPU proceso klaidos `GPU process isn't usable`; produkto HTTP preview buvo pasiekiamas.
 - `node` orchestrated Edge headless screenshot smoke – FAIL dėl vietinio Chromium headless proceso klaidos su izoliuotu profiliu; produkto HTTP preview buvo pasiekiamas.
-- `npm audit --audit-level=high --cache .codex-tmp\npm-cache` – PASS pagal high/critical kriterijų; liko 2 moderate React Router breaking-change punktai.
+- `npm.cmd audit --audit-level=high` – PASS pagal high/critical kriterijų; liko 2 moderate React Router punktai be automatinio fix.
 - `node -e` kainų regresijos skenas – PASS, `14.99` / `44.99` nerasta produkto kode ar release dokumentuose.
 - `npm run build` po Vite 8 migracijos – PASS; Vite 8.2.1 build main JS chunkas ~280.72 kB, `MemberAreaPage` chunkas ~215.80 kB.
 - `node --check scripts/build-client.js` ir `node --check scripts/preview-client.js` – PASS.
@@ -128,3 +130,4 @@ Milestone 5 – Release candidate užbaigtas lokaliai.
 2026-08-13 – Milestone 4 tęsiamas. Pašalinti high dependency audit blokatoriai tiksliniais atnaujinimais, Vite 8 migracija validuota su build ir preview HTTP smoke, secret scan realių frontend paslapčių nerado. `PROJECT_STATE` paliekamas `IN_PROGRESS`, nes responsive/accessibility ir release-candidate checklist dar neužbaigti.
 2026-08-13 – Milestone 5 uždarytas. README ir `codex-work/RELEASE_CHECKLIST.md` atnaujinti, finalinis kainų/narystės skenas praėjo, `npm audit --audit-level=high`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, wrapper syntax check ir `/pricing` preview smoke praėjo. `PROJECT_STATE: RELEASE_CANDIDATE_READY`.
 2026-08-13 – RC auth recovery blockeris sutvarkytas. Pridėtas saugus slaptažodžio atkūrimo srautas: generic forgot-password atsakymas, hashintas vienkartinis tokenas su 15 min. TTL, reset-password su esama slaptažodžio politika, `authVersion` senų JWT sesijų invalidavimui, Brevo/SMTP reset laiškas, vieši LT frontend puslapiai ir avarinis `owner:recover-password` CLI be slaptažodžio argumentų. Production DB, `.env`, Stripe, išorinės paskyros ir realūs el. laiškai neliesti. Validuota su `npm.cmd run lint`, `npm.cmd run typecheck`, `npm.cmd test` (72/72), `npm.cmd run build` ir `git diff --check` (tik CRLF normalizavimo įspėjimai).
+2026-08-13 – Ankstesnio Codex review P2 auth recovery pastabos ištaisytos. Forgot-password siuntimo rezultatas dabar viduje tikslus, siuntimo gedimas išvalo tik tos užklausos aktyvų tokeną ir nepašalina naujesnio tokeno, o reset-password tokenas panaudojamas vienu atominiu DB update. Pridėti env, siuntimo patikimumo, senos/naujos užklausos lenktynių, concurrent reset, bcrypt, `authVersion`, role/subscription ir expired/reused tokenų regresijos testai. Validuota su `npm.cmd run lint`, `npm.cmd run typecheck`, `npm.cmd test` (80/80), `npm.cmd run build`, `npm.cmd audit --audit-level=high` ir `git diff --check`.

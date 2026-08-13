@@ -9,6 +9,9 @@ const requiredInProduction = [
   "STRIPE_WEBHOOK_SECRET",
 ];
 
+const { isBrevoEmailConfigured } = require("../utils/brevoEmail");
+const { isFullEmailTransportConfigured } = require("../utils/emailTransport");
+
 const getMissingKeys = (keys) => keys.filter((key) => !process.env[key]);
 
 const validateEnvironment = () => {
@@ -32,6 +35,18 @@ const validateEnvironment = () => {
     throw new Error(
       `Truksta mokamu planu Stripe Price ID kintamuju: ${missingPaidStripePrices.join(", ")}`
     );
+  }
+
+  if (isProduction) {
+    if (!process.env.EMAIL_FROM?.trim()) {
+      throw new Error("Truksta privalomu aplinkos kintamuju: EMAIL_FROM");
+    }
+
+    if (!isBrevoEmailConfigured() && !isFullEmailTransportConfigured()) {
+      throw new Error(
+        "Truksta el. pasto siuntimo konfiguracijos: reikia BREVO_API_KEY arba pilno SMTP kelio SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER ir SMTP_PASS"
+      );
+    }
   }
 
   if (!isProduction) {

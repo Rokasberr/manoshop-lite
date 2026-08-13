@@ -1,4 +1,5 @@
 const crypto = require("crypto");
+const bcrypt = require("bcryptjs");
 
 const User = require("../models/User");
 const { sendPasswordResetEmail } = require("./passwordResetEmailService");
@@ -38,6 +39,32 @@ const buildPasswordResetUrl = (token) => {
 const resolveQuery = async (query, select = "") =>
   typeof query?.select === "function" ? query.select(select) : query;
 
+const getUserId = (user) => user?._id || user?.id || null;
+
+const clearPasswordResetTokenIfCurrent = async ({
+  userModel,
+  user,
+  tokenHash,
+  expiresAt,
+}) => {
+  const filter = {
+    passwordResetTokenHash: tokenHash,
+    passwordResetExpiresAt: expiresAt,
+  };
+  const userId = getUserId(user);
+
+  if (userId) {
+    filter._id = userId;
+  }
+
+  await userModel.updateOne(filter, {
+    $set: {
+      passwordResetTokenHash: "",
+      passwordResetExpiresAt: null,
+    },
+  });
+};
+
 const requestPasswordReset = async ({
   email,
   userModel = User,
@@ -62,25 +89,38 @@ const requestPasswordReset = async ({
   }
 
   const rawToken = tokenFactory();
+  const tokenHash = hashResetToken(rawToken);
   const expiresAt = new Date(now().getTime() + getResetTokenTtlMinutes() * 60_000);
 
-  user.passwordResetTokenHash = hashResetToken(rawToken);
+  user.passwordResetTokenHash = tokenHash;
   user.passwordResetExpiresAt = expiresAt;
   await user.save();
 
+  let emailSent = false;
+
   try {
-    await emailSender({
+    const sendResult = await emailSender({
       to: user.email,
       resetUrl: buildPasswordResetUrl(rawToken),
       userName: user.name,
     });
+    emailSent = sendResult?.sent !== false && !sendResult?.skipped;
   } catch (error) {
-    logger.warn?.("[auth] Password reset email failed.", {
+    logger.error?.("[auth] Password reset email delivery failed.", {
       reason: error?.code || error?.statusCode || error?.name || "email-error",
     });
   }
 
-  return { message: PASSWORD_RESET_GENERIC_MESSAGE, emailSent: true };
+  if (!emailSent) {
+    await clearPasswordResetTokenIfCurrent({
+      userModel,
+      user,
+      tokenHash,
+      expiresAt,
+    });
+  }
+
+  return { message: PASSWORD_RESET_GENERIC_MESSAGE, emailSent };
 };
 
 const resetPassword = async ({
@@ -101,27 +141,33 @@ const resetPassword = async ({
   }
 
   const tokenHash = hashResetToken(rawToken);
-  const user = await resolveQuery(
-    userModel.findOne({ passwordResetTokenHash: tokenHash }),
-    "+password +passwordResetTokenHash +passwordResetExpiresAt"
+  const changedAt = now();
+  const passwordHash = await bcrypt.hash(String(password), 10);
+  const user = await userModel.findOneAndUpdate(
+    {
+      passwordResetTokenHash: tokenHash,
+      passwordResetExpiresAt: { $gt: changedAt },
+    },
+    {
+      $set: {
+        password: passwordHash,
+        passwordResetTokenHash: "",
+        passwordResetExpiresAt: null,
+        passwordChangedAt: changedAt,
+      },
+      $inc: {
+        authVersion: 1,
+      },
+    },
+    {
+      new: true,
+      projection: { _id: 1 },
+    }
   );
 
-  if (!user || !user.passwordResetExpiresAt || user.passwordResetExpiresAt.getTime() <= now().getTime()) {
-    if (user) {
-      user.passwordResetTokenHash = "";
-      user.passwordResetExpiresAt = null;
-      await user.save();
-    }
-
+  if (!user) {
     throw createHttpError(PASSWORD_RESET_INVALID_MESSAGE, 400);
   }
-
-  user.password = String(password);
-  user.passwordResetTokenHash = "";
-  user.passwordResetExpiresAt = null;
-  user.authVersion = Number(user.authVersion || 0) + 1;
-  user.passwordChangedAt = now();
-  await user.save();
 
   return { message: "Slaptažodis atnaujintas. Dabar gali prisijungti." };
 };
