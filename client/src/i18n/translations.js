@@ -587,7 +587,7 @@ export const translations = {
     pricing: {
       seoTitle: "Stilloak Studio narystės | Demo, Asmeninis ir Privatus verslas",
       seoDescription:
-        "Pasirinkite nemokamą Demo versiją, Asmeninį planą už €24/mėn. arba Privatus verslas planą už €99/mėn. aiškesniems finansams ir verslo įrankiams.",
+        "Pasirinkite nemokamą Demo versiją, Asmeninį planą už €14,99/mėn. arba Privatus verslas planą už €44,99/mėn. aiškesniems finansams ir verslo įrankiams.",
       nav: ["Funkcijos", "Narystės", "Rinkiniai", "Atsiliepimai"],
       heroChip: "Stilloak Studio narystė",
       heroTitle: "Pasirink nario erdvę pagal savo etapą.",
@@ -1242,7 +1242,7 @@ translations.en = mergeLocale(translations.lt, {
   pricing: {
     seoTitle: "Stilloak Studio memberships | Demo, Personal, and Business",
     seoDescription:
-      "Choose the free Demo version, Personal membership for €24/month, or Private Business for €99/month for clearer finance and business tools.",
+      "Choose the free Demo version, Personal membership for €14.99/month, or Private Business for €44.99/month for clearer finance and business tools.",
     nav: ["Features", "Memberships", "Kits", "Reviews"],
     heroChip: "Stilloak Studio membership",
     heroTitle: "Choose the member space for your current stage.",
@@ -1798,7 +1798,7 @@ translations.pl = mergeLocale(translations.en, {
   pricing: {
     seoTitle: "Członkostwa Stilloak Studio | Demo, Osobisty i Biznes",
     seoDescription:
-      "Wybierz darmową wersję Demo, plan Osobisty za €24/mies. albo Prywatny biznes za €99/mies. dla jaśniejszych finansów i narzędzi biznesowych.",
+      "Wybierz darmową wersję Demo, plan Osobisty za €14,99/mies. albo Prywatny biznes za €44,99/mies. dla jaśniejszych finansów i narzędzi biznesowych.",
     nav: ["Funkcje", "Członkostwa", "Zestawy", "Opinie"],
     heroChip: "Członkostwo Stilloak Studio",
     heroTitle: "Wybierz strefę członka dla swojego etapu.",
@@ -2098,7 +2098,7 @@ translations.de = mergeLocale(translations.en, {
   pricing: {
     seoTitle: "Stilloak Studio Mitgliedschaften | Demo, Persönlich und Business",
     seoDescription:
-      "Wählen Sie die kostenlose Demo-Version, Persönlich für €24/Monat oder Private Business für €99/Monat für klarere Finanzen und Business-Tools.",
+      "Wählen Sie die kostenlose Demo-Version, Persönlich für €14,99/Monat oder Private Business für €44,99/Monat für klarere Finanzen und Business-Tools.",
     nav: ["Funktionen", "Mitgliedschaften", "Kits", "Stimmen"],
     heroChip: "Stilloak Studio Mitgliedschaft",
     heroTitle: "Wählen Sie den Mitgliederbereich für Ihre aktuelle Phase.",
@@ -2426,7 +2426,7 @@ translations.fr = mergeLocale(translations.en, {
   pricing: {
     seoTitle: "Abonnements Stilloak Studio | Démo, Personnel et Business",
     seoDescription:
-      "Choisissez la Démo gratuite, Personnel à €24/mois ou Private Business à €99/mois pour plus de clarté financière et des outils business.",
+      "Choisissez la Démo gratuite, Personnel à €14,99/mois ou Private Business à €44,99/mois pour plus de clarté financière et des outils business.",
     nav: ["Fonctions", "Abonnements", "Kits", "Avis"],
     heroChip: "Abonnement Stilloak Studio",
     heroTitle: "Choisissez l’espace membre adapté à votre étape.",
@@ -2717,7 +2717,7 @@ translations.es = mergeLocale(translations.en, {
   pricing: {
     seoTitle: "Membresías Stilloak Studio | Demo, Personal y Business",
     seoDescription:
-      "Elige la versión Demo gratuita, Personal por €24/mes o Private Business por €99/mes para finanzas más claras y herramientas de negocio.",
+      "Elige la versión Demo gratuita, Personal por €14,99/mes o Private Business por €44,99/mes para finanzas más claras y herramientas de negocio.",
     nav: ["Funciones", "Membresías", "Kits", "Opiniones"],
     heroChip: "Membresía Stilloak Studio",
     heroTitle: "Elige el espacio de miembro para tu etapa.",

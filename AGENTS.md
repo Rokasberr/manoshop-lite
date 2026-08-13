@@ -10,8 +10,8 @@ Prieš keisdamas kodą visiškai perskaityk:
 Patvirtintos kainos:
 
 - Demo – nemokamas.
-- Asmeninis – 24 EUR/mėn.
-- Privatus verslas – 99 EUR/mėn.
+- Asmeninis – 14,99 EUR/mėn.
+- Privatus verslas – 44,99 EUR/mėn.
 
 Darbo tvarka:
 

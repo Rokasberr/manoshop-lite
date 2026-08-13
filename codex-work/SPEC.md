@@ -37,7 +37,7 @@ Nekeisti visos architektūros be aiškios techninės būtinybės.
 
 ### Asmeninis
 
-- Kaina: 24 EUR/mėn.
+- Kaina: 14,99 EUR/mėn.
 - Prioritetinis pirmas produktas.
 - Saving Studio ir susiję asmeninių finansų įrankiai turi būti realiai naudingi, suprantami ir patikimi.
 - Reikalingas aiškus onboarding, validacija, loading, empty ir error būsenos.
@@ -47,7 +47,7 @@ Nekeisti visos architektūros be aiškios techninės būtinybės.
 
 ### Privatus verslas
 
-- Kaina: 99 EUR/mėn.
+- Kaina: 44,99 EUR/mėn.
 - Darbai pradedami tik užbaigus Asmeninio plano priėmimo kriterijus.
 - Business Studio prieinama tik šiam planui.
 - Vertinti esamas arba suplanuotas funkcijas:
@@ -98,7 +98,7 @@ Codex turi paruošti kodą, dokumentaciją ir kontrolinį sąrašą šiems veiks
 
 Projektas laikomas lokaliai paruoštu release candidate tik kai:
 
-1. Kainos visur yra Demo 0, Asmeninis 24, Privatus verslas 99.
+1. Kainos visur yra Demo 0, Asmeninis 14,99, Privatus verslas 44,99.
 2. Planų prieigos patikrintos frontend ir backend.
 3. Asmeninio plano pagrindiniai vartotojo srautai veikia.
 4. Verslo plano įgyvendinti srautai nėra vien vizualios imitacijos.
