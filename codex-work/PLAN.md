@@ -57,12 +57,13 @@ Pradėti tik užbaigus Milestone 2.
 ## Milestone 4 – Security ir kokybė
 
 - [x] Autentifikacijos ir autorizacijos peržiūra: `protect`, `requireBusinessPlan`, `requireSavingsStudioPro`, `adminOnly`, public store checkout ir order invoice prieigos peržiūrėtos; esami ir nauji testai dengia pagrindinius guard skirtumus.
+- [x] Slaptažodžio atkūrimas: pridėti generic forgot/reset endpointai, hashintas vienkartinis tokenas su trumpu galiojimu, `authVersion` sesijų invalidavimas, el. pašto siuntimas per Brevo/SMTP ir avarinis owner CLI be slaptažodžio argumentų.
 - [x] Įvesties validacija: auth/order/billing/Saving Studio validacijos patikrintos, Site Builder `selectedProducts` ID validacija sustiprinta, public checkout apribotas rate limiteriu.
 - [x] Klaidos neatskleidžia jautrios informacijos: production error handler slepia 500 stack, env validacija tikrina privalomus kintamuosius, Stripe webhook raw body tvarka padengta testu.
 - [x] Patikrinta, kad frontend neturi paslapčių: `rg` secret scan nerado realių raktų `client/src`; rasti tik `.env.example`, dokumentacijos placeholderiai ir testiniai slaptažodžiai admin-flow smoke skripte.
 - [x] Patikrintos dependency ir konfigūracijos rizikos be nekontroliuojamų atnaujinimų: tiksliniai axios/postcss/autoprefixer/express/mongoose/morgan/nodemailer/sharp/Vite/plugin atnaujinimai pritaikyti; `npm audit --audit-level=high` nebeturi high/critical blokatorių, liko React Router 7 breaking-change moderate migracija.
 - [x] Responsive ir accessibility patikra: pridėtas globalus keyboard skip-link į `Layout`, o Saving Studio mobile-first shell saugomas statine responsive regresija; naršyklinis screenshot smoke liko aplinkos apribojimas dėl vietinio Chromium GPU proceso klaidos.
-- [x] Kritinių srautų regresijos testai: 63/63 Node testai dengia auth/access, billing, Stripe, Saving Studio, Business Studio ir klientų layout accessibility regresijas.
+- [x] Kritinių srautų regresijos testai: 72/72 Node testai dengia auth/access, password recovery, owner CLI safety, billing, Stripe, Saving Studio, Business Studio ir klientų layout accessibility regresijas.
 - [x] Praeina pilnas lint, typecheck, test ir build.
 
 ## Milestone 5 – Release candidate

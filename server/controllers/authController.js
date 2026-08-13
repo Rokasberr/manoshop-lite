@@ -1,14 +1,23 @@
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
+const { requestPasswordReset, resetPassword } = require("../services/passwordRecoveryService");
 const { serializeSubscription } = require("../services/stripeMembershipService");
 const { createHttpError } = require("../utils/httpError");
 const { normalizeUserRole } = require("../utils/userRole");
 
 const signToken = (user) =>
-  jwt.sign({ id: user._id, role: normalizeUserRole(user) }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN || "7d",
-  });
+  jwt.sign(
+    {
+      id: user._id,
+      role: normalizeUserRole(user),
+      authVersion: Number(user.authVersion || 0),
+    },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: process.env.JWT_EXPIRES_IN || "7d",
+    }
+  );
 
 const formatAuthResponse = (user) => ({
   token: signToken(user),
@@ -73,9 +82,25 @@ const logoutUser = async (_req, res) => {
   res.json({ message: "Atsijungta." });
 };
 
+const forgotPassword = async (req, res) => {
+  const result = await requestPasswordReset({ email: req.body.email });
+  res.json({ message: result.message });
+};
+
+const resetUserPassword = async (req, res) => {
+  const result = await resetPassword({
+    token: req.body.token,
+    password: req.body.password,
+  });
+
+  res.json({ message: result.message });
+};
+
 module.exports = {
+  forgotPassword,
   registerUser,
   loginUser,
   logoutUser,
   getCurrentUser,
+  resetUserPassword,
 };

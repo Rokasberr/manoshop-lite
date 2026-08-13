@@ -77,6 +77,8 @@ Open `http://127.0.0.1:4174/pricing` and confirm the React root renders.
 - Owner verifies `CLIENT_URL` and CORS allow only intended production origins.
 - Owner verifies production MongoDB connection points to the approved production database.
 - Owner verifies admin account creation or rotation through a private channel; no public/default admin password is used.
+- If emergency owner password recovery is needed, run only after confirming the target database and email:
+  `npm run owner:recover-password -- --target-email=owner@example.com --confirm-email=owner@example.com`
 - Owner verifies Stripe Live mode is intentionally enabled only after final approval.
 - Owner verifies `STRIPE_PRICE_ASMENINIS` is 24 EUR per month.
 - Owner verifies `STRIPE_PRICE_PRIVATUS_VERSLAS` is 99 EUR per month.

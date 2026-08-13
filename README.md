@@ -68,6 +68,8 @@ Backend naudoja šiuos kintamųjų pavadinimus:
 - `MONGO_DB_NAME`
 - `JWT_SECRET`
 - `JWT_EXPIRES_IN`
+- `PASSWORD_RESET_BASE_URL`
+- `PASSWORD_RESET_TOKEN_TTL_MINUTES`
 - `CLIENT_URL`
 - `COMPANY_NAME`
 - `STRIPE_SECRET_KEY`
@@ -127,6 +129,16 @@ Po mokėjimo frontend gali kviesti saugų atsarginį sinchronizavimo endpointą,
 Viešų administratoriaus prisijungimo duomenų repozitoriume neturi būti. Administratoriaus paskyra turi būti sukuriama arba nustatoma saugiu, neviešinamu būdu, pavyzdžiui per kontroliuojamą seed, vidinį administravimo procesą arba tiesioginę saugią DB operaciją.
 
 Produkcijoje savininkas turi patikrinti, kad administratoriaus paskyros slaptažodis yra unikalus, stiprus ir nėra naudotas jokioje viešoje dokumentacijoje ar demo aplinkoje.
+
+Jei savininkas nebegali prisijungti ir įprastas el. pašto atkūrimas neveikia, atskirame patvirtintame priežiūros lange galima naudoti avarinį CLI. Jo nevykdyti be aiškaus DB ir savininko el. pašto patvirtinimo:
+
+```bash
+npm run owner:recover-password -- --target-email=owner@example.com --confirm-email=owner@example.com
+```
+
+Komanda nepriima slaptažodžio per argumentus. Ji parodo pasirinktą MongoDB duomenų bazės vardą, tada naują slaptažodį skaito per paslėptą promptą arba stdin. Ji keičia tik nurodyto vartotojo slaptažodį, išvalo atkūrimo tokeną ir padidina `authVersion`, kad senos JWT sesijos nebegaliotų.
+
+Slaptažodžio atkūrimo el. laiškams būtina sukonfigūruoti `EMAIL_FROM` ir vieną siuntimo kelią: `BREVO_API_KEY` Brevo API keliui arba SMTP keliui `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`.
 
 ## Produkcinis Checklist
 

@@ -80,6 +80,25 @@ const userSchema = new mongoose.Schema(
       required: true,
       minlength: 6,
     },
+    passwordResetTokenHash: {
+      type: String,
+      default: "",
+      select: false,
+    },
+    passwordResetExpiresAt: {
+      type: Date,
+      default: null,
+      select: false,
+    },
+    authVersion: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    passwordChangedAt: {
+      type: Date,
+      default: null,
+    },
     role: {
       type: String,
       enum: ["customer", "admin", "Customer", "Admin"],
@@ -108,6 +127,7 @@ const userSchema = new mongoose.Schema(
 userSchema.index({ role: 1 });
 userSchema.index({ "subscription.stripeCustomerId": 1 }, { sparse: true });
 userSchema.index({ "subscription.stripeSubscriptionId": 1 }, { sparse: true });
+userSchema.index({ passwordResetTokenHash: 1 }, { sparse: true });
 
 userSchema.pre("save", async function save(next) {
   if (!this.isModified("password")) {

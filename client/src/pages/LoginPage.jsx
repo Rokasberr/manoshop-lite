@@ -62,7 +62,10 @@ const LoginPage = () => {
 
       toast.success(copy.success);
     } catch (submitError) {
-      setError(submitError.response?.data?.message || copy.fail);
+      const backendMessage = submitError.response?.data?.message;
+      const safeBackendMessage =
+        submitError.response?.status < 500 && typeof backendMessage === "string" ? backendMessage : "";
+      setError(safeBackendMessage || copy.fail);
     } finally {
       setLoading(false);
     }
@@ -114,6 +117,11 @@ const LoginPage = () => {
               value={formData.password}
               onChange={(event) => handleChange("password", event.target.value)}
             />
+            <div className="mt-2 text-right text-sm">
+              <Link to="/forgot-password" className="font-semibold" style={{ color: "rgb(var(--accent-strong))" }}>
+                {copy.forgotPassword}
+              </Link>
+            </div>
           </div>
 
           <button type="submit" disabled={loading} className="button-primary w-full">

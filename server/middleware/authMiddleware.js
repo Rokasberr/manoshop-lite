@@ -27,6 +27,10 @@ const protect = async (req, res, next) => {
       return next(createHttpError("Vartotojas nebegalioja.", 401));
     }
 
+    if (Number(decoded.authVersion || 0) !== Number(user.authVersion || 0)) {
+      return next(createHttpError("Sesija nebegalioja. Prisijunk iš naujo.", 401));
+    }
+
     req.user = user;
     req.userRole = normalizeUserRole(user);
     next();

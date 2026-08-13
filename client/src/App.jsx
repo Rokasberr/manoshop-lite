@@ -22,6 +22,8 @@ const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
 const CheckoutSuccessPage = lazy(() => import("./pages/CheckoutSuccessPage"));
 const CheckoutCancelPage = lazy(() => import("./pages/CheckoutCancelPage"));
 const LoginPage = lazy(() => import("./pages/LoginPage"));
+const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
 const RegisterPage = lazy(() => import("./pages/RegisterPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const PricingPage = lazy(() => import("./pages/PricingPage"));
@@ -68,6 +70,8 @@ const App = () => (
         <Route path="/stores/:slug" element={<PublicStorePage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/programa" element={<Navigate to="/pricing" replace />} />
