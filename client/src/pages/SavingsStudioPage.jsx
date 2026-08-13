@@ -162,6 +162,13 @@ const roundScenarioAmount = (value) => {
   return Math.ceil(numericValue / 10) * 10;
 };
 
+const parseDecimalInput = (value, fallback = 0) => {
+  const numericValue = Number(String(value || "").replace(",", "."));
+  return Number.isFinite(numericValue) ? numericValue : fallback;
+};
+
+const formatDraftCurrency = (value) => money.format(parseDecimalInput(value));
+
 const formatFutureMonthLabel = (monthsAhead) => {
   if (!Number.isFinite(monthsAhead) || monthsAhead <= 0) {
     return "dabar";
@@ -1450,8 +1457,8 @@ const SavingsStudioPage = () => {
 
   const handleNextOnboardingStep = () => {
     if (onboardingStep === 0) {
-      const monthlyIncome = Number(String(profileForm.monthlyIncome || "0").replace(",", "."));
-      const monthlySavingsTarget = Number(String(profileForm.monthlySavingsTarget || "0").replace(",", "."));
+      const monthlyIncome = parseDecimalInput(profileForm.monthlyIncome, NaN);
+      const monthlySavingsTarget = parseDecimalInput(profileForm.monthlySavingsTarget, NaN);
 
       if (!Number.isFinite(monthlyIncome) || monthlyIncome <= 0) {
         toast.error("Įvesk mėnesio pajamas, kad setup būtų prasmingas.");
@@ -1466,7 +1473,7 @@ const SavingsStudioPage = () => {
 
     if (onboardingStep === 1) {
       const hasAnyBudget = ONBOARDING_BUDGET_CATEGORIES.some((category) => {
-        const amount = Number(String(budgetInputs[category] || "0").replace(",", "."));
+        const amount = parseDecimalInput(budgetInputs[category], NaN);
         return Number.isFinite(amount) && amount > 0;
       });
 
@@ -1495,8 +1502,8 @@ const SavingsStudioPage = () => {
     try {
       const [profileResult] = await Promise.all([
         savingsStudioService.updateProfile({
-          monthlyIncome: Number(String(profileForm.monthlyIncome || "0").replace(",", ".")),
-          monthlySavingsTarget: Number(String(profileForm.monthlySavingsTarget || "0").replace(",", ".")),
+          monthlyIncome: parseDecimalInput(profileForm.monthlyIncome),
+          monthlySavingsTarget: parseDecimalInput(profileForm.monthlySavingsTarget),
           primaryFocus: profileForm.primaryFocus,
           onboardingCompleted: true,
         }),
@@ -1504,7 +1511,7 @@ const SavingsStudioPage = () => {
           month: currentMonthKey(),
           budgets: ONBOARDING_BUDGET_CATEGORIES.map((category) => ({
             category,
-            limitAmount: Number(String(budgetInputs[category] || "0").replace(",", ".")),
+            limitAmount: parseDecimalInput(budgetInputs[category], NaN),
           })).filter((budget) => Number.isFinite(budget.limitAmount) && budget.limitAmount > 0),
         }),
       ]);
@@ -1526,7 +1533,7 @@ const SavingsStudioPage = () => {
       const budgetsPayload = categories
         .map((category) => ({
           category,
-          limitAmount: Number(String(budgetInputs[category] || "").replace(",", ".")),
+          limitAmount: parseDecimalInput(budgetInputs[category], NaN),
         }))
         .filter((budget) => Number.isFinite(budget.limitAmount) && budget.limitAmount > 0);
 
@@ -1974,7 +1981,7 @@ const SavingsStudioPage = () => {
             <div className="flex flex-wrap gap-2">
               <span className="hero-chip">Asmeninis planas</span>
               <span className="hero-chip">Pilna nario zona</span>
-              <span className="hero-chip">14.99 €/mėn.</span>
+              <span className="hero-chip">24 €/mėn.</span>
             </div>
             <h1 className="mt-7 max-w-4xl break-words font-display text-4xl font-bold leading-tight sm:text-6xl lg:text-7xl">
               Stilloak asmeninė darbo erdvė
@@ -2193,13 +2200,13 @@ const SavingsStudioPage = () => {
                       <div>
                         <p className="text-sm font-semibold text-muted">Mėnesio pajamos</p>
                         <p className="mt-1 text-lg font-semibold">
-                          {money.format(Number(String(profileForm.monthlyIncome || "0").replace(",", ".")))}
+                          {formatDraftCurrency(profileForm.monthlyIncome)}
                         </p>
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-muted">Taupymo tikslas</p>
                         <p className="mt-1 text-lg font-semibold">
-                          {money.format(Number(String(profileForm.monthlySavingsTarget || "0").replace(",", ".")))}
+                          {formatDraftCurrency(profileForm.monthlySavingsTarget)}
                         </p>
                       </div>
                     </div>
@@ -2212,7 +2219,7 @@ const SavingsStudioPage = () => {
                         <div key={category} className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
                           <p className="text-sm font-semibold text-muted">{category}</p>
                           <p className="mt-1 text-base font-semibold">
-                            {money.format(Number(String(budgetInputs[category] || "0").replace(",", ".")))}
+                            {formatDraftCurrency(budgetInputs[category])}
                           </p>
                         </div>
                       ))}

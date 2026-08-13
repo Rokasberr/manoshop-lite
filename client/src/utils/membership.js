@@ -16,7 +16,7 @@ export const planDisplayNames = {
   free: "Be aktyvios narystės",
   basic: "Demo versija",
   personal: "Asmeninis",
-  private_business: "Verslas",
+  private_business: "Privatus verslas",
 };
 
 export const normalizePlan = (plan = "") => {

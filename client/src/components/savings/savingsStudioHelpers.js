@@ -37,6 +37,11 @@ export const dateFormatter = new Intl.DateTimeFormat("lt-LT", {
   year: "numeric",
 });
 
+const toFiniteNumber = (value, fallback = 0) => {
+  const numericValue = Number(value);
+  return Number.isFinite(numericValue) ? numericValue : fallback;
+};
+
 export const currentDateInput = () => new Date().toISOString().slice(0, 10);
 export const currentMonthKey = () => new Date().toISOString().slice(0, 7);
 
@@ -112,10 +117,10 @@ export const getBudgetStatus = ({ spent, limitAmount }) => {
 };
 
 export const getGoalProgress = (goal) => {
-  const targetAmount = Number(goal.targetAmount || 0);
-  const currentAmount = Number(goal.currentAmount || 0);
+  const targetAmount = toFiniteNumber(goal.targetAmount);
+  const currentAmount = Math.max(toFiniteNumber(goal.currentAmount), 0);
 
-  if (!targetAmount) {
+  if (targetAmount <= 0) {
     return {
       progress: 0,
       remaining: 0,
@@ -123,19 +128,21 @@ export const getGoalProgress = (goal) => {
     };
   }
 
+  const remaining = Math.max(targetAmount - currentAmount, 0);
+
   return {
-    progress: Math.min((currentAmount / targetAmount) * 100, 100),
-    remaining: Number((targetAmount - currentAmount).toFixed(2)),
+    progress: Math.min(Math.max((currentAmount / targetAmount) * 100, 0), 100),
+    remaining: Number(remaining.toFixed(2)),
     complete: currentAmount >= targetAmount,
   };
 };
 
 export const recurringMonthlyEquivalent = (expense) => {
-  const amount = Number(expense.amount || 0);
+  const amount = Math.max(toFiniteNumber(expense.amount), 0);
 
   switch (expense.frequency) {
     case "weekly":
-      return Number((((amount * 52) / 12) || 0).toFixed(2));
+      return Number(((amount * 52) / 12).toFixed(2));
     case "quarterly":
       return Number((amount / 3).toFixed(2));
     case "yearly":

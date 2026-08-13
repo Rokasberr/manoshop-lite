@@ -4,35 +4,35 @@ Codex privalo palaikyti šį failą kaip gyvą planą.
 
 ## Milestone 0 – Baseline audit
 
-- [ ] Patikrinta Git ir projekto struktūra.
-- [ ] Perskaityta esama dokumentacija.
-- [ ] Surasti visi membership ir pricing šaltiniai.
-- [ ] Surasti klientų ir serverio planų guard mechanizmai.
-- [ ] Surasti testų, lint, typecheck ir build scenarijai.
-- [ ] Įvertinti esami Excel arba finansų prototipai.
-- [ ] Užfiksuotos dabartinės klaidos ir rizikos.
-- [ ] Į PLAN.md įrašytos konkrečios rastos komandos ir priėmimo kriterijai.
+- [x] Patikrinta Git ir projekto struktūra: root workspace su `client` ir `server`, papildomas ne-workspace `ai-sales-copilot-saas`.
+- [x] Perskaityta esama dokumentacija: `AGENTS.md`, `SPEC.md`, `PLAN.md`, `IMPLEMENT.md`, `STATUS.md`.
+- [x] Surasti visi membership ir pricing šaltiniai: `server/config/subscriptionPlans.js`, `client/src/constants/subscriptionPlans.js`, `client/src/i18n/translations.js`, `client/src/pages/SavingsStudioPage.jsx`, `client/src/pages/admin/InstagramGeneratorPage.jsx`.
+- [x] Surasti klientų ir serverio planų guard mechanizmai: `server/config/planAccess.js`, `server/middleware/authMiddleware.js`, `server/routes/savingsStudioRoutes.js`, `server/routes/businessRoutes.js`, `client/src/utils/membership.js`, `client/src/components/ProtectedRoute.jsx`, `client/src/pages/MemberAreaPage.jsx`.
+- [x] Surasti testų, lint, typecheck ir build scenarijai: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`.
+- [x] Įvertinti esami Excel arba finansų prototipai: `server/protected-digital-products/excel/*.xlsx`, įskaitant Savings Tracker ir Personal Budget System.
+- [x] Užfiksuotos dabartinės klaidos ir rizikos: senos kainos 14.99/44.99 klientui, serveriui, SEO tekstams ir admin Instagram šablonams.
+- [x] Į PLAN.md įrašytos konkrečios rastos komandos ir priėmimo kriterijai.
 
 ## Milestone 1 – Bendras production pagrindas
 
-- [ ] Centralizuota teisinga kainodara.
-- [ ] Pašalintos senos arba neteisingos kainos.
-- [ ] Sutvarkytas planų pavadinimų nuoseklumas.
-- [ ] Patikrinta autentifikacija ir sesijos valdymas.
-- [ ] Patikrinti backend planų guard.
-- [ ] Sutvarkytos kritinės bendros UI ir API klaidos.
-- [ ] Praeina milestone validacija.
+- [x] Centralizuota teisinga kainodara: Demo 0, Asmeninis 24, Privatus verslas 99.
+- [x] Pašalintos senos arba neteisingos kainos: `14.99` ir `44.99` neliko `client/src` arba `server` membership šaltiniuose.
+- [x] Sutvarkytas planų pavadinimų nuoseklumas: LT planas `private_business` rodomas kaip `Privatus verslas`.
+- [x] Patikrinta autentifikacija ir sesijos valdymas: padengta esamais auth, billing sync ir protected route testais.
+- [x] Patikrinti backend planų guard: Demo negali pasiekti full Saving Studio ar Business Studio, Asmeninis negali pasiekti Business Studio.
+- [x] Sutvarkytos kritinės bendros UI ir API klaidos: build scenarijus pervestas į sandboxe veikiantį Vite API wrapperį.
+- [x] Praeina milestone validacija: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`.
 
 ## Milestone 2 – Asmeninis 10/10
 
-- [ ] Saving Studio srautų auditas.
-- [ ] Skaičiavimų ir duomenų validacija.
+- [ ] Saving Studio srautų auditas: pradėta nuo `SavingsStudioPage.jsx`, `savingsStudioHelpers.js`, `savingsStudioController.js`, `savingsStudioService.js` ir esamų testų spragų.
+- [ ] Skaičiavimų ir duomenų validacija: pridėtos apsaugos nuo `NaN` goal progress, recurring monthly equivalent ir onboarding draft currency preview keliuose.
 - [ ] Onboarding ir aiški vartotojo kelionė.
 - [ ] Loading, empty, success ir error būsenos.
 - [ ] Mobilus ir desktop UX.
 - [ ] Planų ir kreditų elgesio nuoseklumas.
 - [ ] Demo ir Asmeninio prieigų testai.
-- [ ] Reikalingi unit ir integration testai.
+- [ ] Reikalingi unit ir integration testai: pridėtas `server/tests/savingsStudioHelpers.test.js` kliento helperių ir Saving Studio puslapio regresijai.
 - [ ] Asmeninio plano smoke test.
 - [ ] Galutinė Asmeninio plano diff peržiūra.
 - [ ] Praeina milestone validacija.
