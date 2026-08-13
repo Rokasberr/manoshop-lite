@@ -3739,7 +3739,7 @@ const SavingsStudioPage = () => {
             <Mail size={20} style={{ color: "rgb(var(--accent))" }} />
           </div>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <div className="mt-6 grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-3">
             <ForecastMetricTile
               label="Suvestinės"
               value={automationReadiness.summaryStatus}
@@ -4560,14 +4560,18 @@ const AutomationTriggerCard = ({ onRun, trigger }) => {
 
   return (
     <div className={`rounded-[24px] border p-5 ${toneClasses[trigger.tone] || toneClasses.info}`}>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h3 className="text-lg font-semibold">{trigger.title}</h3>
-          <p className="mt-2 text-sm leading-6 text-muted">{trigger.body}</p>
+      <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <h3 className="break-words text-lg font-semibold">{trigger.title}</h3>
+          <p className="mt-2 break-words text-sm leading-6 text-muted">{trigger.body}</p>
         </div>
-        <button type="button" className="button-secondary gap-2 sm:shrink-0" onClick={onRun}>
-          {trigger.actionLabel}
-          <ArrowUpRight size={14} />
+        <button
+          type="button"
+          className="button-secondary w-full max-w-full gap-2 whitespace-normal break-words text-center sm:w-auto sm:shrink-0"
+          onClick={onRun}
+        >
+          <span className="min-w-0 break-words">{trigger.actionLabel}</span>
+          <ArrowUpRight className="shrink-0" size={14} />
         </button>
       </div>
     </div>

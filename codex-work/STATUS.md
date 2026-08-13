@@ -8,6 +8,8 @@ Final production readiness audit – lokaliai paruošta, su rankiniu production 
 
 ## Užbaigta
 
+- 2026-08-13 Savings Studio responsive CTA pataisa: automatikos kortelės `Išsiųsk naują suvestinę dabar` mobile režimu dėlioja tekstą ir CTA vertikaliai, mygtukas turi `w-full max-w-full`, tekstas gali lūžti, rodyklė lieka mygtuko viduje, o statistikos `Suvestinės / Kopijos / Signalai` grid saugiai lieka vieno stulpelio iki `sm`.
+- `server/tests/savingsStudioPersonalUi.test.js` papildytas statine regresija, saugančia mobile CTA vertikalų layout, `w-full/max-w-full` elgesį, responsive statistikos grid ir `whitespace-nowrap` nebuvimą ilgame summary mygtuke.
 - 2026-08-13 papildomas Asmeninio nario zonos review etapas pradėtas šakoje `codex/personal-member-area-10of10-20260813`: perskaityti `AGENTS.md`, `SPEC.md`, `PLAN.md`, `IMPLEMENT.md` ir ši būsena, inventorizuoti `MemberAreaPage`, `SavingsStudioPage`, Saving Studio helperiai, service sluoksnis, backend route/controller/modeliai, membership guardai ir esami access/UI testai.
 - Sukurtas `codex-work/PERSONAL_MEMBER_AREA.md` su esama būsena, problemomis, įgyvendinimo planu, prieigos matrica, priėmimo kriterijais ir likusiomis rankinėmis patikromis.
 - Saving Studio backend sustiprintas: CSV preview dabar atpažįsta jau egzistuojančius ir tame pačiame CSV pasikartojančius tik visiškai sutampančius `date + amount + title + category` dublikatus, o CSV confirm importuoja tik priimtas eilutes ir grąžina `invalidRows`, `duplicateRows` bei `rejectedCount`.
@@ -82,6 +84,13 @@ Final production readiness audit – lokaliai paruošta, su rankiniu production 
 
 ## Validacijos rezultatai
 
+- 2026-08-13 Savings Studio responsive CTA pataisa: `node --test server/tests/savingsStudioPersonalUi.test.js` – PASS, 6/6.
+- 2026-08-13 Savings Studio responsive CTA pataisa final: `npm.cmd run lint` – PASS, patikrinti 99 backend JavaScript failai.
+- 2026-08-13 Savings Studio responsive CTA pataisa final: `npm.cmd run typecheck` – PASS, backend JavaScript syntax check praėjo 99 failams.
+- 2026-08-13 Savings Studio responsive CTA pataisa final: `npm.cmd test` – PASS, 93/93.
+- 2026-08-13 Savings Studio responsive CTA pataisa final: `npm.cmd run build` – PASS, Vite 8.2.1 build sugeneravo `client/dist`.
+- 2026-08-13 Savings Studio responsive CTA pataisa final: `git diff --check` – PASS, whitespace klaidų nerado; rodomi tik CRLF normalizavimo įspėjimai.
+- 2026-08-13 Savings Studio responsive CTA pataisa final: `git status --short` – PASS peržiūrėta, pakeisti tik `client/src/pages/SavingsStudioPage.jsx`, `server/tests/savingsStudioPersonalUi.test.js` ir `codex-work/STATUS.md`.
 - 2026-08-13 Personal member area papildoma patikra: `node --test server/tests/savingsStudioImportSecurity.test.js` – PASS, 4/4.
 - 2026-08-13 Personal member area papildoma patikra: `node --test server/tests/savingsStudioPersonalUi.test.js` – PASS, 5/5.
 - 2026-08-13 Personal member area papildoma patikra: `npm.cmd run build` – PASS, Vite 8.2.1 build sugeneravo `client/dist`.
