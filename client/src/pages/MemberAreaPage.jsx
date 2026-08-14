@@ -521,13 +521,13 @@ const SavingStudioSection = ({ access }) => {
   const { t } = useLanguage();
 
   return (
-    <section className="space-y-5">
+    <section className="min-w-0 space-y-5">
       <div className="panel p-5 sm:p-6">
         <span className="signal-pill">{t("memberArea.moduleCards.saving.title")}</span>
         <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">{t("memberArea.moduleCards.saving.title")}</h2>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">{t("memberArea.moduleCards.saving.subtitle")}</p>
       </div>
-      {access.personal ? <SavingsStudioPage /> : <BazinisMemberPage />}
+      <div className="min-w-0">{access.personal ? <SavingsStudioPage /> : <BazinisMemberPage />}</div>
     </section>
   );
 };
@@ -709,14 +709,14 @@ const MemberAreaPage = () => {
   };
 
   return (
-    <div className="member-workspace space-y-6">
+    <div className="member-workspace w-full min-w-0 space-y-6">
       {canUsePreview && (
         <PreviewSwitch currentPlanId={realPlanId} selectedPlanId={previewPlanId} onChange={setPreviewPlanId} />
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
+      <div className="grid min-w-0 gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-7 xl:grid-cols-[260px_minmax(0,1fr)] xl:gap-8 2xl:grid-cols-[280px_minmax(0,1fr)] 2xl:gap-10">
         <DashboardNav activeSection={activeSection} onChange={setActiveSection} access={access} />
-        <main className="min-w-0">{renderActiveSection()}</main>
+        <main className="w-full min-w-0">{renderActiveSection()}</main>
       </div>
     </div>
   );

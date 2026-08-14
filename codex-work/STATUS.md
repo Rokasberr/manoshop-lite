@@ -8,6 +8,8 @@ Final production readiness audit – lokaliai paruošta, su rankiniu production 
 
 ## Užbaigta
 
+- 2026-08-14 Savings Studio plataus workspace responsive etapas: `Layout` tapo route-aware ir tik `/members/savings-studio` naudoja `w-full max-w-[1800px]` su `px-4 sm:px-6 lg:px-8 2xl:px-10`, vieši puslapiai palikti `max-w-7xl`; `MemberAreaPage` pagrindinis karkasas pervestas į `w-full min-w-0` ir `lg/xl/2xl` sidebar + `minmax(0,1fr)` gridą; `SavingsStudioPage` šaknis ir pagrindinės sekcijos papildytos `min-w-0`, dideliuose ekranuose naudoja platesnę darbo zoną, o tekstu/veiksmais apkrauti trijų stulpelių blokai į 3 kolonas pereina tik nuo `2xl`.
+- Išsaugotos ankstesnės Savings Studio overflow apsaugos: `InsightTile` didelės sumos, 6 mėnesių grafiko vidinis horizontalus scroll, `SummaryArchiveItem`, `AutomationTriggerCard`, `ForecastMetricTile`, CTA ir kortelių tekstų/mygtukų wrap elgesys liko padengti `server/tests/savingsStudioPersonalUi.test.js`.
 - 2026-08-14 Savings Studio InsightTile responsive hotfix šakoje `codex/fix-insight-metric-overflow-20260814`: `InsightTile` metrikos pervestos į width-safe korteles su `min-w-0`, `max-w-full`, normaliais label/value/hint lūžiais, `shrink-0` ikona, `text-2xl` baziniu value dydžiu ir `tabular-nums`; trys tiesioginiai `InsightTile` grid tėvai pakeisti iš viewport `sm:grid-cols-2/3` į container-safe `repeat(auto-fit,minmax(min(100%,13rem),1fr))`.
 - 2026-08-14 sutvarkytas Savings Studio „6 mėnesių vaizdas“ grafikas: grafikas apgaubtas vidiniu `w-full max-w-full overflow-x-auto` slinkimo konteineriu, vidinis 6 stulpelių grid turi `min-w-[32rem]`, datos ir sumos laikomos įskaitomos be viso puslapio horizontalaus overflow, o pilna suma išlieka per `title`.
 - `server/tests/savingsStudioPersonalUi.test.js` papildytas tikslinėmis regresijomis, kurios ištraukia konkretų `InsightTile` komponentą, tris jo metrikų grid blokus ir „6 mėnesių vaizdas“ panelę, nekeičiant ankstesnių `ForecastMetricTile`, `AutomationTriggerCard` ir `SummaryArchiveItem` patikrų.
@@ -92,6 +94,11 @@ Final production readiness audit – lokaliai paruošta, su rankiniu production 
 
 ## Validacijos rezultatai
 
+- 2026-08-14 Savings Studio plataus workspace responsive etapas: `node --test server/tests/savingsStudioPersonalUi.test.js` – PASS, 15/15.
+- 2026-08-14 Savings Studio plataus workspace responsive etapas: `npm.cmd run lint` – PASS, patikrinti 99 backend JavaScript failai.
+- 2026-08-14 Savings Studio plataus workspace responsive etapas: `npm.cmd run typecheck` – PASS, backend JavaScript syntax check praėjo 99 failams.
+- 2026-08-14 Savings Studio plataus workspace responsive etapas: `npm.cmd test` – PASS, 102/102.
+- 2026-08-14 Savings Studio plataus workspace responsive etapas: `npm.cmd run build` – PASS, Vite 8.2.1 build sugeneravo `client/dist`; `MemberAreaPage` chunkas ~219.06 kB.
 - 2026-08-14 Savings Studio InsightTile responsive hotfix: `node --test server/tests/savingsStudioPersonalUi.test.js` – PASS, 12/12.
 - 2026-08-14 Savings Studio InsightTile responsive hotfix: `npm.cmd run lint` – PASS, patikrinti 99 backend JavaScript failai.
 - 2026-08-14 Savings Studio InsightTile responsive hotfix: `npm.cmd run typecheck` – PASS, backend JavaScript syntax check praėjo 99 failams.
@@ -225,6 +232,7 @@ Final production readiness audit – lokaliai paruošta, su rankiniu production 
 
 ## Paskutinis atnaujinimas
 
+2026-08-14 – Savings Studio plataus workspace responsive etapas lokaliai baigtas. Tik `/members/savings-studio` gavo platų `max-w-[1800px]` layout režimą; vieši, admin ir verslo puslapiai neplėsti. Nario zonos sidebar/turinio grid pervestas į `minmax(0,1fr)`, Savings Studio trijų stulpelių sekcijos atidėtos iki `2xl`, o ankstesnės mobile overflow apsaugos paliktos ir padengtos statinėmis regresijomis. Production deploy, Stripe Live, DB ir git push nevykdyti.
 2026-08-13 – Milestone 3 uždarytas ir Milestone 4 pradėtas. Business Dashboard/Store/Orders/Revenue/Site Builder/Admin Analytics sutvarkyti konservatyviai: paid-only revenue, public checkout limiteris, griežtesnė selected product ID validacija, paid-order invoice atsisiuntimas ir aiškus rankinių payout ribojimas. Validuota su `npm run lint`, `npm run typecheck`, `npm test` ir `npm run build`. `PROJECT_STATE` paliekamas `IN_PROGRESS`, nes Security/kokybės milestone ir release-candidate patikra dar neužbaigti.
 2026-08-13 – Milestone 4 tęsiamas. Pašalinti high dependency audit blokatoriai tiksliniais atnaujinimais, Vite 8 migracija validuota su build ir preview HTTP smoke, secret scan realių frontend paslapčių nerado. `PROJECT_STATE` paliekamas `IN_PROGRESS`, nes responsive/accessibility ir release-candidate checklist dar neužbaigti.
 2026-08-13 – Milestone 5 uždarytas. README ir `codex-work/RELEASE_CHECKLIST.md` atnaujinti, finalinis kainų/narystės skenas praėjo, `npm audit --audit-level=high`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, wrapper syntax check ir `/pricing` preview smoke praėjo. `PROJECT_STATE: RELEASE_CANDIDATE_READY`.
