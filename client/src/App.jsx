@@ -5,6 +5,7 @@ import LoadingSpinner from "./components/LoadingSpinner";
 import Layout from "./components/Layout";
 import AdminPreviewLayout from "./components/admin-dashboard/AdminPreviewLayout";
 import AdminShell from "./components/admin-dashboard/AdminShell";
+import BusinessLayout from "./components/business/BusinessLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { infoPages } from "./content/infoPages";
 
@@ -101,14 +102,16 @@ const App = () => (
         </Route>
 
         <Route element={<ProtectedRoute requireBusinessPlan />}>
-          <Route path="/business" element={<BusinessDashboardPage />} />
-          <Route path="/business/site-builder" element={<SiteBuilderPage />} />
-          <Route path="/business/digital-products" element={<BusinessProductsPage />} />
-          <Route path="/business/my-products" element={<BusinessProductsPage mode="selected" />} />
-          <Route path="/business/my-store" element={<SiteBuilderPage />} />
-          <Route path="/business/orders" element={<BusinessOrdersPage />} />
-          <Route path="/business/earnings" element={<BusinessOrdersPage mode="earnings" />} />
-          <Route path="/business/settings" element={<SiteBuilderPage />} />
+          <Route path="/business" element={<BusinessLayout />}>
+            <Route index element={<BusinessDashboardPage />} />
+            <Route path="site-builder" element={<SiteBuilderPage />} />
+            <Route path="digital-products" element={<BusinessProductsPage />} />
+            <Route path="my-products" element={<BusinessProductsPage mode="selected" />} />
+            <Route path="my-store" element={<Navigate to="/business/site-builder" replace />} />
+            <Route path="orders" element={<BusinessOrdersPage />} />
+            <Route path="earnings" element={<BusinessOrdersPage mode="earnings" />} />
+            <Route path="settings" element={<Navigate to="/business/site-builder" replace />} />
+          </Route>
         </Route>
 
         <Route element={<ProtectedRoute requireAdmin />}>
