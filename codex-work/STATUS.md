@@ -8,6 +8,7 @@ Final production readiness audit – lokaliai paruošta, su rankiniu production 
 
 ## Užbaigta
 
+- 2026-08-14 Verslo zonos P1 invoice saugumo pataisa: `GET /api/orders/:id/invoice` po ownership/admin prieigos patikros ir prieš PDF generavimą dabar leidžia sąskaitą tik `paymentStatus === "paid"` užsakymams; pending, failed, canceled/cancelled, expired ir bet kokios kitos neapmokėtos būsenos atmetamos 409 klaida net pirkėjui, store savininkui ar administratoriui. `server/tests/businessStudio.test.js` papildytas behavior-level controller testais paid PDF keliui, unpaid blokavimui ir ownership 403 išsaugojimui; Business Orders UI paid-only mygtuko regresija palikta.
 - 2026-08-14 Savings Studio plataus workspace responsive etapas: `Layout` tapo route-aware ir tik `/members/savings-studio` naudoja `w-full max-w-[1800px]` su `px-4 sm:px-6 lg:px-8 2xl:px-10`, vieši puslapiai palikti `max-w-7xl`; `MemberAreaPage` pagrindinis karkasas pervestas į `w-full min-w-0` ir `lg/xl/2xl` sidebar + `minmax(0,1fr)` gridą; `SavingsStudioPage` šaknis ir pagrindinės sekcijos papildytos `min-w-0`, dideliuose ekranuose naudoja platesnę darbo zoną, o tekstu/veiksmais apkrauti trijų stulpelių blokai į 3 kolonas pereina tik nuo `2xl`.
 - Išsaugotos ankstesnės Savings Studio overflow apsaugos: `InsightTile` didelės sumos, 6 mėnesių grafiko vidinis horizontalus scroll, `SummaryArchiveItem`, `AutomationTriggerCard`, `ForecastMetricTile`, CTA ir kortelių tekstų/mygtukų wrap elgesys liko padengti `server/tests/savingsStudioPersonalUi.test.js`.
 - 2026-08-14 Savings Studio InsightTile responsive hotfix šakoje `codex/fix-insight-metric-overflow-20260814`: `InsightTile` metrikos pervestos į width-safe korteles su `min-w-0`, `max-w-full`, normaliais label/value/hint lūžiais, `shrink-0` ikona, `text-2xl` baziniu value dydžiu ir `tabular-nums`; trys tiesioginiai `InsightTile` grid tėvai pakeisti iš viewport `sm:grid-cols-2/3` į container-safe `repeat(auto-fit,minmax(min(100%,13rem),1fr))`.
@@ -94,6 +95,11 @@ Final production readiness audit – lokaliai paruošta, su rankiniu production 
 
 ## Validacijos rezultatai
 
+- 2026-08-14 Verslo zonos P1 invoice saugumo pataisa: `node --test server/tests/businessStudio.test.js` – PASS, 9/9.
+- 2026-08-14 Verslo zonos P1 invoice saugumo pataisa: `npm.cmd run lint` – PASS, patikrinti 99 backend JavaScript failai.
+- 2026-08-14 Verslo zonos P1 invoice saugumo pataisa: `npm.cmd run typecheck` – PASS, backend JavaScript syntax check praėjo 99 failams.
+- 2026-08-14 Verslo zonos P1 invoice saugumo pataisa: `npm.cmd test` – PASS, 105/105.
+- 2026-08-14 Verslo zonos P1 invoice saugumo pataisa: `npm.cmd run build` – PASS, Vite 8.2.1 build sugeneravo `client/dist`.
 - 2026-08-14 Savings Studio plataus workspace responsive etapas: `node --test server/tests/savingsStudioPersonalUi.test.js` – PASS, 15/15.
 - 2026-08-14 Savings Studio plataus workspace responsive etapas: `npm.cmd run lint` – PASS, patikrinti 99 backend JavaScript failai.
 - 2026-08-14 Savings Studio plataus workspace responsive etapas: `npm.cmd run typecheck` – PASS, backend JavaScript syntax check praėjo 99 failams.

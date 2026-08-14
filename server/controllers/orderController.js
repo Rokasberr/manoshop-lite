@@ -326,6 +326,11 @@ const getOrderInvoicePdf = async (req, res) => {
     throw new Error("Neturi teisės matyti šios sąskaitos.");
   }
 
+  if (order.paymentStatus !== "paid") {
+    res.status(409);
+    throw new Error("Saskaita pasiekiama tik po sekmingo apmokejimo.");
+  }
+
   const pdfBuffer = createInvoicePdfBuffer(order);
   const invoiceNumber =
     order.invoice?.number || `INV-LEGACY-${String(order._id).slice(-6).toUpperCase()}`;
