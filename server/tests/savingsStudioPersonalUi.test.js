@@ -5,8 +5,12 @@ const test = require("node:test");
 
 const root = path.resolve(__dirname, "..", "..");
 const pagePath = path.join(root, "client", "src", "pages", "SavingsStudioPage.jsx");
+const layoutPath = path.join(root, "client", "src", "components", "Layout.jsx");
+const memberAreaPath = path.join(root, "client", "src", "pages", "MemberAreaPage.jsx");
 
 const readPageSource = () => fs.readFileSync(pagePath, "utf8");
+const readLayoutSource = () => fs.readFileSync(layoutPath, "utf8");
+const readMemberAreaSource = () => fs.readFileSync(memberAreaPath, "utf8");
 
 const extractBetween = (source, startMarker, endMarker) => {
   const startIndex = source.indexOf(startMarker);
@@ -51,18 +55,71 @@ const extractSixMonthViewSource = (source) => {
 
 test("Saving Studio keeps a mobile-first responsive shell", () => {
   const indexSource = fs.readFileSync(path.join(root, "client", "index.html"), "utf8");
-  const layoutSource = fs.readFileSync(path.join(root, "client", "src", "components", "Layout.jsx"), "utf8");
+  const layoutSource = readLayoutSource();
   const source = readPageSource();
 
   assert.match(indexSource, /<meta name="viewport" content="width=device-width, initial-scale=1\.0" \/>/);
-  assert.match(layoutSource, /<main id="main-content" className="mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">/);
+  assert.match(layoutSource, /<main id="main-content" className=\{mainContainerClassName\}>/);
   assert.match(source, /marketing-dark overflow-hidden rounded-lg px-5 py-7 sm:px-8 sm:py-9 lg:px-10/);
-  assert.match(source, /grid gap-8 lg:grid-cols-\[1\.02fr_0\.98fr\] lg:items-end/);
+  assert.match(source, /member-workspace member-workspace-personal w-full min-w-0 space-y-8 2xl:space-y-10/);
+  assert.match(source, /grid min-w-0 gap-8 lg:grid-cols-\[minmax\(0,1\.02fr\)_minmax\(0,0\.98fr\)\] lg:items-end 2xl:gap-10/);
   assert.match(source, /mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap/);
-  assert.match(source, /grid gap-6 xl:grid-cols-\[0\.92fr_1\.1fr_0\.98fr\]/);
-  assert.match(source, /mt-6 grid gap-4 md:grid-cols-\[1\.2fr_1fr_1fr\]/);
+  assert.match(source, /grid min-w-0 gap-6 xl:grid-cols-\[minmax\(0,0\.9fr\)_minmax\(0,1\.1fr\)\] 2xl:grid-cols-\[minmax\(0,0\.92fr\)_minmax\(0,1\.1fr\)_minmax\(0,0\.98fr\)\] 2xl:gap-8/);
+  assert.match(source, /mt-6 grid min-w-0 gap-4 md:grid-cols-\[minmax\(0,1\.2fr\)_minmax\(0,1fr\)_minmax\(0,1fr\)\]/);
   assert.match(source, /max-h-\[92vh\] w-full max-w-3xl overflow-y-auto/);
   assert.doesNotMatch(source, /<table[\s>]/);
+});
+
+test("Layout uses a wide route-aware container only for Savings Studio", () => {
+  const source = readLayoutSource();
+
+  assert.match(source, /import \{ Outlet, useLocation \} from "react-router-dom"/);
+  assert.match(source, /const \{ pathname \} = useLocation\(\)/);
+  assert.match(source, /pathname === "\/members\/savings-studio"/);
+  assert.match(source, /isSavingsStudioWorkspace[\s\S]*"mx-auto w-full max-w-\[1800px\] px-4 pb-16 pt-6 sm:px-6 lg:px-8 2xl:px-10"/);
+  assert.match(source, /: "mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8"/);
+  assert.match(source, /href="#main-content"/);
+  assert.match(source, /<Navbar \/>/);
+  assert.match(source, /<Footer \/>/);
+});
+
+test("Member area shell lets Savings Studio use the available workspace width", () => {
+  const source = readMemberAreaSource();
+  const savingSectionSource = extractComponentSource(source, "SavingStudioSection", "JournalSection");
+
+  assert.match(source, /member-workspace w-full min-w-0 space-y-6/);
+  assert.match(
+    source,
+    /grid min-w-0 gap-6 lg:grid-cols-\[240px_minmax\(0,1fr\)\] lg:gap-7 xl:grid-cols-\[260px_minmax\(0,1fr\)\] xl:gap-8 2xl:grid-cols-\[280px_minmax\(0,1fr\)\] 2xl:gap-10/
+  );
+  assert.match(source, /<main className="w-full min-w-0">\{renderActiveSection\(\)\}<\/main>/);
+  assert.match(savingSectionSource, /<section className="min-w-0 space-y-5">/);
+  assert.match(savingSectionSource, /<div className="min-w-0">\{access\.personal \? <SavingsStudioPage \/> : <BazinisMemberPage \/>\}<\/div>/);
+  assert.match(source, /soft-card flex gap-2 overflow-x-auto rounded-lg/);
+  assert.match(source, /soft-card sticky top-28 rounded-lg/);
+});
+
+test("Savings Studio important three-column sections wait for wide screens", () => {
+  const source = readPageSource();
+
+  assert.match(
+    source,
+    /id="savings-ledger" className="grid min-w-0 gap-6 xl:grid-cols-\[minmax\(0,0\.9fr\)_minmax\(0,1\.1fr\)\] 2xl:grid-cols-\[minmax\(0,0\.92fr\)_minmax\(0,1\.1fr\)_minmax\(0,0\.98fr\)\] 2xl:gap-8"/
+  );
+  assert.match(
+    source,
+    /<section className="grid min-w-0 gap-6 xl:grid-cols-2 2xl:grid-cols-\[minmax\(0,1\.05fr\)_minmax\(0,0\.95fr\)_minmax\(0,1fr\)\] 2xl:gap-8">/
+  );
+  assert.match(
+    source,
+    /<section className="grid min-w-0 gap-6 xl:grid-cols-2 2xl:grid-cols-\[minmax\(0,1\.04fr\)_minmax\(0,0\.96fr\)_minmax\(0,1fr\)\] 2xl:gap-8">/
+  );
+  assert.match(source, /grid min-w-0 gap-4 md:grid-cols-3/);
+  assert.match(source, /mt-4 grid min-w-0 gap-3 md:grid-cols-3/);
+  assert.doesNotMatch(source, /sm:grid-cols-3/);
+  assert.doesNotMatch(source, /xl:grid-cols-\[0\.92fr_1\.1fr_0\.98fr\]/);
+  assert.doesNotMatch(source, /xl:grid-cols-\[1\.05fr_0\.95fr_1fr\]/);
+  assert.doesNotMatch(source, /xl:grid-cols-\[1\.04fr_0\.96fr_1fr\]/);
 });
 
 test("Saving Studio onboarding validation has a persistent inline error state", () => {
