@@ -2101,7 +2101,7 @@ const SavingsStudioPage = () => {
               </div>
               <ShieldCheck size={20} style={{ color: "rgb(var(--accent-strong))" }} />
             </div>
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <div className="mt-5 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-3">
               <InsightTile
                 icon={WalletCards}
                 label="Šis mėnuo"
@@ -2402,7 +2402,7 @@ const SavingsStudioPage = () => {
               </div>
             </div>
 
-            <div className="mt-8 grid gap-4 sm:grid-cols-3">
+            <div className="mt-8 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
               <InsightTile
                 icon={WalletCards}
                 label="Šis mėnuo"
@@ -2431,7 +2431,7 @@ const SavingsStudioPage = () => {
               />
             </div>
 
-            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <div className="mt-6 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
               <InsightTile
                 icon={Target}
                 label="Tikslai"
@@ -3007,31 +3007,36 @@ const SavingsStudioPage = () => {
           <div className="panel p-6">
               <p className="eyebrow">mėnesio vaizdas</p>
             <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">6 mėnesių vaizdas</h2>
-            <div className="mt-6 grid h-[260px] grid-cols-6 items-end gap-3">
-              {monthlyTotals.map((entry) => {
-                const height = `${Math.max((entry.total / highestMonthlyTotal) * 100, entry.total ? 16 : 8)}%`;
+            <div className="mt-6 w-full max-w-full overflow-x-auto pb-2">
+              <div className="grid h-[260px] min-w-[32rem] grid-cols-6 items-end gap-3">
+                {monthlyTotals.map((entry) => {
+                  const height = `${Math.max((entry.total / highestMonthlyTotal) * 100, entry.total ? 16 : 8)}%`;
+                  const formattedTotal = money.format(entry.total);
 
-                return (
-                  <div key={entry.key} className="flex h-full flex-col items-center justify-end gap-3">
-                    <div className="relative h-full w-full overflow-hidden rounded-full bg-[rgb(var(--surface-soft))]">
-                      <div
-                        className="absolute inset-x-0 bottom-0 rounded-full"
-                        style={{
-                          height,
-                          background:
-                            "linear-gradient(180deg, rgb(var(--accent)), rgb(var(--accent-strong)))",
-                        }}
-                      />
+                  return (
+                    <div key={entry.key} className="flex h-full min-w-0 flex-col items-center justify-end gap-3">
+                      <div className="relative h-full w-full min-w-0 rounded-full bg-[rgb(var(--surface-soft))]">
+                        <div
+                          className="absolute inset-x-0 bottom-0 rounded-full"
+                          style={{
+                            height,
+                            background:
+                              "linear-gradient(180deg, rgb(var(--accent)), rgb(var(--accent-strong)))",
+                          }}
+                        />
+                      </div>
+                      <div className="min-w-0 w-full text-center">
+                        <p className="whitespace-nowrap text-[0.68rem] font-semibold uppercase tracking-normal text-muted">
+                          {entry.label.split(" ")[0]}
+                        </p>
+                        <p className="mt-1 whitespace-nowrap text-xs font-semibold leading-tight tabular-nums" title={formattedTotal}>
+                          {formattedTotal}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-center">
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
-                        {entry.label.split(" ")[0]}
-                      </p>
-                      <p className="mt-1 text-sm font-semibold">{money.format(entry.total)}</p>
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </div>
 
@@ -4606,13 +4611,15 @@ const ImportInsightCard = ({ label, value }) => (
 );
 
 const InsightTile = ({ hint, icon: Icon, label, value }) => (
-  <div className="metric-card">
-    <div className="flex items-center justify-between gap-3">
-      <p className="text-xs uppercase tracking-[0.3em] text-white/45">{label}</p>
-      <Icon size={18} style={{ color: "rgb(var(--accent-strong))" }} />
+  <div className="metric-card min-w-0 max-w-full">
+    <div className="flex min-w-0 items-center justify-between gap-3">
+      <p className="min-w-0 whitespace-normal break-words text-xs uppercase tracking-[0.3em] text-white/45">{label}</p>
+      <Icon className="shrink-0" size={18} style={{ color: "rgb(var(--accent-strong))" }} />
     </div>
-    <p className="mt-3 font-display text-3xl font-bold">{value}</p>
-    <p className="mt-2 text-sm text-white/62">{hint}</p>
+    <p className="mt-3 min-w-0 max-w-full whitespace-normal break-words font-display text-2xl font-bold leading-tight tabular-nums xl:text-3xl">
+      {value}
+    </p>
+    <p className="mt-2 whitespace-normal break-words text-sm text-white/62">{hint}</p>
   </div>
 );
 

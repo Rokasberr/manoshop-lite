@@ -29,6 +29,26 @@ const extractPreviousDivBlock = (source, marker) => {
   return source.slice(startIndex, endIndex);
 };
 
+const extractMetricGridBefore = (source, marker) => {
+  const markerIndex = source.indexOf(marker);
+  assert.notEqual(markerIndex, -1, `Missing marker: ${marker}`);
+  const startIndex = source.lastIndexOf('<div className="mt-', markerIndex);
+  assert.notEqual(startIndex, -1, `Missing metric grid before marker: ${marker}`);
+  const endIndex = source.indexOf("\n            </div>", markerIndex);
+  assert.notEqual(endIndex, -1, `Missing metric grid close after marker: ${marker}`);
+  return source.slice(startIndex, endIndex);
+};
+
+const extractSixMonthViewSource = (source) => {
+  const headingIndex = source.indexOf("6 mėnesių vaizdas");
+  assert.notEqual(headingIndex, -1, "Missing 6 month view heading");
+  const startIndex = source.lastIndexOf('<div className="panel p-6">', headingIndex);
+  assert.notEqual(startIndex, -1, "Missing 6 month view panel start");
+  const endIndex = source.indexOf('\n          <div className="panel p-6">', headingIndex + 1);
+  assert.notEqual(endIndex, -1, "Missing 6 month view panel end");
+  return source.slice(startIndex, endIndex);
+};
+
 test("Saving Studio keeps a mobile-first responsive shell", () => {
   const indexSource = fs.readFileSync(path.join(root, "client", "index.html"), "utf8");
   const layoutSource = fs.readFileSync(path.join(root, "client", "src", "components", "Layout.jsx"), "utf8");
@@ -134,6 +154,76 @@ test("ForecastMetricTile allows labels, values, and hints to wrap inside narrow 
   assert.match(metricTileSource, /mt-2 max-w-full whitespace-normal break-words text-sm leading-6 text-muted/);
   assert.doesNotMatch(metricTileSource, /whitespace-nowrap/);
   assert.doesNotMatch(metricTileSource, /overflow-hidden/);
+});
+
+test("InsightTile allows money values to wrap inside narrow cards", () => {
+  const source = readPageSource();
+  const insightTileSource = extractComponentSource(source, "InsightTile", "InsightSignalCard");
+
+  assert.match(insightTileSource, /metric-card min-w-0 max-w-full/);
+  assert.match(insightTileSource, /flex min-w-0 items-center justify-between gap-3/);
+  assert.match(insightTileSource, /min-w-0 whitespace-normal break-words text-xs uppercase/);
+  assert.match(insightTileSource, /<Icon className="shrink-0" size=\{18\}/);
+  assert.match(
+    insightTileSource,
+    /mt-3 min-w-0 max-w-full whitespace-normal break-words font-display text-2xl font-bold leading-tight tabular-nums xl:text-3xl/
+  );
+  assert.match(insightTileSource, /mt-2 whitespace-normal break-words text-sm text-white\/62/);
+  assert.doesNotMatch(insightTileSource, /overflow-hidden/);
+  assert.doesNotMatch(insightTileSource, /whitespace-nowrap/);
+});
+
+test("InsightTile metric groups use container-safe auto-fit grids", () => {
+  const source = readPageSource();
+  const heroPanelSource = extractBetween(
+    source,
+    '<h2 className="mt-3 font-display text-3xl font-bold leading-tight">Tavo aiškumo panelė</h2>',
+    '<p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted">usage guide</p>'
+  );
+  const monthMetricsSource = extractMetricGridBefore(source, "icon={PiggyBank}");
+  const focusMetricsSource = extractMetricGridBefore(source, "icon={AlertTriangle}");
+  const safeGrid = /grid min-w-0 grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,13rem\),1fr\)\)\]/;
+
+  assert.match(heroPanelSource, /mt-5 grid min-w-0 grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,13rem\),1fr\)\)\] gap-3/);
+  assert.match(heroPanelSource, /label="Šis mėnuo"/);
+  assert.match(heroPanelSource, /label="Tikslai"/);
+  assert.match(heroPanelSource, /label="Pastovios"/);
+  assert.match(heroPanelSource, /label="Laisva suma"/);
+  assert.doesNotMatch(heroPanelSource, /sm:grid-cols-[23]/);
+
+  assert.match(monthMetricsSource, safeGrid);
+  assert.match(monthMetricsSource, /gap-4/);
+  assert.match(monthMetricsSource, /label="Šis mėnuo"/);
+  assert.match(monthMetricsSource, /label="Po pastovių išlaidų"/);
+  assert.match(monthMetricsSource, /label="Pastovios išlaidos"/);
+  assert.doesNotMatch(monthMetricsSource, /sm:grid-cols-[23]/);
+
+  assert.match(focusMetricsSource, safeGrid);
+  assert.match(focusMetricsSource, /gap-4/);
+  assert.match(focusMetricsSource, /label="Tikslai"/);
+  assert.match(focusMetricsSource, /label="Didžiausias spaudimas"/);
+  assert.match(focusMetricsSource, /label="Laisva suma"/);
+  assert.doesNotMatch(focusMetricsSource, /sm:grid-cols-[23]/);
+});
+
+test("Six month chart scrolls internally without hiding labels or values", () => {
+  const source = readPageSource();
+  const sixMonthSource = extractSixMonthViewSource(source);
+
+  assert.match(sixMonthSource, /mt-6 w-full max-w-full overflow-x-auto pb-2/);
+  assert.match(sixMonthSource, /grid h-\[260px\] min-w-\[32rem\] grid-cols-6 items-end gap-3/);
+  assert.match(sixMonthSource, /flex h-full min-w-0 flex-col items-center justify-end gap-3/);
+  assert.match(sixMonthSource, /min-w-0 w-full text-center/);
+  assert.match(sixMonthSource, /whitespace-nowrap text-\[0\.68rem\] font-semibold uppercase tracking-normal text-muted/);
+  assert.match(sixMonthSource, /const formattedTotal = money\.format\(entry\.total\)/);
+  assert.match(
+    sixMonthSource,
+    /mt-1 whitespace-nowrap text-xs font-semibold leading-tight tabular-nums" title=\{formattedTotal\}/
+  );
+  assert.match(sixMonthSource, /\{formattedTotal\}/);
+  assert.doesNotMatch(sixMonthSource, /truncate/);
+  assert.doesNotMatch(sixMonthSource, /overflow-hidden/);
+  assert.doesNotMatch(sixMonthSource, /<div className="mt-6 grid h-\[260px\] grid-cols-6 items-end gap-3">/);
 });
 
 test("Summary archive actions stay inside narrow cards", () => {
