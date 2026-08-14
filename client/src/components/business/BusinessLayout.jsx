@@ -84,9 +84,9 @@ const BusinessLayout = () => {
               <BriefcaseBusiness size={14} aria-hidden="true" />
               Verslo zona
             </span>
-            <h1 className="mt-3 break-words font-display text-3xl font-bold leading-tight sm:text-4xl">
+            <p className="mt-3 break-words font-display text-3xl font-bold leading-tight sm:text-4xl">
               {activeModuleLabel}
-            </h1>
+            </p>
             <p className="mt-2 max-w-3xl text-sm leading-7 text-muted">
               Operacinė darbo zona svetainės kūrimui, produktams, užsakymams ir pajamoms.
             </p>

@@ -38,6 +38,8 @@ test("BusinessLayout exists and owns the Business workspace shell without nested
   assert.match(source, /to="\/members\/savings-studio"/);
   assert.match(source, /Grįžti į nario zoną/);
   assert.doesNotMatch(source, /<main[\s>]/);
+  assert.doesNotMatch(source, /<h1[\s>]/);
+  assert.match(source, /<p[\s\S]*\{activeModuleLabel\}[\s\S]*<\/p>/);
 });
 
 test("Business workspace navigation exposes six unique real modules with active states", () => {
