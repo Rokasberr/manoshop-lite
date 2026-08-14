@@ -8,6 +8,9 @@ Final production readiness audit – lokaliai paruošta, su rankiniu production 
 
 ## Užbaigta
 
+- 2026-08-14 Verslo zonos 2 etapas: sukurtas bendras `BusinessLayout` shell su `Outlet`, aktyvia `NavLink` navigacija, `Verslo zona` identitetu, grįžimu į `/members/savings-studio`, desktop sticky sidebar ir mobile vidiniu `overflow-x-auto` navigacijos slinkimu. Visi protected `/business` child route perkelti po `BusinessLayout`; `/business/my-store` ir `/business/settings` palikti tik kaip `Navigate replace` į `/business/site-builder`.
+- 2026-08-14 Verslo workspace layout išplėstas iki `max-w-[1800px]` tik `/business` ir `/business/*` kartu su `/members/savings-studio`; vieši puslapiai ir `/stores/:slug` liko `max-w-7xl`. Nario zonos Business kortelės deduplikuotos: pašalinta atskira `My Website` kortelė, o `/business` aiškiau įvardytas kaip operacinė Verslo darbo zona. `BusinessDashboardPage` greitos kortelės neberodo `my-store/settings` dublių.
+- 2026-08-14 pridėtas `server/tests/businessWorkspaceUi.test.js`, saugantis Business layout egzistavimą, šešias unikalias navigacijos nuorodas, `/business` `end` aktyvumą, sticky/mobile navigaciją, `minmax(0,1fr)` karkasą, protected route nesting, legacy redirectus, platų layout režimą, viešų puslapių siaurą konteinerį, Member Area dublių pašalinimą ir nested `<main>` nebuvimą `BusinessLayout`.
 - 2026-08-14 Verslo zonos P1 invoice saugumo pataisa: `GET /api/orders/:id/invoice` po ownership/admin prieigos patikros ir prieš PDF generavimą dabar leidžia sąskaitą tik `paymentStatus === "paid"` užsakymams; pending, failed, canceled/cancelled, expired ir bet kokios kitos neapmokėtos būsenos atmetamos 409 klaida net pirkėjui, store savininkui ar administratoriui. `server/tests/businessStudio.test.js` papildytas behavior-level controller testais paid PDF keliui, unpaid blokavimui ir ownership 403 išsaugojimui; Business Orders UI paid-only mygtuko regresija palikta.
 - 2026-08-14 Savings Studio plataus workspace responsive etapas: `Layout` tapo route-aware ir tik `/members/savings-studio` naudoja `w-full max-w-[1800px]` su `px-4 sm:px-6 lg:px-8 2xl:px-10`, vieši puslapiai palikti `max-w-7xl`; `MemberAreaPage` pagrindinis karkasas pervestas į `w-full min-w-0` ir `lg/xl/2xl` sidebar + `minmax(0,1fr)` gridą; `SavingsStudioPage` šaknis ir pagrindinės sekcijos papildytos `min-w-0`, dideliuose ekranuose naudoja platesnę darbo zoną, o tekstu/veiksmais apkrauti trijų stulpelių blokai į 3 kolonas pereina tik nuo `2xl`.
 - Išsaugotos ankstesnės Savings Studio overflow apsaugos: `InsightTile` didelės sumos, 6 mėnesių grafiko vidinis horizontalus scroll, `SummaryArchiveItem`, `AutomationTriggerCard`, `ForecastMetricTile`, CTA ir kortelių tekstų/mygtukų wrap elgesys liko padengti `server/tests/savingsStudioPersonalUi.test.js`.
@@ -95,6 +98,12 @@ Final production readiness audit – lokaliai paruošta, su rankiniu production 
 
 ## Validacijos rezultatai
 
+- 2026-08-14 Verslo zonos 2 etapas: `node --test server/tests/businessStudio.test.js` – PASS, 9/9.
+- 2026-08-14 Verslo zonos 2 etapas: `node --test server/tests/businessWorkspaceUi.test.js` – PASS, 6/6.
+- 2026-08-14 Verslo zonos 2 etapas: `npm.cmd run lint` – PASS, patikrinti 100 backend JavaScript failų.
+- 2026-08-14 Verslo zonos 2 etapas: `npm.cmd run typecheck` – PASS, backend JavaScript syntax check praėjo 100 failų.
+- 2026-08-14 Verslo zonos 2 etapas: `npm.cmd test` – PASS, 111/111.
+- 2026-08-14 Verslo zonos 2 etapas: `npm.cmd run build` – PASS, Vite 8.2.1 build sugeneravo `client/dist`; `MemberAreaPage` chunkas ~218.91 kB.
 - 2026-08-14 Verslo zonos P1 invoice saugumo pataisa: `node --test server/tests/businessStudio.test.js` – PASS, 9/9.
 - 2026-08-14 Verslo zonos P1 invoice saugumo pataisa: `npm.cmd run lint` – PASS, patikrinti 99 backend JavaScript failai.
 - 2026-08-14 Verslo zonos P1 invoice saugumo pataisa: `npm.cmd run typecheck` – PASS, backend JavaScript syntax check praėjo 99 failams.
@@ -238,6 +247,7 @@ Final production readiness audit – lokaliai paruošta, su rankiniu production 
 
 ## Paskutinis atnaujinimas
 
+2026-08-14 – Verslo zonos 2 etapas lokaliai baigtas. Protected `/business` workspace turi bendrą responsive `BusinessLayout`, šešias unikalias operacines navigacijos nuorodas, desktop sticky sidebar, mobile vidinį horizontalų nav scroll ir legacy `my-store/settings` redirectus į `site-builder`. Globalus platus `max-w-[1800px]` režimas taikomas `/members/savings-studio`, `/business` ir `/business/*`, bet ne viešiems puslapiams ar `/stores/:slug`. Production deploy, Stripe Live, DB ir git push nevykdyti.
 2026-08-14 – Savings Studio plataus workspace responsive etapas lokaliai baigtas. Tik `/members/savings-studio` gavo platų `max-w-[1800px]` layout režimą; vieši, admin ir verslo puslapiai neplėsti. Nario zonos sidebar/turinio grid pervestas į `minmax(0,1fr)`, Savings Studio trijų stulpelių sekcijos atidėtos iki `2xl`, o ankstesnės mobile overflow apsaugos paliktos ir padengtos statinėmis regresijomis. Production deploy, Stripe Live, DB ir git push nevykdyti.
 2026-08-13 – Milestone 3 uždarytas ir Milestone 4 pradėtas. Business Dashboard/Store/Orders/Revenue/Site Builder/Admin Analytics sutvarkyti konservatyviai: paid-only revenue, public checkout limiteris, griežtesnė selected product ID validacija, paid-order invoice atsisiuntimas ir aiškus rankinių payout ribojimas. Validuota su `npm run lint`, `npm run typecheck`, `npm test` ir `npm run build`. `PROJECT_STATE` paliekamas `IN_PROGRESS`, nes Security/kokybės milestone ir release-candidate patikra dar neužbaigti.
 2026-08-13 – Milestone 4 tęsiamas. Pašalinti high dependency audit blokatoriai tiksliniais atnaujinimais, Vite 8 migracija validuota su build ir preview HTTP smoke, secret scan realių frontend paslapčių nerado. `PROJECT_STATE` paliekamas `IN_PROGRESS`, nes responsive/accessibility ir release-candidate checklist dar neužbaigti.

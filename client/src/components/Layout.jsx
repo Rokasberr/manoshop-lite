@@ -7,7 +7,9 @@ import CookieConsentBanner from "./CookieConsentBanner";
 const Layout = () => {
   const { pathname } = useLocation();
   const isSavingsStudioWorkspace = pathname === "/members/savings-studio";
-  const mainContainerClassName = isSavingsStudioWorkspace
+  const isBusinessWorkspace = pathname === "/business" || pathname.startsWith("/business/");
+  const isWideWorkspace = isSavingsStudioWorkspace || isBusinessWorkspace;
+  const mainContainerClassName = isWideWorkspace
     ? "mx-auto w-full max-w-[1800px] px-4 pb-16 pt-6 sm:px-6 lg:px-8 2xl:px-10"
     : "mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8";
 

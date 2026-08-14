@@ -12,7 +12,6 @@ import {
   LockKeyhole,
   PackageCheck,
   ReceiptText,
-  Store,
   Target,
   User2,
   WalletCards,
@@ -60,8 +59,8 @@ const dashboardSections = [
 const businessModules = [
   {
     id: "business",
-    title: "Business Studio",
-    subtitle: "Privati verslo apžvalga ir strategijos zona.",
+    title: "Verslo darbo zona",
+    subtitle: "Operacinė svetainės, produktų, užsakymų ir pajamų zona.",
     to: "/business",
     icon: BriefcaseBusiness,
   },
@@ -78,13 +77,6 @@ const businessModules = [
     subtitle: "Peržiūrėkite verslo katalogą ir produktų galimybes.",
     to: "/business/digital-products",
     icon: PackageCheck,
-  },
-  {
-    id: "myWebsite",
-    title: "My Website",
-    subtitle: "Atidarykite savo viešą parduotuvės puslapį.",
-    to: "/business/my-store",
-    icon: Store,
   },
   {
     id: "myProducts",

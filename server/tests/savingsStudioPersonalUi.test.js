@@ -70,13 +70,14 @@ test("Saving Studio keeps a mobile-first responsive shell", () => {
   assert.doesNotMatch(source, /<table[\s>]/);
 });
 
-test("Layout uses a wide route-aware container only for Savings Studio", () => {
+test("Layout uses a wide route-aware container for Savings Studio and Business workspaces", () => {
   const source = readLayoutSource();
 
   assert.match(source, /import \{ Outlet, useLocation \} from "react-router-dom"/);
   assert.match(source, /const \{ pathname \} = useLocation\(\)/);
   assert.match(source, /pathname === "\/members\/savings-studio"/);
-  assert.match(source, /isSavingsStudioWorkspace[\s\S]*"mx-auto w-full max-w-\[1800px\] px-4 pb-16 pt-6 sm:px-6 lg:px-8 2xl:px-10"/);
+  assert.match(source, /pathname === "\/business" \|\| pathname\.startsWith\("\/business\/"\)/);
+  assert.match(source, /isWideWorkspace[\s\S]*"mx-auto w-full max-w-\[1800px\] px-4 pb-16 pt-6 sm:px-6 lg:px-8 2xl:px-10"/);
   assert.match(source, /: "mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8"/);
   assert.match(source, /href="#main-content"/);
   assert.match(source, /<Navbar \/>/);

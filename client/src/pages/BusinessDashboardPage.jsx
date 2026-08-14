@@ -34,13 +34,6 @@ const dashboardCards = [
     cta: "Atidaryti kataloga",
   },
   {
-    title: "Mano svetaine",
-    text: "Patikrink publikuota store puslapi ir klientu kelia.",
-    to: "/business/my-store",
-    icon: Store,
-    cta: "Perziureti",
-  },
-  {
     title: "Mano produktai",
     text: "Valdyk produktus, kuriuos pasirinkai rodyti savo store.",
     to: "/business/my-products",
@@ -60,13 +53,6 @@ const dashboardCards = [
     to: "/business/earnings",
     icon: BarChart3,
     cta: "Atidaryti pajamas",
-  },
-  {
-    title: "Nustatymai",
-    text: "Tvarkyk svetaines profili, slug ir publikavimo busena.",
-    to: "/business/settings",
-    icon: Settings,
-    cta: "Atidaryti",
   },
 ];
 
