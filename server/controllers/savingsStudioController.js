@@ -6,7 +6,7 @@ const SavingsBudget = require("../models/SavingsBudget");
 const SavingsEntry = require("../models/SavingsEntry");
 const SavingsGoal = require("../models/SavingsGoal");
 const SavingsStudioProfile = require("../models/SavingsStudioProfile");
-const { buildSummaryEmail, sendSavingsSummaryEmail } = require("../services/savingsStudioSummaryEmailService");
+const { sendSavingsSummaryEmail } = require("../services/savingsStudioSummaryEmailService");
 const { logSavingsAuditSafe } = require("../services/savingsStudioAuditService");
 const {
   buildSavingsSummary,
@@ -51,8 +51,9 @@ const MAX_TEXT_LENGTH = 80;
 const MAX_NOTES_LENGTH = 240;
 const MAX_MONEY_AMOUNT = 100000000;
 const MAX_IMPORT_ROWS = 300;
-const MAX_BACKUP_AUDIT_ROWS = 200;
 const MAX_ACTIVITY_ROWS = 36;
+const MAX_EXPORT_ROWS = 5000;
+const BACKUP_SCHEMA_VERSION = "saving-studio-backup.v1";
 
 const buildDownloadTimestamp = () => new Date().toISOString().replace(/[:.]/g, "-");
 const roundCurrency = (value) => moneyAmount(value);
@@ -62,6 +63,153 @@ const moneyFormatter = new Intl.NumberFormat("lt-LT", {
   maximumFractionDigits: 2,
 });
 const formatMoney = (value) => moneyFormatter.format(Number(value || 0));
+const safeDownloadFileName = (value) => String(value || "download").replace(/[^a-zA-Z0-9._-]/g, "_");
+
+const toPlainObject = (value) => {
+  if (value && typeof value.toObject === "function") {
+    return value.toObject();
+  }
+
+  return value || {};
+};
+
+const documentId = (value) => {
+  const plain = toPlainObject(value);
+  return plain._id ? String(plain._id) : "";
+};
+
+const serializeDateValue = (value) => {
+  if (!value) {
+    return null;
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+};
+
+const serializeSavingsProfileBackup = (profile) => {
+  const plain = toPlainObject(profile);
+
+  return {
+    id: documentId(plain),
+    onboardingCompleted: Boolean(plain.onboardingCompleted),
+    monthlyIncome: moneyAmount(plain.monthlyIncome),
+    monthlySavingsTarget: moneyAmount(plain.monthlySavingsTarget),
+    primaryFocus: String(plain.primaryFocus || ""),
+    summaryEmailsEnabled: Boolean(plain.summaryEmailsEnabled),
+    summaryEmailFrequency: ["weekly", "monthly"].includes(plain.summaryEmailFrequency)
+      ? plain.summaryEmailFrequency
+      : "weekly",
+    summaryEmailLastSentAt: serializeDateValue(plain.summaryEmailLastSentAt),
+    createdAt: serializeDateValue(plain.createdAt),
+    updatedAt: serializeDateValue(plain.updatedAt),
+  };
+};
+
+const serializeImportSourceBackup = (importSource = {}) => ({
+  system: String(importSource.system || ""),
+  entryId: String(importSource.entryId || ""),
+});
+
+const serializeSavingsEntryBackup = (entry) => {
+  const plain = toPlainObject(entry);
+
+  return {
+    id: documentId(plain),
+    title: String(plain.title || ""),
+    amount: moneyAmount(plain.amount),
+    category: String(plain.category || ""),
+    date: String(plain.date || ""),
+    notes: String(plain.notes || ""),
+    importSource: serializeImportSourceBackup(plain.importSource),
+    importFingerprint: String(plain.importFingerprint || ""),
+    createdAt: serializeDateValue(plain.createdAt),
+    updatedAt: serializeDateValue(plain.updatedAt),
+  };
+};
+
+const serializeSavingsBudgetBackup = (budget) => {
+  const plain = toPlainObject(budget);
+
+  return {
+    id: documentId(plain),
+    month: String(plain.month || ""),
+    category: String(plain.category || ""),
+    limitAmount: moneyAmount(plain.limitAmount),
+    createdAt: serializeDateValue(plain.createdAt),
+    updatedAt: serializeDateValue(plain.updatedAt),
+  };
+};
+
+const serializeSavingsGoalBackup = (goal) => {
+  const plain = toPlainObject(goal);
+
+  return {
+    id: documentId(plain),
+    title: String(plain.title || ""),
+    targetAmount: moneyAmount(plain.targetAmount),
+    currentAmount: moneyAmount(plain.currentAmount),
+    targetDate: String(plain.targetDate || ""),
+    notes: String(plain.notes || ""),
+    createdAt: serializeDateValue(plain.createdAt),
+    updatedAt: serializeDateValue(plain.updatedAt),
+  };
+};
+
+const serializeRecurringExpenseBackup = (expense) => {
+  const plain = toPlainObject(expense);
+
+  return {
+    id: documentId(plain),
+    title: String(plain.title || ""),
+    amount: moneyAmount(plain.amount),
+    category: String(plain.category || ""),
+    frequency: RECURRING_FREQUENCIES.some((entry) => entry.value === plain.frequency)
+      ? plain.frequency
+      : "monthly",
+    notes: String(plain.notes || ""),
+    lastLoggedMonth: String(plain.lastLoggedMonth || ""),
+    createdAt: serializeDateValue(plain.createdAt),
+    updatedAt: serializeDateValue(plain.updatedAt),
+  };
+};
+
+const csvTextCell = (value) => {
+  const rawValue = value === null || value === undefined ? "" : String(value);
+  const formulaSafeValue = /^[\s\u0000-\u001f]*[=+\-@]/.test(rawValue) ? `'${rawValue}` : rawValue;
+
+  return `"${formulaSafeValue.replace(/"/g, '""')}"`;
+};
+
+const csvSafeCell = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
+
+const csvAmountCell = (value) => {
+  const amount = Number(value);
+
+  if (!Number.isFinite(amount)) {
+    throw createHttpError("Eksporte rastas netinkamas sumos formatas.", 500);
+  }
+
+  return amount.toFixed(2);
+};
+
+const buildEntriesCsv = (entries) => {
+  const headers = ["date", "title", "category", "amount_eur", "notes", "source"];
+  const rows = (Array.isArray(entries) ? entries : []).map((entry) => [
+    csvSafeCell(entry.date || ""),
+    csvTextCell(entry.title || ""),
+    csvTextCell(entry.category || ""),
+    csvAmountCell(entry.amount),
+    csvTextCell(entry.notes || ""),
+    csvTextCell(entry.importSource?.system || ""),
+  ]);
+
+  return `\uFEFF${[headers.map(csvSafeCell), ...rows].map((row) => row.join(",")).join("\r\n")}\r\n`;
+};
 
 const sortEntries = (entries) =>
   [...entries].sort((left, right) => {
@@ -1499,28 +1647,68 @@ const getSavingsActivity = async (req, res) => {
   });
 };
 
+const exportSavingsEntriesCsv = async (req, res) => {
+  const scope = String(req.query.scope || "").trim().toLowerCase();
+  const hasMonth = req.query.month !== undefined && String(req.query.month).trim() !== "";
+
+  if (scope && scope !== "all") {
+    throw createHttpError("Pasirink galiojantį CSV eksporto tipą.");
+  }
+
+  if (scope === "all" && hasMonth) {
+    throw createHttpError("Visų duomenų eksportas negali turėti mėnesio filtro.");
+  }
+
+  const month = scope === "all" ? "" : parseMonthKey(req.query.month);
+  const query = { user: req.user._id };
+
+  if (month) {
+    query.date = {
+      $gte: `${month}-01`,
+      $lte: `${month}-31`,
+    };
+  }
+
+  const entries = await SavingsEntry.find(query).sort({ date: -1, updatedAt: -1 }).limit(MAX_EXPORT_ROWS + 1);
+
+  if (entries.length > MAX_EXPORT_ROWS) {
+    throw createHttpError("Eksportui per daug eilučių. Pasirink konkretų mėnesį.", 413);
+  }
+
+  const fileScope = scope === "all" ? "all" : month;
+  const filename = safeDownloadFileName(`stilloak-savings-studio-entries-${fileScope}.csv`);
+
+  await logSavingsAuditSafe({
+    userId: req.user._id,
+    action: "entries-csv-export",
+    entityType: "entries-csv",
+    metadata: {
+      scope: scope === "all" ? "all" : "month",
+      month,
+      entryCount: entries.length,
+    },
+  });
+
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+  res.status(200).send(buildEntriesCsv(entries.map(toPlainObject)));
+};
+
 const exportSavingsBackup = async (req, res) => {
-  const [payload, allBudgets, auditLogs] = await Promise.all([
+  const [payload, allBudgets] = await Promise.all([
     buildSavingsSummaryPayload(req.user._id),
     SavingsBudget.find({ user: req.user._id }).sort({ month: -1, category: 1 }),
-    SavingsStudioAuditLog.find({ user: req.user._id }).sort({ createdAt: -1 }).limit(MAX_BACKUP_AUDIT_ROWS),
   ]);
 
   const fileKey = new Date().toISOString().slice(0, 10);
   const backup = {
+    schemaVersion: BACKUP_SCHEMA_VERSION,
     generatedAt: new Date().toISOString(),
-    user: {
-      id: req.user._id.toString(),
-      email: req.user.email,
-      subscription: req.user.subscription,
-    },
-    profile: payload.profile,
-    summary: payload.summary,
-    entries: payload.entries,
-    budgets: allBudgets,
-    goals: payload.goals,
-    recurringExpenses: payload.recurringExpenses,
-    auditLogs,
+    profile: serializeSavingsProfileBackup(payload.profile),
+    entries: payload.entries.map(serializeSavingsEntryBackup),
+    budgets: allBudgets.map(serializeSavingsBudgetBackup),
+    goals: payload.goals.map(serializeSavingsGoalBackup),
+    recurringExpenses: payload.recurringExpenses.map(serializeRecurringExpenseBackup),
   };
 
   await logSavingsAuditSafe({
@@ -1536,32 +1724,85 @@ const exportSavingsBackup = async (req, res) => {
   });
 
   res.setHeader("Content-Type", "application/json; charset=utf-8");
-  res.setHeader("Content-Disposition", `attachment; filename=\"savings-studio-backup-${fileKey}.json\"`);
+  res.setHeader("Content-Disposition", `attachment; filename="${safeDownloadFileName(`savings-studio-backup-${fileKey}.json`)}"`);
   res.status(200).send(JSON.stringify(backup, null, 2));
 };
 
+const buildSavingsSummaryTextReport = ({ summary, userName }) => {
+  const periodLabel = "Mėnesio ataskaita";
+  const budgetLines = (summary.budgetProgress || [])
+    .map(
+      (budget) =>
+        `- ${budget.category}: faktas ${formatMoney(budget.actualSpent)}, prognozuojama ${formatMoney(
+          budget.projectedSpent
+        )}, limitas ${formatMoney(budget.limitAmount)}, būsena ${budget.status}`
+    );
+  const goalLines = (summary.goalsWithProgress || [])
+    .map(
+      (goal) =>
+        `- ${goal.title}: sukaupta ${formatMoney(goal.savedAmount)}, tikslas ${formatMoney(
+          goal.targetAmount
+        )}, progresas ${Number(goal.visualProgress || 0).toFixed(0)}%`
+    );
+  const categoryLines = (summary.categoryTotals || [])
+    .map((entry) => `- ${entry.category}: ${formatMoney(entry.total)}`);
+
+  return [
+    "Stilloak Studio",
+    "Saving Studio",
+    "",
+    `${periodLabel}: ${summary.month}`,
+    userName ? `Vartotojas: ${userName}` : "",
+    "",
+    "Pagrindiniai skaičiai",
+    `Pajamos: ${formatMoney(summary.monthlyIncome)}`,
+    `Faktinės mėnesio išlaidos: ${formatMoney(summary.monthTotal)}`,
+    `Likusi pasikartojančių išlaidų prognozė: ${formatMoney(summary.recurringMonthlyTotal)}`,
+    `Bendra mėnesio prognozė: ${formatMoney(summary.projectedMonthTotal)}`,
+    `Likutis pagal faktą: ${formatMoney(summary.balance)}`,
+    `Likutis po prognozės: ${formatMoney(summary.safeToSaveAfterRecurring)}`,
+    "",
+    "Faktinės kategorijų išlaidos",
+    ...(categoryLines.length ? categoryLines : ["- Šiam mėnesiui įrašų dar nėra."]),
+    "",
+    "Biudžetai",
+    ...(budgetLines.length ? budgetLines : ["- Šiam mėnesiui biudžetų ir išlaidų dar nėra."]),
+    "",
+    "Tikslai",
+    ...(goalLines.length ? goalLines : ["- Tikslų dar nėra."]),
+    "",
+    "Pastovių išlaidų atskyrimas",
+    `Jau įtrauktos pastovios išlaidos: ${formatMoney(summary.fixedVsFlexible?.loggedRecurring)}`,
+    `Likusi pastovių išlaidų prognozė: ${formatMoney(summary.fixedVsFlexible?.recurringRemaining)}`,
+    `Lanksčios faktinės išlaidos: ${formatMoney(summary.fixedVsFlexible?.flexibleSpent)}`,
+    "",
+    "Pastaba",
+    "Faktinės išlaidos skaičiuojamos tik iš įrašų. Pasikartojančių išlaidų prognozė rodoma atskirai, todėl ji nedubliuojama su jau įtrauktais įrašais.",
+  ]
+    .filter((line) => line !== "")
+    .join("\n");
+};
+
 const downloadSavingsSummaryDocument = async (req, res) => {
-  const profile = await getProfileDocument(req.user._id);
-  const frequency = String(req.query.frequency || profile.summaryEmailFrequency || "weekly").trim();
-  const format = String(req.query.format || "html").trim().toLowerCase();
+  const frequency = String(req.query.frequency || "monthly").trim();
+  const format = String(req.query.format || "txt").trim().toLowerCase();
+  const month = parseMonthKey(req.query.month);
 
-  if (!["weekly", "monthly"].includes(frequency)) {
-    throw createHttpError("Pasirink galiojantį suvestinės dažnį.");
+  if (frequency !== "monthly") {
+    throw createHttpError("TXT atsisiuntimui palaikoma tik mėnesio ataskaita.");
   }
 
-  if (!["html", "txt"].includes(format)) {
-    throw createHttpError("Pasirink galiojantį suvestinės failo formatą.");
+  if (format !== "txt") {
+    throw createHttpError("Pasirink galiojantį TXT ataskaitos formatą.");
   }
 
-  const { summary } = await buildSavingsSummaryPayload(req.user._id);
-  const email = buildSummaryEmail({
-    frequency,
-    summary,
+  const reportPayload = await buildSavingsSummaryPayload(req.user._id, { month });
+  const report = buildSavingsSummaryTextReport({
+    summary: reportPayload.summary,
     userName: req.user.name,
   });
-  const frequencyLabel = frequency === "monthly" ? "monthly" : "weekly";
-  const fileStamp = buildDownloadTimestamp();
-  const filename = `stilloak-${frequencyLabel}-summary-${fileStamp}.${format}`;
+  const reportFileStamp = buildDownloadTimestamp();
+  const reportFilename = safeDownloadFileName(`stilloak-monthly-summary-${month}-${reportFileStamp}.txt`);
 
   await logSavingsAuditSafe({
     userId: req.user._id,
@@ -1570,15 +1811,13 @@ const downloadSavingsSummaryDocument = async (req, res) => {
     metadata: {
       frequency,
       format,
+      month,
     },
   });
 
-  res.setHeader(
-    "Content-Type",
-    format === "html" ? "text/html; charset=utf-8" : "text/plain; charset=utf-8"
-  );
-  res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-  res.status(200).send(format === "html" ? email.html : email.text);
+  res.setHeader("Content-Type", "text/plain; charset=utf-8");
+  res.setHeader("Content-Disposition", `attachment; filename="${reportFilename}"`);
+  res.status(200).send(report);
 };
 
 const sendSavingsSummaryEmailNow = async (req, res) => {
@@ -1637,6 +1876,7 @@ module.exports = {
   deleteRecurringExpense,
   getSavingsSummary,
   getSavingsActivity,
+  exportSavingsEntriesCsv,
   exportSavingsBackup,
   downloadSavingsSummaryDocument,
   sendSavingsSummaryEmailNow,

@@ -27,6 +27,7 @@ const {
   deleteRecurringExpense,
   getSavingsSummary,
   getSavingsActivity,
+  exportSavingsEntriesCsv,
   exportSavingsBackup,
   downloadSavingsSummaryDocument,
   sendSavingsSummaryEmailNow,
@@ -84,6 +85,7 @@ router.put("/recurring/:recurringId", mutationLimiter, validateObjectId("recurri
 router.delete("/recurring/:recurringId", mutationLimiter, validateObjectId("recurringId"), asyncHandler(deleteRecurringExpense));
 router.get("/summary", asyncHandler(getSavingsSummary));
 router.get("/activity", asyncHandler(getSavingsActivity));
+router.get("/entries-export", backupLimiter, asyncHandler(exportSavingsEntriesCsv));
 router.get("/summary-export", asyncHandler(downloadSavingsSummaryDocument));
 router.get("/backup", backupLimiter, asyncHandler(exportSavingsBackup));
 router.post("/summary-email", emailLimiter, asyncHandler(sendSavingsSummaryEmailNow));

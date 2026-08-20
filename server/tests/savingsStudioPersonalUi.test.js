@@ -5,12 +5,14 @@ const test = require("node:test");
 
 const root = path.resolve(__dirname, "..", "..");
 const pagePath = path.join(root, "client", "src", "pages", "SavingsStudioPage.jsx");
+const servicePath = path.join(root, "client", "src", "services", "savingsStudioService.js");
 const layoutPath = path.join(root, "client", "src", "components", "Layout.jsx");
 const memberAreaPath = path.join(root, "client", "src", "pages", "MemberAreaPage.jsx");
 const digitalProductAccessGridPath = path.join(root, "client", "src", "components", "DigitalProductAccessGrid.jsx");
 const cssPath = path.join(root, "client", "src", "index.css");
 
 const readPageSource = () => fs.readFileSync(pagePath, "utf8");
+const readServiceSource = () => fs.readFileSync(servicePath, "utf8");
 const readLayoutSource = () => fs.readFileSync(layoutPath, "utf8");
 const readMemberAreaSource = () => fs.readFileSync(memberAreaPath, "utf8");
 const readDigitalProductAccessGridSource = () => fs.readFileSync(digitalProductAccessGridPath, "utf8");
@@ -251,9 +253,60 @@ test("Saving Studio forms guard against duplicate submit at handler level", () =
   assert.match(source, /const handleRecurringSubmit = async[\s\S]*if \(savingRecurring\) \{[\s\S]*return;/);
   assert.match(source, /const handleLogRecurringExpense = async[\s\S]*if \(loggingRecurringId \|\| recurringExpense\.lastLoggedMonth === currentRecurringMonth\)/);
   assert.match(source, /const handleConfirmCsvImport = async[\s\S]*if \(confirmingCsvImport\) \{[\s\S]*return;/);
+  assert.match(source, /const handleDownloadSummary = async[\s\S]*if \(downloadingSummaryKey\) \{[\s\S]*return;/);
+  assert.match(source, /const handleDownloadEntriesCsv = async[\s\S]*if \(downloadingCsvKey\) \{[\s\S]*return;/);
+  assert.match(source, /const handleDownloadBackup = async[\s\S]*if \(downloadingBackup\) \{[\s\S]*return;/);
   assert.match(source, /const handleDelete = async[\s\S]*if \(deletingId\) \{[\s\S]*return;/);
   assert.match(source, /const handleDeleteGoal = async[\s\S]*if \(deletingGoalId\) \{[\s\S]*return;/);
   assert.match(source, /const handleDeleteRecurring = async[\s\S]*if \(deletingRecurringId\) \{[\s\S]*return;/);
+});
+
+test("Saving Studio downloads selected month as TXT and CSV with safe Blob cleanup", () => {
+  const source = readPageSource();
+  const serviceSource = readServiceSource();
+  const downloadSource = extractBetween(
+    source,
+    "const handleDownloadSummary = async (monthOverride = \"\") => {",
+    "const handleDelete = async"
+  );
+
+  assert.match(serviceSource, /window\.URL\.createObjectURL\(blob\)/);
+  assert.match(serviceSource, /window\.URL\.revokeObjectURL\(objectUrl\)/);
+  assert.match(serviceSource, /const sanitizeDownloadFilename = /);
+  assert.match(serviceSource, /const downloadSummaryFile = async \(\{ month, format = "txt" \}\) =>/);
+  assert.match(serviceSource, /params: \{ frequency: "monthly", format, month \}/);
+  assert.match(serviceSource, /const downloadEntriesCsv = async \(\{ month, scope = "month" \}\) =>/);
+  assert.match(serviceSource, /\/savings-studio\/entries-export/);
+  assert.match(serviceSource, /scope === "all" \? \{ scope: "all" \} : \{ month \}/);
+
+  assert.ok(downloadSource.includes('const reportMonth = /^\\d{4}-\\d{2}$/.test(String(monthOverride || "")) ? monthOverride : selectedBudgetMonth;'));
+  assert.match(downloadSource, /downloadSummaryFile\(\{ month: reportMonth, format: "txt" \}\)/);
+  assert.match(downloadSource, /downloadEntriesCsv\(\{ month: selectedBudgetMonth, scope \}\)/);
+  assert.match(source, /const \[downloadingCsvKey, setDownloadingCsvKey\] = useState\(""\)/);
+  assert.match(source, /disabled=\{Boolean\(downloadingCsvKey\)\}/);
+  assert.match(source, /Atsisiųsti \$\{selectedBudgetMonth\} CSV/);
+  assert.match(source, /Atsisiųsti visų įrašų CSV/);
+  assert.doesNotMatch(source, /Atsisiųsti savaitės TXT/);
+  assert.match(source, /Atsisiųsti mėnesio TXT/);
+  assert.match(source, /name="summaryEmailFrequency"/);
+  assert.match(source, /<option value="weekly">/);
+  assert.match(source, /onClick=\{handleDownloadSummary\}/);
+  assert.doesNotMatch(source, /handleDownloadSummary\("weekly"\)/);
+  assert.match(source, /grid mobile-stack-grid min-w-0 grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,13rem\),1fr\)\)\] gap-3/);
+});
+
+test("Saving Studio summary archive only offers TXT generation for monthly exports", () => {
+  const source = readPageSource();
+  const summaryArchiveSource = extractComponentSource(source, "SummaryArchiveItem", "CoachSignalCard");
+
+  assert.ok(summaryArchiveSource.includes('const archiveMonth = /^\\d{4}-\\d{2}$/.test(String(item.metadata?.month || "")) ? item.metadata.month : "";'));
+  assert.ok(summaryArchiveSource.includes('const canDownloadMonthlyTxt = item.action === "summary-export" && frequency === "monthly";'));
+  assert.match(summaryArchiveSource, /\{canDownloadMonthlyTxt \? \(/);
+  assert.match(summaryArchiveSource, /onClick=\{\(\) => onDownload\(archiveMonth\)\}/);
+  assert.match(summaryArchiveSource, /archiveMonth \? `Sugeneruoti \$\{archiveMonth\} TXT` : "Sugeneruoti/);
+  assert.match(summaryArchiveSource, /onClick=\{\(\) => onSend\(frequency\)\}/);
+  assert.doesNotMatch(summaryArchiveSource, /onClick=\{onDownload\}/);
+  assert.doesNotMatch(summaryArchiveSource, />Atsisi[^<]*sti v[^<]*l<\/span>/);
 });
 
 test("Saving Studio CSV import validates file type and size before preview request", () => {
@@ -402,7 +455,8 @@ test("Summary archive actions stay inside narrow cards", () => {
     /grid w-full grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,10rem\),1fr\)\)\] gap-2/
   );
   assert.match(summaryArchiveSource, /className="button-secondary w-full max-w-full justify-center gap-2 whitespace-normal break-normal text-center"/);
-  assert.match(summaryArchiveSource, /<span className="min-w-0 whitespace-normal break-normal">Atsisi[^<]*sti v[^<]*l<\/span>/);
+  assert.match(summaryArchiveSource, /Sugeneruoti \$\{archiveMonth\} TXT/);
+  assert.match(summaryArchiveSource, /Sugeneruoti/);
   assert.match(summaryArchiveSource, /<span className="min-w-0 whitespace-normal break-normal">Si[^<]*sti dar kart[^<]*<\/span>/);
   assert.match(summaryArchiveSource, /<Download className="shrink-0" size=\{14\} \/>/);
   assert.match(summaryArchiveSource, /<Mail className="shrink-0" size=\{14\} \/>/);
