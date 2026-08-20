@@ -1,13 +1,13 @@
-﻿export const journalArticles = [
+export const journalArticles = [
   {
     slug: "bazinio-plano-erdve-atnaujinta",
-    category: "Demo versija",
+    category: "Demo",
     date: "2026 m. gegužės 5 d.",
     readTime: "2 min. skaitymo",
-    title: "Demo versijos erdvė atnaujinta",
+    title: "Demo erdvė atnaujinta",
     cover: {
       issue: "Naujiena 01",
-      heading: "Aiškesnis Demo versijos startas.",
+      heading: "Aiškesnis Demo startas.",
       lines: ["mėnesio apžvalga", "pradiniai resursai", "kelias į Asmeninį"],
       background: "linear-gradient(135deg, rgba(20,27,24,0.98) 0%, rgba(56,78,66,0.95) 48%, rgba(184,166,124,0.92) 100%)",
       panel: "linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03))",
@@ -17,25 +17,25 @@
     excerpt:
       "Pridėta mėnesio apžvalga, pradiniai resursai ir aiškesnis kelias į Asmeninį planą.",
     intro:
-      "Demo versijos erdvė atnaujinta taip, kad naujas narys greičiau suprastų, nuo ko pradėti. Ji lieka lengvas startas, bet dabar turi daugiau krypties: mėnesio fokusą, pradines resursų peržiūras ir aiškesnį atnaujinimo kelią.",
+      "Demo erdvė atnaujinta taip, kad naujas narys greičiau suprastų, nuo ko pradėti. Ji lieka lengvas startas, bet dabar turi daugiau krypties: mėnesio fokusą, pradines resursų peržiūras ir aiškesnį atnaujinimo kelią.",
     sections: [
       {
-        heading: "Kas pasikeitė Demo versijoje",
+        heading: "Kas pasikeitė Demo erdvėje",
         paragraphs: [
-          "Demo versija narys dabar mato paprastą mėnesio apžvalgą, gali pasirinkti vieną fokusą ir pasitikrinti pagrindinius žingsnius be sudėtingos sistemos.",
+          "Demo narys dabar mato paprastą mėnesio apžvalgą, gali pasirinkti vieną fokusą ir pasitikrinti pagrindinius žingsnius be sudėtingos sistemos.",
           "Pridėti pradiniai resursai padeda pradėti nuo mažų veiksmų: mėnesio sąrašo, biudžeto pasiruošimo ir tikslo planavimo.",
         ],
       },
       {
         heading: "Kaip tai susijungia su Asmeniniu planu",
         paragraphs: [
-          "Demo versija rodo kryptį, o Asmeninis atrakina pilnesnę struktūrą: mėnesio suvestines, tikslų progreso korteles, premium resursus ir pilnas nario naujienas.",
+          "Demo rodo kryptį, o Asmeninis atrakina pilnesnę struktūrą: mėnesio suvestines, tikslų progreso korteles, premium resursus ir pilnas nario naujienas.",
           "Atnaujinimo kelias dabar paaiškintas ramiau, kad narys suprastų, ką gauna dabar ir kas atsiveria perėjus į pilną planą.",
         ],
       },
     ],
     takeaway:
-      "Demo versija lieka ribota, bet ji dabar aiškiau parodo pirmus žingsnius ir natūralų kelią į pilną nario patirtį.",
+      "Demo lieka ribota, bet ji dabar aiškiau parodo pirmus žingsnius ir natūralų kelią į pilną nario patirtį.",
   },
   {
     slug: "ruosiami-nauji-nario-resursai",
@@ -68,7 +68,7 @@
         heading: "Kaip jie bus atrenkami",
         paragraphs: [
           "Kiekvienas resursas bus vertinamas pagal naudą nariui, o ne pagal failų skaičių. Mažiau, bet aiškiau yra svarbiau už didelį archyvą be krypties.",
-          "Demo versija gali matyti ribotas peržiūras, o pilni resursai bus jungiami prie Asmeninio ir Verslo planų.",
+          "Demo gali matyti ribotas peržiūras, o pilni resursai bus jungiami prie Asmeninio ir Verslo planų.",
         ],
       },
     ],
@@ -175,7 +175,7 @@
         heading: "Ką nariai matys pirmiausia",
         paragraphs: [
           "Asmeninio ir Verslo planų nariai matys ankstyvus produkto pristatymus, naujų resursų paaiškinimus ir svarbiausius platformos pokyčius.",
-          "Demo versija gali matyti ribotas peržiūras, kad būtų aišku, kas vyksta, bet pilnas turinys lieka aktyviems mokamiems planams.",
+          "Demo gali matyti ribotas peržiūras, kad būtų aišku, kas vyksta, bet pilnas turinys lieka aktyviems mokamiems planams.",
         ],
       },
       {

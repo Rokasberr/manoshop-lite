@@ -14,7 +14,7 @@ const subscriptionPlans = {
   basic: {
     id: "basic",
     legacyId: "bazinis",
-    name: "Demo versija",
+    name: "Demo",
     price: 0,
     currency: "eur",
     interval: "month",
@@ -49,7 +49,7 @@ const subscriptionPlans = {
   private_business: {
     id: "private_business",
     legacyId: "privatus_verslas",
-    name: "Privatus verslas",
+    name: "Verslas",
     price: 44.99,
     currency: "eur",
     interval: "month",
