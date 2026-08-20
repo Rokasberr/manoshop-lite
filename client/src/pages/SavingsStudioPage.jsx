@@ -536,7 +536,7 @@ const SavingsStudioPage = () => {
           savingsStudioService.getMeta(),
           savingsStudioService.getProfile(),
           savingsStudioService.getEntries(),
-          savingsStudioService.getSummary(),
+          savingsStudioService.getSummary(currentMonthKey()),
           savingsStudioService.getBudgets(currentMonthKey()),
           savingsStudioService.getGoals(),
           savingsStudioService.getRecurringExpenses(),
@@ -689,7 +689,12 @@ const SavingsStudioPage = () => {
   );
 
   const budgetProgress = useMemo(
-    () =>
+    () => {
+      if (Array.isArray(summary?.budgetProgress)) {
+        return summary.budgetProgress;
+      }
+
+      return (
       categories
         .map((category) => {
           const budget = budgets.find((entry) => entry.category === category);
@@ -712,8 +717,10 @@ const SavingsStudioPage = () => {
             status: getBudgetStatus({ spent: projectedSpent, limitAmount }),
           };
         })
-        .filter((entry) => entry.limitAmount > 0 || entry.actualSpent > 0 || entry.recurringCommitted > 0),
-    [budgets, categories, recurringByCategory, spentByCategory]
+        .filter((entry) => entry.limitAmount > 0 || entry.actualSpent > 0 || entry.recurringCommitted > 0)
+      );
+    },
+    [budgets, categories, recurringByCategory, spentByCategory, summary?.budgetProgress]
   );
 
   const budgetOverview = {
@@ -1452,7 +1459,7 @@ const SavingsStudioPage = () => {
   const refreshSummaryAndEntries = async () => {
     const [entriesResult, summaryResult] = await Promise.all([
       savingsStudioService.getEntries(),
-      savingsStudioService.getSummary(),
+      savingsStudioService.getSummary(selectedBudgetMonth),
     ]);
 
     startTransition(() => {
@@ -1462,9 +1469,15 @@ const SavingsStudioPage = () => {
   };
 
   const refreshSummary = async () => {
-    const summaryResult = await savingsStudioService.getSummary();
+    const summaryResult = await savingsStudioService.getSummary(selectedBudgetMonth);
     setSummary(summaryResult.summary || null);
   };
+
+  useEffect(() => {
+    if (!loading) {
+      refreshSummary();
+    }
+  }, [loading, selectedBudgetMonth]);
 
   const refreshGoals = async () => {
     const goalResult = await savingsStudioService.getGoals();
@@ -3136,7 +3149,7 @@ const SavingsStudioPage = () => {
                             : ""
                         }`}
                       >
-                        {money.format(entry.projectedSpent)} / {money.format(entry.limitAmount || 0)}
+                        Prognozuojama: {money.format(entry.projectedSpent)} / {money.format(entry.limitAmount || 0)}
                       </span>
                     </div>
                     <div className="mt-3 h-2 overflow-hidden rounded-full bg-[rgb(var(--surface-soft))]">
@@ -3148,18 +3161,18 @@ const SavingsStudioPage = () => {
                             ? "bg-amber-500"
                             : "bg-[rgb(var(--accent))]"
                         }`}
-                        style={{ width: `${entry.limitAmount ? Math.max(entry.percentUsed, 6) : 0}%` }}
+                        style={{ width: `${entry.limitAmount ? Math.min(Math.max(entry.visualPercentUsed ?? entry.percentUsed, 6), 100) : 0}%` }}
                       />
                     </div>
                     <p className="mt-3 text-xs uppercase tracking-[0.16em] text-muted">
-                      Faktinės: {money.format(entry.actualSpent)} · Pastovios: {money.format(entry.recurringCommitted)}
+                      Faktinės išlaidos: {money.format(entry.actualSpent)} · Likusios pasikartojančios: {money.format(entry.recurringCommitted)}
                     </p>
                     <p className="mt-3 text-sm text-muted">
                       {entry.status === "over"
-                        ? `Viršyta ${money.format(Math.abs(entry.remaining))}`
+                        ? `Prognozuojamai viršyta ${money.format(entry.overAmount ?? Math.abs(entry.remaining))}`
                         : entry.limitAmount
-                        ? `Liko ${money.format(entry.remaining)}`
-                        : `Šioje kategorijoje kol kas išleista ${money.format(entry.spent)}`}
+                        ? `Prognozuojamai liko ${money.format(entry.remaining)}`
+                        : `Šioje kategorijoje faktinių išlaidų yra ${money.format(entry.actualSpent)}`}
                     </p>
                   </div>
                 ))
@@ -3266,11 +3279,11 @@ const SavingsStudioPage = () => {
                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   <div>
                     <p className="text-sm font-semibold text-muted">Po faktinių išlaidų</p>
-                    <p className="mt-1 text-lg font-semibold">{money.format(savingsCapacity.afterActual || 0)}</p>
+                    <p className="mt-1 text-lg font-semibold">{money.format(savingsCapacity.afterActual ?? 0)}</p>
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-muted">Po projekcijų</p>
-                    <p className="mt-1 text-lg font-semibold">{money.format(savingsCapacity.afterProjected || 0)}</p>
+                    <p className="mt-1 text-lg font-semibold">{money.format(savingsCapacity.afterProjected ?? 0)}</p>
                   </div>
                 </div>
               </div>

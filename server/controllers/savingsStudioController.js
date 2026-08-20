@@ -8,6 +8,17 @@ const SavingsGoal = require("../models/SavingsGoal");
 const SavingsStudioProfile = require("../models/SavingsStudioProfile");
 const { buildSummaryEmail, sendSavingsSummaryEmail } = require("../services/savingsStudioSummaryEmailService");
 const { logSavingsAuditSafe } = require("../services/savingsStudioAuditService");
+const {
+  buildSavingsSummary,
+  currentDateKey,
+  currentMonthKey,
+  getLoggedRecurringIdsForMonth,
+  getEntryMonthKey,
+  isStrictDateKey,
+  isStrictMonthKey,
+  moneyAmount,
+  recurringMonthlyEquivalent,
+} = require("../../shared/savingsStudioCalculations.cjs");
 
 const CATEGORIES = [
   "Būstas",
@@ -43,41 +54,14 @@ const MAX_IMPORT_ROWS = 300;
 const MAX_BACKUP_AUDIT_ROWS = 200;
 const MAX_ACTIVITY_ROWS = 36;
 
-const currentMonthKey = () => new Date().toISOString().slice(0, 7);
 const buildDownloadTimestamp = () => new Date().toISOString().replace(/[:.]/g, "-");
-
-const previousMonthKey = () => {
-  const date = new Date();
-  date.setUTCDate(1);
-  date.setUTCMonth(date.getUTCMonth() - 1);
-  return date.toISOString().slice(0, 7);
-};
-
-const roundCurrency = (value) => Number(value.toFixed(2));
+const roundCurrency = (value) => moneyAmount(value);
 const moneyFormatter = new Intl.NumberFormat("lt-LT", {
   style: "currency",
   currency: "EUR",
   maximumFractionDigits: 2,
 });
 const formatMoney = (value) => moneyFormatter.format(Number(value || 0));
-
-const monthOptions = (count = 6) => {
-  const formatter = new Intl.DateTimeFormat("lt-LT", {
-    month: "short",
-    year: "numeric",
-  });
-
-  return Array.from({ length: count }, (_, index) => {
-    const date = new Date();
-    date.setUTCDate(1);
-    date.setUTCMonth(date.getUTCMonth() - (count - index - 1));
-
-    return {
-      key: date.toISOString().slice(0, 7),
-      label: formatter.format(date),
-    };
-  });
-};
 
 const sortEntries = (entries) =>
   [...entries].sort((left, right) => {
@@ -99,7 +83,7 @@ const createHttpError = (message, status = 400) => {
 const parseMonthKey = (value, fallback = currentMonthKey()) => {
   const month = String(value || fallback).trim();
 
-  if (!/^\d{4}-\d{2}$/.test(month)) {
+  if (!isStrictMonthKey(month)) {
     throw createHttpError("Naudok galiojantį mėnesio formatą YYYY-MM.");
   }
 
@@ -112,17 +96,7 @@ const parseMonthKey = (value, fallback = currentMonthKey()) => {
   return month;
 };
 
-const isValidDateKey = (value) => {
-  const date = String(value || "").trim();
-
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    return false;
-  }
-
-  const parsed = new Date(`${date}T00:00:00.000Z`);
-
-  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === date;
-};
+const isValidDateKey = (value) => isStrictDateKey(value);
 
 const parseEntryInput = (input) => {
   const title = String(input.title || "").trim();
@@ -413,19 +387,7 @@ const findDuplicateImportedRows = async ({ rows, userId }) => {
 };
 
 const recurringToMonthlyEquivalent = (expense) => {
-  const amount = Number(expense.amount || 0);
-
-  switch (expense.frequency) {
-    case "weekly":
-      return roundCurrency((amount * 52) / 12);
-    case "quarterly":
-      return roundCurrency(amount / 3);
-    case "yearly":
-      return roundCurrency(amount / 12);
-    case "monthly":
-    default:
-      return roundCurrency(amount);
-  }
+  return recurringMonthlyEquivalent(expense);
 };
 
 const decorateRecurringExpense = (expense) => ({
@@ -485,87 +447,12 @@ const monthsUntilTargetDate = (targetDate) => {
   return Math.max(rawMonths, 1);
 };
 
-const buildSummary = (entries) => {
-  const monthKey = currentMonthKey();
-  const lastMonthKey = previousMonthKey();
-  const monthlyTotals = monthOptions(6).map((entry) => ({
-    ...entry,
-    total: 0,
-  }));
-  const weeklyTotalsCurrentMonth = Array.from({ length: 5 }, (_, index) => ({
-    key: `week-${index + 1}`,
-    label: `${index + 1} sav.`,
-    total: 0,
-  }));
-  const monthlyLookup = new Map(monthlyTotals.map((entry) => [entry.key, entry]));
-  const categoryLookup = new Map();
-
-  let totalSpent = 0;
-  let currentMonthTotal = 0;
-  let previousMonthTotal = 0;
-
-  for (const entry of entries) {
-    const amount = Number(entry.amount);
-    const entryMonth = entry.date.slice(0, 7);
-
-    totalSpent += amount;
-
-    if (entryMonth === monthKey) {
-      currentMonthTotal += amount;
-
-      const dayOfMonth = Number(entry.date.slice(-2));
-      const bucketIndex = Math.min(Math.max(Math.floor((dayOfMonth - 1) / 7), 0), weeklyTotalsCurrentMonth.length - 1);
-      weeklyTotalsCurrentMonth[bucketIndex].total += amount;
-    }
-
-    if (entryMonth === lastMonthKey) {
-      previousMonthTotal += amount;
-    }
-
-    if (monthlyLookup.has(entryMonth)) {
-      monthlyLookup.get(entryMonth).total += amount;
-    }
-
-    categoryLookup.set(entry.category, (categoryLookup.get(entry.category) || 0) + amount);
-  }
-
-  const categoryTotals = [...categoryLookup.entries()]
-    .map(([category, total]) => ({
-      category,
-      total: roundCurrency(total),
-    }))
-    .sort((left, right) => right.total - left.total);
-
-  const change =
-    previousMonthTotal > 0
-      ? roundCurrency(((currentMonthTotal - previousMonthTotal) / previousMonthTotal) * 100)
-      : null;
-
-  return {
-    monthTotal: roundCurrency(currentMonthTotal),
-    previousMonthTotal: roundCurrency(previousMonthTotal),
-    change,
-    averageSpend: entries.length ? roundCurrency(totalSpent / entries.length) : 0,
-    topCategory: categoryTotals[0]?.category || "Dar nėra duomenų",
-    recentCount: entries.length,
-    recentEntries: sortEntries(entries).slice(0, 5),
-    categoryTotals,
-    monthlyTotals: monthlyTotals.map((entry) => ({
-      ...entry,
-      total: roundCurrency(entry.total),
-    })),
-    weeklyTotalsCurrentMonth: weeklyTotalsCurrentMonth.map((entry) => ({
-      ...entry,
-      total: roundCurrency(entry.total),
-    })),
-  };
-};
-
 const buildInsights = ({ budgets, entries, goals, profile, recurringExpenses, summary }) => {
-  const monthKey = currentMonthKey();
+  const monthKey = parseMonthKey(summary.month, currentMonthKey());
   const currentMonthSpent = Number(summary.monthTotal || 0);
+  const loggedRecurringIds = getLoggedRecurringIdsForMonth(entries, monthKey);
   const outstandingRecurringExpenses = recurringExpenses.filter(
-    (recurringExpense) => recurringExpense.lastLoggedMonth !== monthKey
+    (recurringExpense) => !loggedRecurringIds.has(String(recurringExpense._id || "").trim())
   );
   const recurringMonthlyTotal = roundCurrency(
     outstandingRecurringExpenses.reduce((sum, recurringExpense) => sum + recurringToMonthlyEquivalent(recurringExpense), 0)
@@ -606,8 +493,8 @@ const buildInsights = ({ budgets, entries, goals, profile, recurringExpenses, su
     .sort((left, right) => right.ratio - left.ratio);
 
   const projectedMonthTotal = roundCurrency(currentMonthSpent + recurringMonthlyTotal);
-  const safeToSaveAfterRecurring =
-    profile.monthlyIncome > 0 ? roundCurrency(Number(profile.monthlyIncome) - projectedMonthTotal) : null;
+  const monthlyIncome = roundCurrency(Number(profile.monthlyIncome || 0));
+  const safeToSaveAfterRecurring = roundCurrency(monthlyIncome - projectedMonthTotal);
   const categoryPressure = budgetProgress
     .slice(0, 5)
     .map((entry) => ({
@@ -623,10 +510,10 @@ const buildInsights = ({ budgets, entries, goals, profile, recurringExpenses, su
           : "healthy",
     }));
   const savingsCapacity = {
-    income: Number(profile.monthlyIncome || 0),
+    income: monthlyIncome,
     currentMonthSpent,
     projectedMonthTotal,
-    afterActual: profile.monthlyIncome > 0 ? roundCurrency(Number(profile.monthlyIncome) - currentMonthSpent) : null,
+    afterActual: roundCurrency(monthlyIncome - currentMonthSpent),
     afterProjected: safeToSaveAfterRecurring,
     target: Number(profile.monthlySavingsTarget || 0),
   };
@@ -816,8 +703,7 @@ const buildInsights = ({ budgets, entries, goals, profile, recurringExpenses, su
   return {
     recurringMonthlyTotal,
     recurringByCategory,
-    availableToSave:
-      profile.monthlyIncome > 0 ? roundCurrency(Number(profile.monthlyIncome) - currentMonthSpent) : null,
+    availableToSave: roundCurrency(monthlyIncome - currentMonthSpent),
     safeToSaveAfterRecurring,
     projectedMonthTotal,
     goalPace,
@@ -828,8 +714,20 @@ const buildInsights = ({ budgets, entries, goals, profile, recurringExpenses, su
   };
 };
 
-const buildSavingsSummaryPayload = async (userId) => {
-  const month = currentMonthKey();
+const buildAuthoritativeSummary = ({ budgets, entries, goals, month, profile, recurringExpenses }) => ({
+  ...buildSavingsSummary({
+    budgets,
+    entries,
+    goals,
+    month,
+    profile,
+    recurringExpenses,
+  }),
+  recentEntries: sortEntries(entries).slice(0, 5),
+});
+
+const buildSavingsSummaryPayload = async (userId, options = {}) => {
+  const month = parseMonthKey(options.month, currentMonthKey());
   const [entries, profile, recurringExpenses, budgets, goals] = await Promise.all([
     SavingsEntry.find({ user: userId }),
     getProfileDocument(userId),
@@ -837,7 +735,14 @@ const buildSavingsSummaryPayload = async (userId) => {
     SavingsBudget.find({ user: userId, month }),
     SavingsGoal.find({ user: userId }),
   ]);
-  const summary = buildSummary(entries);
+  const summary = buildAuthoritativeSummary({
+    budgets,
+    entries,
+    goals,
+    month,
+    profile,
+    recurringExpenses,
+  });
   const insightPayload = buildInsights({
     budgets,
     entries,
@@ -1293,7 +1198,27 @@ const deleteSavingsEntry = async (req, res) => {
     throw createHttpError("Išlaidos įrašas nerastas.", 404);
   }
 
+  const recurringEntryId =
+    entry.importSource?.system === "recurring-expense" ? String(entry.importSource?.entryId || "").trim() : "";
+  const entryMonth = getEntryMonthKey(entry);
+
   await entry.deleteOne();
+
+  if (recurringEntryId && entryMonth) {
+    await RecurringExpense.findOneAndUpdate(
+      {
+        _id: recurringEntryId,
+        user: req.user._id,
+        lastLoggedMonth: entryMonth,
+      },
+      {
+        $set: {
+          lastLoggedMonth: "",
+        },
+      }
+    );
+  }
+
   await logSavingsAuditSafe({
     userId: req.user._id,
     action: "entry-delete",
@@ -1452,7 +1377,7 @@ const logRecurringExpenseAsEntry = async (req, res) => {
 
   const date =
     month === currentMonthKey()
-      ? new Date().toISOString().slice(0, 10)
+      ? currentDateKey()
       : `${month}-01`;
   const importFingerprint = buildRecurringLogFingerprint({
     month,
@@ -1550,7 +1475,8 @@ const deleteRecurringExpense = async (req, res) => {
 };
 
 const getSavingsSummary = async (req, res) => {
-  const { summary } = await buildSavingsSummaryPayload(req.user._id);
+  const month = parseMonthKey(req.query.month);
+  const { summary } = await buildSavingsSummaryPayload(req.user._id, { month });
   res.json({
     summary,
   });
