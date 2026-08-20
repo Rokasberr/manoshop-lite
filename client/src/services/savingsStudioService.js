@@ -80,8 +80,10 @@ const deleteRecurringExpense = async (recurringId) => {
   await api.delete(`/savings-studio/recurring/${recurringId}`);
 };
 
-const getSummary = async () => {
-  const { data } = await api.get("/savings-studio/summary");
+const getSummary = async (month) => {
+  const { data } = await api.get("/savings-studio/summary", {
+    params: month ? { month } : {},
+  });
   return data;
 };
 

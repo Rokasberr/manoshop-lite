@@ -47,7 +47,7 @@ test("Saving Studio onboarding draft currency preview uses safe formatting", () 
 test("Saving Studio mutations refresh dependent summary and activity state", () => {
   const source = fs.readFileSync(path.join(root, "client", "src", "pages", "SavingsStudioPage.jsx"), "utf8");
 
-  assert.match(source, /const refreshSummary = async \(\) => \{[\s\S]*savingsStudioService\.getSummary\(\)/);
+  assert.match(source, /const refreshSummary = async \(\) => \{[\s\S]*savingsStudioService\.getSummary\(selectedBudgetMonth\)/);
   assert.match(source, /handleEntrySubmit[\s\S]*Promise\.all\(\[refreshSummaryAndEntries\(\), refreshActivity\(\)\]\)/);
   assert.match(source, /handleConfirmCsvImport[\s\S]*Promise\.all\(\[refreshSummaryAndEntries\(\), refreshActivity\(\)\]\)/);
   assert.match(source, /handleDelete = async[\s\S]*Promise\.all\(\[refreshSummaryAndEntries\(\), refreshActivity\(\)\]\)/);
@@ -55,6 +55,17 @@ test("Saving Studio mutations refresh dependent summary and activity state", () 
   assert.match(source, /handleDeleteGoal[\s\S]*Promise\.all\(\[refreshGoals\(\), refreshSummary\(\), refreshActivity\(\)\]\)/);
   assert.match(source, /handleRecurringSubmit[\s\S]*Promise\.all\(\[refreshRecurring\(\), refreshSummary\(\), refreshActivity\(\)\]\)/);
   assert.match(source, /handleDeleteRecurring[\s\S]*Promise\.all\(\[refreshRecurring\(\), refreshSummary\(\), refreshActivity\(\)\]\)/);
+});
+
+test("Saving Studio budget UI labels actual and projected amounts separately", () => {
+  const source = fs.readFileSync(path.join(root, "client", "src", "pages", "SavingsStudioPage.jsx"), "utf8");
+
+  assert.match(source, /Prognozuojama: \{money\.format\(entry\.projectedSpent\)\}/);
+  assert.match(source, /Faktinės išlaidos: \{money\.format\(entry\.actualSpent\)\}/);
+  assert.match(source, /Likusios pasikartojančios: \{money\.format\(entry\.recurringCommitted\)\}/);
+  assert.match(source, /Prognozuojamai viršyta/);
+  assert.match(source, /Prognozuojamai liko/);
+  assert.doesNotMatch(source, /FaktinÄ—s: \{money\.format\(entry\.actualSpent\)\}.*Pastovios/s);
 });
 
 test("Saving Studio initial load failure keeps a visible retry state", () => {

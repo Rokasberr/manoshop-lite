@@ -1,3 +1,5 @@
+import calculations from "../../../../shared/savingsStudioCalculations.cjs";
+
 export const DEFAULT_CATEGORIES = [
   "Būstas",
   "Maistas",
@@ -37,14 +39,18 @@ export const dateFormatter = new Intl.DateTimeFormat("lt-LT", {
   year: "numeric",
 });
 
-const toFiniteNumber = (value, fallback = 0) => {
-  const numericValue = Number(value);
-  return Number.isFinite(numericValue) ? numericValue : fallback;
-};
+const {
+  currentDateKey,
+  currentMonthKey: getCurrentMonthKey,
+  goalProgress,
+  isStrictMonthKey,
+  recurringMonthlyEquivalent: getRecurringMonthlyEquivalent,
+  toFiniteNumber,
+} = calculations;
 
-export const currentDateInput = () => new Date().toISOString().slice(0, 10);
-export const currentMonthKey = () => new Date().toISOString().slice(0, 7);
-const isMonthKey = (value) => /^\d{4}-\d{2}$/.test(String(value || ""));
+export const currentDateInput = () => currentDateKey();
+export const currentMonthKey = () => getCurrentMonthKey();
+const isMonthKey = (value) => isStrictMonthKey(value);
 
 export const emptyEntry = (categories = DEFAULT_CATEGORIES) => ({
   title: "",
@@ -138,41 +144,16 @@ export const getBudgetStatus = ({ spent, limitAmount }) => {
 };
 
 export const getGoalProgress = (goal) => {
-  const targetAmount = toFiniteNumber(goal.targetAmount);
-  const currentAmount = Math.max(toFiniteNumber(goal.currentAmount), 0);
-
-  if (targetAmount <= 0) {
-    return {
-      progress: 0,
-      remaining: 0,
-      complete: false,
-    };
-  }
-
-  const remaining = Math.max(targetAmount - currentAmount, 0);
+  const result = goalProgress(goal);
 
   return {
-    progress: Math.min(Math.max((currentAmount / targetAmount) * 100, 0), 100),
-    remaining: Number(remaining.toFixed(2)),
-    complete: currentAmount >= targetAmount,
+    progress: result.visualProgress,
+    remaining: result.remaining,
+    complete: result.complete,
   };
 };
 
-export const recurringMonthlyEquivalent = (expense) => {
-  const amount = Math.max(toFiniteNumber(expense.amount), 0);
-
-  switch (expense.frequency) {
-    case "weekly":
-      return Number(((amount * 52) / 12).toFixed(2));
-    case "quarterly":
-      return Number((amount / 3).toFixed(2));
-    case "yearly":
-      return Number((amount / 12).toFixed(2));
-    case "monthly":
-    default:
-      return Number(amount.toFixed(2));
-  }
-};
+export const recurringMonthlyEquivalent = (expense) => getRecurringMonthlyEquivalent(expense);
 
 export const formatRecurringFrequency = (value, options = DEFAULT_RECURRING_FREQUENCIES) =>
   options.find((option) => option.value === value)?.label || value;
