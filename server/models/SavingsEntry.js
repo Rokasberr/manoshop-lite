@@ -48,9 +48,25 @@ const savingsEntrySchema = new mongoose.Schema(
         trim: true,
       },
     },
+    importFingerprint: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 64,
+    },
   },
   {
     timestamps: true,
+  }
+);
+
+savingsEntrySchema.index(
+  { user: 1, importFingerprint: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      importFingerprint: { $type: "string", $gt: "" },
+    },
   }
 );
 

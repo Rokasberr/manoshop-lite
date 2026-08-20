@@ -1,3 +1,5 @@
+const crypto = require("node:crypto");
+
 const RecurringExpense = require("../models/RecurringExpense");
 const SavingsStudioAuditLog = require("../models/SavingsStudioAuditLog");
 const SavingsBudget = require("../models/SavingsBudget");
@@ -101,7 +103,25 @@ const parseMonthKey = (value, fallback = currentMonthKey()) => {
     throw createHttpError("Naudok galiojantį mėnesio formatą YYYY-MM.");
   }
 
+  const parsedMonth = Number(month.slice(5, 7));
+
+  if (parsedMonth < 1 || parsedMonth > 12) {
+    throw createHttpError("Naudok galiojantį mėnesio formatą YYYY-MM.");
+  }
+
   return month;
+};
+
+const isValidDateKey = (value) => {
+  const date = String(value || "").trim();
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return false;
+  }
+
+  const parsed = new Date(`${date}T00:00:00.000Z`);
+
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === date;
 };
 
 const parseEntryInput = (input) => {
@@ -127,7 +147,7 @@ const parseEntryInput = (input) => {
     throw createHttpError("Įvesta suma per didelė.");
   }
 
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(new Date(`${date}T00:00:00`).getTime())) {
+  if (!isValidDateKey(date)) {
     throw createHttpError("Įvesk galiojančią išlaidų datą.");
   }
 
@@ -148,12 +168,19 @@ const parseBudgetPayload = (input) => {
   const month = parseMonthKey(input.month);
   const budgets = Array.isArray(input.budgets) ? input.budgets : [];
 
-  const normalizedBudgets = budgets
+  const normalizedBudgetMap = new Map();
+
+  budgets
     .map((budget) => ({
       category: String(budget.category || "").trim(),
       limitAmount: Number(budget.limitAmount),
     }))
-    .filter((budget) => budget.category && Number.isFinite(budget.limitAmount) && budget.limitAmount > 0);
+    .filter((budget) => budget.category && Number.isFinite(budget.limitAmount) && budget.limitAmount > 0)
+    .forEach((budget) => {
+      normalizedBudgetMap.set(budget.category, budget);
+    });
+
+  const normalizedBudgets = [...normalizedBudgetMap.values()];
 
   for (const budget of normalizedBudgets) {
     if (!CATEGORIES.includes(budget.category)) {
@@ -205,7 +232,7 @@ const parseGoalInput = (input) => {
     throw createHttpError("Dabartinė sukaupta suma negali būti neigiama.");
   }
 
-  if (targetDate && (!/^\d{4}-\d{2}-\d{2}$/.test(targetDate) || Number.isNaN(new Date(`${targetDate}T00:00:00`).getTime()))) {
+  if (targetDate && !isValidDateKey(targetDate)) {
     throw createHttpError("Naudok galiojančią tikslo datą YYYY-MM-DD formatu.");
   }
 
@@ -322,6 +349,27 @@ const buildEntryFingerprint = (entry) => {
   return `${date}__${amount}__${title}__${category}`;
 };
 
+const buildEntryImportFingerprint = (entry) => {
+  const canonicalPayload = JSON.stringify({
+    title: normalizeFingerprintText(entry?.title),
+    amount: Number(entry?.amount || 0).toFixed(2),
+    date: String(entry?.date || "").trim(),
+    category: normalizeFingerprintText(entry?.category),
+  });
+
+  return crypto.createHash("sha256").update(canonicalPayload).digest("hex");
+};
+
+const buildRecurringLogFingerprint = ({ month, recurringId }) => {
+  const canonicalPayload = JSON.stringify({
+    system: "recurring-expense",
+    recurringId: String(recurringId || "").trim(),
+    month: String(month || "").trim(),
+  });
+
+  return crypto.createHash("sha256").update(canonicalPayload).digest("hex");
+};
+
 const findDuplicateImportedRows = async ({ rows, userId }) => {
   if (!rows.length) {
     return {
@@ -330,16 +378,26 @@ const findDuplicateImportedRows = async ({ rows, userId }) => {
     };
   }
 
+  const rowsWithFingerprints = rows.map((row) => ({
+    ...row,
+    importFingerprint: buildEntryImportFingerprint(row),
+  }));
   const existingEntries = await SavingsEntry.find({
     user: userId,
-    date: { $in: [...new Set(rows.map((row) => row.date))] },
-  }).select("title amount date category");
-  const duplicateFingerprints = new Set(existingEntries.map(buildEntryFingerprint));
+    $or: [
+      { importFingerprint: { $in: [...new Set(rowsWithFingerprints.map((row) => row.importFingerprint))] } },
+      { date: { $in: [...new Set(rowsWithFingerprints.map((row) => row.date))] } },
+    ],
+  }).select("title amount date category importFingerprint");
+  const duplicateFingerprints = new Set([
+    ...existingEntries.map(buildEntryFingerprint),
+    ...existingEntries.map((entry) => entry.importFingerprint).filter(Boolean),
+  ]);
   const seenInputFingerprints = new Set();
   const inputDuplicateIndexes = new Set();
 
-  rows.forEach((row, index) => {
-    const fingerprint = buildEntryFingerprint(row);
+  rowsWithFingerprints.forEach((row, index) => {
+    const fingerprint = row.importFingerprint;
 
     if (seenInputFingerprints.has(fingerprint)) {
       inputDuplicateIndexes.add(index);
@@ -374,6 +432,38 @@ const decorateRecurringExpense = (expense) => ({
   ...expense.toObject(),
   monthlyEquivalent: recurringToMonthlyEquivalent(expense),
 });
+
+const createImportedEntry = async ({ entry, rowNumber, userId }) => {
+  const importFingerprint = buildEntryImportFingerprint(entry);
+
+  try {
+    const createdEntry = await SavingsEntry.create({
+      user: userId,
+      ...entry,
+      importFingerprint,
+      importSource: buildImportSource({ system: "csv-upload" }),
+    });
+
+    return {
+      entry: createdEntry,
+      duplicate: null,
+    };
+  } catch (error) {
+    if (error?.code === 11000) {
+      return {
+        entry: null,
+        duplicate: {
+          rowNumber,
+          status: "duplicate",
+          error: "Toks įrašas jau importuotas anksčiau.",
+          normalized: entry,
+        },
+      };
+    }
+
+    throw error;
+  }
+};
 
 const monthsUntilTargetDate = (targetDate) => {
   if (!targetDate) {
@@ -802,6 +892,16 @@ const updateSavingsProfile = async (req, res) => {
     { new: true, upsert: true }
   );
 
+  await logSavingsAuditSafe({
+    userId: req.user._id,
+    action: "profile-update",
+    entityType: "profile",
+    entityId: profile._id.toString(),
+    metadata: {
+      onboardingCompleted: profile.onboardingCompleted,
+    },
+  });
+
   res.json({ profile });
 };
 
@@ -892,23 +992,51 @@ const getSavingsBudgets = async (req, res) => {
 const upsertSavingsBudgets = async (req, res) => {
   const { month, budgets } = parseBudgetPayload(req.body);
 
-  await SavingsBudget.deleteMany({
-    user: req.user._id,
-    month,
-  });
-
-  let savedBudgets = [];
-
   if (budgets.length) {
-    savedBudgets = await SavingsBudget.insertMany(
+    await SavingsBudget.bulkWrite(
       budgets.map((budget) => ({
-        user: req.user._id,
-        month,
-        category: budget.category,
-        limitAmount: budget.limitAmount,
+        updateOne: {
+          filter: {
+            user: req.user._id,
+            month,
+            category: budget.category,
+          },
+          update: {
+            $set: {
+              limitAmount: budget.limitAmount,
+            },
+            $setOnInsert: {
+              user: req.user._id,
+              month,
+              category: budget.category,
+            },
+          },
+          upsert: true,
+        },
       }))
     );
   }
+
+  await SavingsBudget.deleteMany({
+    user: req.user._id,
+    month,
+    category: { $nin: budgets.map((budget) => budget.category) },
+  });
+
+  const savedBudgets = await SavingsBudget.find({
+    user: req.user._id,
+    month,
+  }).sort({ category: 1 });
+
+  await logSavingsAuditSafe({
+    userId: req.user._id,
+    action: "budget-upsert",
+    entityType: "budget",
+    metadata: {
+      month,
+      budgetCount: savedBudgets.length,
+    },
+  });
 
   res.json({
     month,
@@ -930,7 +1058,6 @@ const createSavingsEntry = async (req, res) => {
     user: req.user._id,
     ...input,
   });
-
   await logSavingsAuditSafe({
     userId: req.user._id,
     action: "entry-create",
@@ -991,7 +1118,9 @@ const previewSavingsEntriesImport = async (req, res) => {
 
     const normalized = entry.normalized;
     const isDuplicate =
-      duplicateFingerprints.has(buildEntryFingerprint(normalized)) || inputDuplicateIndexes.has(validRowIndex);
+      duplicateFingerprints.has(buildEntryFingerprint(normalized)) ||
+      duplicateFingerprints.has(buildEntryImportFingerprint(normalized)) ||
+      inputDuplicateIndexes.has(validRowIndex);
 
     validRowIndex += 1;
 
@@ -1065,7 +1194,9 @@ const importSavingsEntries = async (req, res) => {
 
     const normalized = entry.normalized;
     const isDuplicate =
-      duplicateFingerprints.has(buildEntryFingerprint(normalized)) || inputDuplicateIndexes.has(validRowIndex);
+      duplicateFingerprints.has(buildEntryFingerprint(normalized)) ||
+      duplicateFingerprints.has(buildEntryImportFingerprint(normalized)) ||
+      inputDuplicateIndexes.has(validRowIndex);
 
     validRowIndex += 1;
 
@@ -1079,18 +1210,29 @@ const importSavingsEntries = async (req, res) => {
       return;
     }
 
-    acceptedRows.push(normalized);
+    acceptedRows.push({
+      rowNumber: entry.rowNumber,
+      normalized,
+    });
   });
   const invalidRows = parsedPreview.filter((entry) => entry.status === "error");
-  const importedEntries = acceptedRows.length
-    ? await SavingsEntry.insertMany(
-        acceptedRows.map((entry) => ({
-          user: req.user._id,
-          ...entry,
-          importSource: buildImportSource({ system: "csv-upload" }),
-        }))
-      )
-    : [];
+  const importedEntries = [];
+
+  for (const entry of acceptedRows) {
+    const result = await createImportedEntry({
+      entry: entry.normalized,
+      rowNumber: entry.rowNumber,
+      userId: req.user._id,
+    });
+
+    if (result.entry) {
+      importedEntries.push(result.entry);
+    }
+
+    if (result.duplicate) {
+      duplicateRows.push(result.duplicate);
+    }
+  }
 
   await logSavingsAuditSafe({
     userId: req.user._id,
@@ -1102,9 +1244,12 @@ const importSavingsEntries = async (req, res) => {
   });
 
   res.status(201).json({
+    acceptedCount: importedEntries.length,
     importedCount: importedEntries.length,
     entries: importedEntries,
     rejectedCount: invalidRows.length + duplicateRows.length,
+    invalidCount: invalidRows.length,
+    duplicateCount: duplicateRows.length,
     invalidRows,
     duplicateRows,
   });
@@ -1288,59 +1433,99 @@ const updateRecurringExpense = async (req, res) => {
 };
 
 const logRecurringExpenseAsEntry = async (req, res) => {
-  const recurringExpense = await RecurringExpense.findOne({
+  const month = parseMonthKey(req.body.month, currentMonthKey());
+  const existingRecurringExpense = await RecurringExpense.findOne({
     _id: req.params.recurringId,
     user: req.user._id,
   });
 
-  if (!recurringExpense) {
+  if (!existingRecurringExpense) {
     throw createHttpError("Pasikartojanti išlaida nerasta.", 404);
   }
 
-  const month = parseMonthKey(req.body.month, currentMonthKey());
-
-  if (recurringExpense.lastLoggedMonth === month) {
+  if (existingRecurringExpense.lastLoggedMonth === month) {
     throw createHttpError("Ši pasikartojanti išlaida jau įtraukta šiam mėnesiui.", 409);
   }
+
+  const recurringExpense = existingRecurringExpense;
+
 
   const date =
     month === currentMonthKey()
       ? new Date().toISOString().slice(0, 10)
       : `${month}-01`;
-
-  const entry = await SavingsEntry.create({
-    user: req.user._id,
-    title: recurringExpense.title,
-    amount: recurringToMonthlyEquivalent(recurringExpense),
-    category: recurringExpense.category,
-    date,
-    notes: recurringExpense.notes
-      ? `${recurringExpense.notes} | Sugeneruota iš pasikartojančios išlaidos.`
-      : "Sugeneruota iš pasikartojančios išlaidos.",
-    importSource: buildImportSource({
-      system: "recurring-expense",
-      entryId: recurringExpense._id.toString(),
-    }),
+  const importFingerprint = buildRecurringLogFingerprint({
+    month,
+    recurringId: recurringExpense._id,
   });
 
-  recurringExpense.lastLoggedMonth = month;
-  await recurringExpense.save();
+  let entry = null;
+  let createdEntry = true;
 
+  try {
+    entry = await SavingsEntry.create({
+      user: req.user._id,
+      title: recurringExpense.title,
+      amount: recurringToMonthlyEquivalent(recurringExpense),
+      category: recurringExpense.category,
+      date,
+      notes: recurringExpense.notes
+        ? `${recurringExpense.notes} | Sugeneruota iš pasikartojančios išlaidos.`
+        : "Sugeneruota iš pasikartojančios išlaidos.",
+      importFingerprint,
+      importSource: buildImportSource({
+        system: "recurring-expense",
+        entryId: recurringExpense._id.toString(),
+      }),
+    });
+  } catch (error) {
+    if (error?.code !== 11000) {
+      throw error;
+    }
+
+    createdEntry = false;
+    entry = await SavingsEntry.findOne({
+      user: req.user._id,
+      importFingerprint,
+    });
+
+    if (!entry) {
+      throw error;
+    }
+  }
+
+  const updatedRecurringExpense = await RecurringExpense.findOneAndUpdate(
+    {
+      _id: req.params.recurringId,
+      user: req.user._id,
+    },
+    {
+      $set: {
+        lastLoggedMonth: month,
+      },
+    },
+    { new: true }
+  );
+
+  if (!updatedRecurringExpense) {
+    throw createHttpError("Pasikartojanti išlaida nerasta.", 404);
+  }
   await logSavingsAuditSafe({
     userId: req.user._id,
     action: "recurring-log-to-entry",
     entityType: "recurring",
-    entityId: recurringExpense._id.toString(),
+    entityId: updatedRecurringExpense._id.toString(),
     metadata: {
+      createdEntry,
       month,
       entryId: entry._id.toString(),
       amount: entry.amount,
     },
   });
 
-  res.status(201).json({
+  res.status(createdEntry ? 201 : 200).json({
     entry,
-    recurringExpense: decorateRecurringExpense(recurringExpense),
+    recurringExpense: decorateRecurringExpense(updatedRecurringExpense),
   });
 };
 
@@ -1531,5 +1716,6 @@ module.exports = {
   sendSavingsSummaryEmailNow,
   upsertSavingsBudgets,
   CATEGORIES,
+  buildEntryImportFingerprint,
   buildSavingsSummaryPayload,
 };

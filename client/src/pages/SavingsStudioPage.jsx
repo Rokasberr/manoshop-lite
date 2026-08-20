@@ -68,6 +68,7 @@ const ONBOARDING_STEPS = [
   },
 ];
 const USAGE_WIZARD_STORAGE_KEY = "savings_studio_usage_wizard_seen";
+const MAX_CSV_FILE_SIZE_BYTES = 1024 * 1024;
 const USAGE_WIZARD_STEPS = [
   {
     key: "setup",
@@ -1549,6 +1550,10 @@ const SavingsStudioPage = () => {
 
   const handleSaveOnboarding = async (event) => {
     event.preventDefault();
+    if (savingOnboarding) {
+      return;
+    }
+
     const validationError = getOnboardingCompletionError({ budgetInputs, profileForm });
 
     if (validationError) {
@@ -1595,6 +1600,10 @@ const SavingsStudioPage = () => {
 
   const handleSaveBudgets = async (event) => {
     event.preventDefault();
+    if (savingBudgets || loadingBudgets) {
+      return;
+    }
+
     setSavingBudgets(true);
 
     try {
@@ -1680,6 +1689,10 @@ const SavingsStudioPage = () => {
 
   const handleEntrySubmit = async (event) => {
     event.preventDefault();
+    if (submitting) {
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -1702,6 +1715,10 @@ const SavingsStudioPage = () => {
 
   const handleGoalSubmit = async (event) => {
     event.preventDefault();
+    if (savingGoal) {
+      return;
+    }
+
     setSavingGoal(true);
 
     try {
@@ -1724,6 +1741,10 @@ const SavingsStudioPage = () => {
 
   const handleRecurringSubmit = async (event) => {
     event.preventDefault();
+    if (savingRecurring) {
+      return;
+    }
+
     setSavingRecurring(true);
 
     try {
@@ -1745,6 +1766,10 @@ const SavingsStudioPage = () => {
   };
 
   const handleLogRecurringExpense = async (recurringExpense) => {
+    if (loggingRecurringId || recurringExpense.lastLoggedMonth === currentRecurringMonth) {
+      return;
+    }
+
     setLoggingRecurringId(recurringExpense._id);
 
     try {
@@ -1764,6 +1789,26 @@ const SavingsStudioPage = () => {
     const file = event.target.files?.[0];
 
     if (!file) {
+      return;
+    }
+
+    if (previewingCsv || confirmingCsvImport) {
+      event.target.value = "";
+      return;
+    }
+
+    const isCsvFile =
+      file.name.toLowerCase().endsWith(".csv") || ["text/csv", "application/vnd.ms-excel", ""].includes(file.type);
+
+    if (!isCsvFile) {
+      event.target.value = "";
+      toast.error("Pasirink CSV formato failą.");
+      return;
+    }
+
+    if (file.size > MAX_CSV_FILE_SIZE_BYTES) {
+      event.target.value = "";
+      toast.error("CSV failas per didelis. Įkelk iki 1 MB failą.");
       return;
     }
 
@@ -1791,6 +1836,10 @@ const SavingsStudioPage = () => {
   };
 
   const handleConfirmCsvImport = async () => {
+    if (confirmingCsvImport) {
+      return;
+    }
+
     if (!csvPreviewResult?.validRows?.length) {
       toast.error("Nėra ką importuoti.");
       return;
@@ -1805,7 +1854,18 @@ const SavingsStudioPage = () => {
       await Promise.all([refreshSummaryAndEntries(), refreshActivity()]);
       setCsvPreviewResult(null);
       setCsvFileName("");
-      toast.success(`Importuota ${result.importedCount} įrašų.`);
+      const rejectedCount = result.rejectedCount || 0;
+      const duplicateCount = result.duplicateCount || result.duplicateRows?.length || 0;
+      const invalidCount = result.invalidCount || result.invalidRows?.length || 0;
+      const qualitySummary = rejectedCount
+        ? `Importuota ${result.importedCount}, atmesta ${rejectedCount} (${duplicateCount} dubl., ${invalidCount} netink.).`
+        : `Importuota ${result.importedCount} įrašų.`;
+
+      if (rejectedCount) {
+        toast.error(`Importas baigtas dalinai. ${qualitySummary}`);
+      } else {
+        toast.success(qualitySummary);
+      }
     } catch (error) {
       toast.error(error.response?.data?.message || "Nepavyko importuoti peržiūros eilučių.");
     } finally {
@@ -1847,6 +1907,10 @@ const SavingsStudioPage = () => {
   };
 
   const handleDelete = async (entryId) => {
+    if (deletingId) {
+      return;
+    }
+
     const confirmed = window.confirm("Ar tikrai nori ištrinti šią išlaidą?");
 
     if (!confirmed) {
@@ -1867,6 +1931,10 @@ const SavingsStudioPage = () => {
   };
 
   const handleDeleteGoal = async (goalId) => {
+    if (deletingGoalId) {
+      return;
+    }
+
     const confirmed = window.confirm("Ar tikrai nori ištrinti šį taupymo tikslą?");
 
     if (!confirmed) {
@@ -1887,6 +1955,10 @@ const SavingsStudioPage = () => {
   };
 
   const handleDeleteRecurring = async (recurringId) => {
+    if (deletingRecurringId) {
+      return;
+    }
+
     const confirmed = window.confirm("Ar tikrai nori ištrinti šią pasikartojančią išlaidą?");
 
     if (!confirmed) {
