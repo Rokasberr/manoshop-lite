@@ -26,8 +26,8 @@ const Navbar = () => {
     { label: copy.nav.membership, to: "/pricing" },
   ];
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate("/");
   };
 

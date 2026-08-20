@@ -65,7 +65,26 @@ const validateResetPasswordInput = (req, _res, next) => {
   next();
 };
 
+const validateChangePasswordInput = (req, _res, next) => {
+  const currentPassword = String(req.body?.currentPassword || "");
+  const newPassword = String(req.body?.newPassword || "");
+  const passwordError = getPasswordPolicyError(newPassword);
+
+  if (!currentPassword) {
+    return next(createHttpError("Dabartinis slaptažodis yra privalomas.", 400));
+  }
+
+  if (passwordError) {
+    return next(createHttpError(passwordError, 400));
+  }
+
+  req.body.currentPassword = currentPassword;
+  req.body.newPassword = newPassword;
+  next();
+};
+
 module.exports = {
+  validateChangePasswordInput,
   validateForgotPasswordInput,
   validateLoginInput,
   validateRegisterInput,

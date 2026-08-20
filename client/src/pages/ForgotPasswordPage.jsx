@@ -15,6 +15,11 @@ const ForgotPasswordPage = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (loading) {
+      return;
+    }
+
     setMessage("");
     setError("");
 
@@ -49,22 +54,27 @@ const ForgotPasswordPage = () => {
         </div>
 
         {message && (
-          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-200">
+          <div aria-live="polite" className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-200">
             {message}
           </div>
         )}
 
         {error && (
-          <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-300">
+          <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-300">
             {error}
           </div>
         )}
 
         <div>
-          <label className="mb-2 block text-sm font-semibold">{copy.email}</label>
+          <label htmlFor="forgot-password-email" className="mb-2 block text-sm font-semibold">{copy.email}</label>
           <input
+            id="forgot-password-email"
+            name="email"
             className="input-field"
             type="email"
+            inputMode="email"
+            autoComplete="email"
+            required
             value={email}
             onChange={(event) => setEmail(event.target.value)}
           />

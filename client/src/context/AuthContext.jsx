@@ -8,6 +8,11 @@ const tokenKey = "manoshop_token";
 const userKey = "manoshop_user";
 const initialToken = localStorage.getItem(tokenKey);
 
+const clearStoredAuth = () => {
+  localStorage.removeItem(tokenKey);
+  localStorage.removeItem(userKey);
+};
+
 const normalizeAuthUser = (user) =>
   user
     ? {
@@ -20,6 +25,12 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(initialToken);
   const [user, setUser] = useState(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(Boolean(initialToken));
+
+  const clearAuthState = useCallback(() => {
+    setToken(null);
+    setUser(null);
+    clearStoredAuth();
+  }, []);
 
   useEffect(() => {
     const restoreAuth = async () => {
@@ -34,17 +45,14 @@ export const AuthProvider = ({ children }) => {
         setUser(normalizedProfile);
         localStorage.setItem(userKey, JSON.stringify(normalizedProfile));
       } catch (_error) {
-        localStorage.removeItem(tokenKey);
-        localStorage.removeItem(userKey);
-        setToken(null);
-        setUser(null);
+        clearAuthState();
       } finally {
         setIsCheckingAuth(false);
       }
     };
 
     restoreAuth();
-  }, [token]);
+  }, [clearAuthState, token]);
 
   const persistAuth = useCallback((payload) => {
     const normalizedUser = normalizeAuthUser(payload.user);
@@ -79,17 +87,24 @@ export const AuthProvider = ({ children }) => {
     return payload;
   }, [persistAuth]);
 
-  const logout = useCallback(() => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem(tokenKey);
-    localStorage.removeItem(userKey);
-  }, []);
+  const logout = useCallback(
+    async ({ skipServer = false } = {}) => {
+      try {
+        if (!skipServer) {
+          await authService.logout();
+        }
+      } catch (_error) {
+        // Local cleanup must happen even if the server token is already invalid or the network is down.
+      } finally {
+        clearAuthState();
+      }
+    },
+    [clearAuthState]
+  );
 
   useEffect(() => {
     const handleAuthExpired = () => {
-      setToken(null);
-      setUser(null);
+      clearAuthState();
       setIsCheckingAuth(false);
     };
 
@@ -98,7 +113,7 @@ export const AuthProvider = ({ children }) => {
     return () => {
       window.removeEventListener("manoshop:auth-expired", handleAuthExpired);
     };
-  }, []);
+  }, [clearAuthState]);
 
   const value = {
     user,

@@ -7,6 +7,12 @@ import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import { hasActiveMembership, isAdminUser } from "../utils/membership";
 
+const isSafeInternalRedirect = (value) =>
+  typeof value === "string" &&
+  value.startsWith("/") &&
+  !value.startsWith("//") &&
+  !value.includes("://");
+
 const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -15,6 +21,7 @@ const LoginPage = () => {
   const copy = t("auth.login");
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState(location.state?.message || "");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -22,7 +29,7 @@ const LoginPage = () => {
       return;
     }
 
-    if (location.state?.from) {
+    if (isSafeInternalRedirect(location.state?.from)) {
       navigate(location.state.from, { replace: true });
       return;
     }
@@ -47,6 +54,10 @@ const LoginPage = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    if (loading) {
+      return;
+    }
+
     if (!formData.email.trim() || !formData.password.trim()) {
       setError(copy.emptyError);
       return;
@@ -55,6 +66,7 @@ const LoginPage = () => {
     try {
       setLoading(true);
       setError("");
+      setSuccessMessage("");
       await login({
         email: formData.email.trim(),
         password: formData.password,
@@ -94,26 +106,43 @@ const LoginPage = () => {
           </div>
 
           {error && (
-            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-300">
+            <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-300">
               {error}
             </div>
           )}
 
+          {successMessage && (
+            <div aria-live="polite" className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-200">
+              {successMessage}
+            </div>
+          )}
+
           <div>
-            <label className="mb-2 block text-sm font-semibold">{copy.email}</label>
+            <label htmlFor="login-email" className="mb-2 block text-sm font-semibold">{copy.email}</label>
             <input
+              id="login-email"
+              name="email"
               className="input-field"
               type="email"
+              inputMode="email"
+              autoComplete="email"
+              required
               value={formData.email}
               onChange={(event) => handleChange("email", event.target.value)}
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-semibold">{copy.password}</label>
+            <label htmlFor="login-password" className="mb-2 block text-sm font-semibold">{copy.password}</label>
             <input
+              id="login-password"
+              name="password"
               className="input-field"
               type="password"
+              autoComplete="current-password"
+              minLength={6}
+              maxLength={128}
+              required
               value={formData.password}
               onChange={(event) => handleChange("password", event.target.value)}
             />
