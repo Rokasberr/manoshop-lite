@@ -147,8 +147,8 @@ const PreviewSwitch = ({ currentPlanId, selectedPlanId, onChange }) => {
   }));
 
   return (
-    <section className="soft-card rounded-lg p-4 sm:p-5">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <section className="soft-card min-w-0 rounded-lg p-4 sm:p-5">
+      <div className="flex min-w-0 flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase text-muted">{t("memberArea.preview.eyebrow")}</p>
           <h2 className="mt-2 font-display text-2xl font-bold">{t("memberArea.preview.title")}</h2>
@@ -158,7 +158,7 @@ const PreviewSwitch = ({ currentPlanId, selectedPlanId, onChange }) => {
           </p>
         </div>
 
-        <div className="grid gap-2 sm:grid-cols-2 lg:min-w-[520px]">
+        <div className="grid w-full min-w-0 max-w-full gap-2 sm:grid-cols-2 lg:max-w-[520px]">
           {options.map((option) => {
             const isSelected = selectedPlanId === option.id;
 
@@ -167,7 +167,7 @@ const PreviewSwitch = ({ currentPlanId, selectedPlanId, onChange }) => {
                 key={option.id}
                 type="button"
                 onClick={() => onChange(option.id)}
-                className={`rounded-lg border px-4 py-3 text-left transition duration-200 hover:-translate-y-0.5 ${
+                className={`min-w-0 rounded-lg border px-4 py-3 text-left transition duration-200 hover:-translate-y-0.5 ${
                   isSelected ? "bg-[rgb(var(--accent-strong))] text-white" : "bg-white text-[rgb(var(--text))]"
                 }`}
                 style={{
@@ -196,8 +196,8 @@ const DashboardNavContent = ({ activeSection, onChange, access }) => {
 
   return (
   <>
-    <div className="lg:hidden">
-      <div className="soft-card flex gap-2 overflow-x-auto rounded-lg p-2 pb-3 shadow-[0_18px_50px_rgba(17,31,26,0.08)]">
+    <div className="min-w-0 max-w-full lg:hidden">
+      <div className="soft-card flex min-w-0 max-w-full gap-2 overflow-x-auto rounded-lg p-2 pb-3 shadow-[0_18px_50px_rgba(17,31,26,0.08)] [contain:inline-size]">
         {dashboardSections.map((section) => {
           const Icon = section.icon;
           const isActive = activeSection === section.id;
@@ -208,13 +208,13 @@ const DashboardNavContent = ({ activeSection, onChange, access }) => {
               key={section.id}
               type="button"
               onClick={() => onChange(section.id)}
-              className={`inline-flex min-h-[3rem] shrink-0 items-center gap-2 rounded-lg px-3.5 text-sm font-semibold transition ${
+              className={`inline-flex min-h-[3rem] min-w-[9rem] max-w-[12rem] shrink-0 items-center gap-2 rounded-lg px-3.5 text-left text-sm font-semibold transition ${
                 isActive ? "bg-[rgb(var(--accent-strong))] text-white" : "text-muted hover:bg-[rgb(var(--surface-soft))]"
               }`}
             >
-              <Icon size={16} />
-              {t(`memberArea.sections.${section.id}`)}
-              {isLocked && <LockKeyhole size={13} />}
+              <Icon className="shrink-0" size={16} />
+              <span className="min-w-0 whitespace-normal leading-5">{t(`memberArea.sections.${section.id}`)}</span>
+              {isLocked && <LockKeyhole className="shrink-0" size={13} />}
             </button>
           );
         })}
@@ -241,11 +241,11 @@ const DashboardNavContent = ({ activeSection, onChange, access }) => {
                     : "text-muted hover:bg-[rgb(var(--surface-soft))] hover:text-[rgb(var(--text))]"
                 }`}
               >
-                <span className="flex items-center gap-3">
-                  <Icon size={17} />
-                  {t(`memberArea.sections.${section.id}`)}
+                <span className="flex min-w-0 items-center gap-3">
+                  <Icon className="shrink-0" size={17} />
+                  <span className="min-w-0 whitespace-normal leading-5">{t(`memberArea.sections.${section.id}`)}</span>
                 </span>
-                {isLocked && <LockKeyhole size={14} />}
+                {isLocked && <LockKeyhole className="shrink-0" size={14} />}
               </button>
             );
           })}
@@ -260,7 +260,7 @@ const LockedModuleCard = () => {
   const { t } = useLanguage();
 
   return (
-  <div className="soft-card mx-auto max-w-2xl rounded-lg border-dashed p-6 text-center shadow-[0_24px_70px_rgba(17,31,26,0.08)] sm:p-8">
+    <div className="soft-card mx-auto w-full min-w-0 max-w-2xl rounded-lg border-dashed p-6 text-center shadow-[0_24px_70px_rgba(17,31,26,0.08)] sm:p-8">
     <div className="soft-pill mx-auto flex h-12 w-12 items-center justify-center rounded-lg text-muted">
       <LockKeyhole size={20} />
     </div>
@@ -268,7 +268,7 @@ const LockedModuleCard = () => {
     <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-muted">
       {t("memberArea.lockedText")}
     </p>
-    <Link to="/pricing" className="button-primary mt-6 min-h-[3rem] justify-center gap-2">
+    <Link to="/pricing" className="button-primary mt-6 min-h-[3rem] w-full justify-center gap-2 whitespace-normal sm:w-auto">
       {t("common.buttons.viewPlans")}
       <ArrowRight size={16} />
     </Link>
@@ -280,33 +280,33 @@ const ModuleCard = ({ title, subtitle, icon: Icon, isLocked = false, onOpen, to,
   const { t } = useLanguage();
 
   return (
-  <article className="marketing-card flex h-full flex-col p-5 shadow-[0_18px_56px_rgba(17,31,26,0.07)] sm:p-6 md:min-h-[270px]">
-    <div className="flex items-start justify-between gap-4">
+  <article className="marketing-card flex h-full min-w-0 max-w-full flex-col p-5 shadow-[0_18px_56px_rgba(17,31,26,0.07)] sm:p-6 md:min-h-[270px]">
+    <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
       <div className="soft-pill flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-[rgb(var(--accent-strong))]">
         <Icon size={20} />
       </div>
       {isLocked ? (
-        <span className="signal-pill inline-flex items-center gap-1">
+        <span className="signal-pill inline-flex min-w-0 items-center gap-1 self-start whitespace-normal">
           <LockKeyhole size={13} />
           {t("common.states.locked")}
         </span>
       ) : (
-        <span className="signal-pill">{t("common.states.active")}</span>
+        <span className="signal-pill self-start whitespace-normal">{t("common.states.active")}</span>
       )}
     </div>
     <h3 className="mt-5 break-words font-display text-2xl font-bold leading-tight">{title}</h3>
     <p className="mt-3 flex-1 text-sm leading-7 text-muted">{subtitle}</p>
     {isLocked ? (
-      <Link to="/pricing" className="button-secondary mt-5 min-h-[3rem] justify-center">
+      <Link to="/pricing" className="button-secondary mt-5 min-h-[3rem] w-full justify-center whitespace-normal">
         {t("common.buttons.viewPlans")}
       </Link>
     ) : to ? (
-      <Link to={to} className="button-primary mt-5 min-h-[3rem] justify-center gap-2">
+      <Link to={to} className="button-primary mt-5 min-h-[3rem] w-full justify-center gap-2 whitespace-normal">
         {cta}
         <ArrowRight size={16} />
       </Link>
     ) : (
-      <button type="button" onClick={onOpen} className="button-primary mt-5 min-h-[3rem] justify-center gap-2">
+      <button type="button" onClick={onOpen} className="button-primary mt-5 min-h-[3rem] w-full justify-center gap-2 whitespace-normal">
         {cta}
         <ArrowRight size={16} />
       </button>
@@ -355,10 +355,10 @@ const OverviewSection = ({ planId, access, onOpenSection }) => {
   ];
 
   return (
-    <div className="space-y-6">
-      <section className="member-executive-surface overflow-hidden rounded-lg p-6 sm:p-8 lg:p-10">
-        <div className="grid gap-8 lg:grid-cols-[1fr_0.42fr] lg:items-end">
-          <div>
+    <div className="min-w-0 space-y-6">
+      <section className="member-executive-surface min-w-0 rounded-lg p-6 sm:p-8 lg:p-10">
+        <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.42fr)] lg:items-end">
+          <div className="min-w-0">
             <span className="inline-flex rounded-lg border border-[#e2ca91]/30 bg-[#e2ca91]/12 px-3 py-1 text-xs font-bold uppercase text-[#f2d99a]">
               {currentPlanLabel}
             </span>
@@ -379,7 +379,7 @@ const OverviewSection = ({ planId, access, onOpenSection }) => {
               ].map(([label, value]) => (
                 <div key={label} className="rounded-lg border border-white/10 bg-black/18 p-4">
                   <p className="text-xs font-bold uppercase text-white/44">{label}</p>
-                  <p className="mt-2 font-display text-2xl font-bold text-white">{value}</p>
+                  <p className="mt-2 break-words font-display text-2xl font-bold text-white">{value}</p>
                 </div>
               ))}
             </div>
@@ -387,7 +387,7 @@ const OverviewSection = ({ planId, access, onOpenSection }) => {
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <section className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-4">
         {moduleCards.map((card) => (
           <ModuleCard key={card.title} {...card} />
         ))}
@@ -432,9 +432,9 @@ const DigitalProductsSection = ({ planId }) => {
 
   return (
     <section className="space-y-5">
-      <div className="panel overflow-hidden p-5 sm:p-6">
-        <div className="grid gap-6 lg:grid-cols-[1fr_0.38fr] lg:items-end">
-          <div>
+      <div className="panel min-w-0 p-5 sm:p-6">
+        <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.38fr)] lg:items-end">
+          <div className="min-w-0">
             <span className="signal-pill">{t("memberArea.sections.digital")}</span>
             <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">{t("memberArea.sections.digital")}</h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">{t("memberArea.digitalText")}</p>
@@ -446,7 +446,7 @@ const DigitalProductsSection = ({ planId }) => {
           </div>
         </div>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        <div className="mt-6 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,12rem),1fr))] gap-3">
           <Link to="/digital-products" className="button-primary min-h-[3rem] justify-center gap-2">
             {t("common.buttons.viewProducts")}
             <ArrowRight size={16} />
@@ -457,14 +457,14 @@ const DigitalProductsSection = ({ planId }) => {
         </div>
       </div>
 
-      <div className="panel p-5 sm:p-6">
+      <div className="panel min-w-0 p-5 sm:p-6">
         <span className="signal-pill">Nario resursai</span>
         <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">Apsaugoti PDF atsisiuntimai</h2>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
           Šie failai pateikiami per nario API. Aukštesnio plano resursai matomi kaip užrakinti, bet tiesioginio viešo failo kelio nėra.
         </p>
 
-        <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-6 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-3">
           {memberResources.map((resource) => {
             const isAccessible = canAccessResource(resource);
             const planLabel = getTranslatedPlanLabel(t, resource.minPlan);
@@ -473,17 +473,17 @@ const DigitalProductsSection = ({ planId }) => {
             return (
               <article
                 key={resource.id}
-                className="rounded-lg border bg-[rgb(var(--surface))] p-4"
+                className="min-w-0 rounded-lg border bg-[rgb(var(--surface))] p-4"
                 style={{ borderColor: "rgb(var(--line) / 0.82)" }}
               >
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
                     <p className="break-words text-sm font-semibold leading-6">{resource.title}</p>
                     <p className="mt-1 text-xs font-semibold uppercase leading-5 text-muted">
                       {resource.format.toUpperCase()} · nuo {planLabel}
                     </p>
                   </div>
-                  {isAccessible ? <FileText size={18} /> : <LockKeyhole size={18} />}
+                  {isAccessible ? <FileText className="shrink-0" size={18} /> : <LockKeyhole className="shrink-0" size={18} />}
                 </div>
                 {isAccessible ? (
                   <button
@@ -514,7 +514,7 @@ const SavingStudioSection = ({ access }) => {
 
   return (
     <section className="min-w-0 space-y-5">
-      <div className="panel p-5 sm:p-6">
+      <div className="panel min-w-0 p-5 sm:p-6">
         <span className="signal-pill">{t("memberArea.moduleCards.saving.title")}</span>
         <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">{t("memberArea.moduleCards.saving.title")}</h2>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">{t("memberArea.moduleCards.saving.subtitle")}</p>
@@ -532,18 +532,18 @@ const JournalSection = ({ access }) => {
   }
 
   return (
-    <section className="space-y-5">
-      <div className="panel p-5 sm:p-6">
+    <section className="min-w-0 space-y-5">
+      <div className="panel min-w-0 p-5 sm:p-6">
         <span className="signal-pill">{t("memberArea.moduleCards.journal.title")}</span>
         <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">{t("memberArea.journalTitle")}</h2>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">{t("memberArea.journalText")}</p>
-        <Link to="/journal" className="button-primary mt-5 gap-2">
+        <Link to="/journal" className="button-primary mt-5 w-full justify-center gap-2 whitespace-normal sm:w-auto">
           {t("memberArea.openJournal")}
           <ArrowRight size={16} />
         </Link>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid min-w-0 gap-4 lg:grid-cols-3">
         {journalArticles.slice(0, 3).map((article) => (
           <Link key={article.slug} to={`/journal/${article.slug}`} className="marketing-card p-5 transition hover:-translate-y-1">
             <p className="text-xs font-bold uppercase text-muted">{article.category}</p>
@@ -564,14 +564,14 @@ const BusinessStudioSection = ({ access }) => {
   }
 
   return (
-    <section className="space-y-5">
-      <div className="panel p-5 sm:p-6">
+    <section className="min-w-0 space-y-5">
+      <div className="panel min-w-0 p-5 sm:p-6">
         <span className="signal-pill">{t("common.plans.private_business")}</span>
         <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">{t("memberArea.moduleCards.business.title")}</h2>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">{t("memberArea.moduleCards.business.subtitle")}</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {businessModules.map((module) => (
           <ModuleCard
             key={module.id}
@@ -592,8 +592,8 @@ const AccountSection = ({ user, planId }) => {
   const { t } = useLanguage();
 
   return (
-    <section className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
-      <div className="panel p-5 sm:p-6">
+    <section className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+      <div className="panel min-w-0 p-5 sm:p-6">
         <span className="signal-pill">{t("memberArea.sections.account")}</span>
         <h2 className="mt-4 font-display text-3xl font-bold">{user?.name}</h2>
         <p className="mt-2 text-muted">{user?.email}</p>
@@ -601,17 +601,17 @@ const AccountSection = ({ user, planId }) => {
           <p className="text-xs font-bold uppercase text-muted">{t("memberArea.accountCurrentPlan")}</p>
           <p className="mt-2 font-display text-2xl font-bold">{getTranslatedPlanLabel(t, planId)}</p>
         </div>
-        <Link to="/profile" className="button-primary mt-5 gap-2">
+        <Link to="/profile" className="button-primary mt-5 w-full justify-center gap-2 whitespace-normal sm:w-auto">
           {t("memberArea.openProfile")}
           <ArrowRight size={16} />
         </Link>
       </div>
 
-      <div className="panel p-5 sm:p-6">
+      <div className="panel min-w-0 p-5 sm:p-6">
         <span className="signal-pill">{t("memberArea.sections.plans")}</span>
         <h2 className="mt-4 font-display text-3xl font-bold">{t("memberArea.changePlanTitle")}</h2>
         <p className="mt-3 text-sm leading-7 text-muted">{t("memberArea.changePlanText")}</p>
-        <Link to="/pricing" className="button-secondary mt-5 justify-center">
+        <Link to="/pricing" className="button-secondary mt-5 w-full justify-center whitespace-normal sm:w-auto">
           {t("common.buttons.viewPlans")}
         </Link>
       </div>
@@ -624,36 +624,36 @@ const PlansSection = ({ planId }) => {
   const subscriptionPlans = getLocalizedSubscriptionPlans(language);
 
   return (
-    <section className="space-y-5">
-      <div className="panel p-5 sm:p-6">
+    <section className="min-w-0 space-y-5">
+      <div className="panel min-w-0 p-5 sm:p-6">
         <span className="signal-pill">{t("memberArea.sections.plans")}</span>
         <h2 className="mt-4 font-display text-3xl font-bold sm:text-4xl">{t("memberArea.chooseAnotherLevel")}</h2>
         <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">{t("memberArea.chooseAnotherText")}</p>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid min-w-0 gap-4 lg:grid-cols-3">
         {subscriptionPlans.map((plan) => {
           const isCurrent = normalizePlan(plan.id) === planId;
           const accent = planAccent[plan.id] || "rgb(var(--accent-strong))";
 
           return (
-            <article key={plan.id} className="marketing-card flex h-full flex-col p-5 shadow-[0_18px_56px_rgba(17,31,26,0.07)] sm:p-6 lg:min-h-[430px]">
-              <div className="flex items-start justify-between gap-4">
-                <span className="signal-pill">{plan.badge}</span>
+            <article key={plan.id} className="marketing-card flex h-full min-w-0 max-w-full flex-col p-5 shadow-[0_18px_56px_rgba(17,31,26,0.07)] sm:p-6 lg:min-h-[430px]">
+              <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                <span className="signal-pill self-start whitespace-normal">{plan.badge}</span>
                 {isCurrent && <CheckCircle2 size={20} style={{ color: accent }} />}
               </div>
-              <h3 className="mt-5 font-display text-3xl font-bold">{plan.name}</h3>
+              <h3 className="mt-5 break-words font-display text-3xl font-bold">{plan.name}</h3>
               <p className="mt-3 text-sm leading-7 text-muted">{plan.subtitle || plan.description}</p>
-              <p className="mt-5 font-display text-4xl font-bold">{formatDashboardPlanPrice(plan.price)}</p>
+              <p className="mt-5 break-words font-display text-4xl font-bold">{formatDashboardPlanPrice(plan.price)}</p>
               <div className="mt-5 flex-1 space-y-2">
                 {plan.features.map((feature) => (
                   <div key={feature} className="soft-card flex gap-3 rounded-lg px-3 py-2.5">
                     <CheckCircle2 className="mt-0.5 shrink-0" size={16} style={{ color: accent }} />
-                    <span className="text-sm leading-6 text-muted">{feature}</span>
+                    <span className="min-w-0 text-sm leading-6 text-muted">{feature}</span>
                   </div>
                 ))}
               </div>
-              <Link to="/pricing" className={`mt-5 min-h-[3rem] ${isCurrent ? "button-secondary" : "button-primary"} w-full justify-center`}>
+              <Link to="/pricing" className={`mt-5 min-h-[3rem] ${isCurrent ? "button-secondary" : "button-primary"} w-full justify-center whitespace-normal`}>
                 {isCurrent ? t("common.states.currentPlan") : t("common.buttons.viewPlans")}
               </Link>
             </article>

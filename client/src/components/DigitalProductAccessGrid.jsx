@@ -34,15 +34,15 @@ const FormatBadge = ({ format }) => {
   const label = format === "XLSX" ? "Excel" : format;
 
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-lg border border-[#e2ca91]/[0.34] bg-[#e2ca91]/[0.14] px-2.5 py-1 text-[11px] font-bold text-[#f8e6b1]">
-      <Icon size={13} />
-      {label}
+    <span className="inline-flex min-w-0 items-center gap-1.5 rounded-lg border border-[#e2ca91]/[0.34] bg-[#e2ca91]/[0.14] px-2.5 py-1 text-[11px] font-bold text-[#f8e6b1]">
+      <Icon className="shrink-0" size={13} />
+      <span className="min-w-0 whitespace-normal">{label}</span>
     </span>
   );
 };
 
 const FeatureBadge = ({ children }) => (
-  <span className="inline-flex items-center rounded-lg border border-white/[0.16] bg-white/[0.1] px-2.5 py-1 text-[11px] font-bold text-white/[0.86]">
+  <span className="inline-flex min-w-0 items-center rounded-lg border border-white/[0.16] bg-white/[0.1] px-2.5 py-1 text-[11px] font-bold text-white/[0.86]">
     {children}
   </span>
 );
@@ -120,9 +120,9 @@ const DownloadButton = ({ disabled, isLoading, onClick, children, variant = "pri
       : "inline-flex min-h-[3rem] items-center justify-center gap-2 rounded-lg border border-white/[0.18] bg-white/[0.1] px-4 py-3 text-sm font-semibold text-white transition duration-200 hover:-translate-y-0.5 hover:border-[#e2ca91]/[0.48] hover:bg-[#e2ca91]/[0.16] disabled:cursor-not-allowed disabled:opacity-60";
 
   return (
-    <button type="button" onClick={onClick} disabled={disabled || isLoading} className={className}>
-      <ArrowDownToLine size={16} />
-      {isLoading ? t("common.states.preparing") : children}
+    <button type="button" onClick={onClick} disabled={disabled || isLoading} className={`${className} w-full max-w-full whitespace-normal text-center`}>
+      <ArrowDownToLine className="shrink-0" size={16} />
+      <span className="min-w-0 whitespace-normal">{isLoading ? t("common.states.preparing") : children}</span>
     </button>
   );
 };
@@ -176,7 +176,7 @@ const PurchaseActions = ({
         )}
 
         {downloadOptions.length ? (
-          <div className={`grid gap-3 ${downloadOptions.length > 1 ? "sm:grid-cols-2" : ""}`}>
+          <div className={`grid min-w-0 gap-3 ${downloadOptions.length > 1 ? "grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))]" : ""}`}>
             {downloadOptions.map((option) => (
               <DownloadButton
                 key={option.format}
@@ -232,7 +232,7 @@ const PurchaseActions = ({
   }
 
   return downloadOptions.length ? (
-    <div className={`grid gap-3 ${downloadOptions.length > 1 ? "sm:grid-cols-2" : ""}`}>
+    <div className={`grid min-w-0 gap-3 ${downloadOptions.length > 1 ? "grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))]" : ""}`}>
       {downloadOptions.map((option) => (
         <DownloadButton
           key={option.format}
@@ -253,13 +253,13 @@ const SectionList = ({ title, items = [], limit = 4, tone = "neutral" }) => {
   const iconClass = tone === "gold" ? "text-[#f2d99a]" : "text-[#9ad7b1]";
 
   return (
-    <div className="rounded-lg border border-white/[0.16] bg-black/[0.26] p-4">
+    <div className="min-w-0 rounded-lg border border-white/[0.16] bg-black/[0.26] p-4">
       <p className="text-xs font-bold uppercase tracking-[0.12em] text-white/[0.68]">{title}</p>
       <ul className="mt-4 space-y-3">
         {items.slice(0, limit).map((item) => (
           <li key={item} className="flex gap-3 text-sm leading-6 text-white/[0.84]">
             <CheckCircle2 className={`mt-0.5 shrink-0 ${iconClass}`} size={16} />
-            <span>{item}</span>
+                <span className="min-w-0">{item}</span>
           </li>
         ))}
       </ul>
@@ -289,7 +289,7 @@ const DigitalProductCard = ({
   const trustBadges = product.trustBadges || defaultTrustBadges;
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-white/[0.16] bg-[#0b1714] text-white shadow-[0_28px_80px_rgba(0,0,0,0.24)] transition duration-200 hover:-translate-y-1 hover:border-[#e2ca91]/[0.42]">
+    <article className="group flex h-full min-w-0 max-w-full flex-col rounded-lg border border-white/[0.16] bg-[#0b1714] text-white shadow-[0_28px_80px_rgba(0,0,0,0.24)] transition duration-200 hover:-translate-y-1 hover:border-[#e2ca91]/[0.42]">
       <div className="relative border-b border-white/[0.14]">
         <ProductPreview product={product} />
         <div className="absolute left-4 top-4 flex flex-wrap gap-2">
@@ -316,14 +316,14 @@ const DigitalProductCard = ({
           ))}
         </div>
 
-        <div className="mt-5">
-          <h3 className="font-display text-2xl font-bold leading-tight text-white">{product.title}</h3>
+        <div className="mt-5 min-w-0">
+          <h3 className="break-words font-display text-2xl font-bold leading-tight text-white">{product.title}</h3>
           <p className="mt-3 text-sm font-semibold leading-6 text-[#f8e6b1]">{product.subtitle}</p>
           <p className="mt-4 text-sm leading-7 text-white/[0.86]">{product.description}</p>
           {product.salesDescription && <p className="mt-3 text-sm leading-7 text-white/[0.76]">{product.salesDescription}</p>}
         </div>
 
-        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+        <div className="mt-5 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,8rem),1fr))] gap-3">
           {[
             [t("common.productLabels.price"), product.priceLabel],
             [t("common.productLabels.format"), getFormatLabel(product.formats)],
@@ -331,7 +331,7 @@ const DigitalProductCard = ({
           ].map(([label, value]) => (
             <div key={label} className="rounded-lg border border-white/[0.16] bg-white/[0.09] px-3 py-3">
               <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-white/[0.64]">{label}</p>
-              <p className="mt-1 text-sm font-bold leading-5 text-white">{value}</p>
+              <p className="mt-1 break-words text-sm font-bold leading-5 text-white">{value}</p>
             </div>
           ))}
         </div>
@@ -348,7 +348,7 @@ const DigitalProductCard = ({
           </ul>
         </div>
 
-        <div className="mt-4 grid gap-3 lg:grid-cols-2">
+        <div className="mt-4 grid min-w-0 gap-3 lg:grid-cols-2">
           <SectionList title={t("common.productLabels.whatYouGet")} items={includedItems} />
           <SectionList title={t("common.productLabels.whoFor")} items={product.targetAudience || []} tone="gold" />
         </div>
@@ -361,7 +361,7 @@ const DigitalProductCard = ({
                 <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#e2ca91]/[0.38] bg-[#e2ca91]/[0.14] text-xs font-bold text-[#f8e6b1]">
                   {index + 1}
                 </span>
-                <span>{step}</span>
+                <span className="min-w-0">{step}</span>
               </li>
             ))}
           </ol>
@@ -380,13 +380,13 @@ const DigitalProductCard = ({
         </div>
 
         <div className="mt-auto pt-6">
-          <div className="rounded-lg border border-white/[0.16] bg-black/[0.34] p-4">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
+          <div className="min-w-0 rounded-lg border border-white/[0.16] bg-black/[0.34] p-4">
+            <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
                 <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/[0.68]">{t("common.productLabels.oneTimePrice")}</p>
-                <p className="mt-1 font-display text-3xl font-bold text-[#f8e6b1]">{product.priceLabel}</p>
+                <p className="mt-1 break-words font-display text-3xl font-bold text-[#f8e6b1]">{product.priceLabel}</p>
               </div>
-              <div className="sm:min-w-[13rem]">
+              <div className="w-full min-w-0 sm:max-w-[13rem]">
                 {isPurchased && (
                   <span className="mb-3 inline-flex items-center gap-2 rounded-lg border border-[#9ad7b1]/[0.42] bg-[#9ad7b1]/[0.16] px-3 py-1 text-xs font-bold text-[#d7f8df]">
                     <ShoppingBag size={14} />
@@ -469,7 +469,7 @@ const DigitalProductAccessGrid = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex gap-2 overflow-x-auto rounded-lg border border-white/[0.16] bg-white/[0.09] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
+      <div className="flex max-w-full gap-2 overflow-x-auto rounded-lg border border-white/[0.16] bg-white/[0.09] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
         {filterOptions.map((filter) => {
           const isActive = activeFilter === filter.value;
 
@@ -491,7 +491,7 @@ const DigitalProductAccessGrid = ({
       </div>
 
       {filteredProducts.length ? (
-        <div className="grid gap-5 lg:grid-cols-3">
+        <div className="grid min-w-0 gap-5 lg:grid-cols-3">
           {filteredProducts.map((product) => (
             <DigitalProductCard
               key={product.id}

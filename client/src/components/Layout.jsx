@@ -14,7 +14,7 @@ const Layout = () => {
     : "mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8";
 
   return (
-    <div className="app-surface relative min-h-screen overflow-hidden">
+    <div className="app-surface relative min-h-screen overflow-x-hidden">
       <div className="site-backdrop pointer-events-none absolute inset-0 -z-10" />
       <a
         href="#main-content"

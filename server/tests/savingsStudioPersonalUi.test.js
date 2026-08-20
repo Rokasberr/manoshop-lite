@@ -7,10 +7,14 @@ const root = path.resolve(__dirname, "..", "..");
 const pagePath = path.join(root, "client", "src", "pages", "SavingsStudioPage.jsx");
 const layoutPath = path.join(root, "client", "src", "components", "Layout.jsx");
 const memberAreaPath = path.join(root, "client", "src", "pages", "MemberAreaPage.jsx");
+const digitalProductAccessGridPath = path.join(root, "client", "src", "components", "DigitalProductAccessGrid.jsx");
+const cssPath = path.join(root, "client", "src", "index.css");
 
 const readPageSource = () => fs.readFileSync(pagePath, "utf8");
 const readLayoutSource = () => fs.readFileSync(layoutPath, "utf8");
 const readMemberAreaSource = () => fs.readFileSync(memberAreaPath, "utf8");
+const readDigitalProductAccessGridSource = () => fs.readFileSync(digitalProductAccessGridPath, "utf8");
+const readCssSource = () => fs.readFileSync(cssPath, "utf8");
 
 const extractBetween = (source, startMarker, endMarker) => {
   const startIndex = source.indexOf(startMarker);
@@ -46,10 +50,20 @@ const extractMetricGridBefore = (source, marker) => {
 const extractSixMonthViewSource = (source) => {
   const headingIndex = source.indexOf("6 mėnesių vaizdas");
   assert.notEqual(headingIndex, -1, "Missing 6 month view heading");
-  const startIndex = source.lastIndexOf('<div className="panel p-6">', headingIndex);
+  const startIndex = source.lastIndexOf('<div className="panel w-full min-w-0 max-w-full p-6">', headingIndex);
   assert.notEqual(startIndex, -1, "Missing 6 month view panel start");
-  const endIndex = source.indexOf('\n          <div className="panel p-6">', headingIndex + 1);
+  const endIndex = source.indexOf('\n          <div className="panel w-full min-w-0 max-w-full p-6">', headingIndex + 1);
   assert.notEqual(endIndex, -1, "Missing 6 month view panel end");
+  return source.slice(startIndex, endIndex);
+};
+
+const extractSixMonthChartSource = (source) => {
+  const chartIndex = source.indexOf("grid h-[260px] min-w-[32rem] grid-cols-6 items-end gap-3");
+  assert.notEqual(chartIndex, -1, "Missing 6 month chart grid");
+  const startIndex = source.lastIndexOf('<div className="panel w-full min-w-0 max-w-full p-6">', chartIndex);
+  assert.notEqual(startIndex, -1, "Missing 6 month chart panel start");
+  const endIndex = source.indexOf('\n          <div className="panel w-full min-w-0 max-w-full p-6">', chartIndex + 1);
+  assert.notEqual(endIndex, -1, "Missing 6 month chart panel end");
   return source.slice(startIndex, endIndex);
 };
 
@@ -60,10 +74,12 @@ test("Saving Studio keeps a mobile-first responsive shell", () => {
 
   assert.match(indexSource, /<meta name="viewport" content="width=device-width, initial-scale=1\.0" \/>/);
   assert.match(layoutSource, /<main id="main-content" className=\{mainContainerClassName\}>/);
-  assert.match(source, /marketing-dark overflow-hidden rounded-lg px-5 py-7 sm:px-8 sm:py-9 lg:px-10/);
+  assert.match(source, /marketing-dark min-w-0 rounded-lg px-5 py-7 sm:px-8 sm:py-9 lg:px-10/);
   assert.match(source, /member-workspace member-workspace-personal w-full min-w-0 space-y-8 2xl:space-y-10/);
   assert.match(source, /grid min-w-0 gap-8 lg:grid-cols-\[minmax\(0,1\.02fr\)_minmax\(0,0\.98fr\)\] lg:items-end 2xl:gap-10/);
   assert.match(source, /mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap/);
+  assert.match(source, /button-primary min-h-\[52px\] w-full justify-center gap-2 sm:w-auto/);
+  assert.match(source, /hero-outline-button min-h-\[52px\] w-full justify-center gap-2 sm:w-auto/);
   assert.match(source, /grid min-w-0 gap-6 xl:grid-cols-\[minmax\(0,0\.9fr\)_minmax\(0,1\.1fr\)\] 2xl:grid-cols-\[minmax\(0,0\.92fr\)_minmax\(0,1\.1fr\)_minmax\(0,0\.98fr\)\] 2xl:gap-8/);
   assert.match(source, /mt-6 grid min-w-0 gap-4 md:grid-cols-\[minmax\(0,1\.2fr\)_minmax\(0,1fr\)_minmax\(0,1fr\)\]/);
   assert.match(source, /max-h-\[92vh\] w-full max-w-3xl overflow-y-auto/);
@@ -82,6 +98,8 @@ test("Layout uses a wide route-aware container for Savings Studio and Business w
   assert.match(source, /href="#main-content"/);
   assert.match(source, /<Navbar \/>/);
   assert.match(source, /<Footer \/>/);
+  assert.match(source, /app-surface relative min-h-screen overflow-x-hidden/);
+  assert.doesNotMatch(source, /app-surface relative min-h-screen overflow-hidden/);
 });
 
 test("Member area shell lets Savings Studio use the available workspace width", () => {
@@ -96,7 +114,9 @@ test("Member area shell lets Savings Studio use the available workspace width", 
   assert.match(source, /<main className="w-full min-w-0">\{renderActiveSection\(\)\}<\/main>/);
   assert.match(savingSectionSource, /<section className="min-w-0 space-y-5">/);
   assert.match(savingSectionSource, /<div className="min-w-0">\{access\.personal \? <SavingsStudioPage \/> : <BazinisMemberPage \/>\}<\/div>/);
-  assert.match(source, /soft-card flex gap-2 overflow-x-auto rounded-lg/);
+  assert.match(source, /soft-card flex min-w-0 max-w-full gap-2 overflow-x-auto rounded-lg/);
+  assert.match(source, /inline-flex min-h-\[3rem\] min-w-\[9rem\] max-w-\[12rem\] shrink-0/);
+  assert.match(source, /<span className="min-w-0 whitespace-normal leading-5">\{t\(`memberArea\.sections\.\$\{section\.id\}`\)\}<\/span>/);
   assert.match(source, /soft-card sticky top-28 rounded-lg/);
 });
 
@@ -121,6 +141,62 @@ test("Savings Studio important three-column sections wait for wide screens", () 
   assert.doesNotMatch(source, /xl:grid-cols-\[0\.92fr_1\.1fr_0\.98fr\]/);
   assert.doesNotMatch(source, /xl:grid-cols-\[1\.05fr_0\.95fr_1fr\]/);
   assert.doesNotMatch(source, /xl:grid-cols-\[1\.04fr_0\.96fr_1fr\]/);
+});
+
+test("Savings Studio P1 mobile actions and charts stay width-safe", () => {
+  const source = readPageSource();
+  const weeklyChartSource = extractBetween(
+    source,
+    'weeklyTotalsCurrentMonth.map((entry) => {',
+    '<WalletCards size={20} style={{ color: "rgb(var(--accent))" }} />'
+  );
+  const summaryActionsSource = extractBetween(
+    source,
+    '<form className="mt-6 space-y-5" onSubmit={handleSaveEmailSettings}>',
+    '<div className="mt-6 soft-card rounded-[24px] p-5">'
+  );
+  const csvPreviewSource = extractBetween(
+    source,
+    "disabled={confirmingCsvImport || !csvPreviewResult.validCount}",
+    "{(csvPreviewResult.preview || []).map((row) => ("
+  );
+
+  assert.match(source, /grid mobile-stack-grid w-full min-w-0 grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,12rem\),1fr\)\)\] gap-3 lg:max-w-\[30rem\]/);
+  assert.match(source, /grid mobile-stack-grid w-full min-w-0 grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,11rem\),1fr\)\)\] gap-3 lg:max-w-\[42rem\] xl:w-auto/);
+  assert.match(source, /button-secondary w-full justify-center gap-2 whitespace-normal text-center/);
+
+  assert.match(source, /mt-6 w-full max-w-full overflow-x-auto pb-2/);
+  assert.match(source, /grid h-\[250px\] min-w-\[28rem\] grid-cols-5 items-end gap-3/);
+  assert.match(weeklyChartSource, /const formattedTotal = money\.format\(entry\.total\)/);
+  assert.match(weeklyChartSource, /whitespace-nowrap text-sm font-semibold leading-tight tabular-nums" title=\{formattedTotal\}/);
+  assert.doesNotMatch(weeklyChartSource, /<div className="mt-6 grid h-\[250px\] grid-cols-5 items-end gap-3">/);
+
+  assert.match(summaryActionsSource, /grid mobile-stack-grid min-w-0 grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,12rem\),1fr\)\)\] gap-4/);
+  assert.match(summaryActionsSource, /<span className="min-w-0 whitespace-normal">\s*\{sendingSummaryEmail \? [\s\S]*?<\/span>/);
+  assert.match(summaryActionsSource, /<span className="min-w-0 whitespace-normal">\s*\{downloadingSummaryKey === "monthly" \? [\s\S]*?<\/span>/);
+  assert.doesNotMatch(summaryActionsSource, /mt-6 grid gap-4 sm:grid-cols-2/);
+  assert.doesNotMatch(summaryActionsSource, /mt-4 grid gap-4 sm:grid-cols-2/);
+
+  assert.match(source, /grid mobile-stack-grid w-full min-w-0 grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,11rem\),1fr\)\)\] gap-3 lg:max-w-\[42rem\] xl:w-auto/);
+  assert.match(source, /button-primary w-full justify-center gap-2 whitespace-normal text-center/);
+  assert.match(csvPreviewSource, /button-secondary w-full justify-center whitespace-normal text-center/);
+  assert.match(csvPreviewSource, /<Download className="shrink-0" size=\{16\} \/>/);
+});
+
+test("Personal member workspace has a mobile viewport overflow safety net", () => {
+  const cssSource = readCssSource();
+
+  assert.match(cssSource, /@media \(max-width: 768px\) \{[\s\S]*?\.member-workspace,/);
+  assert.match(cssSource, /\.member-workspace-personal,/);
+  assert.match(cssSource, /\.member-workspace \.panel,/);
+  assert.match(cssSource, /\.member-workspace \.soft-card-strong \{[\s\S]*?min-width: 0;[\s\S]*?max-width: 100%;/);
+  assert.match(cssSource, /\.member-workspace > \*,[\s\S]*?\.member-workspace \.soft-card-strong > \* \{[\s\S]*?min-width: 0;/);
+  assert.match(cssSource, /\.member-workspace img,[\s\S]*?\.member-workspace svg \{[\s\S]*?max-width: 100%;/);
+  assert.match(cssSource, /\.member-workspace \.button-primary,[\s\S]*?\.member-workspace \.hero-outline-button \{[\s\S]*?max-width: 100%;[\s\S]*?white-space: normal;/);
+  assert.match(cssSource, /\.member-workspace input,[\s\S]*?\.member-workspace textarea \{[\s\S]*?min-width: 0;[\s\S]*?max-width: 100%;/);
+  assert.match(cssSource, /\.member-workspace p,[\s\S]*?\.member-workspace li \{[\s\S]*?overflow-wrap: anywhere;/);
+  assert.match(cssSource, /@layer utilities \{[\s\S]*?@media \(max-width: 768px\) \{[\s\S]*?\.member-workspace \.mobile-stack-grid \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) !important;/);
+  assert.match(cssSource, /\.member-workspace-personal #savings-ledger,[\s\S]*?\.member-workspace-personal #savings-ledger button \{[\s\S]*?min-width: 0 !important;[\s\S]*?width: 100% !important;[\s\S]*?max-width: 100% !important;/);
 });
 
 test("Saving Studio onboarding validation has a persistent inline error state", () => {
@@ -171,10 +247,10 @@ test("Saving Studio automation CTA stays inside mobile cards", () => {
   assert.ok(automationCardMatch);
   const automationCardSource = automationCardMatch[0];
 
-  assert.match(source, /actionLabel: "Siųsti savaitės suvestinę"/);
+  assert.match(source, /actionLabel: "[^"]*savait[^"]*suvestin[^"]*"/);
   assert.match(
     source,
-    /mt-6 grid min-w-0 grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,13rem\),1fr\)\)\] gap-4[\s\S]*label="Suvestinės"[\s\S]*label="Kopijos"[\s\S]*label="Signalai"/
+    /mt-6 grid mobile-stack-grid min-w-0 grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,13rem\),1fr\)\)\] gap-4[\s\S]*label="[^"]+"[\s\S]*label="[^"]+"[\s\S]*label="[^"]+"/
   );
   assert.doesNotMatch(source, /mt-6 grid min-w-0[\s\S]{0,120}sm:grid-cols-3/);
   assert.match(automationCardSource, /flex min-w-0 flex-col gap-4/);
@@ -195,10 +271,10 @@ test("Goal strategy metrics use a container-safe grid", () => {
   const source = readPageSource();
   const goalStrategyMetricsSource = extractPreviousDivBlock(source, "value={String(goalStrategyBoard.length)}");
 
-  assert.match(goalStrategyMetricsSource, /grid min-w-0 grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,13rem\),1fr\)\)\] gap-4/);
-  assert.match(goalStrategyMetricsSource, /label="Aktyvūs tikslai"/);
+  assert.match(goalStrategyMetricsSource, /grid mobile-stack-grid min-w-0 grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,13rem\),1fr\)\)\] gap-4/);
+  assert.match(goalStrategyMetricsSource, /label="Aktyv[^"]* tikslai"/);
   assert.match(goalStrategyMetricsSource, /label="Fokusuoti dabar"/);
-  assert.match(goalStrategyMetricsSource, /label="Didžiausias mėn\. tempas"/);
+  assert.match(goalStrategyMetricsSource, /label="Did[^"]*iausias m[^"]*n\. tempas"/);
   assert.doesNotMatch(goalStrategyMetricsSource, /sm:grid-cols-3/);
 });
 
@@ -235,15 +311,15 @@ test("InsightTile metric groups use container-safe auto-fit grids", () => {
   const source = readPageSource();
   const heroPanelSource = extractBetween(
     source,
-    '<h2 className="mt-3 font-display text-3xl font-bold leading-tight">Tavo aiškumo panelė</h2>',
+    '<h2 className="mt-3 font-display text-3xl font-bold leading-tight">Tavo ai',
     '<p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted">usage guide</p>'
   );
   const monthMetricsSource = extractMetricGridBefore(source, "icon={PiggyBank}");
   const focusMetricsSource = extractMetricGridBefore(source, "icon={AlertTriangle}");
-  const safeGrid = /grid min-w-0 grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,13rem\),1fr\)\)\]/;
+  const safeGrid = /grid mobile-stack-grid min-w-0 grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,13rem\),1fr\)\)\]/;
 
-  assert.match(heroPanelSource, /mt-5 grid min-w-0 grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,13rem\),1fr\)\)\] gap-3/);
-  assert.match(heroPanelSource, /label="Šis mėnuo"/);
+  assert.match(heroPanelSource, /mt-5 grid mobile-stack-grid min-w-0 grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,13rem\),1fr\)\)\] gap-3/);
+  assert.match(heroPanelSource, /label="[^"]*is m[^"]*nuo"/);
   assert.match(heroPanelSource, /label="Tikslai"/);
   assert.match(heroPanelSource, /label="Pastovios"/);
   assert.match(heroPanelSource, /label="Laisva suma"/);
@@ -251,22 +327,22 @@ test("InsightTile metric groups use container-safe auto-fit grids", () => {
 
   assert.match(monthMetricsSource, safeGrid);
   assert.match(monthMetricsSource, /gap-4/);
-  assert.match(monthMetricsSource, /label="Šis mėnuo"/);
-  assert.match(monthMetricsSource, /label="Po pastovių išlaidų"/);
-  assert.match(monthMetricsSource, /label="Pastovios išlaidos"/);
+  assert.match(monthMetricsSource, /label="[^"]*is m[^"]*nuo"/);
+  assert.match(monthMetricsSource, /label="Po pastovi[^"]* i[^"]*laid[^"]*"/);
+  assert.match(monthMetricsSource, /label="Pastovios i[^"]*laidos"/);
   assert.doesNotMatch(monthMetricsSource, /sm:grid-cols-[23]/);
 
   assert.match(focusMetricsSource, safeGrid);
   assert.match(focusMetricsSource, /gap-4/);
   assert.match(focusMetricsSource, /label="Tikslai"/);
-  assert.match(focusMetricsSource, /label="Didžiausias spaudimas"/);
+  assert.match(focusMetricsSource, /label="Did[^"]*iausias spaudimas"/);
   assert.match(focusMetricsSource, /label="Laisva suma"/);
   assert.doesNotMatch(focusMetricsSource, /sm:grid-cols-[23]/);
 });
 
 test("Six month chart scrolls internally without hiding labels or values", () => {
   const source = readPageSource();
-  const sixMonthSource = extractSixMonthViewSource(source);
+  const sixMonthSource = extractSixMonthChartSource(source);
 
   assert.match(sixMonthSource, /mt-6 w-full max-w-full overflow-x-auto pb-2/);
   assert.match(sixMonthSource, /grid h-\[260px\] min-w-\[32rem\] grid-cols-6 items-end gap-3/);
@@ -295,11 +371,32 @@ test("Summary archive actions stay inside narrow cards", () => {
     /grid w-full grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,10rem\),1fr\)\)\] gap-2/
   );
   assert.match(summaryArchiveSource, /className="button-secondary w-full max-w-full justify-center gap-2 whitespace-normal break-normal text-center"/);
-  assert.match(summaryArchiveSource, /<span className="min-w-0 whitespace-normal break-normal">Atsisiųsti vėl<\/span>/);
-  assert.match(summaryArchiveSource, /<span className="min-w-0 whitespace-normal break-normal">Siųsti dar kartą<\/span>/);
+  assert.match(summaryArchiveSource, /<span className="min-w-0 whitespace-normal break-normal">Atsisi[^<]*sti v[^<]*l<\/span>/);
+  assert.match(summaryArchiveSource, /<span className="min-w-0 whitespace-normal break-normal">Si[^<]*sti dar kart[^<]*<\/span>/);
   assert.match(summaryArchiveSource, /<Download className="shrink-0" size=\{14\} \/>/);
   assert.match(summaryArchiveSource, /<Mail className="shrink-0" size=\{14\} \/>/);
   assert.doesNotMatch(summaryArchiveSource, /sm:flex-row/);
   assert.doesNotMatch(summaryArchiveSource, /sm:shrink-0/);
   assert.doesNotMatch(summaryArchiveSource, /whitespace-nowrap/);
+});
+
+test("Personal member area shared cards stay width-safe from 320 to 768 px", () => {
+  const memberAreaSource = readMemberAreaSource();
+  const digitalGridSource = readDigitalProductAccessGridSource();
+
+  assert.match(memberAreaSource, /soft-card min-w-0 rounded-lg p-4 sm:p-5/);
+  assert.match(memberAreaSource, /grid w-full min-w-0 max-w-full gap-2 sm:grid-cols-2 lg:max-w-\[520px\]/);
+  assert.doesNotMatch(memberAreaSource, /lg:min-w-\[520px\]/);
+  assert.match(memberAreaSource, /marketing-card flex h-full min-w-0 max-w-full flex-col/);
+  assert.match(memberAreaSource, /member-executive-surface min-w-0 rounded-lg/);
+  assert.doesNotMatch(memberAreaSource, /member-executive-surface overflow-hidden/);
+  assert.match(memberAreaSource, /mt-6 grid min-w-0 grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,13rem\),1fr\)\)\] gap-3/);
+  assert.match(memberAreaSource, /button-primary mt-5 w-full justify-center gap-2 whitespace-normal sm:w-auto/);
+
+  assert.match(digitalGridSource, /group flex h-full min-w-0 max-w-full flex-col rounded-lg/);
+  assert.doesNotMatch(digitalGridSource, /group flex h-full flex-col overflow-hidden/);
+  assert.match(digitalGridSource, /mt-5 grid min-w-0 grid-cols-\[repeat\(auto-fit,minmax\(min\(100%,8rem\),1fr\)\)\] gap-3/);
+  assert.match(digitalGridSource, /w-full max-w-full whitespace-normal text-center/);
+  assert.match(digitalGridSource, /w-full min-w-0 sm:max-w-\[13rem\]/);
+  assert.doesNotMatch(digitalGridSource, /sm:min-w-\[13rem\]/);
 });

@@ -1,13 +1,21 @@
 ﻿# Stilloak Studio autonomous status
 
-PROJECT_STATE: READY_FOR_REVIEW_WITH_MANUAL_BROWSER_CHECKS
+PROJECT_STATE: PERSONAL_P1_MOBILE_BLOCKER_PENDING_REAL_DEVICE_VERIFICATION
 
 ## Dabartinis milestone
 
-Final production readiness audit – lokaliai paruošta, su rankiniu production redeploy ir Stripe Price ID patikrinimu prieš launch.
+Milestone 2 – Asmeninis P1 mobile overflow blocker. Lokalus hotfix ir regresijos paruoštos, bet Asmeninis nelaikomas 10/10, kol tikras telefonas arba naršyklinis `scrollWidth/clientWidth` smoke patvirtins, kad Asmeninio nario zona nebeturi puslapio lygio horizontalaus overflow ir dešinės pusės nukirpimo.
 
 ## Užbaigta
 
+- 2026-08-20 Realios telefono problemos Asmeninio nario zonoje pataisa: `Layout` šaknis pakeista iš bendro `overflow-hidden` į `overflow-x-hidden`, kad vertikalus turinys nebūtų nukerpamas kartu su dekoratyviniu overflow, o mobile Asmeninio workspace gavo CSS saugiklį `max-width: 100%`, `min-width: 0`, formų/mygtukų pločio ribojimą ir `overflow-wrap: anywhere` panelėms, kortelėms, formoms ir tekstui.
+- 2026-08-20 Realios telefono problemos regresija: `server/tests/savingsStudioPersonalUi.test.js` papildomai saugo `Layout` nuo `overflow-hidden` grąžinimo ir tikrina mobile viewport safety net Asmeninio workspace lygyje, kad lentelės/pseudo-lentelės ir platūs elementai nebedarytų viso puslapio platesnio už viewport.
+- 2026-08-20 Užfiksuota testų spraga: ankstesni statiniai responsive testai tikrino konkrečias JSX klases ir žinomus komponentų fragmentus, bet ne realų telefono `scrollWidth > clientWidth` elgesį ir ne tėvinio `overflow-hidden` sukeltą nukirpimą; todėl jie negalėjo aptikti vartotojo telefone matyto puslapio lygio overflow.
+- 2026-08-20 Asmeninio nario zonos P1 mobilus responsive hotfix: `MemberAreaPage` mobile dashboard navigacijos elementai gavo ribotą plotį, `min-w-0`, laužomą tekstą ir `shrink-0` ikonas, todėl ilgesnės lokalizuotos etiketės lieka vidinio horizontalaus nav scroll ribose.
+- 2026-08-20 Savings Studio P1 mobile hotfix: hero CTA, usage guide, greita navigacija, goal pace metrikos, weekly rhythm grafikas, fixed-vs-flexible sumos, recurring one-click log, suvestinių siuntimo/atsisiuntimo mygtukai, CSV preview veiksmai, GoalScenario ir CategoryShift kortelės pervestos į width-safe `w-full`/auto-fit/vidinio scroll/teksto wrap klases, kad siauruose mobiliuose konteineriuose nebūtų puslapio horizontalaus overflow.
+- 2026-08-20 `server/tests/savingsStudioPersonalUi.test.js` papildytas P1 mobile hotfix regresija, saugančia mobile CTA auto-fit gridus, savaitinio grafiko vidinį scroll, suvestinių veiksmų wrap ir CSV preview veiksmų width-safe elgesį.
+- 2026-08-20 Asmeninio nario zonos 320-768 px responsive hardening: `MemberAreaPage`, `SavingsStudioPage`, `DigitalProductAccessGrid` ir mobile `.member-workspace` CSS saugikliai pervesti į `min-w-0`, `max-w-full`, auto-fit gridus, mobile column layout, vidinį chart/table-like scroll ir laužomus CTA tekstus, kad platūs elementai nebedidintų viso puslapio pločio siauruose mobiliuose viewportuose.
+- 2026-08-20 `server/tests/savingsStudioPersonalUi.test.js` papildytas Asmeninio nario zonos shared card regresija, kuri saugo preview switch, module cards, resources/plans/account/journal/business korteles ir `DigitalProductAccessGrid` nuo 320-768 px pločio overflow grįžimo.
 - 2026-08-14 Verslo zonos 2 etapas: sukurtas bendras `BusinessLayout` shell su `Outlet`, aktyvia `NavLink` navigacija, `Verslo zona` identitetu, grįžimu į `/members/savings-studio`, desktop sticky sidebar ir mobile vidiniu `overflow-x-auto` navigacijos slinkimu. Visi protected `/business` child route perkelti po `BusinessLayout`; `/business/my-store` ir `/business/settings` palikti tik kaip `Navigate replace` į `/business/site-builder`.
 - 2026-08-14 Verslo workspace layout išplėstas iki `max-w-[1800px]` tik `/business` ir `/business/*` kartu su `/members/savings-studio`; vieši puslapiai ir `/stores/:slug` liko `max-w-7xl`. Nario zonos Business kortelės deduplikuotos: pašalinta atskira `My Website` kortelė, o `/business` aiškiau įvardytas kaip operacinė Verslo darbo zona. `BusinessDashboardPage` greitos kortelės neberodo `my-store/settings` dublių.
 - 2026-08-14 pridėtas `server/tests/businessWorkspaceUi.test.js`, saugantis Business layout egzistavimą, šešias unikalias navigacijos nuorodas, `/business` `end` aktyvumą, sticky/mobile navigaciją, `minmax(0,1fr)` karkasą, protected route nesting, legacy redirectus, platų layout režimą, viešų puslapių siaurą konteinerį, Member Area dublių pašalinimą ir nested `<main>` nebuvimą `BusinessLayout`.
@@ -66,7 +74,7 @@ Final production readiness audit – lokaliai paruošta, su rankiniu production 
 - `server/tests/savingsStudioPersonalUi.test.js` papildytas mobile-first responsive shell regresija: viewport meta, responsive `Layout` shell, Saving Studio breakpoint grid, filter grid, usage wizard modal overflow ir table-free layout.
 - Chrome ir Edge headless screenshot smoke pakartotinai bandytas su izoliuotais profiliais ir software-rendering vėliavomis; abu keliai krito vietiniame Chromium GPU procese, todėl produktui pridėta statinė responsive regresija, o screenshot patikra palikta kaip aplinkos apribojimas.
 - `.codex-tmp/` pridėtas į `.gitignore`, kad lokalūs autonominių smoke bandymų artefaktai nepatektų į commit kandidatus.
-- Milestone 2 – Asmeninis 10/10 uždarytas po pilnos validacijos.
+- Milestone 2 – Asmeninis 10/10 ankstesnis uždarymas atšauktas po realaus telefono P1 overflow reprodukcijos; galutinis uždarymas blokuojamas iki real-device arba browser `scrollWidth/clientWidth` smoke patvirtinimo.
 - Milestone 3 faktinis auditas pradėtas: patikrinti `businessRoutes.js`, `businessController.js`, `businessService.js`, `BusinessDashboardPage.jsx`, `SiteBuilderPage.jsx`, `BusinessProductsPage.jsx`, `BusinessOrdersPage.jsx`, `PublicStorePage.jsx`, `storeRoutes.js`, `Store`, `Order`, `Product` ir commission/Stripe checkout helperiai.
 - Business Studio prieigos kontrolė patvirtinta: frontend `/business/*` maršrutai apsaugoti `ProtectedRoute requireBusinessPlan`, backend `/business` routeris apsaugotas `protect` + `requireBusinessPlan`, esami access control testai dengia Demo/Asmeninis/Verslas skirtumus.
 - Pataisyta Business revenue rizika: dashboard ir admin business analytics nebesumuoja `pending`, `failed`, `canceled` ar `refunded` checkout įrašų kaip pajamų.
@@ -94,10 +102,30 @@ Final production readiness audit – lokaliai paruošta, su rankiniu production 
 
 ## Vykdoma
 
-- Papildomas Asmeninio nario zonos review etapas lokaliai paruoštas review, bet galutinis 10/10 statusas paliktas po prisijungusio vartotojo desktop ir mobile smoke testo. Production veiksmai nevykdyti.
+- P1 blocker: tikrame telefone Asmeninio nario zona nukerpa dešinę puslapio pusę, platūs elementai/lentelės gali daryti visą puslapį platesnį už viewport ir dalis turinio tampa nepasiekiama. Lokalus 320-768 px hardening įgyvendintas, bet Asmeninis nebus uždarytas kaip 10/10 iki prisijungusio realaus telefono arba browser `scrollWidth/clientWidth` smoke patvirtinimo. Production veiksmai nevykdyti.
 
 ## Validacijos rezultatai
 
+- 2026-08-20 Realios telefono problemos Asmeninio nario zonoje pataisa: `node --test server/tests/savingsStudioPersonalUi.test.js` – PASS, 17/17.
+- 2026-08-20 Realios telefono problemos Asmeninio nario zonoje pataisa: `npm.cmd run lint` – PASS, patikrinti 100 backend JavaScript failų.
+- 2026-08-20 Realios telefono problemos Asmeninio nario zonoje pataisa: `npm.cmd run typecheck` – PASS, backend JavaScript syntax check praėjo 100 failų; TypeScript projekto nėra.
+- 2026-08-20 Realios telefono problemos Asmeninio nario zonoje pataisa: `npm.cmd test` – PASS, 113/113.
+- 2026-08-20 Realios telefono problemos Asmeninio nario zonoje pataisa: `npm.cmd run build` – PASS, Vite 8.2.1 build sugeneravo `client/dist`; `MemberAreaPage` chunkas ~221.66 kB.
+- 2026-08-20 Realios telefono problemos Asmeninio nario zonoje pataisa: `git diff --check` – PASS, whitespace klaidų nerado; rodomi tik CRLF normalizavimo įspėjimai.
+- 2026-08-20 Realios telefono problemos Asmeninio nario zonoje pataisa: in-app browser Node REPL įrankis po browser skill discovery šiame seanse nebuvo pateiktas, todėl authenticated mobile screenshot/scrollWidth smoke liko neatliktas; statinė mobile overflow regresija ir pilna validacija praėjo.
+- 2026-08-20 Asmeninio nario zonos 320-768 px responsive hardening: `node --test server/tests/savingsStudioPersonalUi.test.js` – PASS, 18/18.
+- 2026-08-20 Asmeninio nario zonos 320-768 px responsive hardening: UTF-8 replacement character scan – PASS, `SavingsStudioPage.jsx`, `MemberAreaPage.jsx`, `DigitalProductAccessGrid.jsx`, `savingsStudioPersonalUi.test.js` ir `index.css` neturi `U+FFFD`.
+- 2026-08-20 Asmeninio nario zonos 320-768 px responsive hardening: `npm.cmd run lint` – PASS, patikrinti 100 backend JavaScript failų.
+- 2026-08-20 Asmeninio nario zonos 320-768 px responsive hardening: `npm.cmd run typecheck` – PASS, backend JavaScript syntax check praėjo 100 failų; TypeScript projekto nėra.
+- 2026-08-20 Asmeninio nario zonos 320-768 px responsive hardening: `npm.cmd test` – PASS, 114/114.
+- 2026-08-20 Asmeninio nario zonos 320-768 px responsive hardening: `npm.cmd run build` – PASS, Vite 8.2.1 build sugeneravo `client/dist`; `MemberAreaPage` chunkas ~225.34 kB.
+- 2026-08-20 Asmeninio nario zonos 320-768 px responsive hardening: `git diff --check` – PASS, whitespace klaidų nerado; rodomi tik CRLF normalizavimo įspėjimai.
+- 2026-08-20 Asmeninio nario zonos P1 mobile responsive hotfix: `node --test server/tests/savingsStudioPersonalUi.test.js` – PASS, 16/16.
+- 2026-08-20 Asmeninio nario zonos P1 mobile responsive hotfix: `npm.cmd run lint` – PASS, patikrinti 100 backend JavaScript failų.
+- 2026-08-20 Asmeninio nario zonos P1 mobile responsive hotfix: `npm.cmd run typecheck` – PASS, backend JavaScript syntax check praėjo 100 failų; TypeScript projekto nėra.
+- 2026-08-20 Asmeninio nario zonos P1 mobile responsive hotfix: `npm.cmd test` – PASS, 112/112.
+- 2026-08-20 Asmeninio nario zonos P1 mobile responsive hotfix: `npm.cmd run build` – PASS, Vite 8.2.1 build sugeneravo `client/dist`; `MemberAreaPage` chunkas ~221.66 kB.
+- 2026-08-20 Asmeninio nario zonos P1 mobile responsive hotfix: `git diff --check` – PASS, whitespace klaidų nerado; rodomi tik CRLF normalizavimo įspėjimai.
 - 2026-08-14 Verslo zonos 2 etapas: `node --test server/tests/businessStudio.test.js` – PASS, 9/9.
 - 2026-08-14 Verslo zonos 2 etapas: `node --test server/tests/businessWorkspaceUi.test.js` – PASS, 6/6.
 - 2026-08-14 Verslo zonos 2 etapas: `npm.cmd run lint` – PASS, patikrinti 100 backend JavaScript failų.
@@ -219,21 +247,21 @@ Final production readiness audit – lokaliai paruošta, su rankiniu production 
 - Pradinio užkrovimo klaida sprendžiama lokaliu retry UI, nes tai lengvai atšaukiama ir nekeičia autorizacijos ar API elgesio.
 - Kliento bundle rizika sprendžiama route-level `React.lazy` be planų guard architektūros keitimo; `Suspense` fallback naudoja esamą `LoadingSpinner`.
 - Planų ir kreditų peržiūra: atskiro kreditų limito mechanizmo kode nerasta; prieiga kontroliuojama planu ir aktyviu/trialing statusu.
-- Milestone 2 responsive rizika valdoma statiniu regresiniu testu, nes prijungtas browser Node REPL įrankis šiame seanse neatsivėrė per tool discovery, o vietinis Chromium headless krenta prieš puslapio renderinimą.
+- Milestone 2 responsive rizika nebelaikoma pakankamai valdoma vien statiniu regresiniu testu: realaus telefono P1 overflow reprodukcija parodė, kad būtinas prisijungusio telefono arba browser `scrollWidth/clientWidth` smoke prieš Asmeninis 10/10 uždarymą.
 - Business revenue sprendimas konservatyvus: finansinės kortelės rodo tik realiai apmokėtus orderius; pending checkout įrašai saugomi operacinei peržiūrai, bet nelaikomi pajamomis.
 - Business CSV importas nepridėtas, nes esamoje Business Store/Dashboard architektūroje nėra CSV import sutarties; naujo netikro importo kūrimas prieštarautų SPEC reikalavimui neimituoti finansinių operacijų.
 - Withdrawals/payouts lieka rankinis MVP procesas: rodomi commission ir seller earnings, bet nevykdomi jokie realūs išmokėjimai ar Stripe Live veiksmai.
 - React Router 7 migracija atidėta kaip owner decision / atskiras techninis darbas, nes `npm audit fix --force` keistų router major versiją. High/critical audit kriterijus po Vite migracijos yra švarus.
 - Vite 8 toolchain reikalauja modernios Node versijos; `codex-work/RELEASE_CHECKLIST.md` dokumentuoja Node.js `>=22.12.0`, lokaliai validuota su Node `v24.15.0`.
-- `PROJECT_STATE: RELEASE_CANDIDATE_READY` nustatytas tik po finalinės audit/lint/typecheck/test/build/preview validacijos ir release checklist paruošimo.
+- Ankstesnis `PROJECT_STATE: RELEASE_CANDIDATE_READY` nebetaikomas, kol Asmeninio nario zonos P1 mobile overflow blocker nėra patvirtintas real-device arba browser smoke testu.
 
 ## Blokatoriai
 
-- Kritinių lokalaus kodo blokatorių release-candidate būsenai nėra.
+- P1 Asmeninio plano užbaigimo blokatorius: tikrame telefone Asmeninio nario zonoje buvo nukerpama dešinė puslapio pusė ir platūs elementai darė turinį nepasiekiamą; Asmeninis negali būti uždarytas kaip 10/10 iki realaus telefono arba browser `scrollWidth/clientWidth` smoke PASS.
 - Production launch blokatorius iki rankinio veiksmo: viešas frontend deploy dar pateikia seną JS assetą su 24/99 kainomis; reikalingas naujas frontend deploy po šių pakeitimų.
 - Git blokatorius šiame sandboxe: `.git` rašymas neleidžiamas, todėl commit/push turi atlikti operatorius arba PowerShell runneris.
-- Nekritinė rizika: in-app browser Node REPL įrankis šiame kontekste nepasiekiamas; vietinis Chrome/Edge headless krito su GPU proceso klaida, todėl screenshot responsive smoke nebaigtas. Responsive layout regresija padengta statiniu testu.
-- Authenticated Personal Studio naršyklinis smoke be testinės paskyros/slaptažodžių neatliktas; backend ir klientų guardai patikrinti statiniais/unit testais.
+- Kritinė patvirtinimo spraga: in-app browser Node REPL įrankis šiame kontekste nepasiekiamas, o vietinis Chrome/Edge headless krito su GPU proceso klaida, todėl authenticated mobile screenshot/scrollWidth smoke neatliktas. Statiniai testai pridėti kaip regresijos, bet jie nėra realaus telefono pakaitalas.
+- Authenticated Personal Studio desktop/mobile smoke be testinės paskyros/slaptažodžių neatliktas; mobile dalis dabar yra P1 priėmimo blokatorius.
 - Nekritinė dependency rizika: 2 moderate React Router audit punktai lieka iki owner-approved `react-router-dom@7` migracijos.
 
 ## Rankiniai production veiksmai
@@ -247,6 +275,11 @@ Final production readiness audit – lokaliai paruošta, su rankiniu production 
 
 ## Paskutinis atnaujinimas
 
+2026-08-20 – P1 klasifikacija patikslinta: reali telefono overflow problema blokuoja Asmeninio plano užbaigimą. Milestone 2 ir `PROJECT_STATE` grąžinti į blokuotą būseną iki realaus telefono arba naršyklinio `scrollWidth/clientWidth` smoke PASS; statiniai responsive testai laikomi regresijos apsauga, bet ne priėmimo patvirtinimu.
+2026-08-20 – Realios telefono problemos Asmeninio nario zonoje pataisa lokaliai baigta. Spręsta ne tik atskirų CTA problema, bet ir puslapio lygio nukirpimas: `Layout` nebeslepia viso overflow per `overflow-hidden`, o Asmeninio workspace mobile režimu riboja plačių panelių, pseudo-lentelių, formų, mygtukų ir teksto plotį iki viewport. Production deploy, Stripe Live, DB ir git push nevykdyti.
+2026-08-20 – Testų spraga aiškiai suklasifikuota: ankstesni statiniai responsive testai buvo naudingi regresijoms konkrečiuose komponentuose, bet jie nėra tikro telefono arba naršyklinio `scrollWidth/clientWidth` smoke pakaitalas.
+2026-08-20 – Asmeninio nario zonos P1 mobile responsive hotfix lokaliai baigtas. Sutvarkyti likę siaurų mobilių konteinerių rizikos taškai: nario zonos mobile nav etiketės, Savings Studio hero/usage/quick nav CTA, weekly rhythm grafiko vidinis scroll, fixed-vs-flexible sumos, recurring one-click log, suvestinių ir CSV preview veiksmai bei kelios metrikų kortelės. Production deploy, Stripe Live, DB ir git push nevykdyti.
+2026-08-20 – Asmeninio nario zonos P1 overflow hotfix patvirtintas lokalia naršykline patikra. Pataisyta document-level mobile overflow priežasčių grandinė: vidinės nario navigacijos scroll pločio plitimas į layout, Savings Studio ledger/formų/panelių intrinsic plotis ir 1024 px greitos navigacijos fiksuotas `lg:min-w-[42rem]`. Pakeisti `Layout`, `MemberAreaPage`, `SavingsStudioPage`, `DigitalProductAccessGrid`, `index.css`, `PLAN.md`, `STATUS.md` ir `server/tests/savingsStudioPersonalUi.test.js`; Playwright smoke per saugius mock duomenis praėjo 320, 360, 375, 390, 412, 768, 1024 ir 1440 px, screenshotai sugeneruoti `.codex-tmp/screenshots`. Liko rankinis realaus telefono smoke po review; commit, push, deploy, Stripe Live, DB ir išoriniai pakeitimai nevykdyti.
 2026-08-14 – Verslo zonos 2 etapas lokaliai baigtas. Protected `/business` workspace turi bendrą responsive `BusinessLayout`, šešias unikalias operacines navigacijos nuorodas, desktop sticky sidebar, mobile vidinį horizontalų nav scroll ir legacy `my-store/settings` redirectus į `site-builder`. Globalus platus `max-w-[1800px]` režimas taikomas `/members/savings-studio`, `/business` ir `/business/*`, bet ne viešiems puslapiams ar `/stores/:slug`. Production deploy, Stripe Live, DB ir git push nevykdyti.
 2026-08-14 – Savings Studio plataus workspace responsive etapas lokaliai baigtas. Tik `/members/savings-studio` gavo platų `max-w-[1800px]` layout režimą; vieši, admin ir verslo puslapiai neplėsti. Nario zonos sidebar/turinio grid pervestas į `minmax(0,1fr)`, Savings Studio trijų stulpelių sekcijos atidėtos iki `2xl`, o ankstesnės mobile overflow apsaugos paliktos ir padengtos statinėmis regresijomis. Production deploy, Stripe Live, DB ir git push nevykdyti.
 2026-08-13 – Milestone 3 uždarytas ir Milestone 4 pradėtas. Business Dashboard/Store/Orders/Revenue/Site Builder/Admin Analytics sutvarkyti konservatyviai: paid-only revenue, public checkout limiteris, griežtesnė selected product ID validacija, paid-order invoice atsisiuntimas ir aiškus rankinių payout ribojimas. Validuota su `npm run lint`, `npm run typecheck`, `npm test` ir `npm run build`. `PROJECT_STATE` paliekamas `IN_PROGRESS`, nes Security/kokybės milestone ir release-candidate patikra dar neužbaigti.

@@ -1,4 +1,4 @@
-﻿import {
+import {
   AlertTriangle,
   ArrowUpRight,
   CalendarRange,
@@ -2062,7 +2062,7 @@ const SavingsStudioPage = () => {
 
   return (
     <div className="member-workspace member-workspace-personal w-full min-w-0 space-y-8 2xl:space-y-10">
-      <section className="marketing-dark overflow-hidden rounded-lg px-5 py-7 sm:px-8 sm:py-9 lg:px-10">
+      <section className="marketing-dark min-w-0 rounded-lg px-5 py-7 sm:px-8 sm:py-9 lg:px-10">
         <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,0.98fr)] lg:items-end 2xl:gap-10">
           <div className="min-w-0">
             <div className="flex flex-wrap gap-2">
@@ -2078,30 +2078,30 @@ const SavingsStudioPage = () => {
               aiškesniam finansiniam ritmui.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <button type="button" className="button-primary min-h-[52px] gap-2" onClick={() => scrollToSection("savings-ledger")}>
+              <button type="button" className="button-primary min-h-[52px] w-full justify-center gap-2 sm:w-auto" onClick={() => scrollToSection("savings-ledger")}>
                 Pridėti išlaidą
-                <Plus size={16} />
+                <Plus className="shrink-0" size={16} />
               </button>
-              <button type="button" className="hero-outline-button min-h-[52px] gap-2" onClick={() => scrollToSection("savings-budgets")}>
+              <button type="button" className="hero-outline-button min-h-[52px] w-full justify-center gap-2 sm:w-auto" onClick={() => scrollToSection("savings-budgets")}>
                 Peržiūrėti biudžetus
-                <Target size={16} />
+                <Target className="shrink-0" size={16} />
               </button>
-              <button type="button" className="hero-outline-button min-h-[52px] gap-2" onClick={() => scrollToSection("savings-automation")}>
+              <button type="button" className="hero-outline-button min-h-[52px] w-full justify-center gap-2 sm:w-auto" onClick={() => scrollToSection("savings-automation")}>
                 Suvestinės
-                <Mail size={16} />
+                <Mail className="shrink-0" size={16} />
               </button>
             </div>
           </div>
 
           <div className="rounded-lg border border-white/10 bg-white/6 p-4 sm:p-5">
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase text-white/46">Mėnesio valdymas</p>
                 <h2 className="mt-3 font-display text-3xl font-bold leading-tight">Tavo aiškumo panelė</h2>
               </div>
               <ShieldCheck size={20} style={{ color: "rgb(var(--accent-strong))" }} />
             </div>
-            <div className="mt-5 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-3">
+            <div className="mt-5 grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-3">
               <InsightTile
                 icon={WalletCards}
                 label="Šis mėnuo"
@@ -2142,13 +2142,13 @@ const SavingsStudioPage = () => {
             </p>
           </div>
 
-          <div className="flex min-w-0 flex-wrap gap-3">
-            <button type="button" className="button-primary" onClick={() => openUsageWizard(0)}>
+          <div className="grid mobile-stack-grid w-full min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,12rem),1fr))] gap-3 lg:max-w-[30rem]">
+            <button type="button" className="button-primary w-full justify-center whitespace-normal text-center" onClick={() => openUsageWizard(0)}>
               Atidaryti gidą
             </button>
             <button
               type="button"
-              className="button-secondary"
+              className="button-secondary w-full justify-center whitespace-normal text-center"
               onClick={() => {
                 window.localStorage.removeItem(USAGE_WIZARD_STORAGE_KEY);
                 openUsageWizard(profile?.onboardingCompleted ? 1 : 0);
@@ -2161,7 +2161,7 @@ const SavingsStudioPage = () => {
       </section>
 
       {searchParams.get("welcome") === "membership" ? (
-        <section className="public-section">
+        <section className="public-section min-w-0">
           <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
             <div>
               <span className="eyebrow">membership unlocked</span>
@@ -2171,7 +2171,7 @@ const SavingsStudioPage = () => {
                 mėnesio taupymo tikslo ir trijų svarbiausių biudžetų.
               </p>
             </div>
-            <div className="soft-card p-6">
+            <div className="soft-card min-w-0 p-6">
               <p className="text-xs uppercase tracking-[0.24em] text-muted">What opens now</p>
               <div className="mt-4 space-y-3 text-sm leading-6 text-muted">
                 <p>1. Nustatai pirmą mėnesio planą.</p>
@@ -2184,7 +2184,7 @@ const SavingsStudioPage = () => {
       ) : null}
 
       {!profile?.onboardingCompleted && (
-        <section id="savings-setup" className="public-section">
+        <section id="savings-setup" className="public-section min-w-0">
           <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
             <div>
               <span className="eyebrow">first setup</span>
@@ -2193,7 +2193,7 @@ const SavingsStudioPage = () => {
                 {ONBOARDING_STEPS[onboardingStep].description}
               </p>
 
-              <div className="mt-8 flex flex-wrap gap-3">
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 {ONBOARDING_STEPS.map((step, index) => (
                   <div
                     key={step.key}
@@ -2209,7 +2209,7 @@ const SavingsStudioPage = () => {
               </div>
             </div>
 
-            <form className="space-y-4" onSubmit={handleSaveOnboarding}>
+            <form className="min-w-0 space-y-4" onSubmit={handleSaveOnboarding}>
               {onboardingError ? (
                 <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
                   {onboardingError}
@@ -2217,8 +2217,8 @@ const SavingsStudioPage = () => {
               ) : null}
 
               {onboardingStep === 0 ? (
-                <div className="space-y-4">
-                  <div className="grid gap-4 sm:grid-cols-2">
+                <div className="min-w-0 space-y-4">
+                  <div className="grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,12rem),1fr))] gap-4">
                     <label className="block space-y-2">
                       <span className="text-sm font-semibold text-muted">Mėnesio pajamos</span>
                       <input
@@ -2251,7 +2251,7 @@ const SavingsStudioPage = () => {
               ) : null}
 
               {onboardingStep === 1 ? (
-                <div className="space-y-4">
+                <div className="min-w-0 space-y-4">
                   <label className="block space-y-2">
                     <span className="text-sm font-semibold text-muted">Pagrindinis fokusas</span>
                     <select
@@ -2286,10 +2286,10 @@ const SavingsStudioPage = () => {
               ) : null}
 
               {onboardingStep === 2 ? (
-                <div className="space-y-4">
-                  <div className="soft-card rounded-[24px] p-5">
+                <div className="min-w-0 space-y-4">
+                  <div className="soft-card min-w-0 rounded-[24px] p-5">
                     <p className="text-xs uppercase tracking-[0.24em] text-muted">Review</p>
-                    <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                    <div className="mt-4 grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,12rem),1fr))] gap-4">
                       <div>
                         <p className="text-sm font-semibold text-muted">Mėnesio pajamos</p>
                         <p className="mt-1 text-lg font-semibold">
@@ -2321,21 +2321,21 @@ const SavingsStudioPage = () => {
                 </div>
               ) : null}
 
-              <div className="flex flex-wrap gap-3">
+              <div className="grid mobile-stack-grid w-full min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3 lg:max-w-[42rem] xl:w-auto">
                 {onboardingStep > 0 ? (
-                  <button type="button" className="button-secondary gap-2" onClick={handlePreviousOnboardingStep}>
+                  <button type="button" className="button-secondary w-full justify-center gap-2 whitespace-normal text-center" onClick={handlePreviousOnboardingStep}>
                     <ChevronLeft size={16} />
                     Atgal
                   </button>
                 ) : null}
 
                 {onboardingStep < ONBOARDING_STEPS.length - 1 ? (
-                  <button type="button" className="button-primary gap-2" onClick={handleNextOnboardingStep}>
+                  <button type="button" className="button-primary w-full justify-center gap-2 whitespace-normal text-center" onClick={handleNextOnboardingStep}>
                     Toliau
                     <ChevronRight size={16} />
                   </button>
                 ) : (
-                  <button type="submit" className="button-primary gap-2" disabled={savingOnboarding}>
+                  <button type="submit" className="button-primary w-full justify-center gap-2 whitespace-normal text-center" disabled={savingOnboarding}>
                     <CheckCircle2 size={16} />
                     {savingOnboarding ? "Kuriama..." : "Užbaigti pirmą setup"}
                   </button>
@@ -2346,7 +2346,7 @@ const SavingsStudioPage = () => {
         </section>
       )}
 
-      <section id="savings-analytics" className="marketing-dark overflow-hidden rounded-[34px] px-6 py-7 sm:px-8 lg:px-10">
+      <section id="savings-analytics" className="marketing-dark min-w-0 rounded-[34px] px-6 py-7 sm:px-8 lg:px-10">
         <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] 2xl:gap-10">
           <div>
             <span className="hero-chip">Savings Studio</span>
@@ -2359,7 +2359,7 @@ const SavingsStudioPage = () => {
             </p>
 
             <div className="mt-8 rounded-[24px] border border-white/10 bg-white/5 p-5">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="text-xs uppercase tracking-[0.24em] text-white/45">Ką daryti dabar</p>
                   <h3 className="mt-3 font-display text-3xl font-bold">
@@ -2384,7 +2384,7 @@ const SavingsStudioPage = () => {
                 {leadAction ? (
                   <button
                     type="button"
-                    className="button-primary gap-2"
+                    className="button-primary w-full justify-center gap-2 whitespace-normal text-center"
                     onClick={() => handleActionFocus(leadAction)}
                   >
                     {leadAction.ctaLabel}
@@ -2393,7 +2393,7 @@ const SavingsStudioPage = () => {
                 ) : null}
                 <button
                   type="button"
-                  className="button-secondary gap-2"
+                  className="button-secondary w-full justify-center gap-2 whitespace-normal text-center"
                   onClick={() => scrollToSection("savings-automation")}
                 >
                   Peržiūrėti suvestines
@@ -2402,7 +2402,7 @@ const SavingsStudioPage = () => {
               </div>
             </div>
 
-            <div className="mt-8 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
+            <div className="mt-8 grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
               <InsightTile
                 icon={WalletCards}
                 label="Šis mėnuo"
@@ -2431,7 +2431,7 @@ const SavingsStudioPage = () => {
               />
             </div>
 
-            <div className="mt-6 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
+            <div className="mt-6 grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
               <InsightTile
                 icon={Target}
                 label="Tikslai"
@@ -2464,21 +2464,21 @@ const SavingsStudioPage = () => {
 
             {goalPace ? (
               <div className="mt-6 rounded-[24px] border border-white/10 bg-white/5 p-5">
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                   <p className="text-xs uppercase tracking-[0.24em] text-white/45">Tikslo tempas</p>
                     <h3 className="mt-3 font-display text-3xl font-bold">{goalPace.title}</h3>
                   </div>
                   <Target size={18} style={{ color: "rgb(var(--accent-strong))" }} />
                 </div>
-                <div className="mt-4 grid min-w-0 gap-4 lg:grid-cols-3">
+                <div className="mt-4 grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-4">
                   <div className="rounded-[18px] bg-white/5 px-4 py-3">
                     <p className="text-xs uppercase tracking-[0.18em] text-white/45">Reikia per mėn.</p>
-                    <p className="mt-2 text-lg font-semibold">{money.format(goalPace.recommendedMonthly)}</p>
+                    <p className="mt-2 break-words text-lg font-semibold">{money.format(goalPace.recommendedMonthly)}</p>
                   </div>
                   <div className="rounded-[18px] bg-white/5 px-4 py-3">
                     <p className="text-xs uppercase tracking-[0.18em] text-white/45">Liko sukaupti</p>
-                    <p className="mt-2 text-lg font-semibold">{money.format(goalPace.remaining)}</p>
+                    <p className="mt-2 break-words text-lg font-semibold">{money.format(goalPace.remaining)}</p>
                   </div>
                   <div className="rounded-[18px] bg-white/5 px-4 py-3">
                     <p className="text-xs uppercase tracking-[0.18em] text-white/45">Statusas</p>
@@ -2505,7 +2505,7 @@ const SavingsStudioPage = () => {
           </div>
 
           <div className="rounded-[28px] border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.28em] text-white/45">Automatinės įžvalgos</p>
                 <h3 className="mt-3 font-display text-3xl font-bold">Kur verta veikti pirmiausia</h3>
@@ -2542,7 +2542,7 @@ const SavingsStudioPage = () => {
             <h2 className="mt-3 text-2xl font-semibold">Svarbiausios vietos vienoje eilėje</h2>
           </div>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="grid mobile-stack-grid w-full min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3 lg:max-w-[42rem] xl:w-auto">
             {[
               { label: "Įrašai", targetId: "savings-ledger" },
               { label: "Biudžetai", targetId: "savings-budgets" },
@@ -2554,7 +2554,7 @@ const SavingsStudioPage = () => {
               <button
                 key={item.targetId}
                 type="button"
-                className="button-secondary gap-2"
+                className="button-secondary w-full justify-center gap-2 whitespace-normal text-center"
                 onClick={() => scrollToSection(item.targetId)}
               >
                 {item.label}
@@ -2566,8 +2566,8 @@ const SavingsStudioPage = () => {
       </section>
 
       <section className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.06fr)_minmax(0,0.94fr)] 2xl:gap-8">
-        <div id="savings-recurring-forecast" className="panel p-6">
-          <div className="flex items-start justify-between gap-4">
+        <div id="savings-recurring-forecast" className="panel w-full min-w-0 max-w-full p-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="eyebrow">pastovių išlaidų ritmas</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Kur pastovios išlaidos spaudžia labiausiai</h2>
@@ -2579,7 +2579,7 @@ const SavingsStudioPage = () => {
             <Repeat size={20} style={{ color: "rgb(var(--accent))" }} />
           </div>
 
-          <div className="mt-6 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
+          <div className="mt-6 grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
             <ForecastMetricTile
               label="Per mėnesį"
               value={money.format(recurringMonthlyTotal)}
@@ -2604,12 +2604,12 @@ const SavingsStudioPage = () => {
           <div className="mt-6 space-y-4">
             {recurringForecastItems.length ? (
               recurringForecastItems.slice(0, 3).map((expense) => (
-                <div key={expense._id} className="soft-card rounded-[24px] p-5">
+                <div key={expense._id} className="soft-card min-w-0 rounded-[24px] p-5">
                   <div className="flex min-w-0 flex-col gap-4">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-3">
-                        <h3 className="text-lg font-semibold">{expense.title}</h3>
-                        <span className="premium-tag">{expense.category}</span>
+                        <h3 className="break-words text-lg font-semibold">{expense.title}</h3>
+                        <span className="premium-tag max-w-full whitespace-normal text-center">{expense.category}</span>
                       </div>
                       <p className="mt-2 text-sm leading-6 text-muted">
                         {formatRecurringFrequency(expense.frequency, recurringFrequencies)} · {money.format(
@@ -2620,7 +2620,7 @@ const SavingsStudioPage = () => {
 
                     <div className="w-full max-w-full rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3 text-left">
                       <p className="text-xs uppercase tracking-[0.18em] text-muted">Metinė našta</p>
-                      <p className="mt-2 text-lg font-semibold">{money.format(expense.annualEquivalent)}</p>
+                      <p className="mt-2 break-words text-lg font-semibold">{money.format(expense.annualEquivalent)}</p>
                     </div>
                   </div>
                 </div>
@@ -2634,8 +2634,8 @@ const SavingsStudioPage = () => {
           </div>
         </div>
 
-        <div className="panel p-6">
-          <div className="flex items-start justify-between gap-4">
+        <div className="panel w-full min-w-0 max-w-full p-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="eyebrow">tikslų scenarijai</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Kokiu tempu pasieksi tikslą</h2>
@@ -2661,8 +2661,8 @@ const SavingsStudioPage = () => {
       </section>
 
       <section className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.04fr)_minmax(0,0.96fr)] 2xl:gap-8">
-        <div className="panel p-6">
-          <div className="flex items-start justify-between gap-4">
+        <div className="panel w-full min-w-0 max-w-full p-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="eyebrow">mėnesių pokytis</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Kas pasikeitė tarp mėnesių</h2>
@@ -2674,7 +2674,7 @@ const SavingsStudioPage = () => {
             <CalendarRange size={20} style={{ color: "rgb(var(--accent))" }} />
           </div>
 
-          <div className="mt-6 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
+          <div className="mt-6 grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
             <ForecastMetricTile
               label="Lyginamas mėnuo"
               value={comparisonMonthLabel}
@@ -2700,7 +2700,7 @@ const SavingsStudioPage = () => {
             />
           </div>
 
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <div className="mt-6 grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
             {categoryMomentum.length ? (
               categoryMomentum.map((item) => (
                 <CategoryShiftCard
@@ -2727,8 +2727,8 @@ const SavingsStudioPage = () => {
           </div>
         </div>
 
-        <div className="panel p-6">
-          <div className="flex items-start justify-between gap-4">
+        <div className="panel w-full min-w-0 max-w-full p-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="eyebrow">veiksmų istorija</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Kas jau įvyko tavo studio</h2>
@@ -2756,14 +2756,14 @@ const SavingsStudioPage = () => {
       </section>
 
       <section id="savings-ledger" className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] 2xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.1fr)_minmax(0,0.98fr)] 2xl:gap-8">
-        <div className="panel p-6">
-          <div className="flex items-start justify-between gap-4">
+        <div className="panel w-full min-w-0 max-w-full p-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="eyebrow">greitas įvedimas</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">{editingId ? "Redaguoti įrašą" : "Pridėti išlaidą"}</h2>
             </div>
             {editingId ? (
-              <button type="button" className="button-secondary" onClick={handleCancelEdit}>
+              <button type="button" className="button-secondary w-full justify-center whitespace-normal text-center" onClick={handleCancelEdit}>
                 Atšaukti
               </button>
             ) : null}
@@ -2781,7 +2781,7 @@ const SavingsStudioPage = () => {
               />
             </label>
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,12rem),1fr))] gap-4">
               <label className="block space-y-2">
                 <span className="text-sm font-semibold text-muted">Suma</span>
                 <input
@@ -2834,13 +2834,13 @@ const SavingsStudioPage = () => {
             </label>
 
             <button type="submit" className="button-primary w-full gap-2" disabled={submitting}>
-              <Plus size={16} />
+              <Plus className="shrink-0" size={16} />
               {submitting ? "Saugoma..." : editingId ? "Atnaujinti išlaidą" : "Išsaugoti išlaidą"}
             </button>
           </form>
         </div>
 
-        <div className="panel p-6">
+        <div className="panel w-full min-w-0 max-w-full p-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="eyebrow">išlaidų istorija</p>
@@ -2908,12 +2908,12 @@ const SavingsStudioPage = () => {
           <div className="mt-6 space-y-4">
             {filteredEntries.length ? (
               filteredEntries.map((entry) => (
-                <article key={entry._id} className="soft-card rounded-[24px] p-5">
+                <article key={entry._id} className="soft-card min-w-0 rounded-[24px] p-5">
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-3">
                         <h3 className="font-display text-2xl font-bold">{entry.title}</h3>
-                        <span className="premium-tag">{entry.category}</span>
+                        <span className="premium-tag max-w-full whitespace-normal text-center">{entry.category}</span>
                       </div>
                       <p className="mt-3 text-sm leading-6 text-muted">
                         {entry.notes || "Be papildomų pastabų."}
@@ -2929,7 +2929,7 @@ const SavingsStudioPage = () => {
                   </div>
 
                   <div className="mt-4 flex flex-wrap gap-3">
-                    <button type="button" className="button-secondary gap-2" onClick={() => handleEdit(entry)}>
+                    <button type="button" className="button-secondary w-full justify-center gap-2 whitespace-normal text-center" onClick={() => handleEdit(entry)}>
                       <Pencil size={16} />
                       Redaguoti
                     </button>
@@ -2955,8 +2955,8 @@ const SavingsStudioPage = () => {
         </div>
 
         <div className="space-y-6">
-          <div id="savings-budgets" className="panel p-6">
-            <div className="flex items-start justify-between gap-4">
+          <div id="savings-budgets" className="panel w-full min-w-0 max-w-full p-6">
+            <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
               <p className="eyebrow">mėnesio biudžetai</p>
                 <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Biudžetų ribos</h2>
@@ -2998,13 +2998,13 @@ const SavingsStudioPage = () => {
               ))}
 
               <button type="submit" className="button-primary w-full gap-2" disabled={savingBudgets || loadingBudgets}>
-                <Target size={16} />
+                <Target className="shrink-0" size={16} />
                 {savingBudgets ? "Saugoma..." : loadingBudgets ? "Kraunama biudžetus..." : `Išsaugoti ${selectedBudgetMonth} biudžetus`}
               </button>
             </form>
           </div>
 
-          <div className="panel p-6">
+          <div className="panel w-full min-w-0 max-w-full p-6">
               <p className="eyebrow">mėnesio vaizdas</p>
             <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">6 mėnesių vaizdas</h2>
             <div className="mt-6 w-full max-w-full overflow-x-auto pb-2">
@@ -3040,8 +3040,8 @@ const SavingsStudioPage = () => {
             </div>
           </div>
 
-          <div className="panel p-6">
-            <div className="flex items-start justify-between gap-4">
+          <div className="panel w-full min-w-0 max-w-full p-6">
+            <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
               <p className="eyebrow">biudžetų progresas</p>
                 <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Kiek liko iki limito</h2>
@@ -3053,7 +3053,7 @@ const SavingsStudioPage = () => {
               {budgetProgress.length ? (
                 budgetProgress.map((entry) => (
                   <div key={entry.category} className="soft-card rounded-[20px] px-4 py-4">
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                       <span className="font-medium">{entry.category}</span>
                       <span
                         className={`font-semibold ${
@@ -3094,7 +3094,7 @@ const SavingsStudioPage = () => {
               ) : categoryTotals.length ? (
                 categoryTotals.map((entry) => (
                   <div key={entry.category} className="soft-card rounded-[20px] px-4 py-4">
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                       <span className="font-medium">{entry.category}</span>
                       <span className="font-semibold">{money.format(entry.total)}</span>
                     </div>
@@ -3111,8 +3111,8 @@ const SavingsStudioPage = () => {
       </section>
 
       <section className="grid min-w-0 gap-6 xl:grid-cols-2 2xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)_minmax(0,1fr)] 2xl:gap-8">
-        <div className="panel p-6">
-          <div className="flex items-start justify-between gap-4">
+        <div className="panel w-full min-w-0 max-w-full p-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="eyebrow">savaitinis ritmas</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Savaitinis mėnesio ritmas</h2>
@@ -3124,33 +3124,38 @@ const SavingsStudioPage = () => {
             <TrendingUp size={20} style={{ color: "rgb(var(--accent))" }} />
           </div>
 
-          <div className="mt-6 grid h-[250px] grid-cols-5 items-end gap-3">
-            {weeklyTotalsCurrentMonth.map((entry) => {
-              const height = `${Math.max((Number(entry.total || 0) / highestWeeklyTotal) * 100, entry.total ? 16 : 8)}%`;
+          <div className="mt-6 w-full max-w-full overflow-x-auto pb-2">
+            <div className="grid h-[250px] min-w-[28rem] grid-cols-5 items-end gap-3">
+              {weeklyTotalsCurrentMonth.map((entry) => {
+                const height = `${Math.max((Number(entry.total || 0) / highestWeeklyTotal) * 100, entry.total ? 16 : 8)}%`;
+                const formattedTotal = money.format(entry.total);
 
-              return (
-                <div key={entry.key} className="flex h-full flex-col items-center justify-end gap-3">
-                  <div className="relative h-full w-full overflow-hidden rounded-full bg-[rgb(var(--surface-soft))]">
-                    <div
-                      className="absolute inset-x-0 bottom-0 rounded-full"
-                      style={{
-                        height,
-                        background: "linear-gradient(180deg, rgb(var(--accent)), rgb(var(--accent-strong)))",
-                      }}
-                    />
+                return (
+                  <div key={entry.key} className="flex h-full min-w-0 flex-col items-center justify-end gap-3">
+                    <div className="relative h-full w-full overflow-hidden rounded-full bg-[rgb(var(--surface-soft))]">
+                      <div
+                        className="absolute inset-x-0 bottom-0 rounded-full"
+                        style={{
+                          height,
+                          background: "linear-gradient(180deg, rgb(var(--accent)), rgb(var(--accent-strong)))",
+                        }}
+                      />
+                    </div>
+                    <div className="min-w-0 w-full text-center">
+                      <p className="whitespace-nowrap text-xs font-semibold uppercase tracking-normal text-muted">{entry.label}</p>
+                      <p className="mt-1 whitespace-nowrap text-sm font-semibold leading-tight tabular-nums" title={formattedTotal}>
+                        {formattedTotal}
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-center">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">{entry.label}</p>
-                    <p className="mt-1 text-sm font-semibold">{money.format(entry.total)}</p>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        <div className="panel p-6">
-          <div className="flex items-start justify-between gap-4">
+        <div className="panel w-full min-w-0 max-w-full p-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="eyebrow">išlaidų balansas</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Fiksuota vs lanksti dalis</h2>
@@ -3159,24 +3164,24 @@ const SavingsStudioPage = () => {
           </div>
 
           <div className="mt-6 space-y-4">
-            <div className="soft-card rounded-[24px] p-5">
-              <div className="flex items-center justify-between gap-4">
+            <div className="soft-card min-w-0 rounded-[24px] p-5">
+              <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                     <span className="font-medium">Jau užfiksuotos pastovios išlaidos</span>
                 <span className="font-semibold">{money.format(fixedVsFlexible.loggedRecurring)}</span>
               </div>
               <p className="mt-2 text-sm text-muted">Mokėjimai, kuriuos jau pavertei tikrais mėnesio įrašais.</p>
             </div>
 
-            <div className="soft-card rounded-[24px] p-5">
-              <div className="flex items-center justify-between gap-4">
+            <div className="soft-card min-w-0 rounded-[24px] p-5">
+              <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                     <span className="font-medium">Dar likusios projekcijos</span>
                 <span className="font-semibold">{money.format(fixedVsFlexible.recurringRemaining)}</span>
               </div>
               <p className="mt-2 text-sm text-muted">Pastovios išlaidos, kurios dar laukia savo mėnesio įrašo.</p>
             </div>
 
-            <div className="soft-card rounded-[24px] p-5">
-              <div className="flex items-center justify-between gap-4">
+            <div className="soft-card min-w-0 rounded-[24px] p-5">
+              <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                 <span className="font-medium">Lankstus išleidimas</span>
                 <span className="font-semibold">{money.format(fixedVsFlexible.flexibleSpent)}</span>
               </div>
@@ -3184,7 +3189,7 @@ const SavingsStudioPage = () => {
             </div>
 
             {savingsCapacity ? (
-              <div className="soft-card rounded-[24px] p-5">
+              <div className="soft-card min-w-0 rounded-[24px] p-5">
                 <p className="text-xs uppercase tracking-[0.18em] text-muted">Savings capacity</p>
                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   <div>
@@ -3201,8 +3206,8 @@ const SavingsStudioPage = () => {
           </div>
         </div>
 
-        <div className="panel p-6">
-          <div className="flex items-start justify-between gap-4">
+        <div className="panel w-full min-w-0 max-w-full p-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="eyebrow">kategorijų spaudimas</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Kuri kategorija spaudžia labiausiai</h2>
@@ -3213,8 +3218,8 @@ const SavingsStudioPage = () => {
           <div className="mt-6 space-y-4">
             {categoryPressure.length ? (
               categoryPressure.map((entry) => (
-                <div key={entry.category} className="soft-card rounded-[24px] p-5">
-                  <div className="flex items-center justify-between gap-4">
+                <div key={entry.category} className="soft-card min-w-0 rounded-[24px] p-5">
+                  <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                     <span className="font-medium">{entry.category}</span>
                     <span
                       className={`font-semibold ${
@@ -3255,14 +3260,14 @@ const SavingsStudioPage = () => {
       </section>
 
       <section id="savings-goals" className="grid min-w-0 gap-6 xl:grid-cols-2 2xl:gap-8">
-        <div className="panel p-6">
-          <div className="flex items-start justify-between gap-4">
+        <div className="panel w-full min-w-0 max-w-full p-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="eyebrow">taupymo tikslai</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">{editingGoalId ? "Redaguoti tikslą" : "Taupymo tikslai"}</h2>
             </div>
             {editingGoalId ? (
-              <button type="button" className="button-secondary" onClick={handleCancelGoalEdit}>
+              <button type="button" className="button-secondary w-full justify-center whitespace-normal text-center" onClick={handleCancelGoalEdit}>
                 Atšaukti
               </button>
             ) : null}
@@ -3280,7 +3285,7 @@ const SavingsStudioPage = () => {
               />
             </label>
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,12rem),1fr))] gap-4">
               <label className="block space-y-2">
                 <span className="text-sm font-semibold text-muted">Tikslinė suma</span>
                 <input
@@ -3328,7 +3333,7 @@ const SavingsStudioPage = () => {
             </label>
 
             <button type="submit" className="button-primary w-full gap-2" disabled={savingGoal}>
-              <Target size={16} />
+              <Target className="shrink-0" size={16} />
               {savingGoal ? "Saugoma..." : editingGoalId ? "Atnaujinti tikslą" : "Pridėti tikslą"}
             </button>
           </form>
@@ -3336,7 +3341,7 @@ const SavingsStudioPage = () => {
           <div className="mt-6 space-y-4">
             {decoratedGoals.length ? (
               decoratedGoals.map((goal) => (
-                <div key={goal._id} className="soft-card rounded-[24px] p-5">
+                <div key={goal._id} className="soft-card min-w-0 rounded-[24px] p-5">
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div>
                       <h3 className="font-display text-2xl font-bold">{goal.title}</h3>
@@ -3345,7 +3350,7 @@ const SavingsStudioPage = () => {
                       </p>
                     </div>
                     <div className="text-left md:text-right">
-                      <p className="text-xl font-semibold">
+                      <p className="break-words text-xl font-semibold">
                         {money.format(goal.currentAmount)} / {money.format(goal.targetAmount)}
                       </p>
                       <p className="mt-1 text-sm text-muted">
@@ -3364,7 +3369,7 @@ const SavingsStudioPage = () => {
                   {goal.notes ? <p className="mt-3 text-sm leading-6 text-muted">{goal.notes}</p> : null}
 
                   <div className="mt-4 flex flex-wrap gap-3">
-                    <button type="button" className="button-secondary gap-2" onClick={() => handleEditGoal(goal)}>
+                    <button type="button" className="button-secondary w-full justify-center gap-2 whitespace-normal text-center" onClick={() => handleEditGoal(goal)}>
                       <Pencil size={16} />
                       Redaguoti
                     </button>
@@ -3388,8 +3393,8 @@ const SavingsStudioPage = () => {
           </div>
         </div>
 
-        <div id="savings-recurring" className="panel p-6">
-          <div className="flex items-start justify-between gap-4">
+        <div id="savings-recurring" className="panel w-full min-w-0 max-w-full p-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="eyebrow">pastovios išlaidos</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">
@@ -3397,7 +3402,7 @@ const SavingsStudioPage = () => {
               </h2>
             </div>
             {editingRecurringId ? (
-              <button type="button" className="button-secondary" onClick={handleCancelRecurringEdit}>
+              <button type="button" className="button-secondary w-full justify-center whitespace-normal text-center" onClick={handleCancelRecurringEdit}>
                 Atšaukti
               </button>
             ) : null}
@@ -3415,7 +3420,7 @@ const SavingsStudioPage = () => {
               />
             </label>
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,12rem),1fr))] gap-4">
               <label className="block space-y-2">
                 <span className="text-sm font-semibold text-muted">Suma</span>
                 <input
@@ -3485,19 +3490,19 @@ const SavingsStudioPage = () => {
           <div className="mt-6 space-y-4">
             {recurringExpenses.length ? (
               recurringExpenses.map((recurringExpense) => (
-                <div key={recurringExpense._id} className="soft-card rounded-[24px] p-5">
+                <div key={recurringExpense._id} className="soft-card min-w-0 rounded-[24px] p-5">
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div>
                       <div className="flex flex-wrap items-center gap-3">
                         <h3 className="font-display text-2xl font-bold">{recurringExpense.title}</h3>
-                        <span className="premium-tag">{recurringExpense.category}</span>
+                        <span className="premium-tag max-w-full whitespace-normal text-center">{recurringExpense.category}</span>
                       </div>
                       <p className="mt-2 text-sm text-muted">
                         {formatRecurringFrequency(recurringExpense.frequency, recurringFrequencies)}
                       </p>
                     </div>
                     <div className="text-left md:text-right">
-                      <p className="text-xl font-semibold">{money.format(recurringExpense.amount)}</p>
+                      <p className="break-words text-xl font-semibold">{money.format(recurringExpense.amount)}</p>
                       <p className="mt-1 text-sm text-muted">
                         ~ {money.format(recurringExpense.monthlyEquivalent || recurringMonthlyEquivalent(recurringExpense))} / mėn.
                       </p>
@@ -3541,7 +3546,7 @@ const SavingsStudioPage = () => {
                   <div className="mt-4 flex flex-wrap gap-3">
                     <button
                       type="button"
-                      className="button-secondary gap-2"
+                      className="button-secondary w-full justify-center gap-2 whitespace-normal text-center"
                       onClick={() => handleEditRecurring(recurringExpense)}
                     >
                       <Pencil size={16} />
@@ -3569,8 +3574,8 @@ const SavingsStudioPage = () => {
       </section>
 
       <section className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] 2xl:gap-8">
-        <div className="panel p-6">
-          <div className="flex items-start justify-between gap-4">
+        <div className="panel w-full min-w-0 max-w-full p-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="eyebrow">tikslų strategija</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Kaip išdėlioti tikslus protingiau</h2>
@@ -3582,7 +3587,7 @@ const SavingsStudioPage = () => {
             <Target size={20} style={{ color: "rgb(var(--accent))" }} />
           </div>
 
-          <div className="mt-6 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
+          <div className="mt-6 grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
             <ForecastMetricTile
               label="Aktyvūs tikslai"
               value={String(goalStrategyBoard.length)}
@@ -3616,8 +3621,8 @@ const SavingsStudioPage = () => {
           </div>
         </div>
 
-        <div className="panel p-6">
-          <div className="flex items-start justify-between gap-4">
+        <div className="panel w-full min-w-0 max-w-full p-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="eyebrow">pastovių išlaidų apžvalga</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Ką verta peržiūrėti pastovių išlaidų dalyje</h2>
@@ -3629,7 +3634,7 @@ const SavingsStudioPage = () => {
             <Repeat size={20} style={{ color: "rgb(var(--accent))" }} />
           </div>
 
-          <div className="mt-6 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
+          <div className="mt-6 grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
             <ForecastMetricTile
               label="Per ketvirtį"
               value={money.format(recurringQuarterlyTotal)}
@@ -3676,8 +3681,8 @@ const SavingsStudioPage = () => {
       </section>
 
       <section className="grid min-w-0 gap-6 xl:grid-cols-2 2xl:grid-cols-[minmax(0,1.04fr)_minmax(0,0.96fr)_minmax(0,1fr)] 2xl:gap-8">
-        <div className="panel p-6">
-          <div className="flex items-start justify-between gap-4">
+        <div className="panel w-full min-w-0 max-w-full p-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="eyebrow">mėnesio gidas</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Šio mėnesio Stilloak brief</h2>
@@ -3702,8 +3707,8 @@ const SavingsStudioPage = () => {
           </div>
         </div>
 
-        <div className="panel p-6">
-          <div className="flex items-start justify-between gap-4">
+        <div className="panel w-full min-w-0 max-w-full p-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="eyebrow">nario kelias</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Kaip bręsta tavo nario kelias</h2>
@@ -3731,8 +3736,8 @@ const SavingsStudioPage = () => {
           </div>
         </div>
 
-        <div className="panel p-6">
-          <div className="flex items-start justify-between gap-4">
+        <div className="panel w-full min-w-0 max-w-full p-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="eyebrow">automatikos ritmas</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Ką verta automatizuoti dabar</h2>
@@ -3744,7 +3749,7 @@ const SavingsStudioPage = () => {
             <Mail size={20} style={{ color: "rgb(var(--accent))" }} />
           </div>
 
-          <div className="mt-6 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
+          <div className="mt-6 grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
             <ForecastMetricTile
               label="Suvestinės"
               value={automationReadiness.summaryStatus}
@@ -3778,8 +3783,8 @@ const SavingsStudioPage = () => {
       </section>
 
       <section className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] 2xl:gap-8">
-        <div className="panel p-6">
-          <div className="flex items-start justify-between gap-4">
+        <div className="panel w-full min-w-0 max-w-full p-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="eyebrow">strategijos centras</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Aukšto lygio mėnesio vaizdas</h2>
@@ -3791,7 +3796,7 @@ const SavingsStudioPage = () => {
             <PiggyBank size={20} style={{ color: "rgb(var(--accent))" }} />
           </div>
 
-          <div className="mt-6 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
+          <div className="mt-6 grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
             <ForecastMetricTile
               label="Aiškumo balas"
               value={`${strategyCenter.score}/100`}
@@ -3815,7 +3820,7 @@ const SavingsStudioPage = () => {
           </div>
 
           <div className="mt-6 grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
-            <div className="soft-card rounded-[24px] p-5">
+            <div className="soft-card min-w-0 rounded-[24px] p-5">
               <p className="text-xs uppercase tracking-[0.18em] text-muted">Kitas svarbiausias milestone</p>
               <h3 className="mt-3 text-2xl font-semibold">{strategyCenter.nextMilestone}</h3>
               <p className="mt-3 text-sm leading-6 text-muted">
@@ -3824,7 +3829,7 @@ const SavingsStudioPage = () => {
               </p>
             </div>
 
-            <div className="soft-card rounded-[24px] p-5">
+            <div className="soft-card min-w-0 rounded-[24px] p-5">
               <p className="text-xs uppercase tracking-[0.18em] text-muted">Premium išvada</p>
               <p className="mt-3 text-sm leading-7 text-muted">
                 {strategyCenter.score >= 85
@@ -3837,8 +3842,8 @@ const SavingsStudioPage = () => {
           </div>
         </div>
 
-        <div className="panel p-6">
-          <div className="flex items-start justify-between gap-4">
+        <div className="panel w-full min-w-0 max-w-full p-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="eyebrow">importo kokybė</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Ką rodo tavo importų sluoksnis</h2>
@@ -3850,7 +3855,7 @@ const SavingsStudioPage = () => {
             <Download size={20} style={{ color: "rgb(var(--accent))" }} />
           </div>
 
-          <div className="mt-6 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
+          <div className="mt-6 grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
             <ForecastMetricTile
               label="Paskutinis importas"
               value={lastImportEvent?.timestamp || "Dar nebuvo"}
@@ -3905,8 +3910,8 @@ const SavingsStudioPage = () => {
       </section>
 
       <section id="savings-automation" className="grid min-w-0 gap-6 xl:grid-cols-2 2xl:gap-8">
-        <div className="panel p-6">
-          <div className="flex items-start justify-between gap-4">
+        <div className="panel w-full min-w-0 max-w-full p-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="eyebrow">el. pašto suvestinės</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Savaitinės ir mėnesinės suvestinės</h2>
@@ -3949,51 +3954,65 @@ const SavingsStudioPage = () => {
               </select>
             </label>
 
-            <button type="submit" className="button-primary w-full gap-2" disabled={savingEmailSettings}>
-              <Mail size={16} />
-              {savingEmailSettings ? "Saugoma..." : "Išsaugoti suvestinių nustatymus"}
+            <button
+              type="submit"
+              className="button-primary w-full justify-center gap-2 whitespace-normal text-center"
+              disabled={savingEmailSettings}
+            >
+              <Mail className="shrink-0" size={16} />
+              <span className="min-w-0 whitespace-normal">
+                {savingEmailSettings ? "Saugoma..." : "Išsaugoti suvestinių nustatymus"}
+              </span>
             </button>
           </form>
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <div className="mt-6 grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
             <button
               type="button"
-              className="button-secondary w-full justify-center gap-2"
+              className="button-secondary w-full justify-center gap-2 whitespace-normal text-center"
               onClick={() => handleSendSummaryEmail("weekly")}
               disabled={sendingSummaryEmail}
             >
-              <Mail size={16} />
-              {sendingSummaryEmail ? "Siunčiama..." : "Išsiųsti savaitės suvestinę"}
+              <Mail className="shrink-0" size={16} />
+              <span className="min-w-0 whitespace-normal">
+                {sendingSummaryEmail ? "Siunčiama..." : "Išsiųsti savaitės suvestinę"}
+              </span>
             </button>
             <button
               type="button"
-              className="button-secondary w-full justify-center gap-2"
+              className="button-secondary w-full justify-center gap-2 whitespace-normal text-center"
               onClick={() => handleSendSummaryEmail("monthly")}
               disabled={sendingSummaryEmail}
             >
-              <Mail size={16} />
-              {sendingSummaryEmail ? "Siunčiama..." : "Išsiųsti mėnesio suvestinę"}
+              <Mail className="shrink-0" size={16} />
+              <span className="min-w-0 whitespace-normal">
+                {sendingSummaryEmail ? "Siunčiama..." : "Išsiųsti mėnesio suvestinę"}
+              </span>
             </button>
           </div>
 
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div className="mt-4 grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,12rem),1fr))] gap-4">
             <button
               type="button"
-              className="button-secondary w-full justify-center gap-2"
+              className="button-secondary w-full justify-center gap-2 whitespace-normal text-center"
               onClick={() => handleDownloadSummary("weekly")}
               disabled={downloadingSummaryKey === "weekly"}
             >
-              <Download size={16} />
-              {downloadingSummaryKey === "weekly" ? "Ruošiama..." : "Atsisiųsti savaitės suvestinę"}
+              <Download className="shrink-0" size={16} />
+              <span className="min-w-0 whitespace-normal">
+                {downloadingSummaryKey === "weekly" ? "Ruošiama..." : "Atsisiųsti savaitės suvestinę"}
+              </span>
             </button>
             <button
               type="button"
-              className="button-secondary w-full justify-center gap-2"
+              className="button-secondary w-full justify-center gap-2 whitespace-normal text-center"
               onClick={() => handleDownloadSummary("monthly")}
               disabled={downloadingSummaryKey === "monthly"}
             >
-              <Download size={16} />
-              {downloadingSummaryKey === "monthly" ? "Ruošiama..." : "Atsisiųsti mėnesio suvestinę"}
+              <Download className="shrink-0" size={16} />
+              <span className="min-w-0 whitespace-normal">
+                {downloadingSummaryKey === "monthly" ? "Ruošiama..." : "Atsisiųsti mėnesio suvestinę"}
+              </span>
             </button>
           </div>
 
@@ -4011,7 +4030,7 @@ const SavingsStudioPage = () => {
           </div>
 
           <div className="mt-6 soft-card rounded-[24px] p-5">
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.18em] text-muted">Suvestinių archyvas</p>
                 <h3 className="mt-2 text-xl font-semibold">Paskutiniai suvestinių veiksmai</h3>
@@ -4042,8 +4061,8 @@ const SavingsStudioPage = () => {
           </div>
         </div>
 
-        <div id="savings-import" className="panel p-6">
-          <div className="flex items-start justify-between gap-4">
+        <div id="savings-import" className="panel w-full min-w-0 max-w-full p-6">
+          <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="eyebrow">banko importas</p>
               <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">Banko išrašo importas</h2>
@@ -4078,7 +4097,7 @@ const SavingsStudioPage = () => {
 
           {csvPreviewResult ? (
             <div className="mt-6 space-y-4">
-              <div className="soft-card rounded-[24px] p-5">
+              <div className="soft-card min-w-0 rounded-[24px] p-5">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-xs uppercase tracking-[0.18em] text-muted">Peržiūra</p>
@@ -4089,24 +4108,26 @@ const SavingsStudioPage = () => {
                       {csvPreviewResult.duplicateCount || 0}
                     </p>
                   </div>
-                  <div className="flex flex-wrap gap-3">
+                  <div className="grid mobile-stack-grid w-full min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3 lg:max-w-[42rem] xl:w-auto">
                     <button
                       type="button"
-                      className="button-primary gap-2"
+                      className="button-primary w-full justify-center gap-2 whitespace-normal text-center"
                       onClick={handleConfirmCsvImport}
                       disabled={confirmingCsvImport || !csvPreviewResult.validCount}
                     >
-                      <Download size={16} />
-                      {confirmingCsvImport ? "Importuojama..." : `Importuoti ${csvPreviewResult.validCount} eilučių`}
+                      <Download className="shrink-0" size={16} />
+                      <span className="min-w-0 whitespace-normal">
+                        {confirmingCsvImport ? "Importuojama..." : `Importuoti ${csvPreviewResult.validCount} eilučių`}
+                      </span>
                     </button>
-                    <button type="button" className="button-secondary" onClick={handleClearCsvPreview}>
+                    <button type="button" className="button-secondary w-full justify-center whitespace-normal text-center" onClick={handleClearCsvPreview}>
                       Išvalyti peržiūrą
                     </button>
                   </div>
                 </div>
               </div>
 
-              <div className="soft-card rounded-[24px] p-5">
+              <div className="soft-card min-w-0 rounded-[24px] p-5">
                 <p className="text-xs uppercase tracking-[0.18em] text-muted">Pirmos eilutės</p>
                 <div className="mt-4 space-y-3">
                   {(csvPreviewResult.preview || []).map((row) => (
@@ -4133,7 +4154,7 @@ const SavingsStudioPage = () => {
                             </p>
                           )}
                         </div>
-                        <span className="premium-tag">
+                        <span className="premium-tag max-w-full whitespace-normal text-center">
                           {row.status === "ok" ? "Bus importuota" : row.status === "duplicate" ? "Dublikatas" : "Atmesta"}
                         </span>
                       </div>
@@ -4144,8 +4165,8 @@ const SavingsStudioPage = () => {
             </div>
           ) : null}
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <div className="soft-card rounded-[24px] p-5">
+          <div className="mt-6 grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-4">
+            <div className="soft-card min-w-0 rounded-[24px] p-5">
               <p className="text-xs uppercase tracking-[0.18em] text-muted">Priimami stulpeliai</p>
               <ul className="mt-3 space-y-2 text-sm leading-6 text-muted">
                 <li>`title`, `name`, `description`, `merchant`</li>
@@ -4155,7 +4176,7 @@ const SavingsStudioPage = () => {
               </ul>
             </div>
 
-            <div className="soft-card rounded-[24px] p-5">
+            <div className="soft-card min-w-0 rounded-[24px] p-5">
               <p className="text-xs uppercase tracking-[0.18em] text-muted">Kaip veikia</p>
               <ol className="mt-3 space-y-2 text-sm leading-6 text-muted">
                 <li>1. Iš banko eksportuoji CSV.</li>
@@ -4256,7 +4277,7 @@ const ForecastMetricTile = ({ hint, label, value }) => (
 );
 
 const GoalScenarioCard = ({ scenario }) => (
-  <div className="soft-card rounded-[24px] p-5">
+  <div className="soft-card min-w-0 rounded-[24px] p-5">
     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div>
         <p className="text-xs uppercase tracking-[0.18em] text-muted">{scenario.label}</p>
@@ -4279,10 +4300,10 @@ const GoalScenarioCard = ({ scenario }) => (
       </span>
     </div>
 
-    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+    <div className="mt-4 grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))] gap-3">
       <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
         <p className="text-xs uppercase tracking-[0.18em] text-muted">Mėnesiai iki tikslo</p>
-        <p className="mt-2 text-lg font-semibold">{scenario.monthsToGoal}</p>
+        <p className="mt-2 break-words text-lg font-semibold">{scenario.monthsToGoal}</p>
       </div>
       <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
         <p className="text-xs uppercase tracking-[0.18em] text-muted">Rezervas po pastovių išlaidų</p>
@@ -4299,11 +4320,11 @@ const GoalScenarioCard = ({ scenario }) => (
 );
 
 const CategoryShiftCard = ({ currentMonthLabel, item, onOpen, previousMonthLabel }) => (
-  <div className="soft-card rounded-[24px] p-5">
+  <div className="soft-card min-w-0 rounded-[24px] p-5">
     <div className="flex min-w-0 flex-col gap-4">
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-3">
-          <h3 className="text-lg font-semibold">{item.category}</h3>
+          <h3 className="break-words text-lg font-semibold">{item.category}</h3>
           <span
             className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${
               item.direction === "up"
@@ -4337,7 +4358,7 @@ const CategoryShiftCard = ({ currentMonthLabel, item, onOpen, previousMonthLabel
       </div>
     </div>
 
-    <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+    <div className="mt-4 flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <p className="text-xs uppercase tracking-[0.18em] text-muted">
         {item.direction === "up"
           ? "Čia verta pažiūrėti konkrečius pirkinius ir tempą."
@@ -4345,7 +4366,7 @@ const CategoryShiftCard = ({ currentMonthLabel, item, onOpen, previousMonthLabel
           ? "Matyti realus atlaisvėjimas šioje kategorijoje."
           : "Kategorija kol kas juda gana stabiliai."}
       </p>
-      <button type="button" className="button-secondary gap-2" onClick={onOpen}>
+      <button type="button" className="button-secondary w-full justify-center gap-2 whitespace-normal text-center" onClick={onOpen}>
         Rodyti įrašus
         <ArrowUpRight size={14} />
       </button>
@@ -4365,7 +4386,7 @@ const ActivityTimelineItem = ({ item, onOpen }) => {
       <div className="flex min-w-0 flex-col gap-4">
         <div className="min-w-0">
           <p className="text-xs uppercase tracking-[0.18em] text-muted">{item.timestamp}</p>
-          <h3 className="mt-2 text-lg font-semibold">{item.title}</h3>
+          <h3 className="mt-2 break-words text-lg font-semibold">{item.title}</h3>
           <p className="mt-2 text-sm leading-6 text-muted">{item.body}</p>
         </div>
 
@@ -4392,11 +4413,11 @@ const GoalStrategyCard = ({ goal, onOpen }) => {
   };
 
   return (
-    <div className="soft-card rounded-[24px] p-5">
+    <div className="soft-card min-w-0 rounded-[24px] p-5">
       <div className="flex min-w-0 flex-col gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-3">
-            <h3 className="text-lg font-semibold">{goal.title}</h3>
+            <h3 className="break-words text-lg font-semibold">{goal.title}</h3>
             <span className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${priorityClasses[goal.priority] || priorityClasses.steady}`}>
               {goal.strategyTitle}
             </span>
@@ -4413,18 +4434,18 @@ const GoalStrategyCard = ({ goal, onOpen }) => {
         </button>
       </div>
 
-      <div className="mt-4 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))] gap-3">
+      <div className="mt-4 grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))] gap-3">
         <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
           <p className="text-xs uppercase tracking-[0.18em] text-muted">Liko sukaupti</p>
-          <p className="mt-2 text-lg font-semibold">{money.format(goal.remaining)}</p>
+          <p className="mt-2 break-words text-lg font-semibold">{money.format(goal.remaining)}</p>
         </div>
         <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
           <p className="text-xs uppercase tracking-[0.18em] text-muted">Reikia per mėn.</p>
-          <p className="mt-2 text-lg font-semibold">{money.format(goal.recommendedMonthly)}</p>
+          <p className="mt-2 break-words text-lg font-semibold">{money.format(goal.recommendedMonthly)}</p>
         </div>
         <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
           <p className="text-xs uppercase tracking-[0.18em] text-muted">Vietos reikalauja</p>
-          <p className="mt-2 text-lg font-semibold">
+          <p className="mt-2 break-words text-lg font-semibold">
             {goal.shareOfFree === null ? "—" : `${goal.shareOfFree}%`}
           </p>
         </div>
@@ -4445,12 +4466,12 @@ const RecurringReviewCard = ({ expense, onOpen }) => {
   };
 
   return (
-    <div className="soft-card rounded-[24px] p-5">
+    <div className="soft-card min-w-0 rounded-[24px] p-5">
       <div className="flex min-w-0 flex-col gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-3">
-            <h3 className="text-lg font-semibold">{expense.title}</h3>
-            <span className="premium-tag">{expense.category}</span>
+            <h3 className="break-words text-lg font-semibold">{expense.title}</h3>
+            <span className="premium-tag max-w-full whitespace-normal text-center">{expense.category}</span>
             <span className={`rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${priorityClasses[expense.priority] || priorityClasses.steady}`}>
                     {expense.priority === "focus" ? "Peržiūrėti pirmiausia" : expense.priority === "watch" ? "Stebėti" : "Stabilu"}
             </span>
@@ -4467,18 +4488,18 @@ const RecurringReviewCard = ({ expense, onOpen }) => {
         </button>
       </div>
 
-      <div className="mt-4 grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))] gap-3">
+      <div className="mt-4 grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))] gap-3">
         <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
           <p className="text-xs uppercase tracking-[0.18em] text-muted">Per mėn.</p>
-          <p className="mt-2 text-lg font-semibold">{money.format(expense.monthlyEquivalent)}</p>
+          <p className="mt-2 break-words text-lg font-semibold">{money.format(expense.monthlyEquivalent)}</p>
         </div>
         <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
           <p className="text-xs uppercase tracking-[0.18em] text-muted">Per metus</p>
-          <p className="mt-2 text-lg font-semibold">{money.format(expense.annualEquivalent)}</p>
+          <p className="mt-2 break-words text-lg font-semibold">{money.format(expense.annualEquivalent)}</p>
         </div>
         <div className="rounded-[18px] bg-[rgb(var(--surface-soft))] px-4 py-3">
           <p className="text-xs uppercase tracking-[0.18em] text-muted">Pastovių išlaidų dalis</p>
-          <p className="mt-2 text-lg font-semibold">{expense.shareOfRecurring}%</p>
+          <p className="mt-2 break-words text-lg font-semibold">{expense.shareOfRecurring}%</p>
         </div>
       </div>
 
@@ -4508,7 +4529,7 @@ const SummaryArchiveItem = ({ item, onDownload, onSend }) => {
           <p className="mt-2 text-sm leading-6 text-muted">{item.body}</p>
         </div>
         {!isBackup ? (
-          <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))] gap-2">
+          <div className="grid mobile-stack-grid w-full grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))] gap-2">
             <button
               type="button"
               className="button-secondary w-full max-w-full justify-center gap-2 whitespace-normal break-normal text-center"
@@ -4652,7 +4673,7 @@ const InsightSignalCard = ({ insight }) => {
 
   return (
     <div className={`rounded-[18px] border px-4 py-4 ${config.borderClass}`}>
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm font-semibold text-white">{insight.title}</p>
           <p className="mt-2 text-sm leading-6 text-white/72">{insight.body}</p>
@@ -4678,14 +4699,14 @@ const UsageWizardModal = ({
 }) => (
   <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/55 px-4 py-6 backdrop-blur-sm">
     <div className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-[32px] bg-white p-6 shadow-[0_30px_120px_rgba(0,0,0,0.28)] sm:p-8">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-muted">{currentStep.eyebrow}</p>
           <h2 className="mt-3 text-3xl font-bold leading-tight sm:text-[2rem]">{currentStep.title}</h2>
           <p className="mt-4 max-w-2xl text-base leading-7 text-muted">{currentStep.description}</p>
         </div>
 
-        <button type="button" className="button-secondary" onClick={onClose}>
+        <button type="button" className="button-secondary w-full justify-center whitespace-normal text-center" onClick={onClose}>
           Uždaryti
         </button>
       </div>
@@ -4729,23 +4750,23 @@ const UsageWizardModal = ({
       </div>
 
       <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap gap-3">
+        <div className="grid mobile-stack-grid w-full min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3 lg:max-w-[42rem] xl:w-auto">
           {!isFirstStep ? (
-            <button type="button" className="button-secondary gap-2" onClick={onBack}>
+            <button type="button" className="button-secondary w-full justify-center gap-2 whitespace-normal text-center" onClick={onBack}>
               <ChevronLeft size={16} />
               Atgal
             </button>
           ) : null}
         </div>
 
-        <div className="flex flex-wrap gap-3">
+        <div className="grid mobile-stack-grid w-full min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,11rem),1fr))] gap-3 lg:max-w-[42rem] xl:w-auto">
           {!isLastStep ? (
-            <button type="button" className="button-primary gap-2" onClick={onNext}>
+            <button type="button" className="button-primary w-full justify-center gap-2 whitespace-normal text-center" onClick={onNext}>
               Toliau
               <ChevronRight size={16} />
             </button>
           ) : (
-            <button type="button" className="button-primary gap-2" onClick={onComplete}>
+            <button type="button" className="button-primary w-full justify-center gap-2 whitespace-normal text-center" onClick={onComplete}>
               <CheckCircle2 size={16} />
               Užbaigti gidą
             </button>
@@ -4757,4 +4778,3 @@ const UsageWizardModal = ({
 );
 
 export default SavingsStudioPage;
-
