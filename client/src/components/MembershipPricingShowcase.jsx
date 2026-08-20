@@ -40,13 +40,13 @@ const formatPlanPrice = (value, intervalLabel) => {
   const amount = Number(value || 0);
 
   if (amount === 0) {
-    return "€0";
+    return "0 €";
   }
 
-  const formattedAmount = Number.isInteger(amount) ? String(amount) : amount.toFixed(2);
+  const formattedAmount = Number.isInteger(amount) ? String(amount) : amount.toFixed(2).replace(".", ",");
   const formattedInterval = intervalLabel || "";
 
-  return `€${formattedAmount}${formattedInterval}`;
+  return `${formattedAmount} €${formattedInterval}`;
 };
 
 const MembershipPricingShowcase = ({

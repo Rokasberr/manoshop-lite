@@ -1,4 +1,4 @@
-﻿import {
+import {
   ArrowUpRight,
   BarChart3,
   Briefcase,
@@ -336,7 +336,7 @@ const decisionFocusCards = [
     id: "membership",
     title: "Narystės vertė",
     text: "Kai kiekvienas planas turi aiškią priežastį egzistuoti.",
-    recommendation: "Palygink Demo versiją, Asmeninis ir Verslas pagal rezultatą, ne tik pagal funkcijas.",
+    recommendation: "Palygink Demo, Asmeninis ir Verslas pagal rezultatą, ne tik pagal funkcijas.",
   },
   {
     id: "products",

@@ -51,9 +51,9 @@ const common = {
     },
     plans: {
       free: "Be aktyvios narystės",
-      basic: "Demo versija",
+      basic: "Demo",
       personal: "Asmeninis",
-      private_business: "Privatus verslas",
+      private_business: "Verslas",
     },
     productLabels: {
       price: "Kaina",
@@ -123,7 +123,7 @@ const common = {
     },
     plans: {
       free: "No active membership",
-      basic: "Demo version",
+      basic: "Demo",
       personal: "Personal",
       private_business: "Business",
     },
@@ -545,11 +545,11 @@ export const translations = {
         "Stilloak Studio kuria mokamus Excel modelius, planavimo sistemas ir nario erdves žmonėms, kurie nori aiškiau valdyti pinigus, tikslus ir savaitės darbus.",
       primaryCta: "Peržiūrėti produktus",
       secondaryCta: "Peržiūrėti narystes",
-      trustRow: ["Saugus pirkimas", "Atsisiuntimas po apmokėjimo", "Demo versija nemokama", "Be perdėtų pažadų"],
+      trustRow: ["Saugus pirkimas", "Atsisiuntimas po apmokėjimo", "Demo nemokama", "Be perdėtų pažadų"],
       heroCardEyebrow: "Kas viduje",
       heroCards: [
         { title: "Excel produktai", text: "Biudžeto, taupymo ir savaitės planavimo modeliai su aiškia struktūra." },
-        { title: "Nario erdvės", text: "Demo, Asmeninis ir Privatus verslas planai skirtingiems darbo etapams." },
+        { title: "Nario erdvės", text: "Demo, Asmeninis ir Verslas planai skirtingiems darbo etapams." },
         { title: "Praktinė sistema", text: "Mažiau chaoso, daugiau aiškių mėnesio, tikslų ir veiksmų sprendimų." },
       ],
       digitalEyebrow: "Skaitmeniniai produktai",
@@ -564,7 +564,7 @@ export const translations = {
         { title: "Aiški struktūra", text: "Produktai sukurti taip, kad vartotojas greitai suprastų, ką pildyti ir ką stebėti." },
         { title: "Praktiškas dizainas", text: "Kortelės, dashboardai ir lentelės orientuoti į naudojimą, ne į dekorą." },
         { title: "Atskiri pirkimai", text: "Skaitmeniniai produktai nėra automatiškai nemokami Demo plane, todėl prieiga išlieka aiški." },
-      { title: "Planai pagal etapą", text: "Demo skirtas pradžiai, Asmeninis asmeninei sistemai, Privatus verslas verslo zonoms." },
+      { title: "Planai pagal etapą", text: "Demo skirtas pradžiai, Asmeninis asmeninei sistemai, Verslas verslo zonoms." },
       ],
       howEyebrow: "Kaip veikia",
       howTitle: "Paprastas kelias nuo peržiūros iki naudojimo",
@@ -574,7 +574,7 @@ export const translations = {
         { title: "Atsisiųskite po apmokėjimo", text: "Po sėkmingo pirkimo Excel failas atsisiunčiamas iš apsaugotos paskyros prieigos." },
       ],
       faqItems: [
-        { question: "Ar Demo versija atrakina skaitmeninius produktus?", answer: "Ne. Demo versija skirta susipažinti su Saving Studio aplinka. Excel produktai perkami atskirai." },
+        { question: "Ar Demo atrakina skaitmeninius produktus?", answer: "Ne. Demo skirta susipažinti su Saving Studio aplinka. Excel produktai perkami atskirai." },
         { question: "Ar produktai yra vienkartinis pirkimas?", answer: "Taip, kiekvienas skaitmeninis produktas yra atskiras vienkartinis pirkimas." },
         { question: "Ar reikia Excel programos?", answer: "Rekomenduojame naudoti Microsoft Excel arba kitą .xlsx failus palaikančią skaičiuoklę." },
         { question: "Ar galima naudoti verslui?", answer: "Produktai skirti asmeniniam naudojimui ir aiškesniam darbui su savo finansais, tikslais ar planavimu." },
@@ -585,26 +585,26 @@ export const translations = {
       finalCta: "Atidaryti skaitmeninius produktus",
     },
     pricing: {
-      seoTitle: "Stilloak Studio narystės | Demo, Asmeninis ir Privatus verslas",
+      seoTitle: "Stilloak Studio narystės | Demo, Asmeninis ir Verslas",
       seoDescription:
-        "Pasirinkite nemokamą Demo versiją, Asmeninį planą už €14,99/mėn. arba Privatus verslas planą už €44,99/mėn. aiškesniems finansams ir verslo įrankiams.",
+        "Pasirinkite nemokamą Demo, Asmeninį planą už 14,99 €/mėn. arba Verslas planą už 44,99 €/mėn. aiškesniems finansams ir verslo įrankiams.",
       nav: ["Funkcijos", "Narystės", "Rinkiniai", "Atsiliepimai"],
       heroChip: "Stilloak Studio narystė",
       heroTitle: "Pasirink nario erdvę pagal savo etapą.",
       heroText:
-        "Demo versija padeda susipažinti su Saving Studio, Asmeninis atrakina pilną nario erdvę, o Privatus verslas suteikia strateginę verslo erdvę augimui.",
+        "Demo padeda susipažinti su Saving Studio, Asmeninis atrakina pilną nario erdvę, o Verslas suteikia strateginę verslo erdvę augimui.",
       viewMemberships: "Peržiūrėti narystes",
       viewZones: "Pamatyti nario zonas",
-      trustLine: "Demo versija be kortelės · Mokami planai atšaukiami bet kada · Aiškūs planų skirtumai · Jokių paslėptų mokesčių",
+      trustLine: "Demo be kortelės · Mokami planai atšaukiami bet kada · Aiškūs planų skirtumai · Jokių paslėptų mokesčių",
       trustPills: ["Funkcijos aiškios", "Narystės atskirtos", "Ramus pasirinkimas"],
       included: "Įtraukta: {kit}",
       joinLoading: "Jungiama...",
       currentPlan: "Aktyvus planas",
-      demoActivated: "Demo versija aktyvuota.",
+      demoActivated: "Demo aktyvuota.",
       planPresentation: {
         basic: {
           eyebrow: "Nemokama pradžia",
-          cta: "Pradėti Demo versiją",
+          cta: "Pradėti Demo",
           comparison: "Nemokama Saving Studio peržiūra.",
           kitName: "Saving Studio demo",
         },
@@ -616,7 +616,7 @@ export const translations = {
         },
         private_business: {
           eyebrow: "Strateginis lygis",
-          cta: "Pasirinkti Privatus verslas",
+          cta: "Pasirinkti Verslas",
           comparison: "Verslo įrankiams, svetainei, produktams ir pajamų apžvalgai.",
           kitName: "Stilloak Business Kit",
         },
@@ -636,7 +636,7 @@ export const translations = {
           { label: "Nario naujienos", value: "5", note: "ramūs atnaujinimai" },
           { label: "Strategijos lenta", value: "30 d.", note: "augimo kryptis" },
         ],
-        zones: ["Demo versija", "Asmeninis", "Privatus verslas"],
+        zones: ["Demo", "Asmeninis", "Verslas"],
         zoneLabel: "Zona {number}",
       },
       kits: {
@@ -649,7 +649,7 @@ export const translations = {
             title: "Saving Studio Start",
             subtitle: "Pradžiai skirta Saving Studio peržiūra su paprastomis planavimo kortelėmis.",
             included: ["Mėnesio fokuso kortelė", "Mini biudžeto peržiūra", "Paprastas tikslų planas", "7 dienų veiksmų ritmas"],
-            planLabel: "Demo versijos peržiūra",
+            planLabel: "Demo peržiūra",
           },
           {
             title: "Stilloak Growth Kit",
@@ -668,7 +668,7 @@ export const translations = {
     },
     subscriptionPlans: {
       basic: {
-        name: "Demo versija",
+        name: "Demo",
         subtitle: "Nemokama prieiga susipažinti su Saving Studio aplinka.",
         description: "Nemokama prieiga susipažinti su Saving Studio aplinka.",
         badge: "Nemokama",
@@ -681,10 +681,10 @@ export const translations = {
         features: ["Pilna nario zona", "Mėnesio suvestinės", "Tikslų progreso kortelės", "Nario naujienos", "Stilloak Growth Kit", "Premium resursai"],
       },
       private_business: {
-        name: "Privatus verslas",
+        name: "Verslas",
         subtitle: "Verslo įrankiai, svetainės zona, produktai, užsakymai ir pajamų apžvalga vienoje vietoje.",
         description: "Verslo įrankiai, svetainės zona, produktai, užsakymai ir pajamų apžvalga vienoje vietoje.",
-        badge: "Privatus verslas",
+        badge: "Verslas",
         features: ["Viskas iš Asmeninio plano", "Business Studio prieiga", "Svetainės ir produktų zona", "Užsakymų ir pajamų apžvalga", "Verslo šablonai ir skaitmeniniai ištekliai", "Prioritetinė patirtis"],
       },
     },
@@ -720,7 +720,7 @@ export const translations = {
       whyCards: [
         { title: "Vienas aiškus failas", text: "Kiekvienas produktas turi paruoštą struktūrą, pavyzdinius duomenis ir dashboard vaizdą." },
         { title: "Be sudėtingo pasiruošimo", text: "Nereikia kurti formulių nuo nulio. Pradedate nuo paruošto modelio ir pritaikote jį sau." },
-        { title: "Atskirai įsigyjama", text: "Produktai nėra automatiškai įtraukti į Demo versiją. Perkate tik tai, ko jums reikia." },
+        { title: "Atskirai įsigyjama", text: "Produktai nėra automatiškai įtraukti į Demo. Perkate tik tai, ko jums reikia." },
       ],
       faqEyebrow: "Klausimai",
       faqTitle: "Dažniausiai užduodami klausimai",
@@ -817,13 +817,13 @@ export const translations = {
         required: "Užpildyk visus laukus.",
         passwordLength: "Slaptažodis turi būti bent 6 simbolių.",
         passwordMismatch: "Slaptažodžiai nesutampa.",
-        demoSuccess: "Paskyra sukurta. Demo versija aktyvuota.",
+        demoSuccess: "Paskyra sukurta. Demo aktyvuota.",
         productSuccess: "Paskyra sukurta. Galite įsigyti pasirinktą produktą.",
         success: "Paskyra sukurta. Pasirink planą.",
         fail: "Registracija nepavyko.",
         eyebrow: "naujas narys",
         title: "Sukurk paskyrą ir pradėk ramiau",
-        intro: "Po registracijos galėsi pasirinkti Demo versiją arba tęsti į mokamą nario planą.",
+        intro: "Po registracijos galėsi pasirinkti Demo arba tęsti į mokamą nario planą.",
         note: "Paskyroje saugomi užsakymai, sąskaitos ir narystės prieiga nuo pirmo pirkimo.",
         formTitle: "Sukurti paskyrą",
         formText: "Greita pradžia į tavo privačią Stilloak erdvę.",
@@ -1017,7 +1017,7 @@ export const translations = {
       overviewTitle: "Tavo StillOak erdvė",
       overviewText: "Tvarkykite skaitmeninius produktus, šablonus ir nario įrankius vienoje aiškioje vietoje.",
       planCta: {
-        basic: "Demo versija suteikia Saving Studio pradžią. Skaitmeninius produktus galima įsigyti atskirai.",
+        basic: "Demo suteikia Saving Studio pradžią. Skaitmeninius produktus galima įsigyti atskirai.",
         personal: "Atrakinkite Asmeninį planą ir gaukite pilną Saving Studio patirtį.",
         private_business: "Atrakinkite Business Studio ir valdykite svetainę, produktus bei užsakymus vienoje vietoje.",
       },
@@ -1064,13 +1064,13 @@ export const translations = {
       accountCurrentPlan: "Dabartinis planas",
       openProfile: "Atidaryti profilį",
       changePlanTitle: "Keiskite planą tada, kai reikia daugiau.",
-      changePlanText: "Demo versija skirta Saving Studio peržiūrai, Asmeninis atrakina pilną Saving Studio, o Privatus verslas prideda verslo zonas.",
+      changePlanText: "Demo skirta Saving Studio peržiūrai, Asmeninis atrakina pilną Saving Studio, o Verslas prideda verslo zonas.",
       chooseAnotherLevel: "Pasirinkite kitą lygį",
-      chooseAnotherText: "Kiekvienas planas turi aiškią paskirtį: Demo Saving Studio pradžiai, Asmeninis pilnai asmeninei sistemai, Privatus verslas verslo valdymui.",
+      chooseAnotherText: "Kiekvienas planas turi aiškią paskirtį: Demo Saving Studio pradžiai, Asmeninis pilnai asmeninei sistemai, Verslas verslo valdymui.",
     },
     protected: {
       businessEyebrow: "Verslas",
-      businessTitle: "Business Studio prieinama tik Privatus verslas plano nariams",
+      businessTitle: "Business Studio prieinama tik Verslas plano nariams",
       businessText: "Saving Studio lieka pasiekiama pagal tavo narystę, bet Site Builder, My Store, Orders ir Earnings yra papildoma verslo zona.",
       backToSaving: "Grįžti į Saving Studio",
     },
@@ -1199,7 +1199,7 @@ translations.en = mergeLocale(translations.lt, {
       "Stilloak Studio creates paid Excel models, planning systems, and member spaces for people who want clearer money, goals, and weekly work.",
     primaryCta: "View products",
     secondaryCta: "View memberships",
-    trustRow: ["Secure purchase", "Download after payment", "Free Demo version", "No exaggerated promises"],
+    trustRow: ["Secure purchase", "Download after payment", "Free Demo", "No exaggerated promises"],
     heroCardEyebrow: "Inside Stilloak",
     heroCards: [
       { title: "Excel products", text: "Budget, savings, and weekly planning models with a clear structure." },
@@ -1241,7 +1241,7 @@ translations.en = mergeLocale(translations.lt, {
   pricing: {
     seoTitle: "Stilloak Studio memberships | Demo, Personal, and Business",
     seoDescription:
-      "Choose the free Demo version, Personal membership for €14.99/month, or Private Business for €44.99/month for clearer finance and business tools.",
+      "Choose the free Demo, Personal membership for 14.99 €/month, or Business for 44.99 €/month for clearer finance and business tools.",
     nav: ["Features", "Memberships", "Kits", "Reviews"],
     heroChip: "Stilloak Studio membership",
     heroTitle: "Choose the member space for your current stage.",
@@ -1253,9 +1253,9 @@ translations.en = mergeLocale(translations.lt, {
     included: "Included: {kit}",
     joinLoading: "Connecting...",
       currentPlan: "Active plan",
-      demoActivated: "Demo version activated.",
+      demoActivated: "Demo activated.",
     planPresentation: {
-      basic: { eyebrow: "Free start", cta: "Start Demo version", comparison: "Free Saving Studio preview.", kitName: "Saving Studio demo" },
+      basic: { eyebrow: "Free start", cta: "Start Demo", comparison: "Free Saving Studio preview.", kitName: "Saving Studio demo" },
       personal: { eyebrow: "Recommended", cta: "Choose Personal", comparison: "For the full member space and personal progress.", kitName: "Stilloak Growth Kit" },
       private_business: { eyebrow: "Strategic level", cta: "Choose Business", comparison: "For business tools, website, products, and revenue overview.", kitName: "Stilloak Business Kit" },
     },
@@ -1274,7 +1274,7 @@ translations.en = mergeLocale(translations.lt, {
         { label: "Member news", value: "5", note: "calm updates" },
         { label: "Strategy board", value: "30 d.", note: "growth direction" },
       ],
-      zones: ["Demo version", "Personal", "Business"],
+      zones: ["Demo", "Personal", "Business"],
       zoneLabel: "Zone {number}",
     },
     kits: {
@@ -1283,14 +1283,14 @@ translations.en = mergeLocale(translations.lt, {
       text: "Each Stilloak Studio plan has a clear purpose. Digital products are bought separately; membership unlocks member areas and a working rhythm.",
       choosePlan: "Choose a plan",
       items: [
-        { title: "Saving Studio Start", subtitle: "A starter Saving Studio preview with simple planning cards.", included: ["Monthly focus card", "Mini budget preview", "Simple goals plan", "7-day action rhythm"], planLabel: "Demo version preview" },
+        { title: "Saving Studio Start", subtitle: "A starter Saving Studio preview with simple planning cards.", included: ["Monthly focus card", "Mini budget preview", "Simple goals plan", "7-day action rhythm"], planLabel: "Demo preview" },
         { title: "Stilloak Growth Kit", subtitle: "More tools for active use, content planning, and project growth.", included: ["Everything in Start Kit", "Instagram post idea kit", "Content planning template", "Product/service description template", "Monthly action plan"], planLabel: "Included in Personal" },
         { title: "Stilloak Business Kit", subtitle: "Premium business kit with proposal, client, and pricing templates.", included: ["Everything in Growth Kit", "Business proposal template", "Client onboarding checklist", "Premium pricing template", "Campaign planning template", "Priority updates"], planLabel: "Included in Business" },
       ],
     },
   },
   subscriptionPlans: {
-    basic: { name: "Demo version", subtitle: "Free access to explore the Saving Studio environment.", description: "Free access to explore the Saving Studio environment.", badge: "Free", features: ["Saving Studio preview", "Basic planning cards", "Upgrade to Personal anytime", "Digital products can be purchased separately"] },
+    basic: { name: "Demo", subtitle: "Free access to explore the Saving Studio environment.", description: "Free access to explore the Saving Studio environment.", badge: "Free", features: ["Saving Studio preview", "Basic planning cards", "Upgrade to Personal anytime", "Digital products can be purchased separately"] },
     personal: { name: "Personal", description: "Full member space with summaries, goals, and premium resources.", badge: "Most popular", features: ["Full member area", "Monthly summaries", "Goal progress cards", "Member news", "Stilloak Growth Kit", "Premium resources"] },
     private_business: { name: "Business", subtitle: "Business tools, website area, products, orders, and revenue overview in one place.", description: "Business tools, website area, products, orders, and revenue overview in one place.", badge: "Business", features: ["Everything in Personal", "Business Studio access", "Website and product area", "Orders and revenue overview", "Business templates and digital resources", "Priority experience"] },
   },
@@ -1420,7 +1420,7 @@ translations.en = mergeLocale(translations.lt, {
       required: "Fill in all fields.",
       passwordLength: "Password must be at least 6 characters.",
       passwordMismatch: "Passwords do not match.",
-      demoSuccess: "Account created. Demo version activated.",
+      demoSuccess: "Account created. Demo activated.",
       productSuccess: "Account created. You can purchase the selected product.",
       success: "Account created. Choose a plan.",
       fail: "Registration failed.",
@@ -1796,7 +1796,7 @@ translations.pl = mergeLocale(translations.en, {
   pricing: {
     seoTitle: "Członkostwa Stilloak Studio | Demo, Osobisty i Biznes",
     seoDescription:
-      "Wybierz darmową wersję Demo, plan Osobisty za €14,99/mies. albo Prywatny biznes za €44,99/mies. dla jaśniejszych finansów i narzędzi biznesowych.",
+      "Wybierz darmową wersję Demo, plan Osobisty za 14,99 €/mies. albo Business za 44,99 €/mies. dla jaśniejszych finansów i narzędzi biznesowych.",
     nav: ["Funkcje", "Członkostwa", "Zestawy", "Opinie"],
     heroChip: "Członkostwo Stilloak Studio",
     heroTitle: "Wybierz strefę członka dla swojego etapu.",
@@ -2095,7 +2095,7 @@ translations.de = mergeLocale(translations.en, {
   pricing: {
     seoTitle: "Stilloak Studio Mitgliedschaften | Demo, Persönlich und Business",
     seoDescription:
-      "Wählen Sie die kostenlose Demo-Version, Persönlich für €14,99/Monat oder Private Business für €44,99/Monat für klarere Finanzen und Business-Tools.",
+      "Wählen Sie die kostenlose Demo-Version, Persönlich für 14,99 €/Monat oder Business für 44,99 €/Monat für klarere Finanzen und Business-Tools.",
     nav: ["Funktionen", "Mitgliedschaften", "Kits", "Stimmen"],
     heroChip: "Stilloak Studio Mitgliedschaft",
     heroTitle: "Wählen Sie den Mitgliederbereich für Ihre aktuelle Phase.",
@@ -2422,7 +2422,7 @@ translations.fr = mergeLocale(translations.en, {
   pricing: {
     seoTitle: "Abonnements Stilloak Studio | Démo, Personnel et Business",
     seoDescription:
-      "Choisissez la Démo gratuite, Personnel à €14,99/mois ou Private Business à €44,99/mois pour plus de clarté financière et des outils business.",
+      "Choisissez la Démo gratuite, Personnel à 14,99 €/mois ou Business à 44,99 €/mois pour plus de clarté financière et des outils business.",
     nav: ["Fonctions", "Abonnements", "Kits", "Avis"],
     heroChip: "Abonnement Stilloak Studio",
     heroTitle: "Choisissez l’espace membre adapté à votre étape.",
@@ -2712,7 +2712,7 @@ translations.es = mergeLocale(translations.en, {
   pricing: {
     seoTitle: "Membresías Stilloak Studio | Demo, Personal y Business",
     seoDescription:
-      "Elige la versión Demo gratuita, Personal por €14,99/mes o Private Business por €44,99/mes para finanzas más claras y herramientas de negocio.",
+      "Elige la versión Demo gratuita, Personal por 14,99 €/mes o Business por 44,99 €/mes para finanzas más claras y herramientas de negocio.",
     nav: ["Funciones", "Membresías", "Kits", "Opiniones"],
     heroChip: "Membresía Stilloak Studio",
     heroTitle: "Elige el espacio de miembro para tu etapa.",

@@ -3,7 +3,7 @@ import { translations } from "../i18n/translations";
 export const subscriptionPlans = [
   {
     id: "basic",
-    name: "Demo versija",
+    name: "Demo",
     subtitle: "Nemokama prieiga susipažinti su Saving Studio aplinka.",
     price: 0,
     intervalLabel: "",
@@ -36,13 +36,13 @@ export const subscriptionPlans = [
   },
   {
     id: "private_business",
-    name: "Privatus verslas",
+    name: "Verslas",
     price: 44.99,
     intervalLabel: "/mėn.",
     subtitle: "Verslo įrankiai, svetainės zona, produktai, užsakymai ir pajamų apžvalga vienoje vietoje.",
     description: "Verslo įrankiai, svetainės zona, produktai, užsakymai ir pajamų apžvalga vienoje vietoje.",
     provider: "stripe",
-    badge: "Privatus verslas",
+    badge: "Verslas",
     features: [
       "Viskas iš Asmeninio plano",
       "Business Studio prieiga",

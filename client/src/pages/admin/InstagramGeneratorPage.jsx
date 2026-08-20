@@ -20,7 +20,7 @@ import instagramPostService from "../../services/instagramPostService";
 
 const postTypeOptions = [
   { value: "brand-intro", label: "Brand intro" },
-  { value: "bazinis-planas", label: "Demo versija" },
+  { value: "bazinis-planas", label: "Demo" },
   { value: "asmeninis-planas", label: "Asmeninis planas" },
   { value: "privatus-verslas", label: "Verslas" },
   { value: "plan-comparison", label: "Plan comparison" },
@@ -46,7 +46,7 @@ const initialForm = {
   subtitle:
     "Sukurta tiems, kurie nori tvarkingos, premium ir lengvai suprantamos skaitmeninės patirties.",
   badge: "PRIVATI NARIO ERDVĖ",
-  features: ["Demo versija", "Asmeninis", "Verslas"].join("\n"),
+  features: ["Demo", "Asmeninis", "Verslas"].join("\n"),
   price: "",
   website: "stilloak-studio.com",
   ctaText: "Paprasta pradėti. Aišku naudoti. Sukurta augimui.",
@@ -64,12 +64,12 @@ const presets = [
     },
   },
   {
-    label: "Demo versija",
+    label: "Demo",
     icon: FileImage,
     values: {
       ...initialForm,
       postType: "bazinis-planas",
-      headline: "Pradėk su nemokama Demo versija.",
+      headline: "Pradėk su nemokama Demo.",
       subtitle:
         "Skirta tiems, kurie nori susipažinti su Saving Studio aplinka ir bazinėmis planavimo kortelėmis.",
       badge: "DEMO VERSIJA",
@@ -91,7 +91,7 @@ const presets = [
     },
   },
   {
-    label: "Privatus verslas",
+    label: "Verslas",
     icon: FileImage,
     values: {
       ...initialForm,
@@ -117,7 +117,7 @@ const presets = [
       headline: "Palygink planus pagal savo etapą.",
       subtitle: "Aiškus kelias nuo paprastos pradžios iki premium verslo naudojimo.",
       badge: "PLANŲ PALYGINIMAS",
-      features: ["Demo versija - €0", "Asmeninis - 14,99 €/mėn.", "Privatus verslas - 44,99 €/mėn."].join("\n"),
+      features: ["Demo - €0", "Asmeninis - 14,99 €/mėn.", "Verslas - 44,99 €/mėn."].join("\n"),
       ctaText: "Pasirink savo planą",
     },
   },

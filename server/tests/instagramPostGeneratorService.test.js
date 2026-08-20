@@ -52,7 +52,7 @@ test("builds clean filenames and caption templates", () => {
     postType: "bazinis-planas",
     format: "square",
     outputType: "jpg",
-    headline: "Pradėk paprastai su Demo versija.",
+    headline: "Pradėk paprastai su Demo.",
     subtitle: "Skirta aiškiai pradžiai.",
     badge: "DEMO VERSIJA",
     features: ["Pagrindinės funkcijos", "Aiški pradžia", "Lengvas naudojimas"],
@@ -62,6 +62,6 @@ test("builds clean filenames and caption templates", () => {
   const caption = buildCaption(payload);
 
   assert.equal(filename, "stilloak-bazinis-20260506-0809");
-  assert.match(caption, /Demo versija/);
+  assert.match(caption, /Demo/);
   assert.match(caption, /stilloak-studio\.com$/);
 });

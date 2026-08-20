@@ -33,7 +33,7 @@ const POST_TYPES = {
     captionKey: "brandIntro",
   },
   "bazinis-planas": {
-    label: "Demo versija",
+    label: "Demo",
     slug: "bazinis",
     template: "template-plan",
     captionKey: "bazinis",
@@ -77,14 +77,14 @@ const CAPTION_TEMPLATES = {
   brandIntro: (website) => `Stilloak Studio – privati nario erdvė aiškesniam pasirinkimui.
 
 Pasirink planą pagal savo etapą:
-• Demo versija
+• Demo
 • Asmeninis
 • Verslas
 
 Paprasta pradėti. Aišku naudoti. Sukurta augimui.
 
 ${website}`,
-  bazinis: (website) => `Demo versija – nemokama Saving Studio pradžia.
+  bazinis: (website) => `Demo – nemokama Saving Studio pradžia.
 
 Tinka, jeigu nori susipažinti su bazinėmis planavimo kortelėmis ir vėliau pereiti į Asmeninį planą.
 

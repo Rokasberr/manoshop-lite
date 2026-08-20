@@ -206,7 +206,7 @@ const buildPremiumEvaluation = ({ frequency, summary }) => {
       : "Bendras vaizdas signalizuoja, kad mėnesio struktūrą reikia peržiūrėti iš esmės, nes dabartinis tempas nepalieka pakankamai erdvės tikslams ir rezervui.";
 
   return {
-    title: frequency === "monthly" ? "AI mėnesio komentaras" : "AI savaitės komentaras",
+    title: frequency === "monthly" ? "Mėnesio komentaras" : "Savaitės komentaras",
     body: lines.join(" "),
     nextStep,
     score,

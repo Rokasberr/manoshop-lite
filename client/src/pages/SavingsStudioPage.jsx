@@ -1219,7 +1219,7 @@ const SavingsStudioPage = () => {
         key: "setup",
         title: profile?.onboardingCompleted ? "Pirmas setup užbaigtas" : "Pirmas setup dar formuojamas",
         body: profile?.onboardingCompleted
-          ? "Demo versijos nario finansinis karkasas jau vietoje: pajamos, tikslas ir pirmi biudžetai."
+          ? "Demo nario finansinis karkasas jau vietoje: pajamos, tikslas ir pirmi biudžetai."
           : "Kai užbaigsi pirmą setup, visa studio pradės rodyti daug tikslesnį kontekstą.",
         done: Boolean(profile?.onboardingCompleted),
         timestamp: null,

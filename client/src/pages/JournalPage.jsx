@@ -1,4 +1,4 @@
-﻿import { ArrowRight, Quote } from "lucide-react";
+import { ArrowRight, Quote } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -31,7 +31,7 @@ const JournalPage = () => {
       <JournalAccessGate
         user={user}
         title="Nario naujienos pilnai atsiveria Asmeniniam ir Verslo planui."
-        description="Demo versija gali matyti ribotas peržiūras, tačiau pilni įrašai, resursų pristatymai ir nario erdvių pokyčiai lieka aktyviems mokamiems planams."
+        description="Demo gali matyti ribotas peržiūras, tačiau pilni įrašai, resursų pristatymai ir nario erdvių pokyčiai lieka aktyviems mokamiems planams."
       />
     );
   }
@@ -108,10 +108,10 @@ const JournalPage = () => {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="marketing-card p-6">
-            <p className="text-xs uppercase tracking-[0.3em] text-muted">Demo versija</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-muted">Demo</p>
             <h3 className="mt-4 font-display text-3xl font-bold">Ribotos peržiūros</h3>
             <p className="mt-4 text-sm leading-7 text-muted">
-              Demo versija narys gali matyti kryptį ir trumpas užrakintų naujienų santraukas.
+              Demo narys gali matyti kryptį ir trumpas užrakintų naujienų santraukas.
             </p>
           </div>
           <div className="marketing-card p-6">

@@ -95,7 +95,7 @@ const activateDemoPlan = async (req, res) => {
 
   if (!plan || plan.provider !== "internal") {
     res.status(500);
-    throw new Error("Demo versija šiuo metu nepasiekiama.");
+    throw new Error("Demo šiuo metu nepasiekiama.");
   }
 
   const user = await User.findById(req.user._id).select("-password");
