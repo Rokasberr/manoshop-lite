@@ -142,28 +142,55 @@ const extractFilename = (contentDisposition = "", fallbackName = "download") => 
   const utf8Match = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i);
 
   if (utf8Match?.[1]) {
-    return decodeURIComponent(utf8Match[1]);
+    try {
+      return sanitizeDownloadFilename(decodeURIComponent(utf8Match[1]), fallbackName);
+    } catch (_error) {
+      return fallbackName;
+    }
   }
 
   const basicMatch = contentDisposition.match(/filename="?([^"]+)"?/i);
 
-  return basicMatch?.[1] || fallbackName;
+  return sanitizeDownloadFilename(basicMatch?.[1] || fallbackName, fallbackName);
 };
 
-const downloadSummaryFile = async (frequency, format = "html") => {
+const sanitizeDownloadFilename = (value, fallbackName = "download") => {
+  const fileName = String(value || fallbackName)
+    .replace(/[/\\?%*:|"<> \r\n\t]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  return fileName || fallbackName;
+};
+
+const downloadSummaryFile = async ({ month, format = "txt" }) => {
   const response = await api.get("/savings-studio/summary-export", {
-    params: { frequency, format },
+    params: { frequency: "monthly", format, month },
     responseType: "blob",
   });
 
-  const fallbackFrequency = frequency === "monthly" ? "monthly" : "weekly";
-  const fallbackName = `stilloak-${fallbackFrequency}-summary-${new Date()
-    .toISOString()
-    .replace(/[:.]/g, "-")}.${format === "txt" ? "txt" : "html"}`;
+  const safeMonth = /^\d{4}-\d{2}$/.test(String(month || "")) ? month : new Date().toISOString().slice(0, 7);
+  const fallbackName = `stilloak-monthly-summary-${safeMonth}.txt`;
 
   triggerBlobDownload({
     blobPart: response.data,
-    contentType: response.headers["content-type"] || "application/octet-stream",
+    contentType: response.headers["content-type"] || "text/plain",
+    fileName: extractFilename(response.headers["content-disposition"] || "", fallbackName),
+  });
+};
+
+const downloadEntriesCsv = async ({ month, scope = "month" }) => {
+  const response = await api.get("/savings-studio/entries-export", {
+    params: scope === "all" ? { scope: "all" } : { month },
+    responseType: "blob",
+  });
+  const safeMonth = /^\d{4}-\d{2}$/.test(String(month || "")) ? month : new Date().toISOString().slice(0, 7);
+  const fallbackName =
+    scope === "all" ? "stilloak-savings-studio-entries-all.csv" : `stilloak-savings-studio-entries-${safeMonth}.csv`;
+
+  triggerBlobDownload({
+    blobPart: response.data,
+    contentType: response.headers["content-type"] || "text/csv",
     fileName: extractFilename(response.headers["content-disposition"] || "", fallbackName),
   });
 };
@@ -209,5 +236,6 @@ export default {
   deleteEntry,
   sendSummaryEmail,
   downloadSummaryFile,
+  downloadEntriesCsv,
   downloadBackup,
 };

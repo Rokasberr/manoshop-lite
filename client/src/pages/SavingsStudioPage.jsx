@@ -509,6 +509,7 @@ const SavingsStudioPage = () => {
   const [savingEmailSettings, setSavingEmailSettings] = useState(false);
   const [sendingSummaryEmail, setSendingSummaryEmail] = useState(false);
   const [downloadingSummaryKey, setDownloadingSummaryKey] = useState("");
+  const [downloadingCsvKey, setDownloadingCsvKey] = useState("");
   const [previewingCsv, setPreviewingCsv] = useState(false);
   const [confirmingCsvImport, setConfirmingCsvImport] = useState(false);
   const [downloadingBackup, setDownloadingBackup] = useState(false);
@@ -1892,6 +1893,10 @@ const SavingsStudioPage = () => {
   };
 
   const handleDownloadBackup = async () => {
+    if (downloadingBackup) {
+      return;
+    }
+
     setDownloadingBackup(true);
 
     try {
@@ -1905,17 +1910,43 @@ const SavingsStudioPage = () => {
     }
   };
 
-  const handleDownloadSummary = async (frequency) => {
-    setDownloadingSummaryKey(frequency);
+  const handleDownloadSummary = async (monthOverride = "") => {
+    if (downloadingSummaryKey) {
+      return;
+    }
+
+    const reportMonth = /^\d{4}-\d{2}$/.test(String(monthOverride || "")) ? monthOverride : selectedBudgetMonth;
+
+    setDownloadingSummaryKey("monthly");
 
     try {
-      await savingsStudioService.downloadSummaryFile(frequency);
-      toast.success(`${frequency === "monthly" ? "Mėnesio" : "Savaitės"} suvestinė paruošta atsisiųsti.`);
+      await savingsStudioService.downloadSummaryFile({ month: reportMonth, format: "txt" });
+      toast.success("Mėnesio TXT ataskaita paruošta atsisiųsti.");
       await refreshActivity();
     } catch (error) {
-      toast.error(error.response?.data?.message || "Nepavyko paruošti suvestinės failo.");
+      toast.error(error.response?.data?.message || "Nepavyko paruošti mėnesio TXT ataskaitos.");
     } finally {
       setDownloadingSummaryKey("");
+    }
+  };
+
+  const handleDownloadEntriesCsv = async (scope = "month") => {
+    const key = scope === "all" ? "all" : selectedBudgetMonth;
+
+    if (downloadingCsvKey) {
+      return;
+    }
+
+    setDownloadingCsvKey(key);
+
+    try {
+      await savingsStudioService.downloadEntriesCsv({ month: selectedBudgetMonth, scope });
+      toast.success(scope === "all" ? "Visų įrašų CSV paruoštas atsisiųsti." : "Mėnesio įrašų CSV paruoštas atsisiųsti.");
+      await refreshActivity();
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Nepavyko paruošti CSV eksporto.");
+    } finally {
+      setDownloadingCsvKey("");
     }
   };
 
@@ -4080,23 +4111,12 @@ const SavingsStudioPage = () => {
             <button
               type="button"
               className="button-secondary w-full justify-center gap-2 whitespace-normal text-center"
-              onClick={() => handleDownloadSummary("weekly")}
-              disabled={downloadingSummaryKey === "weekly"}
-            >
-              <Download className="shrink-0" size={16} />
-              <span className="min-w-0 whitespace-normal">
-                {downloadingSummaryKey === "weekly" ? "Ruošiama..." : "Atsisiųsti savaitės suvestinę"}
-              </span>
-            </button>
-            <button
-              type="button"
-              className="button-secondary w-full justify-center gap-2 whitespace-normal text-center"
-              onClick={() => handleDownloadSummary("monthly")}
+              onClick={handleDownloadSummary}
               disabled={downloadingSummaryKey === "monthly"}
             >
               <Download className="shrink-0" size={16} />
               <span className="min-w-0 whitespace-normal">
-                {downloadingSummaryKey === "monthly" ? "Ruošiama..." : "Atsisiųsti mėnesio suvestinę"}
+                {downloadingSummaryKey === "monthly" ? "Ruošiama..." : "Atsisiųsti mėnesio TXT"}
               </span>
             </button>
           </div>
@@ -4109,8 +4129,7 @@ const SavingsStudioPage = () => {
                 : "Suvestinių dar nesiuntėme. Gali pasibandyti rankinį siuntimą ir pamatyti, kaip atrodys laiškas."}
             </p>
             <p className="mt-3 text-sm leading-6 text-muted">
-              Savaitės ir mėnesio suvestines gali atsisiųsti pakartotinai. Kiekvienas parsisiuntimas sugeneruoja naują
-              failą.
+              Mėnesio TXT ataskaitą gali atsisiųsti pakartotinai. Kiekvienas parsisiuntimas sugeneruoja naują failą.
             </p>
           </div>
 
@@ -4133,7 +4152,7 @@ const SavingsStudioPage = () => {
                   <SummaryArchiveItem
                     key={item.id}
                     item={item}
-                    onDownload={(frequency) => handleDownloadSummary(frequency)}
+                    onDownload={handleDownloadSummary}
                     onSend={(frequency) => handleSendSummaryEmail(frequency)}
                   />
                 ))
@@ -4271,9 +4290,34 @@ const SavingsStudioPage = () => {
             </div>
           </div>
 
+          <div className="mt-6 grid mobile-stack-grid min-w-0 grid-cols-[repeat(auto-fit,minmax(min(100%,13rem),1fr))] gap-3">
+            <button
+              type="button"
+              className="button-secondary w-full justify-center gap-2 whitespace-normal text-center"
+              onClick={() => handleDownloadEntriesCsv("month")}
+              disabled={Boolean(downloadingCsvKey)}
+            >
+              <Download className="shrink-0" size={16} />
+              <span className="min-w-0 whitespace-normal">
+                {downloadingCsvKey === selectedBudgetMonth ? "Ruošiama..." : `Atsisiųsti ${selectedBudgetMonth} CSV`}
+              </span>
+            </button>
+            <button
+              type="button"
+              className="button-secondary w-full justify-center gap-2 whitespace-normal text-center"
+              onClick={() => handleDownloadEntriesCsv("all")}
+              disabled={Boolean(downloadingCsvKey)}
+            >
+              <Download className="shrink-0" size={16} />
+              <span className="min-w-0 whitespace-normal">
+                {downloadingCsvKey === "all" ? "Ruošiama..." : "Atsisiųsti visų įrašų CSV"}
+              </span>
+            </button>
+          </div>
+
           <button
             type="button"
-            className="button-secondary mt-6 w-full justify-center gap-2"
+            className="button-secondary mt-3 w-full justify-center gap-2 whitespace-normal text-center"
             onClick={handleDownloadBackup}
             disabled={downloadingBackup}
           >
@@ -4604,6 +4648,8 @@ const RecurringReviewCard = ({ expense, onOpen }) => {
 const SummaryArchiveItem = ({ item, onDownload, onSend }) => {
   const frequency = item.metadata?.frequency || "weekly";
   const isBackup = item.action === "backup-export";
+  const archiveMonth = /^\d{4}-\d{2}$/.test(String(item.metadata?.month || "")) ? item.metadata.month : "";
+  const canDownloadMonthlyTxt = item.action === "summary-export" && frequency === "monthly";
 
   return (
     <div className="rounded-[20px] bg-[rgb(var(--surface-soft))] px-4 py-4">
@@ -4615,14 +4661,18 @@ const SummaryArchiveItem = ({ item, onDownload, onSend }) => {
         </div>
         {!isBackup ? (
           <div className="grid mobile-stack-grid w-full grid-cols-[repeat(auto-fit,minmax(min(100%,10rem),1fr))] gap-2">
-            <button
-              type="button"
-              className="button-secondary w-full max-w-full justify-center gap-2 whitespace-normal break-normal text-center"
-              onClick={() => onDownload(frequency)}
-            >
-              <Download className="shrink-0" size={14} />
-              <span className="min-w-0 whitespace-normal break-normal">Atsisiųsti vėl</span>
-            </button>
+            {canDownloadMonthlyTxt ? (
+              <button
+                type="button"
+                className="button-secondary w-full max-w-full justify-center gap-2 whitespace-normal break-normal text-center"
+                onClick={() => onDownload(archiveMonth)}
+              >
+                <Download className="shrink-0" size={14} />
+                <span className="min-w-0 whitespace-normal break-normal">
+                  {archiveMonth ? `Sugeneruoti ${archiveMonth} TXT` : "Sugeneruoti šio mėnesio TXT"}
+                </span>
+              </button>
+            ) : null}
             <button
               type="button"
               className="button-secondary w-full max-w-full justify-center gap-2 whitespace-normal break-normal text-center"
