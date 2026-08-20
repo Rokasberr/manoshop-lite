@@ -241,6 +241,37 @@ test("Saving Studio CSV import quality uses server duplicate rows", () => {
   assert.match(source, /disabled=\{confirmingCsvImport \|\| !csvPreviewResult\.validCount\}/);
 });
 
+test("Saving Studio forms guard against duplicate submit at handler level", () => {
+  const source = readPageSource();
+
+  assert.match(source, /const handleSaveOnboarding = async[\s\S]*if \(savingOnboarding\) \{[\s\S]*return;/);
+  assert.match(source, /const handleSaveBudgets = async[\s\S]*if \(savingBudgets \|\| loadingBudgets\) \{[\s\S]*return;/);
+  assert.match(source, /const handleEntrySubmit = async[\s\S]*if \(submitting\) \{[\s\S]*return;/);
+  assert.match(source, /const handleGoalSubmit = async[\s\S]*if \(savingGoal\) \{[\s\S]*return;/);
+  assert.match(source, /const handleRecurringSubmit = async[\s\S]*if \(savingRecurring\) \{[\s\S]*return;/);
+  assert.match(source, /const handleLogRecurringExpense = async[\s\S]*if \(loggingRecurringId \|\| recurringExpense\.lastLoggedMonth === currentRecurringMonth\)/);
+  assert.match(source, /const handleConfirmCsvImport = async[\s\S]*if \(confirmingCsvImport\) \{[\s\S]*return;/);
+  assert.match(source, /const handleDelete = async[\s\S]*if \(deletingId\) \{[\s\S]*return;/);
+  assert.match(source, /const handleDeleteGoal = async[\s\S]*if \(deletingGoalId\) \{[\s\S]*return;/);
+  assert.match(source, /const handleDeleteRecurring = async[\s\S]*if \(deletingRecurringId\) \{[\s\S]*return;/);
+});
+
+test("Saving Studio CSV import validates file type and size before preview request", () => {
+  const source = readPageSource();
+  const csvHandlerSource = extractBetween(
+    source,
+    "const handleCsvImport = async (event) => {",
+    "const handleConfirmCsvImport = async () => {"
+  );
+
+  assert.match(source, /const MAX_CSV_FILE_SIZE_BYTES = 1024 \* 1024/);
+  assert.match(csvHandlerSource, /file\.name\.toLowerCase\(\)\.endsWith\("\.csv"\)/);
+  assert.match(csvHandlerSource, /"text\/csv", "application\/vnd\.ms-excel", ""/);
+  assert.match(csvHandlerSource, /if \(file\.size > MAX_CSV_FILE_SIZE_BYTES\)/);
+  assert.match(csvHandlerSource, /Pasirink CSV formato failą/);
+  assert.match(csvHandlerSource, /CSV failas per didelis/);
+});
+
 test("Saving Studio automation CTA stays inside mobile cards", () => {
   const source = readPageSource();
   const automationCardMatch = source.match(/const AutomationTriggerCard = \(\{ onRun, trigger \}\) => \{[\s\S]*?const ImportInsightCard/);
