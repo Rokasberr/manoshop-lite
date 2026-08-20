@@ -29,18 +29,20 @@ Codex privalo palaikyti šį failą kaip gyvą planą.
 - [x] Skaičiavimų ir duomenų validacija: pridėtos apsaugos nuo `NaN` goal progress, recurring monthly equivalent, onboarding draft currency preview, `formatChange(undefined)` ir netvarkingų month option entry datų keliuose.
 - [x] Onboarding ir aiški vartotojo kelionė: step-by-step usage wizard, pirmo setup validacija, inline klaidos ir serverio klaidos būsena.
 - [x] Loading, empty, success ir error būsenos: pradinio Saving Studio užkrovimo retry, onboarding inline alert, biudžetų mėnesio retry, esamos empty/success būsenos ir mutation loading states validuoti statiniais testais.
-- [x] Mobilus ir desktop UX: route-level lazy loading sumažino pradinį klientų JS chunką nuo ~958 kB iki ~437 kB; `npm --workspace client run preview` sutvarkytas sandboxe, `/pricing` HTTP smoke grąžina 200, o `server/tests/savingsStudioPersonalUi.test.js` saugo mobile-first shell, breakpoint grid, modal overflow ir table-free Saving Studio layout regresijas. Chrome/Edge headless screenshot bandymai lieka aplinkos ribojimas dėl vietinio GPU proceso klaidos.
+- [ ] Mobilus ir desktop UX: P1 realaus telefono problema Asmeninio nario zonoje blokuoja galutinį Asmeninis 10/10 statusą, kol tikras telefonas arba naršyklinis `scrollWidth <= clientWidth` smoke patvirtins, kad `/members/savings-studio` ir Asmeninio nario zona 320-768 px ekranuose nebeturi puslapio lygio horizontalaus overflow ir dešinės pusės nukirpimo. Lokalus 320-768 px kodo hardening ir statinės regresijos pridėtos, bet ankstesni statiniai responsive testai šios realios problemos neaptiko.
 - [x] Planų ir kreditų elgesio nuoseklumas: atskiros kreditų sistemos kode nerasta; planų elgesys remiasi esamais membership/status guardais ir padengtas prieigos testais.
 - [x] Demo ir Asmeninio prieigų testai: `accessControlP1.test.js` patvirtina, kad Demo/basic negali naudoti full Saving Studio API, o Personal gali.
 - [x] Reikalingi unit ir integration testai: `server/tests/savingsStudioHelpers.test.js` dengia kliento helperius, onboarding valiutos preview ir Saving Studio mutation smoke regresiją.
 - [x] Saving Studio mutation smoke: entries, CSV import, goals, recurring expenses ir delete veiksmai po sėkmės atnaujina priklausomą summary/activity būseną.
-- [x] Asmeninio plano smoke test: `npm test`, `npm run lint`, `npm run typecheck`, `npm run build` ir preview HTTP 200 patikra praėjo.
+- [ ] Asmeninio plano smoke test: `npm test`, `npm run lint`, `npm run typecheck`, `npm run build` praėjo lokaliai po P1 hotfix, bet galutiniam uždarymui trūksta prisijungusio realaus telefono arba browser `scrollWidth/clientWidth` patikros Asmeninio nario zonoje.
 - [x] Galutinė Asmeninio plano diff peržiūra: peržiūrėti pakeisti `SavingsStudioPage.jsx`, preview wrapperis, naujos Personal UI regresijos ir dokumentacijos diff.
-- [x] Praeina milestone validacija.
+- [ ] Praeina milestone validacija: blokuoja P1 mobile overflow real-device/browser smoke patvirtinimas.
 
 ## Milestone 3 – Privatus verslas 10/10
 
 Pradėti tik užbaigus Milestone 2.
+
+Pastaba 2026-08-20: ankstesni Verslo etapo darbai lieka dokumentuoti, bet nauji Privataus verslo plano darbai nestumiami, kol Asmeninio plano P1 mobile overflow blocker nėra patvirtintas realaus telefono arba browser `scrollWidth/clientWidth` smoke testu.
 
 - [x] Business Studio prieigos kontrolė: klientas naudoja `ProtectedRoute requireBusinessPlan`, backend `/business` routeris naudoja `protect` + `requireBusinessPlan`, o `accessControlP1.test.js` patvirtina Demo/Asmeninis blokavimą ir Verslo prieigą.
 - [x] Business Dashboard: `/business/dashboard` rodo realią store būseną, paid-only pajamas ir paskutinius orderius iš backend `recentOrders`; neapmokėti checkout nėra skaičiuojami kaip pajamos.

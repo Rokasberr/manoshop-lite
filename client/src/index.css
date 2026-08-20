@@ -673,6 +673,87 @@
       inset 0 1px 0 rgb(255 255 255 / 0.08);
   }
 
+  @media (max-width: 768px) {
+    .member-workspace,
+    .member-workspace-personal,
+    .member-workspace section,
+    .member-workspace article,
+    .member-workspace .panel,
+    .member-workspace .public-section,
+    .member-workspace .marketing-card,
+    .member-workspace .soft-card,
+       .member-workspace .soft-card-strong {
+         min-width: 0;
+         max-width: 100%;
+       }
+
+       .member-workspace > *,
+       .member-workspace main,
+       .member-workspace section,
+       .member-workspace form,
+       .member-workspace label,
+       .member-workspace article > *,
+       .member-workspace .panel > *,
+       .member-workspace .marketing-card > *,
+       .member-workspace .soft-card > *,
+       .member-workspace .soft-card-strong > * {
+         min-width: 0;
+       }
+
+       .member-workspace img,
+       .member-workspace video,
+       .member-workspace canvas,
+       .member-workspace svg {
+         max-width: 100%;
+       }
+
+       .member-workspace .button-primary,
+       .member-workspace .button-secondary,
+       .member-workspace .hero-outline-button {
+      min-width: 0;
+      max-width: 100%;
+      white-space: normal;
+      text-align: center;
+    }
+
+    .member-workspace input,
+    .member-workspace select,
+    .member-workspace textarea {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .member-workspace .mobile-stack-grid {
+      grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    .member-workspace-personal #savings-ledger {
+      inline-size: min(100%, calc(100vw - 2rem));
+      max-inline-size: calc(100vw - 2rem);
+    }
+
+    .member-workspace-personal #savings-ledger > *,
+    .member-workspace-personal #savings-ledger .panel,
+    .member-workspace-personal #savings-ledger form,
+    .member-workspace-personal #savings-ledger label,
+    .member-workspace-personal #savings-ledger input,
+    .member-workspace-personal #savings-ledger select,
+    .member-workspace-personal #savings-ledger textarea,
+    .member-workspace-personal #savings-ledger button {
+      inline-size: 100%;
+      max-inline-size: 100%;
+    }
+
+    .member-workspace p,
+    .member-workspace h1,
+    .member-workspace h2,
+    .member-workspace h3,
+    .member-workspace span,
+    .member-workspace li {
+      overflow-wrap: anywhere;
+    }
+  }
+
   .member-hero-basic {
     background:
       radial-gradient(circle at 15% 0%, rgb(164 220 190 / 0.18), transparent 32%),
@@ -1092,4 +1173,26 @@ html.dark body {
 .dark .app-surface .plan-shell {
   background: linear-gradient(180deg, rgb(var(--surface) / 0.96), rgb(var(--surface-soft) / 0.72));
   box-shadow: 0 22px 60px rgb(0 0 0 / 0.18);
+}
+
+@layer utilities {
+  @media (max-width: 768px) {
+    .member-workspace .mobile-stack-grid {
+      grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    .member-workspace-personal #savings-ledger,
+    .member-workspace-personal #savings-ledger > *,
+    .member-workspace-personal #savings-ledger .panel,
+    .member-workspace-personal #savings-ledger form,
+    .member-workspace-personal #savings-ledger label,
+    .member-workspace-personal #savings-ledger input,
+    .member-workspace-personal #savings-ledger select,
+    .member-workspace-personal #savings-ledger textarea,
+    .member-workspace-personal #savings-ledger button {
+      min-width: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+  }
 }
