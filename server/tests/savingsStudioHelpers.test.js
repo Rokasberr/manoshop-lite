@@ -37,6 +37,17 @@ test("Saving Studio client helpers do not emit NaN for malformed numeric values"
   assert.equal(buildMonthOptions([{ date: "" }, {}, null]).some((option) => option.value === "all"), true);
 });
 
+test("Saving Studio chart month label tolerates summary monthly totals without label", async () => {
+  const { formatChartMonthLabel, monthLabel } = await importHelpers();
+  const realMonthlyTotalEntry = { key: "2026-08", total: 100 };
+  const expectedSafeLabel = monthLabel(realMonthlyTotalEntry.key).split(/\s+/)[0];
+
+  assert.doesNotThrow(() => formatChartMonthLabel(realMonthlyTotalEntry));
+  assert.equal(formatChartMonthLabel(realMonthlyTotalEntry), expectedSafeLabel);
+  assert.equal(formatChartMonthLabel({ key: "not-a-month", total: 100 }), "N/A");
+  assert.equal(formatChartMonthLabel({ label: " Rugpjutis 2026 ", total: 100 }), "Rugpjutis");
+});
+
 test("Saving Studio onboarding draft currency preview uses safe formatting", () => {
   const source = fs.readFileSync(path.join(root, "client", "src", "pages", "SavingsStudioPage.jsx"), "utf8");
 
