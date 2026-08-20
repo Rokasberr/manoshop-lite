@@ -95,6 +95,32 @@ export const monthLabel = (monthKey) => {
   }).format(parsedDate);
 };
 
+const firstSafeLabelToken = (value) => {
+  const normalizedValue = String(value || "").trim();
+
+  if (!normalizedValue) {
+    return "N/A";
+  }
+
+  return normalizedValue.split(/\s+/)[0] || "N/A";
+};
+
+export const formatChartMonthLabel = (entry) => {
+  const explicitLabel = typeof entry?.label === "string" ? entry.label.trim() : "";
+
+  if (explicitLabel) {
+    return firstSafeLabelToken(explicitLabel);
+  }
+
+  const key = typeof entry?.key === "string" ? entry.key.trim() : "";
+
+  if (!isMonthKey(key)) {
+    return "N/A";
+  }
+
+  return firstSafeLabelToken(monthLabel(key));
+};
+
 export const buildMonthOptions = (entries = []) => {
   const safeEntries = Array.isArray(entries) ? entries : [];
   const months = new Set(

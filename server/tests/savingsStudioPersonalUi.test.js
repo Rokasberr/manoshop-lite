@@ -185,6 +185,19 @@ test("Savings Studio P1 mobile actions and charts stay width-safe", () => {
   assert.match(csvPreviewSource, /<Download className="shrink-0" size=\{16\} \/>/);
 });
 
+test("Saving Studio six month chart accepts server monthlyTotals without labels", () => {
+  const source = readPageSource();
+  const sixMonthChartSource = extractSixMonthChartSource(source);
+
+  assert.match(source, /formatChartMonthLabel,/);
+  assert.match(source, /const monthlyTotals = Array\.isArray\(summary\?\.monthlyTotals\) \? summary\.monthlyTotals : \[\]/);
+  assert.match(sixMonthChartSource, /monthlyTotals\.map\(\(entry, index\) => \{/);
+  assert.match(sixMonthChartSource, /const safeTotal = Number\(entry\?\.total \|\| 0\)/);
+  assert.match(sixMonthChartSource, /const monthLabel = formatChartMonthLabel\(entry\)/);
+  assert.match(sixMonthChartSource, /\{monthLabel\}/);
+  assert.doesNotMatch(sixMonthChartSource, /entry\.label\.split/);
+});
+
 test("Personal member workspace has a mobile viewport overflow safety net", () => {
   const cssSource = readCssSource();
 
@@ -433,7 +446,7 @@ test("Six month chart scrolls internally without hiding labels or values", () =>
   assert.match(sixMonthSource, /flex h-full min-w-0 flex-col items-center justify-end gap-3/);
   assert.match(sixMonthSource, /min-w-0 w-full text-center/);
   assert.match(sixMonthSource, /whitespace-nowrap text-\[0\.68rem\] font-semibold uppercase tracking-normal text-muted/);
-  assert.match(sixMonthSource, /const formattedTotal = money\.format\(entry\.total\)/);
+  assert.match(sixMonthSource, /const formattedTotal = money\.format\(safeTotal\)/);
   assert.match(
     sixMonthSource,
     /mt-1 whitespace-nowrap text-xs font-semibold leading-tight tabular-nums" title=\{formattedTotal\}/

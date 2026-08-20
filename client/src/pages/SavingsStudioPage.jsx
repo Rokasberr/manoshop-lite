@@ -38,6 +38,7 @@ import {
   emptyGoal,
   emptyRecurringExpense,
   formatChange,
+  formatChartMonthLabel,
   formatRecurringFrequency,
   getBudgetStatus,
   getGoalProgress,
@@ -752,11 +753,11 @@ const SavingsStudioPage = () => {
   };
   const categoryPressure = summary?.categoryPressure || [];
   const savingsCapacity = summary?.savingsCapacity || null;
-  const monthlyTotals = summary?.monthlyTotals || [];
+  const monthlyTotals = Array.isArray(summary?.monthlyTotals) ? summary.monthlyTotals : [];
   const categoryTotals = summary?.categoryTotals || [];
   const summaryInsights = summary?.insights || [];
   const availableToSave = summary?.availableToSave;
-  const highestMonthlyTotal = Math.max(...monthlyTotals.map((entry) => entry.total), 1);
+  const highestMonthlyTotal = Math.max(...monthlyTotals.map((entry) => Number(entry?.total || 0)), 1);
   const activeGoalsCount = decoratedGoals.filter((goal) => !goal.complete).length;
   const currentRecurringMonth = currentMonthKey();
   const weeklyTotalsCurrentMonth = summary?.weeklyTotalsCurrentMonth || [];
@@ -3125,12 +3126,17 @@ const SavingsStudioPage = () => {
             <h2 className="mt-4 text-3xl font-bold leading-tight sm:text-[2rem]">6 mėnesių vaizdas</h2>
             <div className="mt-6 w-full max-w-full overflow-x-auto pb-2">
               <div className="grid h-[260px] min-w-[32rem] grid-cols-6 items-end gap-3">
-                {monthlyTotals.map((entry) => {
-                  const height = `${Math.max((entry.total / highestMonthlyTotal) * 100, entry.total ? 16 : 8)}%`;
-                  const formattedTotal = money.format(entry.total);
+                {monthlyTotals.map((entry, index) => {
+                  const safeTotal = Number(entry?.total || 0);
+                  const height = `${Math.max((safeTotal / highestMonthlyTotal) * 100, safeTotal ? 16 : 8)}%`;
+                  const formattedTotal = money.format(safeTotal);
+                  const monthLabel = formatChartMonthLabel(entry);
 
                   return (
-                    <div key={entry.key} className="flex h-full min-w-0 flex-col items-center justify-end gap-3">
+                    <div
+                      key={entry?.key || `month-total-${index}`}
+                      className="flex h-full min-w-0 flex-col items-center justify-end gap-3"
+                    >
                       <div className="relative h-full w-full min-w-0 rounded-full bg-[rgb(var(--surface-soft))]">
                         <div
                           className="absolute inset-x-0 bottom-0 rounded-full"
@@ -3143,7 +3149,7 @@ const SavingsStudioPage = () => {
                       </div>
                       <div className="min-w-0 w-full text-center">
                         <p className="whitespace-nowrap text-[0.68rem] font-semibold uppercase tracking-normal text-muted">
-                          {entry.label.split(" ")[0]}
+                          {monthLabel}
                         </p>
                         <p className="mt-1 whitespace-nowrap text-xs font-semibold leading-tight tabular-nums" title={formattedTotal}>
                           {formattedTotal}
