@@ -57,3 +57,29 @@ test("client layout keeps keyboard skip link to main content", () => {
   assert.match(layoutSource, /focus:not-sr-only/);
   assert.match(layoutSource, /<main id="main-content"/);
 });
+
+test("Profile page exposes Stripe Portal and subscription invoice UI safely", () => {
+  const profileSource = fs.readFileSync(path.join(root, "client", "src", "pages", "ProfilePage.jsx"), "utf8");
+  const billingServiceSource = fs.readFileSync(path.join(root, "client", "src", "services", "billingService.js"), "utf8");
+
+  assert.match(profileSource, /Valdyti prenumeratą ir sąskaitas/);
+  assert.match(profileSource, /Sutvarkyti mokėjimą/);
+  assert.match(profileSource, /Prenumeratos mokėjimai/);
+  assert.match(profileSource, /Sąskaitų santrauka/);
+  assert.match(profileSource, /openingPortal/);
+  assert.match(profileSource, /if \(openingPortal\) \{/);
+  assert.match(profileSource, /w-full max-w-full justify-center gap-2 whitespace-normal/);
+  assert.match(profileSource, /Kortelės, plano ir pilnų sąskaitų valdymas vyksta per Stripe Customer Portal/);
+  assert.doesNotMatch(profileSource, /backendRole}: \{normalizedRole}/);
+  assert.match(billingServiceSource, /post\("\/billing\/create-portal-session"\)/);
+  assert.match(billingServiceSource, /get\("\/billing\/subscription-invoices"\)/);
+});
+
+test("Billing success handles missing Stripe session ID without endless sync", () => {
+  const successSource = fs.readFileSync(path.join(root, "client", "src", "pages", "BillingSuccessPage.jsx"), "utf8");
+
+  assert.match(successSource, /if \(!sessionId\) \{/);
+  assert.match(successSource, /Trūksta Stripe sesijos patvirtinimo/);
+  assert.match(successSource, /attempts < 4/);
+  assert.match(successSource, /cancelled = true/);
+});

@@ -15,6 +15,7 @@ const {
   markStripeWebhookEventProcessed,
 } = require("../services/webhookEventService");
 const {
+  findLatestStripeSubscriptionForUser,
   serializeSubscription,
   syncUserSubscriptionFromStripeSubscription,
   syncUserSubscriptionFromCheckoutSession,
@@ -158,7 +159,17 @@ const syncStripeMembership = async (req, res) => {
   const normalizedSessionId = String(sessionId || "").trim();
 
   if (!normalizedSessionId) {
-    throw createHttpError("Reikalingas Stripe Checkout Session ID.", 400);
+    const syncedUser = await findLatestStripeSubscriptionForUser(stripe, user);
+    const currentUser = syncedUser || (await User.findById(req.user._id).select("-password"));
+
+    return res.json({
+      synced: Boolean(syncedUser),
+      pendingWebhook: false,
+      message: syncedUser
+        ? "Narystė atnaujinta pagal naujausią Stripe prenumeratą."
+        : "Aktyvi Stripe prenumerata šiai paskyrai nerasta.",
+      subscription: serializeSubscription(currentUser?.subscription || user.subscription),
+    });
   }
 
   let session;
@@ -173,7 +184,7 @@ const syncStripeMembership = async (req, res) => {
     return res.status(202).json({
       synced: false,
       pendingWebhook: true,
-      message: "Mokejimas vis dar apdorojamas. Naryste bus atnaujinta, kai Stripe patvirtins sesija.",
+      message: "Mokėjimas vis dar apdorojamas. Narystė bus atnaujinta, kai Stripe patvirtins sesiją.",
       subscription: serializeSubscription(currentUser?.subscription || user.subscription),
     });
   }
@@ -182,15 +193,15 @@ const syncStripeMembership = async (req, res) => {
   const sessionUserId = session.metadata?.userId || session.client_reference_id || "";
 
   if (!sessionUserId || sessionUserId !== expectedUserId) {
-    throw createHttpError("Si Stripe sesija nepriklauso dabartinei paskyrai.", 403);
+    throw createHttpError("Ši Stripe sesija nepriklauso dabartinei paskyrai.", 403);
   }
 
   if (session.metadata?.checkoutType === "order" || session.metadata?.type === "digital_product") {
-    throw createHttpError("Si Stripe sesija nera narystes apmokejimas.", 400);
+    throw createHttpError("Ši Stripe sesija nėra narystės apmokėjimas.", 400);
   }
 
   if (session.mode !== "subscription") {
-    throw createHttpError("Si Stripe sesija nera prenumeratos apmokejimas.", 400);
+    throw createHttpError("Ši Stripe sesija nėra prenumeratos apmokėjimas.", 400);
   }
 
   const subscriptionId =
@@ -202,7 +213,7 @@ const syncStripeMembership = async (req, res) => {
     return res.status(202).json({
       synced: false,
       pendingWebhook: true,
-      message: "Stripe prenumerata dar nepriskirta sesijai. Bandyk dar karta po keliu akimirku.",
+      message: "Stripe prenumerata dar nepriskirta sesijai. Bandyk dar kartą po kelių akimirkų.",
       subscription: serializeSubscription(currentUser?.subscription || user.subscription),
     });
   }
@@ -213,7 +224,7 @@ const syncStripeMembership = async (req, res) => {
     return res.status(202).json({
       synced: false,
       pendingWebhook: true,
-      message: "Stripe dar nepatvirtino mokejimo. Naryste neaktyvuota.",
+      message: "Stripe dar nepatvirtino mokėjimo. Narystė neaktyvuota.",
       subscription: serializeSubscription(currentUser?.subscription || user.subscription),
     });
   }
@@ -238,18 +249,122 @@ const syncStripeMembership = async (req, res) => {
   res.json({
     synced: Boolean(syncedUser),
     pendingWebhook: !syncedUser,
-    message: syncedUser ? "Naryste patvirtinta pagal Stripe sesija." : "Mokejimas vis dar apdorojamas.",
+    message: syncedUser ? "Narystė patvirtinta pagal Stripe sesiją." : "Mokėjimas vis dar apdorojamas.",
     subscription: serializeSubscription(currentUser?.subscription || user.subscription),
   });
 };
 
 const getStripeId = (value) => (typeof value === "string" ? value : value?.id || "");
 
+const isPaidStripeSubscription = (subscription) => {
+  const planId = normalizePlanId(subscription?.plan || "free");
+
+  return (
+    subscription?.provider === "stripe" &&
+    ["personal", "private_business"].includes(planId) &&
+    Boolean(subscription?.stripeCustomerId) &&
+    Boolean(subscription?.stripeSubscriptionId)
+  );
+};
+
+const createCustomerPortalSession = async (req, res) => {
+  const stripe = getStripeClient();
+  const user = await User.findById(req.user._id).select("-password");
+
+  if (!user) {
+    throw createHttpError("Vartotojas nerastas.", 404);
+  }
+
+  if (!isPaidStripeSubscription(user.subscription)) {
+    throw createHttpError("Stripe prenumeratos savitarna pasiekiama tik mokamai Stripe narystei.", 409);
+  }
+
+  const clientUrl = resolveClientUrl(req.headers.origin);
+  const session = await stripe.billingPortal.sessions.create(
+    {
+      customer: user.subscription.stripeCustomerId,
+      return_url: `${clientUrl}/profile`,
+    },
+    {
+      idempotencyKey: buildIdempotencyKey(
+        "billing-portal",
+        [
+          req.user._id,
+          user.subscription.stripeCustomerId,
+          Math.floor(Date.now() / 30_000),
+        ],
+        req.headers["idempotency-key"]
+      ),
+    }
+  );
+
+  res.status(201).json({
+    url: session.url,
+  });
+};
+
+const serializeInvoice = (invoice) => ({
+  date: invoice.created ? new Date(invoice.created * 1000).toISOString() : null,
+  amount: Number(((invoice.amount_paid || invoice.amount_due || invoice.total || 0) / 100).toFixed(2)),
+  currency: String(invoice.currency || "eur").toLowerCase(),
+  status: invoice.status || "",
+  number: invoice.number || "",
+  hostedInvoiceUrl: invoice.hosted_invoice_url || "",
+  invoicePdf: invoice.invoice_pdf || "",
+});
+
+const listSubscriptionInvoices = async (req, res) => {
+  const stripe = getStripeClient();
+  const user = await User.findById(req.user._id).select("-password");
+
+  if (!user) {
+    throw createHttpError("Vartotojas nerastas.", 404);
+  }
+
+  if (!user.subscription?.stripeCustomerId || user.subscription?.provider !== "stripe") {
+    return res.json({ invoices: [] });
+  }
+
+  try {
+    const invoiceList = await stripe.invoices.list({
+      customer: user.subscription.stripeCustomerId,
+      limit: 10,
+    });
+
+    res.json({
+      invoices: (invoiceList.data || []).map(serializeInvoice),
+    });
+  } catch (_error) {
+    throw createHttpError("Prenumeratos sąskaitų šiuo metu nepavyko užkrauti.", 503);
+  }
+};
+
 const resolveUserIdForStripeSubscription = async (subscription) => {
   const metadataUserId = subscription?.metadata?.userId;
+  const stripeCustomerId = getStripeId(subscription?.customer);
 
   if (metadataUserId) {
-    return metadataUserId;
+    const metadataUser = await User.findById(metadataUserId);
+
+    if (!metadataUser) {
+      return "";
+    }
+
+    if (stripeCustomerId) {
+      const customerOwner = await User.findOne({ "subscription.stripeCustomerId": stripeCustomerId });
+
+      if (customerOwner && customerOwner._id.toString() !== metadataUser._id.toString()) {
+        return "";
+      }
+
+      const metadataUserCustomerId = metadataUser.subscription?.stripeCustomerId || "";
+
+      if (metadataUserCustomerId && metadataUserCustomerId !== stripeCustomerId) {
+        return "";
+      }
+    }
+
+    return metadataUser._id.toString();
   }
 
   const subscriptionRecord = subscription?.id
@@ -260,7 +375,6 @@ const resolveUserIdForStripeSubscription = async (subscription) => {
     return subscriptionRecord.user.toString();
   }
 
-  const stripeCustomerId = getStripeId(subscription?.customer);
   const user = stripeCustomerId
     ? await User.findOne({ "subscription.stripeCustomerId": stripeCustomerId })
     : null;
@@ -403,6 +517,7 @@ const handleStripeWebhook = async (req, res) => {
         break;
       }
       case "customer.subscription.updated":
+      case "customer.subscription.created":
       case "customer.subscription.deleted": {
         const subscription = event.data.object;
         const userId = await resolveUserIdForStripeSubscription(subscription);
@@ -425,6 +540,11 @@ const handleStripeWebhook = async (req, res) => {
       case "invoice.payment_failed": {
         const invoice = event.data.object;
         await syncInvoicePayment({ stripe, invoice, status: "failed" });
+        break;
+      }
+      case "invoice.payment_action_required": {
+        const invoice = event.data.object;
+        await syncInvoicePayment({ stripe, invoice, status: "pending" });
         break;
       }
       case "charge.refunded": {
@@ -464,14 +584,16 @@ const handleStripeWebhook = async (req, res) => {
     return res.json({ received: true });
   } catch (error) {
     await markStripeWebhookEventFailed(webhookRecord, error);
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: "Webhook apdoroti nepavyko. Stripe gali pakartoti įvykį." });
   }
 };
 
 module.exports = {
   activateDemoPlan,
+  createCustomerPortalSession,
   createPaymentSession,
   getBillingProfile,
+  listSubscriptionInvoices,
   syncStripeMembership,
   handleStripeWebhook,
 };

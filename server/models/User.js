@@ -53,6 +53,10 @@ const subscriptionSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    canceledAt: {
+      type: Date,
+      default: null,
+    },
     lastSyncedAt: {
       type: Date,
       default: null,
