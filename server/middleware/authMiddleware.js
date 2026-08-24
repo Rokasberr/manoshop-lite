@@ -9,6 +9,7 @@ const {
 const User = require("../models/User");
 const { createHttpError } = require("../utils/httpError");
 const { isAdminUser, normalizeUserRole } = require("../utils/userRole");
+const { isEmailVerifiedForAccess } = require("../services/emailVerificationService");
 
 const protect = async (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -23,7 +24,7 @@ const protect = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id).select("-password");
 
-    if (!user) {
+    if (!user || user.isDeleted) {
       return next(createHttpError("Vartotojas nebegalioja.", 401));
     }
 
@@ -104,6 +105,14 @@ const requireSavingsStudioPro = (req, res, next) => {
   return next();
 };
 
+const requireVerifiedEmail = (req, res, next) => {
+  if (isAdminUser(req.user) || isEmailVerifiedForAccess(req.user)) {
+    return next();
+  }
+
+  return next(createHttpError("Patvirtink el. pasta pries tesiant si veiksma.", 403));
+};
+
 module.exports = {
   requireAuth,
   protect,
@@ -111,6 +120,7 @@ module.exports = {
   memberOnly,
   hasActiveMembership,
   requirePlan,
+  requireVerifiedEmail,
   requireBusinessPlan,
   requireSavingsStudioPro,
 };

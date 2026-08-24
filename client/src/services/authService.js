@@ -35,13 +35,53 @@ const changePassword = async (payload) => {
   return data;
 };
 
+const verifyEmail = async (token) => {
+  const { data } = await api.post("/auth/verify-email", { token });
+  return data;
+};
+
+const resendVerification = async () => {
+  const { data } = await api.post("/auth/resend-verification");
+  return data;
+};
+
+const exportData = async () => {
+  const response = await api.get("/auth/export-data", {
+    responseType: "blob",
+  });
+  const blob = new Blob([response.data], {
+    type: response.headers["content-type"] || "application/json;charset=utf-8",
+  });
+  const disposition = response.headers["content-disposition"] || "";
+  const fileNameMatch = disposition.match(/filename="([^"]+)"/);
+  const fileName = fileNameMatch?.[1] || "stilloak-user-data.json";
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+};
+
+const deleteAccount = async (payload) => {
+  const { data } = await api.delete("/auth/account", { data: payload });
+  return data;
+};
+
 export default {
   changePassword,
+  deleteAccount,
+  exportData,
   forgotPassword,
   register,
   login,
   logout,
   profile,
+  resendVerification,
   resetPassword,
+  verifyEmail,
 };
 

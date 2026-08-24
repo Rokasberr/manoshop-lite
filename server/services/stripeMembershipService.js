@@ -32,7 +32,7 @@ const updateUserSubscription = async ({
   const plan = getPlanById(planId) || getPlanById("free");
   const user = await User.findById(userId);
 
-  if (!user) {
+  if (!user || user.isDeleted) {
     return null;
   }
 

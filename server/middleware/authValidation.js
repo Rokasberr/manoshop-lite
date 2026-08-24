@@ -83,10 +83,40 @@ const validateChangePasswordInput = (req, _res, next) => {
   next();
 };
 
+const validateVerifyEmailInput = (req, _res, next) => {
+  const token = String(req.body?.token || "").trim();
+
+  if (!token || token.length < 32 || token.length > 256) {
+    return next(createHttpError("El. pasto patvirtinimo nuoroda neteisinga arba pasibaigusi.", 400));
+  }
+
+  req.body.token = token;
+  next();
+};
+
+const validateDeleteAccountInput = (req, _res, next) => {
+  const currentPassword = String(req.body?.currentPassword || "");
+  const confirmationText = String(req.body?.confirmationText || "").trim();
+
+  if (!currentPassword) {
+    return next(createHttpError("Dabartinis slaptazodis yra privalomas.", 400));
+  }
+
+  if (confirmationText !== "IŠTRINTI PASKYRĄ") {
+    return next(createHttpError("Patvirtinimo tekstas neteisingas.", 400));
+  }
+
+  req.body.currentPassword = currentPassword;
+  req.body.confirmationText = confirmationText;
+  next();
+};
+
 module.exports = {
   validateChangePasswordInput,
+  validateDeleteAccountInput,
   validateForgotPasswordInput,
   validateLoginInput,
   validateRegisterInput,
   validateResetPasswordInput,
+  validateVerifyEmailInput,
 };

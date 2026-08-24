@@ -34,6 +34,10 @@ const matchesQuery = (entry, query) =>
     const actual = entry[key];
 
     if (value && typeof value === "object" && !(value instanceof Date)) {
+      if (value.$ne !== undefined) {
+        return actual !== value.$ne;
+      }
+
       if (value.$gt !== undefined) {
         return actual instanceof Date && actual.getTime() > value.$gt.getTime();
       }

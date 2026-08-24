@@ -94,6 +94,29 @@ const userSchema = new mongoose.Schema(
       default: null,
       select: false,
     },
+    emailVerifiedAt: {
+      type: Date,
+      default: null,
+    },
+    emailVerificationRequired: {
+      type: Boolean,
+      default: false,
+    },
+    emailVerificationTokenHash: {
+      type: String,
+      default: "",
+      select: false,
+    },
+    emailVerificationExpiresAt: {
+      type: Date,
+      default: null,
+      select: false,
+    },
+    emailVerificationSentAt: {
+      type: Date,
+      default: null,
+      select: false,
+    },
     authVersion: {
       type: Number,
       default: 0,
@@ -122,6 +145,15 @@ const userSchema = new mongoose.Schema(
         provider: "internal",
       }),
     },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,
@@ -132,6 +164,7 @@ userSchema.index({ role: 1 });
 userSchema.index({ "subscription.stripeCustomerId": 1 }, { sparse: true });
 userSchema.index({ "subscription.stripeSubscriptionId": 1 }, { sparse: true });
 userSchema.index({ passwordResetTokenHash: 1 }, { sparse: true });
+userSchema.index({ emailVerificationTokenHash: 1 }, { sparse: true });
 
 userSchema.pre("save", async function save(next) {
   if (!this.isModified("password")) {

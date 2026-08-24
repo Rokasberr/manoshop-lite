@@ -68,13 +68,19 @@ const RegisterPage = () => {
       }
 
       if (purchaseProductId) {
-        toast.success(copy.productSuccess);
-        navigate(`/digital-products?product=${encodeURIComponent(purchaseProductId)}`);
+        toast.success("Paskyra sukurta. Pries pirkima patvirtink el. pasta.");
+        navigate("/profile", { state: { pendingProductId: purchaseProductId } });
+        return;
+      }
+
+      if (selectedPlan && selectedPlan !== "basic") {
+        toast.success("Paskyra sukurta. Patvirtink el. pasta, tada galesi testi apmokejima.");
+        navigate("/profile", { state: { selectedPlan } });
         return;
       }
 
       toast.success(copy.success);
-      navigate("/pricing");
+      navigate("/profile");
     } catch (submitError) {
       setError(submitError.response?.data?.message || copy.fail);
     } finally {

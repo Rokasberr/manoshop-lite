@@ -208,9 +208,9 @@ test("billing routes rate-limit portal, sync, and subscription invoice endpoints
   assert.match(source, /billingPortalLimiter = createWindowRateLimiter/);
   assert.match(source, /billingSyncLimiter = createWindowRateLimiter/);
   assert.match(source, /billingInvoicesLimiter = createWindowRateLimiter/);
-  assert.match(source, /router\.post\("\/create-portal-session", protect, billingPortalLimiter/);
-  assert.match(source, /router\.post\("\/sync-stripe-membership", protect, billingSyncLimiter/);
-  assert.match(source, /router\.get\("\/subscription-invoices", protect, billingInvoicesLimiter/);
+  assert.match(source, /router\.post\("\/create-portal-session", protect, requireVerifiedEmail, billingPortalLimiter/);
+  assert.match(source, /router\.post\("\/sync-stripe-membership", protect, requireVerifiedEmail, billingSyncLimiter/);
+  assert.match(source, /router\.get\("\/subscription-invoices", protect, requireVerifiedEmail, billingInvoicesLimiter/);
   assert.match(source, /Per daug prenumeratos savitarnos užklausų/);
   assert.match(source, /Per daug narystės sinchronizavimo užklausų/);
   assert.match(source, /Per daug prenumeratos sąskaitų užklausų/);
