@@ -5,6 +5,8 @@ const controllerPath = require.resolve("../controllers/billingController");
 const stripeClientPath = require.resolve("../utils/stripeClient");
 const webhookEventServicePath = require.resolve("../services/webhookEventService");
 const stripeMembershipServicePath = require.resolve("../services/stripeMembershipService");
+const transactionalEmailServicePath = require.resolve("../services/transactionalEmailService");
+const digitalProductPurchaseServicePath = require.resolve("../services/digitalProductPurchaseService");
 
 const createResponse = () => ({
   statusCode: 200,
@@ -24,9 +26,18 @@ const createResponse = () => ({
   },
 });
 
-const loadController = ({ event, shouldProcess = true, syncError = null, stripeOverrides = {} }) => {
+const loadController = ({
+  event,
+  shouldProcess = true,
+  syncError = null,
+  emailError = null,
+  digitalPurchase = null,
+  stripeOverrides = {},
+}) => {
   const webhookCalls = [];
   const syncCalls = [];
+  const emailCalls = [];
+  const digitalPurchaseCalls = [];
   const stripe = {
     webhooks: {
       constructEvent: () => {
@@ -99,9 +110,60 @@ const loadController = ({ event, shouldProcess = true, syncError = null, stripeO
       },
     },
   };
+  require.cache[transactionalEmailServicePath] = {
+    id: transactionalEmailServicePath,
+    filename: transactionalEmailServicePath,
+    loaded: true,
+    exports: {
+      sendDigitalProductPurchaseEmail: async (payload) => {
+        emailCalls.push(["digital-product", payload]);
+        if (emailError) {
+          throw emailError;
+        }
+        return { sent: true };
+      },
+      sendSubscriptionCancellationEmail: async (payload) => {
+        emailCalls.push(["subscription-cancellation", payload]);
+        if (emailError) {
+          throw emailError;
+        }
+        return { sent: true };
+      },
+      sendSubscriptionPaymentIssueEmail: async (payload) => {
+        if (!["failed", "pending"].includes(payload.payment?.status)) {
+          return { sent: false, skipped: true };
+        }
+        emailCalls.push(["subscription-payment-issue", payload]);
+        if (emailError) {
+          throw emailError;
+        }
+        return { sent: true };
+      },
+      sendSubscriptionPaymentSucceededEmail: async (payload) => {
+        emailCalls.push(["subscription-payment-succeeded", payload]);
+        if (emailError) {
+          throw emailError;
+        }
+        return { sent: true };
+      },
+    },
+  };
+  require.cache[digitalProductPurchaseServicePath] = {
+    id: digitalProductPurchaseServicePath,
+    filename: digitalProductPurchaseServicePath,
+    loaded: true,
+    exports: {
+      syncDigitalProductPurchaseFromSession: async (session) => {
+        digitalPurchaseCalls.push(session);
+        return digitalPurchase;
+      },
+    },
+  };
 
   return {
     controller: require("../controllers/billingController"),
+    digitalPurchaseCalls,
+    emailCalls,
     syncCalls,
     webhookCalls,
   };
@@ -115,9 +177,11 @@ const withModelMocks = async (callback) => {
     userFindById: User.findById,
     userFindOne: User.findOne,
     subscriptionFindOne: Subscription.findOne,
+    paymentFindOne: Payment.findOne,
     paymentFindOneAndUpdate: Payment.findOneAndUpdate,
   };
   const paymentCalls = [];
+  const payments = new Map();
 
   User.findById = async (id) => ({
     _id: { toString: () => id },
@@ -128,22 +192,33 @@ const withModelMocks = async (callback) => {
       ? { _id: { toString: () => "user_1" }, subscription: { stripeCustomerId: "cus_user" } }
       : null;
   Subscription.findOne = async () => ({ _id: "subscription_record_1", user: { toString: () => "user_1" } });
+  Payment.findOne = async (filter) => payments.get(`${filter.stripeInvoiceId}:${filter.type}`) || null;
   Payment.findOneAndUpdate = async (filter, update, options) => {
     paymentCalls.push({ filter, update, options });
-    return { _id: "payment_1" };
+    const key = `${filter.stripeInvoiceId}:${filter.type}`;
+    const existing = payments.get(key) || { _id: `payment_${payments.size + 1}` };
+    const next = {
+      ...existing,
+      ...update.$set,
+    };
+    payments.set(key, next);
+    return next;
   };
 
   try {
-    await callback({ paymentCalls });
+    await callback({ paymentCalls, payments });
   } finally {
     User.findById = originals.userFindById;
     User.findOne = originals.userFindOne;
     Subscription.findOne = originals.subscriptionFindOne;
+    Payment.findOne = originals.paymentFindOne;
     Payment.findOneAndUpdate = originals.paymentFindOneAndUpdate;
     delete require.cache[controllerPath];
     delete require.cache[stripeClientPath];
     delete require.cache[webhookEventServicePath];
     delete require.cache[stripeMembershipServicePath];
+    delete require.cache[transactionalEmailServicePath];
+    delete require.cache[digitalProductPurchaseServicePath];
   }
 };
 
@@ -237,7 +312,7 @@ test("invoice paid, failed and action required write safe subscription payment s
 
   for (const [type, expectedStatus] of cases) {
     await withModelMocks(async ({ paymentCalls }) => {
-      const { controller } = loadController({
+      const { controller, emailCalls } = loadController({
         event: {
           id: `evt_${type}`,
           type,
@@ -261,6 +336,7 @@ test("invoice paid, failed and action required write safe subscription payment s
       assert.equal(paymentCalls[0].update.$set.status, expectedStatus);
       assert.equal(paymentCalls[0].update.$set.user, "user_1");
       assert.equal(paymentCalls[0].update.$set.stripeCustomerId, "cus_user");
+      assert.equal(emailCalls.length, 1);
     });
   }
 });
@@ -286,6 +362,167 @@ test("webhook processing errors are marked failed and return a generic retry-saf
 
     assert.equal(res.statusCode, 500);
     assert.equal(res.body.message.includes("secret internal"), false);
+    assert.ok(webhookCalls.some((call) => call[0] === "failed"));
+  });
+});
+
+test("subscription email transport failure keeps payment sync and leaves webhook retryable", async () => {
+  await withModelMocks(async ({ paymentCalls }) => {
+    const { controller, emailCalls, webhookCalls } = loadController({
+      emailError: new Error("SMTP unavailable"),
+      event: {
+        id: "evt_email_fail",
+        type: "invoice.paid",
+        data: {
+          object: {
+            id: "in_1",
+            customer: "cus_user",
+            subscription: "sub_1",
+            amount_paid: 1499,
+            currency: "eur",
+            status: "paid",
+            payment_intent: "pi_1",
+          },
+        },
+      },
+    });
+    const res = await runWebhook(controller);
+
+    assert.equal(res.statusCode, 500);
+    assert.equal(paymentCalls.length, 1);
+    assert.equal(paymentCalls[0].update.$set.status, "succeeded");
+    assert.equal(emailCalls.length, 1);
+    assert.ok(webhookCalls.some((call) => call[0] === "failed"));
+  });
+});
+
+test("late payment_failed for an already succeeded invoice does not downgrade payment or send issue email", async () => {
+  await withModelMocks(async ({ paymentCalls, payments }) => {
+    const paid = loadController({
+      event: {
+        id: "evt_paid_first",
+        type: "invoice.paid",
+        data: {
+          object: {
+            id: "in_same",
+            customer: "cus_user",
+            subscription: "sub_1",
+            amount_paid: 1499,
+            currency: "eur",
+            status: "paid",
+            payment_intent: "pi_1",
+          },
+        },
+      },
+    });
+    const paidRes = await runWebhook(paid.controller);
+    const failed = loadController({
+      event: {
+        id: "evt_failed_late",
+        type: "invoice.payment_failed",
+        data: {
+          object: {
+            id: "in_same",
+            customer: "cus_user",
+            subscription: "sub_1",
+            amount_due: 1499,
+            currency: "eur",
+            status: "open",
+            payment_intent: "pi_1",
+          },
+        },
+      },
+    });
+    const failedRes = await runWebhook(failed.controller);
+
+    assert.deepEqual(paidRes.body, { received: true });
+    assert.deepEqual(failedRes.body, { received: true });
+    assert.equal(paymentCalls.length, 1);
+    assert.equal(payments.get("in_same:subscription_invoice").status, "succeeded");
+    assert.equal(paid.emailCalls.length, 1);
+    assert.equal(paid.emailCalls[0][0], "subscription-payment-succeeded");
+    assert.equal(failed.emailCalls.length, 0);
+  });
+});
+
+test("failed invoice can later be upgraded to succeeded and sends final success email", async () => {
+  await withModelMocks(async ({ paymentCalls, payments }) => {
+    const failed = loadController({
+      event: {
+        id: "evt_failed_first",
+        type: "invoice.payment_failed",
+        data: {
+          object: {
+            id: "in_later_paid",
+            customer: "cus_user",
+            subscription: "sub_1",
+            amount_due: 1499,
+            currency: "eur",
+            status: "open",
+            payment_intent: "pi_1",
+          },
+        },
+      },
+    });
+    const failedRes = await runWebhook(failed.controller);
+    const paid = loadController({
+      event: {
+        id: "evt_paid_later",
+        type: "invoice.paid",
+        data: {
+          object: {
+            id: "in_later_paid",
+            customer: "cus_user",
+            subscription: "sub_1",
+            amount_paid: 1499,
+            currency: "eur",
+            status: "paid",
+            payment_intent: "pi_1",
+          },
+        },
+      },
+    });
+    const paidRes = await runWebhook(paid.controller);
+
+    assert.deepEqual(failedRes.body, { received: true });
+    assert.deepEqual(paidRes.body, { received: true });
+    assert.equal(paymentCalls.length, 2);
+    assert.equal(payments.get("in_later_paid:subscription_invoice").status, "succeeded");
+    assert.equal(failed.emailCalls.length, 1);
+    assert.equal(failed.emailCalls[0][0], "subscription-payment-issue");
+    assert.equal(paid.emailCalls.length, 1);
+    assert.equal(paid.emailCalls[0][0], "subscription-payment-succeeded");
+  });
+});
+
+test("digital product email transport failure keeps paid purchase sync and leaves webhook retryable", async () => {
+  await withModelMocks(async () => {
+    const { controller, digitalPurchaseCalls, emailCalls, webhookCalls } = loadController({
+      emailError: new Error("Brevo unavailable"),
+      digitalPurchase: {
+        _id: "purchase_1",
+        user: "user_1",
+        productId: "12-month-savings-tracker",
+        status: "paid",
+      },
+      event: {
+        id: "evt_digital_email_fail",
+        type: "checkout.session.completed",
+        data: {
+          object: {
+            id: "cs_1",
+            mode: "payment",
+            payment_status: "paid",
+            metadata: { type: "digital_product", userId: "user_1", productId: "12-month-savings-tracker" },
+          },
+        },
+      },
+    });
+    const res = await runWebhook(controller);
+
+    assert.equal(res.statusCode, 500);
+    assert.equal(digitalPurchaseCalls.length, 1);
+    assert.equal(emailCalls.length, 1);
     assert.ok(webhookCalls.some((call) => call[0] === "failed"));
   });
 });

@@ -20,6 +20,12 @@ const {
   syncUserSubscriptionFromStripeSubscription,
   syncUserSubscriptionFromCheckoutSession,
 } = require("../services/stripeMembershipService");
+const {
+  sendDigitalProductPurchaseEmail,
+  sendSubscriptionCancellationEmail,
+  sendSubscriptionPaymentIssueEmail,
+  sendSubscriptionPaymentSucceededEmail,
+} = require("../services/transactionalEmailService");
 const { getStripeClient, resolveClientUrl } = require("../utils/stripeClient");
 const { createHttpError } = require("../utils/httpError");
 
@@ -425,6 +431,14 @@ const syncInvoicePayment = async ({ stripe, invoice, status }) => {
     ? await Subscription.findOne({ stripeSubscriptionId })
     : null;
   const amount = Number(((invoice.amount_paid || invoice.amount_due || invoice.total || 0) / 100).toFixed(2));
+  const existingPayment = await Payment.findOne({
+    stripeInvoiceId: invoice.id,
+    type: "subscription_invoice",
+  });
+
+  if (existingPayment?.status === "succeeded" && status !== "succeeded") {
+    return existingPayment;
+  }
 
   return Payment.findOneAndUpdate(
     { stripeInvoiceId: invoice.id, type: "subscription_invoice" },
@@ -490,7 +504,11 @@ const handleStripeWebhook = async (req, res) => {
         }
 
         if (session.metadata?.type === "digital_product" || session.metadata?.checkoutType === "digital_product") {
-          await syncDigitalProductPurchaseFromSession(session);
+          const purchase = await syncDigitalProductPurchaseFromSession(session);
+
+          if (purchase) {
+            await sendDigitalProductPurchaseEmail({ purchase });
+          }
           break;
         }
 
@@ -534,23 +552,63 @@ const handleStripeWebhook = async (req, res) => {
             stripeCustomerId: getStripeId(subscription.customer),
             subscription,
           });
+          const subscriptionRecord = await Subscription.findOne({
+            stripeSubscriptionId: getStripeId(subscription.id),
+          });
+
+          if (subscriptionRecord) {
+            await sendSubscriptionCancellationEmail({
+              subscription,
+              subscriptionRecord,
+              eventType: event.type,
+            });
+          }
         }
         break;
       }
       case "invoice.paid":
       case "invoice.payment_succeeded": {
         const invoice = event.data.object;
-        await syncInvoicePayment({ stripe, invoice, status: "succeeded" });
+        const payment = await syncInvoicePayment({ stripe, invoice, status: "succeeded" });
+        const subscriptionRecord = getStripeId(invoice.subscription)
+          ? await Subscription.findOne({ stripeSubscriptionId: getStripeId(invoice.subscription) })
+          : null;
+
+        await sendSubscriptionPaymentSucceededEmail({
+          invoice,
+          payment,
+          subscriptionRecord,
+        });
         break;
       }
       case "invoice.payment_failed": {
         const invoice = event.data.object;
-        await syncInvoicePayment({ stripe, invoice, status: "failed" });
+        const payment = await syncInvoicePayment({ stripe, invoice, status: "failed" });
+        const subscriptionRecord = getStripeId(invoice.subscription)
+          ? await Subscription.findOne({ stripeSubscriptionId: getStripeId(invoice.subscription) })
+          : null;
+
+        await sendSubscriptionPaymentIssueEmail({
+          invoice,
+          payment,
+          subscriptionRecord,
+          actionRequired: false,
+        });
         break;
       }
       case "invoice.payment_action_required": {
         const invoice = event.data.object;
-        await syncInvoicePayment({ stripe, invoice, status: "pending" });
+        const payment = await syncInvoicePayment({ stripe, invoice, status: "pending" });
+        const subscriptionRecord = getStripeId(invoice.subscription)
+          ? await Subscription.findOne({ stripeSubscriptionId: getStripeId(invoice.subscription) })
+          : null;
+
+        await sendSubscriptionPaymentIssueEmail({
+          invoice,
+          payment,
+          subscriptionRecord,
+          actionRequired: true,
+        });
         break;
       }
       case "charge.refunded": {
