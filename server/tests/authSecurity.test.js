@@ -404,4 +404,3 @@ test("auth forms expose labels, names, autocomplete, required fields, and alert 
   assert.match(profileSource, /autoComplete="new-password"/);
   assert.match(profileSource, /max-w-full/);
 });
-
