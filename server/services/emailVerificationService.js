@@ -6,7 +6,7 @@ const { sendEmailVerificationEmail } = require("./emailVerificationEmailService"
 
 const TOKEN_BYTES = 32;
 const DEFAULT_TTL_HOURS = 24;
-const INVALID_MESSAGE = "El. pasto patvirtinimo nuoroda neteisinga arba pasibaigusi.";
+const INVALID_MESSAGE = "El. pašto patvirtinimo nuoroda neteisinga arba pasibaigusi.";
 
 const hashEmailVerificationToken = (token) =>
   crypto.createHash("sha256").update(String(token || ""), "utf8").digest("hex");
@@ -144,7 +144,7 @@ const verifyEmailToken = async ({ token, userModel = User, now = () => new Date(
     throw createHttpError(INVALID_MESSAGE, 400);
   }
 
-  return { message: "El. pastas patvirtintas.", user };
+  return { message: "El. paštas patvirtintas.", user };
 };
 
 const isEmailVerifiedForAccess = (user) =>

@@ -493,8 +493,7 @@ export const translations = {
         visitContact: "Susisiekti",
         cookieSettings: "Slapukų nustatymai",
         rights: "Visos teisės saugomos.",
-        hours: "I-V 9:00-18:00",
-        location: "Vilnius, Lietuva",
+        contactPrompt: "Susisiekite el. paštu",
       },
     },
     cookieConsent: {
@@ -1148,8 +1147,7 @@ translations.en = mergeLocale(translations.lt, {
       visitContact: "Contact us",
       cookieSettings: "Cookie settings",
       rights: "All rights reserved.",
-      hours: "Mon-Fri 9:00-18:00",
-      location: "Vilnius, Lithuania",
+      contactPrompt: "Contact us by email",
     },
   },
   cookieConsent: {
@@ -1703,8 +1701,7 @@ translations.pl = mergeLocale(translations.en, {
       visitContact: "Skontaktuj się",
       cookieSettings: "Ustawienia cookies",
       rights: "Wszelkie prawa zastrzeżone.",
-      hours: "Pon-Pt 9:00-18:00",
-      location: "Wilno, Litwa",
+      contactPrompt: "Skontaktuj się e-mailem",
     },
   },
   cookieConsent: {
@@ -2002,8 +1999,7 @@ translations.de = mergeLocale(translations.en, {
       visitContact: "Kontakt aufnehmen",
       cookieSettings: "Cookie-Einstellungen",
       rights: "Alle Rechte vorbehalten.",
-      hours: "Mo-Fr 9:00-18:00",
-      location: "Vilnius, Litauen",
+      contactPrompt: "Kontakt per E-Mail",
     },
   },
   cookieConsent: {
@@ -2329,8 +2325,7 @@ translations.fr = mergeLocale(translations.en, {
       visitContact: "Nous contacter",
       cookieSettings: "Paramètres des cookies",
       rights: "Tous droits réservés.",
-      hours: "Lun-Ven 9:00-18:00",
-      location: "Vilnius, Lituanie",
+      contactPrompt: "Contactez-nous par e-mail",
     },
   },
   cookieConsent: {
@@ -2619,8 +2614,7 @@ translations.es = mergeLocale(translations.en, {
       visitContact: "Contactar",
       cookieSettings: "Configuración de cookies",
       rights: "Todos los derechos reservados.",
-      hours: "Lun-Vie 9:00-18:00",
-      location: "Vilna, Lituania",
+      contactPrompt: "Contáctanos por correo electrónico",
     },
   },
   cookieConsent: {

@@ -82,8 +82,8 @@ const registerUser = async (req, res) => {
   res.status(201).json({
     ...formatAuthResponse(user),
     message: verification.sent
-      ? "Paskyra sukurta. I el. pasta issiunteme patvirtinimo nuoroda."
-      : "Paskyra sukurta. Patvirtinimo laisko issiusti nepavyko, todel gali ji issiusti dar karta profilyje.",
+      ? "Paskyra sukurta. Į el. paštą išsiuntėme patvirtinimo nuorodą."
+      : "Paskyra sukurta. Patvirtinimo laiško išsiųsti nepavyko, todėl gali jį išsiųsti dar kartą profilyje.",
     emailVerificationEmailSent: Boolean(verification.sent),
   });
 };
@@ -149,7 +149,7 @@ const changeUserPassword = async (req, res) => {
   const passwordMatches = await user.comparePassword(req.body.currentPassword);
 
   if (!passwordMatches) {
-    throw createHttpError("Dabartinis slaptazodis neteisingas.", 401);
+    throw createHttpError("Dabartinis slaptažodis neteisingas.", 401);
   }
 
   user.password = req.body.newPassword;
@@ -160,7 +160,7 @@ const changeUserPassword = async (req, res) => {
 
   await user.save();
 
-  res.json({ message: "Slaptazodis pakeistas. Prisijunk is naujo." });
+  res.json({ message: "Slaptažodis pakeistas. Prisijunk iš naujo." });
 };
 
 const verifyUserEmail = async (req, res) => {
@@ -182,15 +182,15 @@ const resendUserEmailVerification = async (req, res) => {
   }
 
   if (getEmailVerificationDto(user).emailVerified) {
-    return res.json({ message: "El. pastas jau patvirtintas.", emailVerificationEmailSent: false });
+    return res.json({ message: "El. paštas jau patvirtintas.", emailVerificationEmailSent: false });
   }
 
   const result = await sendVerificationForUser({ user });
 
   res.json({
     message: result.sent
-      ? "Patvirtinimo laiskas issiustas."
-      : "Patvirtinimo laisko issiusti nepavyko. Bandyk dar karta veliau.",
+      ? "Patvirtinimo laiškas išsiųstas."
+      : "Patvirtinimo laiško išsiųsti nepavyko. Bandyk dar kartą vėliau.",
     emailVerificationEmailSent: Boolean(result.sent),
   });
 };

@@ -20,25 +20,25 @@ const buildVerificationEmail = ({ verificationUrl, userName, ttlHours = 24 }) =>
   const safeUrl = escapeHtml(verificationUrl);
   const greetingName = escapeHtml(userName?.trim() || "nary");
   const safeHours = Number.isFinite(Number(ttlHours)) ? Number(ttlHours) : 24;
-  const subject = `${COMPANY_NAME}: patvirtink el. pasto adresa`;
+  const subject = `${COMPANY_NAME}: patvirtink el. pašto adresą`;
   const text = [
     COMPANY_NAME,
     "",
     `Sveiki, ${userName?.trim() || "nary"},`,
     "",
-    "Patvirtinkite Stilloak Studio paskyros el. pasto adresa.",
-    `Nuoroda galioja ${safeHours} val. ir gali buti panaudota tik viena karta:`,
+    "Patvirtinkite Stilloak Studio paskyros el. pašto adresą.",
+    `Nuoroda galioja ${safeHours} val. ir gali būti panaudota tik vieną kartą:`,
     verificationUrl,
     "",
-    "Jei registracijos neatlikote, galite ignoruoti si laiska.",
+    "Jei registracijos neatlikote, galite ignoruoti šį laišką.",
   ].join("\n");
   const html = `
     <div style="margin:0;padding:24px;background:#f8f4ee;font-family:Arial,sans-serif;color:#2b241d;">
       <div style="max-width:640px;margin:0 auto;background:#ffffff;border:1px solid #ece3d7;border-radius:18px;padding:32px;">
-        <p style="margin:0 0 12px 0;font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:#8a6c46;">El. pasto patvirtinimas</p>
+        <p style="margin:0 0 12px 0;font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:#8a6c46;">El. pašto patvirtinimas</p>
         <h1 style="margin:0 0 16px 0;font-size:28px;line-height:1.2;">Sveiki, ${greetingName}.</h1>
         <p style="margin:0 0 18px 0;font-size:15px;line-height:1.7;color:#6d5c4c;">
-          Patvirtinkite Stilloak Studio paskyros el. pasto adresa. Nuoroda galioja ${safeHours} val. ir gali buti panaudota tik viena karta.
+          Patvirtinkite Stilloak Studio paskyros el. pašto adresą. Nuoroda galioja ${safeHours} val. ir gali būti panaudota tik vieną kartą.
         </p>
         <p style="margin:0 0 22px 0;">
           <a href="${safeUrl}" style="display:inline-block;border-radius:999px;background:#2b241d;color:#ffffff;text-decoration:none;padding:12px 18px;font-weight:700;">
@@ -46,11 +46,11 @@ const buildVerificationEmail = ({ verificationUrl, userName, ttlHours = 24 }) =>
           </a>
         </p>
         <p style="margin:0 0 16px 0;font-size:13px;line-height:1.6;color:#6d5c4c;">
-          Jei mygtukas neveikia, nukopijuokite sia nuoroda i narsykle:<br />
+          Jei mygtukas neveikia, nukopijuokite šią nuorodą į naršyklę:<br />
           <a href="${safeUrl}" style="color:#8a6c46;word-break:break-all;">${safeUrl}</a>
         </p>
         <p style="margin:0;font-size:13px;line-height:1.6;color:#6d5c4c;">
-          Jei registracijos neatlikote, galite ignoruoti si laiska.
+          Jei registracijos neatlikote, galite ignoruoti šį laišką.
         </p>
       </div>
     </div>

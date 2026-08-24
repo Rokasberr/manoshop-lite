@@ -137,7 +137,7 @@ export const infoPages = {
     highlights: [
       "Pagalba dėl užsakymų ir atsisiuntimų",
       "Aiškus atsakymas dėl grąžinimų ar mokėjimų",
-      "Kontaktas el. paštu darbo valandomis",
+      "Susisiekite el. paštu",
     ],
     sections: [
       {
@@ -185,14 +185,6 @@ export const infoPages = {
         ],
       },
       {
-        heading: "Kada dirbame",
-        bullets: [
-          "Pirmadienis–penktadienis: 9:00–18:00",
-          "Savaitgaliais atsakome rečiau, bet skubius klausimus peržiūrime kaip įmanoma greičiau",
-          "Bendras atsakymo laikas: 1–2 darbo dienos",
-        ],
-      },
-      {
         heading: "Klausimų tipai",
         bullets: [
           "mokėjimai",
@@ -200,12 +192,6 @@ export const infoPages = {
           "skaitmeninių failų prieiga",
           "narystės planai ir sąskaitos",
           "bendradarbiavimas ar studijos partnerystės",
-        ],
-      },
-      {
-        heading: "Studijos lokacija",
-        paragraphs: [
-          "Stilloak Studio dirba internetu, o administracinis kontaktas šiuo metu valdomas iš Vilniaus, Lietuvoje.",
         ],
       },
     ],

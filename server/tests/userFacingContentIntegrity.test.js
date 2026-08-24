@@ -13,10 +13,19 @@ const userFacingContentFiles = [
   ["client", "src", "constants", "subscriptionPlans.js"],
   ["client", "src", "constants", "digitalProducts.js"],
   ["client", "src", "content", "infoPages.js"],
+  ["client", "src", "components", "Footer.jsx"],
   ["client", "src", "pages", "BazinisMemberPage.jsx"],
   ["client", "src", "pages", "MemberAreaPage.jsx"],
+  ["client", "src", "pages", "ProfilePage.jsx"],
+  ["client", "src", "pages", "VerifyEmailPage.jsx"],
   ["client", "src", "pages", "SavingsStudioPage.jsx"],
   ["client", "src", "components", "MembershipPricingShowcase.jsx"],
+  ["server", "controllers", "authController.js"],
+  ["server", "middleware", "authMiddleware.js"],
+  ["server", "middleware", "authValidation.js"],
+  ["server", "services", "accountLifecycleService.js"],
+  ["server", "services", "emailVerificationEmailService.js"],
+  ["server", "services", "emailVerificationService.js"],
   ["server", "services", "savingsStudioSummaryEmailService.js"],
   ["server", "config", "subscriptionPlans.js"],
 ];
@@ -62,11 +71,44 @@ test("user-facing content does not promise AI features that are not implemented"
 });
 
 test("main user-facing content files are free from common mojibake fragments", () => {
-  const mojibakePattern = /Ã|Å|Ä|Æ|Ć|ā‚¬|â‚¬|�|ļæ½/;
+  const mojibakePattern = /Ã|Å|Ä|Æ|Ć|ā‚¬|â‚¬|ļæ½|�/;
 
   for (const file of userFacingContentFiles) {
     assert.doesNotMatch(readProjectFile(...file), mojibakePattern, file.join("/"));
   }
+});
+
+test("visible footer and contact content do not expose demo contact details", () => {
+  const footerSource = readProjectFile("client", "src", "components", "Footer.jsx");
+  const translationsSource = readProjectFile("client", "src", "i18n", "translations.js");
+  const infoPagesSource = readProjectFile("client", "src", "content", "infoPages.js");
+  const visibleContactSources = [footerSource, translationsSource, infoPagesSource].join("\n");
+
+  assert.match(footerSource, /hello@stilloak-studio\.com/);
+  assert.match(footerSource, /copy\.links\.contactPrompt/);
+  assert.match(translationsSource, /contactPrompt: "Susisiekite el\. paštu"/);
+  assert.doesNotMatch(visibleContactSources, /\+370 600 12345/);
+  assert.doesNotMatch(visibleContactSources, /Vilnius, Lietuva|Vilnius, Lithuania|Vilniaus, Lietuvoje/);
+  assert.doesNotMatch(visibleContactSources, /I-V 9:00-18:00|9:00–18:00|9:00-18:00/);
+});
+
+test("account lifecycle user-facing Lithuanian messages keep UTF-8 diacritics", () => {
+  const sources = [
+    readProjectFile("server", "services", "accountLifecycleService.js"),
+    readProjectFile("server", "services", "emailVerificationService.js"),
+    readProjectFile("server", "services", "emailVerificationEmailService.js"),
+    readProjectFile("server", "controllers", "authController.js"),
+    readProjectFile("server", "middleware", "authMiddleware.js"),
+    readProjectFile("server", "middleware", "authValidation.js"),
+    readProjectFile("client", "src", "pages", "VerifyEmailPage.jsx"),
+    readProjectFile("client", "src", "pages", "ProfilePage.jsx"),
+  ].join("\n");
+
+  assert.match(sources, /El\. pašto patvirtinimo nuoroda neteisinga arba pasibaigusi/);
+  assert.match(sources, /Paskyra ištrinta/);
+  assert.match(sources, /Verslo nuosavybės patikros nepavyko/);
+  assert.match(sources, /pardavėjo objektų savininko paskyrai reikia rankinės pagalbos/);
+  assert.doesNotMatch(sources, /El\. pasto|Paskyra istrinta|paskyra istrinta|neistrinta|nuosavybes|pardavejo|rankines/);
 });
 
 test("navigation keeps productivity resources inside digital products", () => {

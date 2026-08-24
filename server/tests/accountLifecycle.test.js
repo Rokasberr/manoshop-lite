@@ -263,7 +263,7 @@ test("user data export and account deletion services whitelist data and retain f
   assert.match(exportSource, /Store\.exists\(\{ owner: userId \}\)/);
   assert.match(exportSource, /Product\.collection\.countDocuments/);
   assert.match(exportSource, /sellerId/);
-  assert.match(exportSource, /Verslo nuosavybes patikros nepavyko/);
+  assert.match(exportSource, /Verslo nuosavybės patikros nepavyko/);
   assert.match(exportSource, /BLOCKING_STRIPE_STATUSES/);
   assert.match(exportSource, /getStripeClient\(\)\.subscriptions\.retrieve\(stripeSubscriptionId\)/);
   assert.match(userModel, /isDeleted/);
@@ -338,7 +338,7 @@ test("Personal user without business ownership can self-delete when Stripe does 
       confirmationText: "IŠTRINTI PASKYRĄ",
     });
 
-    assert.match(result.message, /Paskyra istrinta/);
+    assert.match(result.message, /Paskyra ištrinta/);
     assert.equal(user.isDeleted, true);
     assert.equal(user.authVersion, 3);
     assert.equal(user.emailVerificationTokenHash, "");
