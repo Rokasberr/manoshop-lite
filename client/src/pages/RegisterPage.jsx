@@ -31,12 +31,16 @@ const RegisterPage = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    if (loading) {
+      return;
+    }
+
     if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim()) {
       setError(copy.required);
       return;
     }
 
-    if (formData.password.length < 6) {
+    if (formData.password.length < 6 || formData.password.length > 128) {
       setError(copy.passwordLength);
       return;
     }
@@ -101,46 +105,69 @@ const RegisterPage = () => {
           </div>
 
           {error && (
-            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-300">
+            <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-300">
               {error}
             </div>
           )}
 
           <div>
-            <label className="mb-2 block text-sm font-semibold">{copy.name}</label>
+            <label htmlFor="register-name" className="mb-2 block text-sm font-semibold">{copy.name}</label>
             <input
+              id="register-name"
+              name="name"
               className="input-field"
+              autoComplete="name"
+              minLength={2}
+              maxLength={80}
+              required
               value={formData.name}
               onChange={(event) => handleChange("name", event.target.value)}
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-semibold">{copy.email}</label>
+            <label htmlFor="register-email" className="mb-2 block text-sm font-semibold">{copy.email}</label>
             <input
+              id="register-email"
+              name="email"
               className="input-field"
               type="email"
+              inputMode="email"
+              autoComplete="email"
+              required
               value={formData.email}
               onChange={(event) => handleChange("email", event.target.value)}
             />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid min-w-0 gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-2 block text-sm font-semibold">{copy.password}</label>
+              <label htmlFor="register-password" className="mb-2 block text-sm font-semibold">{copy.password}</label>
               <input
+                id="register-password"
+                name="password"
                 className="input-field"
                 type="password"
+                autoComplete="new-password"
+                minLength={6}
+                maxLength={128}
+                required
                 value={formData.password}
                 onChange={(event) => handleChange("password", event.target.value)}
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-semibold">{copy.confirmPassword}</label>
+              <label htmlFor="register-confirm-password" className="mb-2 block text-sm font-semibold">{copy.confirmPassword}</label>
               <input
+                id="register-confirm-password"
+                name="confirmPassword"
                 className="input-field"
                 type="password"
+                autoComplete="new-password"
+                minLength={6}
+                maxLength={128}
+                required
                 value={formData.confirmPassword}
                 onChange={(event) => handleChange("confirmPassword", event.target.value)}
               />

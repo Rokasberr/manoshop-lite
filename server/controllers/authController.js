@@ -6,6 +6,9 @@ const { serializeSubscription } = require("../services/stripeMembershipService")
 const { createHttpError } = require("../utils/httpError");
 const { normalizeUserRole } = require("../utils/userRole");
 
+const DUPLICATE_EMAIL_MESSAGE = "Toks vartotojas jau egzistuoja.";
+const LOGIN_FAILED_MESSAGE = "Neteisingi prisijungimo duomenys.";
+
 const signToken = (user) =>
   jwt.sign(
     {
@@ -30,21 +33,40 @@ const formatAuthResponse = (user) => ({
   },
 });
 
+const formatProfileResponse = (user) => ({
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  role: normalizeUserRole(user),
+  createdAt: user.createdAt,
+  subscription: serializeSubscription(user.subscription),
+});
+
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
 
   const existingUser = await User.findOne({ email });
 
   if (existingUser) {
-    throw createHttpError("Toks vartotojas jau egzistuoja.", 409);
+    throw createHttpError(DUPLICATE_EMAIL_MESSAGE, 409);
   }
 
-  const user = await User.create({
-    name,
-    email,
-    password,
-    role: "customer",
-  });
+  let user;
+
+  try {
+    user = await User.create({
+      name,
+      email,
+      password,
+      role: "customer",
+    });
+  } catch (error) {
+    if (error?.code === 11000) {
+      throw createHttpError(DUPLICATE_EMAIL_MESSAGE, 409);
+    }
+
+    throw error;
+  }
 
   res.status(201).json(formatAuthResponse(user));
 };
@@ -55,7 +77,7 @@ const loginUser = async (req, res) => {
   const user = await User.findOne({ email });
 
   if (!user || !(await user.comparePassword(password))) {
-    throw createHttpError("Neteisingi prisijungimo duomenys.", 401);
+    throw createHttpError(LOGIN_FAILED_MESSAGE, 401);
   }
 
   res.json(formatAuthResponse(user));
@@ -68,18 +90,20 @@ const getCurrentUser = async (req, res) => {
     throw createHttpError("Vartotojas nerastas.", 404);
   }
 
-  res.json({
-    id: user._id,
-    name: user.name,
-    email: user.email,
-    role: normalizeUserRole(user),
-    createdAt: user.createdAt,
-    subscription: serializeSubscription(user.subscription),
-  });
+  res.json(formatProfileResponse(user));
 };
 
-const logoutUser = async (_req, res) => {
-  res.json({ message: "Atsijungta." });
+const logoutUser = async (req, res) => {
+  await User.updateOne(
+    { _id: req.user._id },
+    {
+      $inc: {
+        authVersion: 1,
+      },
+    }
+  );
+
+  res.json({ message: "Atsijungta iš visų aktyvių sesijų." });
 };
 
 const forgotPassword = async (req, res) => {
@@ -96,11 +120,41 @@ const resetUserPassword = async (req, res) => {
   res.json({ message: result.message });
 };
 
+const changeUserPassword = async (req, res) => {
+  const user = await User.findById(req.user._id).select(
+    "+password +passwordResetTokenHash +passwordResetExpiresAt"
+  );
+
+  if (!user) {
+    throw createHttpError("Vartotojas nerastas.", 401);
+  }
+
+  const passwordMatches = await user.comparePassword(req.body.currentPassword);
+
+  if (!passwordMatches) {
+    throw createHttpError("Dabartinis slaptažodis neteisingas.", 401);
+  }
+
+  user.password = req.body.newPassword;
+  user.passwordChangedAt = new Date();
+  user.passwordResetTokenHash = "";
+  user.passwordResetExpiresAt = null;
+  user.authVersion = Number(user.authVersion || 0) + 1;
+
+  await user.save();
+
+  res.json({ message: "Slaptažodis pakeistas. Prisijunk iš naujo." });
+};
+
 module.exports = {
+  changeUserPassword,
   forgotPassword,
+  formatAuthResponse,
+  formatProfileResponse,
   registerUser,
   loginUser,
   logoutUser,
+  signToken,
   getCurrentUser,
   resetUserPassword,
 };
