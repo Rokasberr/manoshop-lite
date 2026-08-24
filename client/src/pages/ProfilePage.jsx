@@ -1,4 +1,4 @@
-﻿import { Download } from "lucide-react";
+﻿import { Download, ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
@@ -36,17 +36,52 @@ const passwordCopy = {
   fail: "Slaptažodžio pakeisti nepavyko.",
 };
 
+const paidPlanIds = new Set(["personal", "private_business"]);
+const problemStatuses = new Set(["past_due", "unpaid", "incomplete", "incomplete_expired", "paused", "inactive"]);
+
+const getSubscriptionStatusLabel = (status = "") => {
+  const labels = {
+    active: "Aktyvi",
+    trialing: "Bandomasis laikotarpis",
+    past_due: "Reikia sutvarkyti mokėjimą",
+    unpaid: "Neapmokėta",
+    canceled: "Atšaukta",
+    incomplete: "Mokėjimas neužbaigtas",
+    incomplete_expired: "Mokėjimo patvirtinimas pasibaigė",
+    paused: "Pristabdyta",
+    inactive: "Neaktyvi",
+  };
+
+  return labels[status] || "Neaktyvi";
+};
+
+const getInvoiceStatusLabel = (status = "") => {
+  const labels = {
+    paid: "Apmokėta",
+    open: "Laukiama apmokėjimo",
+    draft: "Ruošiama",
+    void: "Anuliuota",
+    uncollectible: "Neišieškoma",
+  };
+
+  return labels[status] || "Būsena nepatikslinta";
+};
+
 const ProfilePage = () => {
   const navigate = useNavigate();
   const { user, refreshProfile, logout } = useAuth();
   const { language, t } = useLanguage();
   const copy = t("profile");
   const [orders, setOrders] = useState([]);
+  const [subscriptionInvoices, setSubscriptionInvoices] = useState([]);
+  const [invoiceLoading, setInvoiceLoading] = useState(true);
+  const [invoiceError, setInvoiceError] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [downloadingInvoiceId, setDownloadingInvoiceId] = useState("");
   const [downloadingDigitalKey, setDownloadingDigitalKey] = useState("");
   const [syncingMembership, setSyncingMembership] = useState(false);
+  const [openingPortal, setOpeningPortal] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: "",
     newPassword: "",
@@ -61,6 +96,14 @@ const ProfilePage = () => {
     : canAccessBusinessStudio(user?.subscription?.plan)
       ? "seller"
       : normalizedRole;
+  const subscription = user?.subscription || {};
+  const planId = normalizePlan(subscription.plan || "free");
+  const hasStripePaidPlan = subscription.provider === "stripe" && paidPlanIds.has(planId);
+  const hasPaymentIssue = hasStripePaidPlan && problemStatuses.has(subscription.status);
+  const hasScheduledCancel =
+    hasStripePaidPlan &&
+    (subscription.status === "active" || subscription.status === "trialing") &&
+    Boolean(subscription.cancelAtPeriodEnd);
 
   useEffect(() => {
     refreshProfile();
@@ -79,6 +122,37 @@ const ProfilePage = () => {
     };
 
     loadOrders();
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadSubscriptionInvoices = async () => {
+      try {
+        setInvoiceLoading(true);
+        setInvoiceError("");
+        const data = await billingService.getSubscriptionInvoices();
+
+        if (!cancelled) {
+          setSubscriptionInvoices(Array.isArray(data.invoices) ? data.invoices : []);
+        }
+      } catch (_loadError) {
+        if (!cancelled) {
+          setInvoiceError("Prenumeratos sąskaitų šiuo metu nepavyko užkrauti.");
+          setSubscriptionInvoices([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setInvoiceLoading(false);
+        }
+      }
+    };
+
+    loadSubscriptionInvoices();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleDownloadInvoice = async (order) => {
@@ -115,6 +189,10 @@ const ProfilePage = () => {
   };
 
   const handleSyncStripeMembership = async () => {
+    if (syncingMembership) {
+      return;
+    }
+
     try {
       setSyncingMembership(true);
       const result = await billingService.syncStripeMembership();
@@ -133,6 +211,26 @@ const ProfilePage = () => {
       toast.error(syncError.response?.data?.message || copy.membershipUpdateFailed);
     } finally {
       setSyncingMembership(false);
+    }
+  };
+
+  const handleOpenPortal = async () => {
+    if (openingPortal) {
+      return;
+    }
+
+    try {
+      setOpeningPortal(true);
+      const result = await billingService.createPortalSession();
+
+      if (!result?.url) {
+        throw new Error("Missing portal URL");
+      }
+
+      window.location.assign(result.url);
+    } catch (_portalError) {
+      toast.error("Prenumeratos savitarnos šiuo metu nepavyko atidaryti.");
+      setOpeningPortal(false);
     }
   };
 
@@ -205,15 +303,6 @@ const ProfilePage = () => {
               <p className="mt-2 font-display text-2xl font-bold">
                 {copy.roles[profileRole] || copy.roles.customer}
               </p>
-              <span
-                className="mt-4 inline-flex rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em]"
-                style={{
-                  borderColor: "rgb(var(--line) / 0.82)",
-                  color: "rgb(var(--accent-strong))",
-                }}
-              >
-                {copy.backendRole}: {normalizedRole}
-              </span>
             </div>
           </div>
 
@@ -224,29 +313,58 @@ const ProfilePage = () => {
             </h2>
             <p className="mt-2 text-muted">
               {copy.status}:{" "}
-              <span className="font-semibold capitalize text-current">
-                {copy.subscriptionStatuses[user?.subscription?.status] || user?.subscription?.status || copy.subscriptionStatuses.inactive}
+              <span className="font-semibold text-current">
+                {getSubscriptionStatusLabel(subscription.status)}
               </span>
             </p>
             <p className="mt-2 text-muted">
               {copy.provider}:{" "}
-              <span className="font-semibold capitalize text-current">
-                {copy.subscriptionProviders[user?.subscription?.provider] || user?.subscription?.provider || copy.subscriptionProviders.internal}
+              <span className="font-semibold text-current">
+                {copy.subscriptionProviders[subscription.provider] || copy.subscriptionProviders.internal}
               </span>
             </p>
-            {user?.subscription?.currentPeriodEnd && (
+            {subscription.currentPeriodEnd && (
               <p className="mt-2 text-muted">
-                {copy.renewsUntil}:{" "}
+                {hasScheduledCancel ? "Galioja iki" : copy.renewsUntil}:{" "}
                 <span className="font-semibold text-current">
-                  {new Date(user.subscription.currentPeriodEnd).toLocaleDateString(language)}
+                  {new Date(subscription.currentPeriodEnd).toLocaleDateString(language)}
                 </span>
               </p>
-            )} 
-            <Link to="/pricing" className="button-secondary mt-6 inline-flex">
-              {t("common.buttons.managePlan")}
-            </Link>
+            )}
+            {hasScheduledCancel && (
+              <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-200">
+                Prenumerata bus atšaukta laikotarpio pabaigoje
+                {subscription.currentPeriodEnd
+                  ? `: ${new Date(subscription.currentPeriodEnd).toLocaleDateString(language)}.`
+                  : "."}
+              </div>
+            )}
+            {hasPaymentIssue && (
+              <div role="alert" className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-200">
+                Mokama prieiga pristabdyta, kol mokėjimas bus sutvarkytas.
+              </div>
+            )}
+            {hasStripePaidPlan ? (
+              <button
+                type="button"
+                onClick={handleOpenPortal}
+                disabled={openingPortal}
+                className="button-primary mt-6 w-full max-w-full justify-center gap-2 whitespace-normal disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+              >
+                <ExternalLink size={16} />
+                {openingPortal
+                  ? "Atidaroma..."
+                  : hasPaymentIssue
+                    ? "Sutvarkyti mokėjimą"
+                    : "Valdyti prenumeratą ir sąskaitas"}
+              </button>
+            ) : (
+              <Link to="/pricing" className="button-secondary mt-6 inline-flex w-full justify-center whitespace-normal sm:w-auto">
+                {t("common.buttons.managePlan")}
+              </Link>
+            )}
             {hasActiveMembership(user) && (
-              <Link to="/members/savings-studio" className="button-primary mt-4 inline-flex">
+              <Link to="/members/savings-studio" className="button-secondary mt-4 inline-flex w-full justify-center whitespace-normal sm:w-auto">
                 {t("common.buttons.openStudio")}
               </Link>
             )}
@@ -340,6 +458,74 @@ const ProfilePage = () => {
               {changingPassword ? passwordCopy.loading : passwordCopy.submit}
             </button>
           </form>
+        </div>
+
+        <div className="space-y-6">
+        <div className="panel min-w-0 p-6">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="eyebrow">Prenumeratos mokėjimai</p>
+              <h2 className="mt-4 font-display text-3xl font-bold">Sąskaitų santrauka</h2>
+            </div>
+            {hasStripePaidPlan && (
+              <button
+                type="button"
+                onClick={handleOpenPortal}
+                disabled={openingPortal}
+                className="button-secondary w-full max-w-full justify-center gap-2 whitespace-normal disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+              >
+                <ExternalLink size={16} />
+                {openingPortal ? "Atidaroma..." : "Atidaryti Stripe Portal"}
+              </button>
+            )}
+          </div>
+
+          {invoiceLoading ? (
+            <LoadingSpinner />
+          ) : invoiceError ? (
+            <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-200">
+              {invoiceError}
+            </div>
+          ) : !subscriptionInvoices.length ? (
+            <p className="mt-6 text-sm text-muted">
+              Prenumeratos sąskaitų dar nėra. Kortelės, plano ir pilnų sąskaitų valdymas vyksta per Stripe Customer Portal.
+            </p>
+          ) : (
+            <div className="mt-6 space-y-3">
+              {subscriptionInvoices.map((invoice, invoiceIndex) => (
+                <div key={`${invoice.number || invoice.date || "invoice"}-${invoiceIndex}`} className="soft-card min-w-0 rounded-[24px] p-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="min-w-0">
+                      <p className="font-semibold">{invoice.number || "Stripe sąskaita"}</p>
+                      <p className="mt-1 text-sm text-muted">
+                        {invoice.date ? new Date(invoice.date).toLocaleDateString(language) : "Data nepatikslinta"}
+                      </p>
+                    </div>
+                    <div className="text-left sm:text-right">
+                      <p className="font-semibold">{formatCurrency(invoice.amount)}</p>
+                      <p className="mt-1 text-sm text-muted">{getInvoiceStatusLabel(invoice.status)}</p>
+                    </div>
+                  </div>
+                  {(invoice.hostedInvoiceUrl || invoice.invoicePdf) && (
+                    <div className="mt-4 flex flex-wrap gap-3">
+                      {invoice.hostedInvoiceUrl && (
+                        <a className="button-secondary gap-2" href={invoice.hostedInvoiceUrl} target="_blank" rel="noreferrer">
+                          <ExternalLink size={16} />
+                          Peržiūrėti sąskaitą
+                        </a>
+                      )}
+                      {invoice.invoicePdf && (
+                        <a className="button-secondary gap-2" href={invoice.invoicePdf} target="_blank" rel="noreferrer">
+                          <Download size={16} />
+                          PDF sąskaita
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="panel p-6">
@@ -448,6 +634,7 @@ const ProfilePage = () => {
               ))}
             </div>
           )}
+        </div>
         </div>
       </div>
     </div>

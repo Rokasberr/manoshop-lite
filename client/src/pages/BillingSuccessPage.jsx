@@ -27,6 +27,12 @@ const BillingSuccessPage = () => {
     let attempts = 0;
 
     const syncSubscription = async () => {
+      if (!sessionId) {
+        setStatusMessage("Trūksta Stripe sesijos patvirtinimo. Narystė neaktyvuota.");
+        setLoading(false);
+        return;
+      }
+
       while (!cancelled && attempts < 4) {
         attempts += 1;
 

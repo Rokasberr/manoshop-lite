@@ -37,6 +37,8 @@ Codex privalo palaikyti šį failą kaip gyvą planą.
 - [x] Asmeninio plano smoke test: `npm test`, `npm run lint`, `npm run typecheck`, `npm run build` praėjo po auth security integracijos su naujausiu main.
 - [x] Galutinė Asmeninio plano diff peržiūra: peržiūrėti pakeisti `SavingsStudioPage.jsx`, preview wrapperis, naujos Personal UI regresijos ir dokumentacijos diff.
 - [x] Praeina milestone validacija: P1 mobile overflow blocker pašalintas, Saving Studio balto ekrano hotfix išsaugotas, auth security integracija validuota pilna vietine testų/lint/typecheck/build seka.
+- [x] Stripe prenumeratos savitarna: Profile sync be `sessionId` remiasi autentifikuoto vartotojo naujausia Stripe prenumerata, Checkout session sync išsaugo nuosavybės patikrą, pridėtas Customer Portal endpointas be kliento perduodamų Stripe ID, saugus subscription DTO, paskutinių 10 prenumeratos sąskaitų santrauka ir Profile UI mokėjimo būsenoms.
+- [x] Stripe webhook būsenos: išsaugomi tikslūs `past_due`, `unpaid`, `canceled`, `incomplete`, `incomplete_expired`, `paused` ir `inactive` statusai, prieigą suteikia tik `active` / `trialing`, `cancelAtPeriodEnd` rodomas su periodo pabaiga, o webhook testai dengia checkout, subscription created/updated/deleted, invoice paid/failed/action required, duplicate event ir saugų retry.
 
 ## Milestone 3 – Privatus verslas 10/10
 
@@ -84,10 +86,12 @@ Pastaba 2026-08-24: ankstesni Verslo etapo darbai lieka dokumentuoti. Nauji Priv
 ## Likę tolesni etapai
 
 - [ ] El. pašto patvirtinimas.
+- [ ] Payment failure el. laiškas.
+- [ ] Prenumeratos atšaukimo el. laiškas.
 - [ ] Paskyros ištrynimas.
 - [ ] Vartotojo duomenų eksportas.
-- [ ] Stripe Customer Portal.
-- [ ] Pilnas prenumeratos savitarnos srautas.
+- [x] Stripe Customer Portal.
+- [x] Pilnas prenumeratos savitarnos srautas per Stripe Customer Portal.
 - [ ] Teisiniai puslapiai ir realūs rekvizitai.
 - [ ] Produkcinė beta su rankiniu production deploy, Stripe Live ir produkcinės DB patvirtinimu.
 

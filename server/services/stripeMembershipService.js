@@ -11,6 +11,9 @@ const serializeSubscription = (subscription) => ({
   status: subscription?.status || "active",
   provider: subscription?.provider || "internal",
   currentPeriodEnd: subscription?.currentPeriodEnd || null,
+  cancelAtPeriodEnd: Boolean(subscription?.cancelAtPeriodEnd),
+  canceledAt: subscription?.canceledAt || null,
+  lastSyncedAt: subscription?.lastSyncedAt || null,
 });
 
 const updateUserSubscription = async ({
@@ -44,6 +47,7 @@ const updateUserSubscription = async ({
     stripePriceId: stripePriceId || user.subscription?.stripePriceId || "",
     currentPeriodEnd: currentPeriodEnd || null,
     cancelAtPeriodEnd: Boolean(cancelAtPeriodEnd),
+    canceledAt: canceledAt || null,
     lastSyncedAt: new Date(),
   };
 
@@ -129,15 +133,89 @@ const normalizeStripeSubscriptionStatus = (subscription, { sessionPaymentStatus 
     latestInvoiceStatus === "paid" ||
     paymentIntentStatus === "succeeded";
 
-  if (hasConfirmedPayment && ["incomplete", "past_due", "unpaid", "incomplete_expired"].includes(rawStatus)) {
-    return "active";
+  const knownStatuses = new Set([
+    "active",
+    "trialing",
+    "past_due",
+    "canceled",
+    "incomplete",
+    "incomplete_expired",
+    "unpaid",
+    "paused",
+    "inactive",
+  ]);
+
+  if (knownStatuses.has(rawStatus)) {
+    return rawStatus;
   }
 
-  if (["unpaid", "incomplete_expired"].includes(rawStatus)) {
-    return "inactive";
+  return hasConfirmedPayment ? "active" : "incomplete";
+};
+
+const getStripeId = (value) => (typeof value === "string" ? value : value?.id || "");
+
+const isSameUserId = (left, right) => String(left || "") === String(right || "");
+
+const customerBelongsToUser = async ({ stripeCustomerId, stripeCustomer, user }) => {
+  if (!stripeCustomerId) {
+    return false;
   }
 
-  return rawStatus || (hasConfirmedPayment ? "active" : "incomplete");
+  const userId = user._id.toString();
+  const userCustomerId = user.subscription?.stripeCustomerId || "";
+  const customerOwner = await User.findOne({ "subscription.stripeCustomerId": stripeCustomerId });
+
+  if (customerOwner && !isSameUserId(customerOwner._id, userId)) {
+    return false;
+  }
+
+  if (userCustomerId) {
+    return userCustomerId === stripeCustomerId;
+  }
+
+  const metadataUserId = stripeCustomer?.metadata?.userId || "";
+
+  if (metadataUserId && !isSameUserId(metadataUserId, userId)) {
+    return false;
+  }
+
+  return metadataUserId === userId || (customerOwner && isSameUserId(customerOwner._id, userId));
+};
+
+const subscriptionBelongsToUser = (subscription, userId) => {
+  const metadataUserId = subscription?.metadata?.userId || "";
+
+  return !metadataUserId || isSameUserId(metadataUserId, userId);
+};
+
+const resolveTrustedCheckoutUserId = async ({ session, stripeCustomerId }) => {
+  const candidateUserId = session?.metadata?.userId || session?.client_reference_id || "";
+
+  if (!candidateUserId) {
+    return "";
+  }
+
+  const user = await User.findById(candidateUserId);
+
+  if (!user) {
+    return "";
+  }
+
+  if (stripeCustomerId) {
+    const customerOwner = await User.findOne({ "subscription.stripeCustomerId": stripeCustomerId });
+
+    if (customerOwner && customerOwner._id.toString() !== user._id.toString()) {
+      return "";
+    }
+
+    const userCustomerId = user.subscription?.stripeCustomerId || "";
+
+    if (userCustomerId && userCustomerId !== stripeCustomerId) {
+      return "";
+    }
+  }
+
+  return user._id.toString();
 };
 
 const syncUserSubscriptionFromStripeSubscription = async ({
@@ -172,12 +250,6 @@ const syncUserSubscriptionFromCheckoutSession = async ({
   session,
   fallbackUserId,
 }) => {
-  const userId = session.metadata?.userId || session.client_reference_id || fallbackUserId;
-
-  if (!userId) {
-    return null;
-  }
-
   const subscriptionId =
     typeof session.subscription === "string" ? session.subscription : session.subscription?.id || "";
 
@@ -193,9 +265,18 @@ const syncUserSubscriptionFromCheckoutSession = async ({
     return null;
   }
 
+  const stripeCustomerId = getStripeId(session.customer) || getStripeId(subscription.customer);
+  const userId =
+    (await resolveTrustedCheckoutUserId({ session, stripeCustomerId })) ||
+    (fallbackUserId && !stripeCustomerId ? fallbackUserId : "");
+
+  if (!userId) {
+    return null;
+  }
+
   return syncUserSubscriptionFromStripeSubscription({
     userId,
-    stripeCustomerId: session.customer || "",
+    stripeCustomerId,
     subscription,
     sessionPaymentStatus: session.payment_status || "",
   });
@@ -204,6 +285,7 @@ const syncUserSubscriptionFromCheckoutSession = async ({
 const findLatestStripeSubscriptionForUser = async (stripe, user) => {
   const knownCustomerId = user.subscription?.stripeCustomerId || "";
   let stripeCustomerId = knownCustomerId;
+  let selectedCustomer = null;
 
   if (!stripeCustomerId) {
     const customers = await stripe.customers.list({
@@ -211,14 +293,35 @@ const findLatestStripeSubscriptionForUser = async (stripe, user) => {
       limit: 10,
     });
 
-    const matchedCustomer =
-      customers.data.find((customer) => customer.email?.toLowerCase() === user.email.toLowerCase()) ||
-      customers.data[0];
+    const userId = user._id.toString();
 
-    stripeCustomerId = matchedCustomer?.id || "";
+    for (const customer of customers.data || []) {
+      const emailMatches = customer.email?.toLowerCase() === user.email.toLowerCase();
+      const metadataMatches = customer.metadata?.userId === userId;
+
+      if (!emailMatches && !metadataMatches) {
+        continue;
+      }
+
+      if (await customerBelongsToUser({ stripeCustomerId: customer.id, stripeCustomer: customer, user })) {
+        selectedCustomer = customer;
+        stripeCustomerId = customer.id;
+        break;
+      }
+    }
   }
 
   if (!stripeCustomerId) {
+    return null;
+  }
+
+  if (
+    !(await customerBelongsToUser({
+      stripeCustomerId,
+      stripeCustomer: selectedCustomer,
+      user,
+    }))
+  ) {
     return null;
   }
 
@@ -229,10 +332,11 @@ const findLatestStripeSubscriptionForUser = async (stripe, user) => {
   });
 
   const userId = user._id.toString();
+  const trustedSubscriptions = (subscriptionList.data || []).filter((entry) => subscriptionBelongsToUser(entry, userId));
   const selectedSubscription =
-    subscriptionList.data.find((entry) => entry.metadata?.userId === userId) ||
-    subscriptionList.data.find((entry) => ["active", "trialing", "past_due", "incomplete"].includes(entry.status)) ||
-    subscriptionList.data[0];
+    trustedSubscriptions.find((entry) => entry.metadata?.userId === userId) ||
+    trustedSubscriptions.find((entry) => ["active", "trialing", "past_due", "incomplete"].includes(entry.status)) ||
+    trustedSubscriptions[0];
 
   if (!selectedSubscription) {
     return null;
@@ -241,6 +345,10 @@ const findLatestStripeSubscriptionForUser = async (stripe, user) => {
   const subscription = await stripe.subscriptions.retrieve(selectedSubscription.id, {
     expand: ["latest_invoice.payment_intent"],
   });
+
+  if (!subscriptionBelongsToUser(subscription, userId)) {
+    return null;
+  }
 
   return syncUserSubscriptionFromStripeSubscription({
     userId,

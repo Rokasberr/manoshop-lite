@@ -15,6 +15,16 @@ const syncStripeMembership = async (sessionId = "") => {
   return data;
 };
 
+const createPortalSession = async () => {
+  const { data } = await api.post("/billing/create-portal-session");
+  return data;
+};
+
+const getSubscriptionInvoices = async () => {
+  const { data } = await api.get("/billing/subscription-invoices");
+  return data;
+};
+
 const getBillingProfile = async () => {
   const { data } = await api.get("/billing/me");
   return data;
@@ -22,7 +32,9 @@ const getBillingProfile = async () => {
 
 export default {
   activateDemoPlan,
+  createPortalSession,
   createPaymentSession,
+  getSubscriptionInvoices,
   syncStripeMembership,
   getBillingProfile,
 };

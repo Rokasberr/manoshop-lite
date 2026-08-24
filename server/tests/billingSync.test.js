@@ -5,7 +5,7 @@ const controllerPath = require.resolve("../controllers/billingController");
 const stripeClientPath = require.resolve("../utils/stripeClient");
 const stripeMembershipServicePath = require.resolve("../services/stripeMembershipService");
 
-const loadControllerWithMocks = ({ session, stripeRetrieveError = null, syncedUser = null }) => {
+const loadControllerWithMocks = ({ session, stripeRetrieveError = null, syncedUser = null, latestSyncedUser = null } = {}) => {
   const syncCalls = [];
   const stripe = {
     checkout: {
@@ -43,7 +43,9 @@ const loadControllerWithMocks = ({ session, stripeRetrieveError = null, syncedUs
         plan: subscription?.plan || "free",
         status: subscription?.status || "inactive",
         provider: subscription?.provider || "internal",
+        cancelAtPeriodEnd: Boolean(subscription?.cancelAtPeriodEnd),
       }),
+      findLatestStripeSubscriptionForUser: async () => latestSyncedUser,
       syncUserSubscriptionFromCheckoutSession: async (payload) => {
         syncCalls.push(payload);
         return syncedUser;
@@ -188,6 +190,50 @@ test("paid confirmed Stripe session updates the correct plan", async () => {
       assert.equal(res.body.subscription.plan, "personal");
       assert.equal(syncCalls.length, 1);
       assert.equal(syncCalls[0].fallbackUserId, "user_1");
+    }
+  );
+});
+
+test("sync without session ID checks only the authenticated user's latest Stripe subscription", async () => {
+  const latestSyncedUser = {
+    _id: { toString: () => "user_1" },
+    subscription: { plan: "personal", status: "active", provider: "stripe" },
+  };
+  const { controller, syncCalls } = loadControllerWithMocks({
+    latestSyncedUser,
+    session: null,
+  });
+
+  await withMockedUser(
+    { _id: { toString: () => "user_1" }, subscription: { plan: "free", status: "active" } },
+    async () => {
+      const res = createResponse();
+      await controller.syncStripeMembership(createRequest({ sessionId: "" }), res);
+
+      assert.equal(res.statusCode, 200);
+      assert.equal(res.body.synced, true);
+      assert.equal(res.body.subscription.plan, "personal");
+      assert.equal(syncCalls.length, 0);
+    }
+  );
+});
+
+test("sync without session ID returns a safe not-found response without 500", async () => {
+  const { controller, syncCalls } = loadControllerWithMocks({
+    latestSyncedUser: null,
+    session: null,
+  });
+
+  await withMockedUser(
+    { _id: { toString: () => "user_1" }, subscription: { plan: "free", status: "active" } },
+    async () => {
+      const res = createResponse();
+      await controller.syncStripeMembership(createRequest({ sessionId: "" }), res);
+
+      assert.equal(res.statusCode, 200);
+      assert.equal(res.body.synced, false);
+      assert.match(res.body.message, /nerasta/);
+      assert.equal(syncCalls.length, 0);
     }
   );
 });
