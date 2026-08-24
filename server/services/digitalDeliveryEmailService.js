@@ -1,95 +1,89 @@
-const path = require("path");
-const fs = require("fs/promises");
-
-const { resolveDigitalAssetPath, resolveDigitalAssetMimeType } = require("../utils/digitalAsset");
-const { getEmailTransport, getTransportConfig, isEmailTransportConfigured } = require("../utils/emailTransport");
+const User = require("../models/User");
+const {
+  EmailDeliveryRetryableError,
+  ensureTransactionalEmailDelivery,
+  isValidRecipientEmail,
+  sanitizeErrorMessage,
+} = require("./transactionalEmailDeliveryService");
+const { buildTrustedFrontendUrl, escapeHtml, sanitizePublicText } = require("./transactionalEmailTemplateService");
 
 const COMPANY_NAME = process.env.COMPANY_NAME?.trim() || "Stilloak Studio";
+const SUPPORT_EMAIL = "hello@stilloak-studio.com";
 
 const getDigitalOrderItems = (order) =>
-  order.items.filter(
-    (item) => item.productType === "digital" && item.digitalAsset?.storagePath?.trim()
-  );
+  (order.items || []).filter((item) => item.productType === "digital");
 
-const buildDigitalDeliveryEmail = ({ order, digitalItems, from }) => {
+const buildDigitalDeliveryEmail = ({ order, digitalItems }) => {
   const invoiceNumber = order.invoice?.number || `ORDER-${String(order._id).slice(-6).toUpperCase()}`;
-  const subject = `${COMPANY_NAME}: tavo skaitmeniniai produktai paruošti`;
-  const downloadSummary = digitalItems
+  const productsUrl = buildTrustedFrontendUrl("/profile");
+  const productList = digitalItems
     .map(
       (item) =>
-        `<li style="margin:0 0 8px 0;"><strong>${item.name}</strong> x ${item.quantity} - failas pridėtas prie šio laiško.</li>`
+        `<li style="margin:0 0 8px 0;"><strong>${escapeHtml(sanitizePublicText(item.name))}</strong> x ${escapeHtml(
+          item.quantity
+        )}</li>`
     )
     .join("");
+  const subject = `${COMPANY_NAME}: skaitmeninis produktas paruoštas`;
 
   const html = `
-    <div style="margin:0;padding:24px;background:#f8f4ee;font-family:Arial,sans-serif;color:#2b241d;">
-      <div style="max-width:680px;margin:0 auto;background:#ffffff;border-radius:18px;padding:32px;border:1px solid #ece3d7;">
-        <p style="margin:0 0 12px 0;font-size:12px;letter-spacing:0.24em;text-transform:uppercase;color:#8a6c46;">
-          Skaitmeninis pristatymas
-        </p>
-        <h1 style="margin:0 0 18px 0;font-size:32px;line-height:1.1;">Tavo skaitmeniniai produktai jau paruošti.</h1>
-        <p style="margin:0 0 20px 0;font-size:15px;line-height:1.7;color:#6d5c4c;">
-          Ačiū už pirkimą. Failai pridėti prie šio laiško kaip priedai, o taip pat liks pasiekiami tavo paskyroje.
-        </p>
-        <div style="margin:0 0 20px 0;padding:18px;border-radius:14px;background:#faf7f2;">
-          <p style="margin:0 0 10px 0;font-size:13px;color:#8a6c46;text-transform:uppercase;letter-spacing:0.18em;">Užsakymas</p>
-          <p style="margin:0;font-size:24px;font-weight:700;">${invoiceNumber}</p>
-        </div>
-        <ul style="padding-left:20px;margin:0 0 22px 0;font-size:15px;line-height:1.7;color:#2b241d;">
-          ${downloadSummary}
-        </ul>
-        <p style="margin:0 0 16px 0;font-size:14px;line-height:1.7;color:#6d5c4c;">
-          Jei nori, vėliau šiuos failus galėsi bet kada rasti ir savo profilyje prie užsakymų istorijos.
-        </p>
-        <p style="margin:18px 0 0 0;font-size:14px;line-height:1.7;color:#6d5c4c;">
-          ${COMPANY_NAME}<br />
-          <a href="mailto:${from}" style="color:#8a6c46;text-decoration:none;">${from}</a>
-        </p>
-      </div>
-    </div>
+    <!doctype html>
+    <html lang="lt">
+      <body style="margin:0;padding:24px;background:#f8f4ee;font-family:Arial,sans-serif;color:#2b241d;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;">
+          <tr>
+            <td align="center">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="640" style="width:640px;max-width:100%;border-collapse:separate;background:#ffffff;border:1px solid #ece3d7;border-radius:18px;">
+                <tr>
+                  <td style="padding:32px;">
+                    <p style="margin:0 0 12px 0;font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:#8a6c46;">Skaitmeninis pristatymas</p>
+                    <h1 style="margin:0 0 16px 0;font-size:28px;line-height:1.2;">Pirkimas patvirtintas.</h1>
+                    <p style="margin:0 0 18px 0;font-size:15px;line-height:1.7;color:#6d5c4c;">
+                      Mokėjimas patvirtintas, todėl skaitmeniniai produktai pasiekiami saugioje paskyros zonoje.
+                    </p>
+                    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 18px 0;border-collapse:collapse;border-top:1px solid #ece3d7;border-bottom:1px solid #ece3d7;">
+                      <tr>
+                        <td style="padding:10px 0;color:#6d5c4c;font-size:14px;">Užsakymas</td>
+                        <td style="padding:10px 0;color:#2b241d;font-size:14px;font-weight:700;text-align:right;">${escapeHtml(invoiceNumber)}</td>
+                      </tr>
+                    </table>
+                    <ul style="padding-left:20px;margin:0 0 22px 0;font-size:15px;line-height:1.7;color:#2b241d;">${productList}</ul>
+                    <p style="margin:0 0 22px 0;">
+                      <a href="${escapeHtml(productsUrl)}" style="display:inline-block;border-radius:999px;background:#2b241d;color:#ffffff;text-decoration:none;padding:12px 18px;font-weight:700;">
+                        Atidaryti paskyrą
+                      </a>
+                    </p>
+                    <p style="margin:0 0 16px 0;font-size:14px;line-height:1.7;color:#6d5c4c;">
+                      Saugumo sumetimais šiame laiške nėra failų priedų, tiesioginių failo kelių ar ilgalaikių atsisiuntimo tokenų.
+                    </p>
+                    <p style="margin:18px 0 0 0;font-size:14px;line-height:1.7;color:#6d5c4c;">
+                      Pagalba: <a href="mailto:${SUPPORT_EMAIL}" style="color:#8a6c46;text-decoration:none;">${SUPPORT_EMAIL}</a>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
   `;
 
-  const textLines = [
-    `${COMPANY_NAME}`,
+  const text = [
+    COMPANY_NAME,
     "",
-    "Tavo skaitmeniniai produktai jau paruošti.",
+    "Pirkimas patvirtintas.",
     `Užsakymas: ${invoiceNumber}`,
     "",
-    ...digitalItems.map((item) => `- ${item.name} x ${item.quantity} (failas pridėtas prie laiško)`),
+    ...digitalItems.map((item) => `- ${sanitizePublicText(item.name)} x ${item.quantity}`),
     "",
-    "Failai taip pat liks pasiekiami tavo paskyroje prie užsakymų istorijos.",
-  ];
+    `Produktai pasiekiami saugioje paskyros zonoje: ${productsUrl}`,
+    "Saugumo sumetimais šiame laiške nėra failų priedų, tiesioginių failo kelių ar ilgalaikių atsisiuntimo tokenų.",
+    "",
+    `Pagalba: ${SUPPORT_EMAIL}`,
+  ].join("\n");
 
-  return {
-    subject,
-    html,
-    text: textLines.join("\n"),
-  };
-};
-
-const buildAttachments = async (digitalItems) => {
-  const attachments = [];
-  const seenStoragePaths = new Set();
-
-  for (const item of digitalItems) {
-    if (seenStoragePaths.has(item.digitalAsset.storagePath)) {
-      continue;
-    }
-
-    const filePath = resolveDigitalAssetPath(item.digitalAsset.storagePath);
-    await fs.access(filePath);
-
-    const fileName = (item.digitalAsset.fileName || path.basename(filePath)).replace(/[^\w.\- ]/g, "_");
-
-    attachments.push({
-      filename: fileName,
-      path: filePath,
-      contentType: resolveDigitalAssetMimeType(item.digitalAsset),
-    });
-    seenStoragePaths.add(item.digitalAsset.storagePath);
-  }
-
-  return attachments;
+  return { subject, html, text };
 };
 
 const markDigitalDeliveryFailure = async (order, message) => {
@@ -97,19 +91,36 @@ const markDigitalDeliveryFailure = async (order, message) => {
     status: "failed",
     sentAt: order.digitalDeliveryEmail?.sentAt || null,
     lastAttemptAt: new Date(),
-    error: String(message || "Nepavyko išsiųsti skaitmeninio pristatymo laiško.").slice(0, 500),
+    error: sanitizeErrorMessage(message || "Nepavyko išsiųsti skaitmeninio pristatymo laiško.").slice(0, 500),
   };
 
   await order.save();
   return order;
 };
 
-const ensureDigitalDeliveryEmail = async (order) => {
-  if (!order?.containsDigitalProducts) {
-    return order;
+const getOrderUserId = (order) => {
+  if (!order?.user) {
+    return "";
   }
 
-  if (order.paymentStatus !== "paid") {
+  if (typeof order.user === "object" && order.user._id) {
+    return order.user._id.toString();
+  }
+
+  return order.user.toString?.() || String(order.user || "");
+};
+
+const getUserById = async (userId) => {
+  if (!userId) {
+    return null;
+  }
+
+  const query = User.findById(userId);
+  return query?.select ? query.select("-password") : query;
+};
+
+const ensureDigitalDeliveryEmail = async (order, { emailSender } = {}) => {
+  if (!order?.containsDigitalProducts || order.paymentStatus !== "paid") {
     return order;
   }
 
@@ -120,42 +131,62 @@ const ensureDigitalDeliveryEmail = async (order) => {
   const digitalItems = getDigitalOrderItems(order);
 
   if (!digitalItems.length) {
-    order.digitalDeliveryEmail = {
-      status: "failed",
-      sentAt: null,
-      lastAttemptAt: new Date(),
-      error: "Nerasti skaitmeninių produktų failai šiam užsakymui.",
-    };
-    await order.save();
-    return order;
+    return markDigitalDeliveryFailure(order, "Nerasti skaitmeniniai produktai šiam užsakymui.");
   }
 
-  if (!isEmailTransportConfigured()) {
-    return markDigitalDeliveryFailure(
-      order,
-      "SMTP nėra sukonfigūruotas. Užpildyk SMTP_HOST, SMTP_PORT, EMAIL_FROM ir, jei reikia, SMTP_USER/SMTP_PASS."
-    );
+  const orderUserId = getOrderUserId(order);
+
+  if (!orderUserId) {
+    return markDigitalDeliveryFailure(order, "Užsakymas neturi saugios vartotojo nuosavybės.");
   }
 
-  const { from } = getTransportConfig();
+  const user = await getUserById(orderUserId);
+
+  if (!user || user.isDeleted) {
+    return markDigitalDeliveryFailure(order, "Užsakymo vartotojas nerastas arba ištrintas.");
+  }
+
+  if (user._id?.toString?.() !== orderUserId) {
+    return markDigitalDeliveryFailure(order, "Užsakymo vartotojo nuosavybės patikra nepavyko.");
+  }
+
+  if (!isValidRecipientEmail(user.email)) {
+    return markDigitalDeliveryFailure(order, "Užsakymo vartotojo el. paštas netinkamas.");
+  }
 
   try {
-    const transport = getEmailTransport();
-    const attachments = await buildAttachments(digitalItems);
-    const email = buildDigitalDeliveryEmail({
-      order,
-      digitalItems,
-      from,
+    const result = await ensureTransactionalEmailDelivery({
+      type: "order-digital-delivery",
+      dedupeKey: order._id.toString(),
+      userId: orderUserId,
+      tags: ["order", "digital-delivery"],
+      userModel: {
+        findById: () => ({
+          select: async () => user,
+        }),
+      },
+      emailSender,
+      emailBuilder: () => buildDigitalDeliveryEmail({ order, digitalItems }),
     });
 
-    await transport.sendMail({
-      from,
-      to: order.customerEmail,
-      subject: email.subject,
-      text: email.text,
-      html: email.html,
-      attachments,
-    });
+    if (result?.duplicate && result?.status === "sent") {
+      order.digitalDeliveryEmail = {
+        status: "sent",
+        sentAt: order.digitalDeliveryEmail?.sentAt || new Date(),
+        lastAttemptAt: new Date(),
+        error: "",
+      };
+      await order.save();
+      return order;
+    }
+
+    if (!result?.sent && !result?.skipped) {
+      return markDigitalDeliveryFailure(order, result?.reason || "El. pašto transportas nepatvirtino siuntimo.");
+    }
+
+    if (result?.skipped) {
+      return order;
+    }
 
     order.digitalDeliveryEmail = {
       status: "sent",
@@ -166,11 +197,20 @@ const ensureDigitalDeliveryEmail = async (order) => {
     await order.save();
     return order;
   } catch (error) {
-    console.error("Skaitmeninio pristatymo laiško klaida:", error.message);
-    return markDigitalDeliveryFailure(order, error.message);
+    if (error instanceof EmailDeliveryRetryableError || error?.retryable) {
+      throw error;
+    }
+
+    console.error("[email] Digital order delivery failed.", {
+      order: String(order._id || "").slice(-8),
+      reason: error?.code || error?.statusCode || error?.name || "email-error",
+    });
+
+    return markDigitalDeliveryFailure(order, error);
   }
 };
 
 module.exports = {
+  buildDigitalDeliveryEmail,
   ensureDigitalDeliveryEmail,
 };

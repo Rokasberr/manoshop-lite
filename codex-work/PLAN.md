@@ -86,14 +86,32 @@ Pastaba 2026-08-24: ankstesni Verslo etapo darbai lieka dokumentuoti. Nauji Priv
 ## Likę tolesni etapai
 
 - [x] El. pašto patvirtinimas.
-- [ ] Payment failure el. laiškas.
-- [ ] Prenumeratos atšaukimo el. laiškas.
+- [x] Payment failure el. laiškas.
+- [x] Prenumeratos atšaukimo el. laiškas.
 - [x] Paskyros ištrynimas.
 - [x] Vartotojo duomenų eksportas.
 - [x] Stripe Customer Portal.
 - [x] Pilnas prenumeratos savitarnos srautas per Stripe Customer Portal.
 - [ ] Teisiniai puslapiai ir realūs rekvizitai.
 - [ ] Produkcinė beta su rankiniu production deploy, Stripe Live ir produkcinės DB patvirtinimu.
+
+## Asmeninio plano transakciniai el. laiškai
+
+- [x] Registracijos el. pašto patvirtinimas paliktas kaip vienintelis registracijos laiškas; atskiro dubliuojančio welcome laiško nepridėta.
+- [x] Sėkmingas prenumeratos mokėjimas siunčiamas tik Stripe webhook `invoice.paid` arba `invoice.payment_succeeded` po `Payment` ir `Subscription` sinchronizavimo.
+- [x] Nepavykęs prenumeratos mokėjimas siunčiamas per `invoice.payment_failed`; papildomo veiksmo laiškas siunčiamas per `invoice.payment_action_required`.
+- [x] Suplanuotas atšaukimas siunčiamas per `customer.subscription.updated` arba `customer.subscription.created`, kai po sync `cancelAtPeriodEnd === true`; galutinis atšaukimas siunčiamas per `customer.subscription.deleted` arba patikimą `canceled` būseną.
+- [x] Skaitmeninio produkto laiškas siunčiamas tik po Stripe `checkout.session.completed`, kai `DigitalProductPurchase` įrašas priklauso vartotojui ir jo būsena yra `paid`.
+- [x] Senas skaitmeninių produktų order delivery laiškas pakeistas saugia versija be XLSX/PDF priedų, tiesioginių failų kelių ar ilgalaikių tokenų.
+- [x] Dedupe sprendimas: naujas `EmailDelivery` modelis su `type + dedupeKey`; invoice laiškai deduplikuojami pagal invoice ID ir laiško tipą, suplanuotas atšaukimas pagal subscription ID + periodo pabaigą, galutinis atšaukimas pagal subscription ID, skaitmeninis produktas pagal `DigitalProductPurchase._id`.
+- [x] Jei transportas grąžina klaidą, `EmailDelivery` lieka `failed`, klaida loguojama be pilno el. pašto, Stripe ID, paslapčių ar failų kelių, webhook pažymimas `failed`, o Stripe retry gali pakartoti siuntimą po jau išsaugotos mokėjimo/pirkimo būsenos.
+- [x] Saugių URL principas: transakciniai laiškai naudoja `CLIENT_URL` pirmą patikimą bazę lokaliai, o production režime visada `https://www.stilloak-studio.com`; nenaudojamas `Host` header ir vartotojo redirect URL.
+- [x] Testai padengia verification laiško išlikimą, subscription success/failure/action-required, cancellation dedupe, skaitmeninio produkto paid-only ir dedupe, transporto klaidą, deleted/invalid user skip, HTML escaping, saugius URL, Stripe ID/failų/paslapčių nerodymą ir UTF-8 lietuvišką tekstą.
+- [x] Paskutinis hardening: `EmailDelivery` claim pervestas į atominius `findOneAndUpdate`/upsert kelius; šviežias `processing` grąžina retryable klaidą, o `sent` laikomas sėkmingu duplicate.
+- [x] Pavėlavę Stripe invoice įvykiai apsaugoti: tas pats invoice, jau turintis `succeeded`, nebegali būti numuštas į `failed` arba `pending`, o problemos laiškas tokiu atveju nesiunčiamas.
+- [x] Atšaukimo prioritetas sutvirtintas: `customer.subscription.deleted` arba `canceled` visada siunčia galutinio atšaukimo laišką prieš bet kokį `cancelAtPeriodEnd` vertinimą.
+- [x] Order-level skaitmeninis delivery remiasi `Order.user` ir DB vartotojo el. paštu, ne `order.customerEmail`; dedupe naudoja `EmailDelivery` su `order-digital-delivery + Order._id`.
+- [x] Dokumentuota ribota rizika: jei provider patvirtina siuntimą, bet procesas nulūžta prieš `EmailDelivery.sent` išsaugojimą, Stripe retry gali pakartoti provider siuntimą. Be tikro provider idempotency key sistema siekia at-least-once su dedupe, bet ne absoliutaus exactly-once.
 
 ## Asmeninio plano paskyros gyvavimo ciklo matrica
 
