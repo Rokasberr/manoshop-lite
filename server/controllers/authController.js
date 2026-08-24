@@ -1,6 +1,12 @@
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
+const { buildUserDataExport, deleteCurrentUserAccount } = require("../services/accountLifecycleService");
+const {
+  getEmailVerificationDto,
+  sendVerificationForUser,
+  verifyEmailToken,
+} = require("../services/emailVerificationService");
 const { requestPasswordReset, resetPassword } = require("../services/passwordRecoveryService");
 const { serializeSubscription } = require("../services/stripeMembershipService");
 const { createHttpError } = require("../utils/httpError");
@@ -30,6 +36,7 @@ const formatAuthResponse = (user) => ({
     email: user.email,
     role: normalizeUserRole(user),
     subscription: serializeSubscription(user.subscription),
+    ...getEmailVerificationDto(user),
   },
 });
 
@@ -40,12 +47,13 @@ const formatProfileResponse = (user) => ({
   role: normalizeUserRole(user),
   createdAt: user.createdAt,
   subscription: serializeSubscription(user.subscription),
+  ...getEmailVerificationDto(user),
 });
 
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
 
-  const existingUser = await User.findOne({ email });
+  const existingUser = await User.findOne({ email, isDeleted: { $ne: true } });
 
   if (existingUser) {
     throw createHttpError(DUPLICATE_EMAIL_MESSAGE, 409);
@@ -59,6 +67,7 @@ const registerUser = async (req, res) => {
       email,
       password,
       role: "customer",
+      emailVerificationRequired: true,
     });
   } catch (error) {
     if (error?.code === 11000) {
@@ -68,7 +77,15 @@ const registerUser = async (req, res) => {
     throw error;
   }
 
-  res.status(201).json(formatAuthResponse(user));
+  const verification = await sendVerificationForUser({ user });
+
+  res.status(201).json({
+    ...formatAuthResponse(user),
+    message: verification.sent
+      ? "Paskyra sukurta. I el. pasta issiunteme patvirtinimo nuoroda."
+      : "Paskyra sukurta. Patvirtinimo laisko issiusti nepavyko, todel gali ji issiusti dar karta profilyje.",
+    emailVerificationEmailSent: Boolean(verification.sent),
+  });
 };
 
 const loginUser = async (req, res) => {
@@ -76,7 +93,7 @@ const loginUser = async (req, res) => {
 
   const user = await User.findOne({ email });
 
-  if (!user || !(await user.comparePassword(password))) {
+  if (!user || user.isDeleted || !(await user.comparePassword(password))) {
     throw createHttpError(LOGIN_FAILED_MESSAGE, 401);
   }
 
@@ -86,7 +103,7 @@ const loginUser = async (req, res) => {
 const getCurrentUser = async (req, res) => {
   const user = await User.findById(req.user._id).select("-password");
 
-  if (!user) {
+  if (!user || user.isDeleted) {
     throw createHttpError("Vartotojas nerastas.", 404);
   }
 
@@ -95,7 +112,7 @@ const getCurrentUser = async (req, res) => {
 
 const logoutUser = async (req, res) => {
   await User.updateOne(
-    { _id: req.user._id },
+    { _id: req.user._id, isDeleted: { $ne: true } },
     {
       $inc: {
         authVersion: 1,
@@ -103,7 +120,7 @@ const logoutUser = async (req, res) => {
     }
   );
 
-  res.json({ message: "Atsijungta iš visų aktyvių sesijų." });
+  res.json({ message: "Atsijungta is visu aktyviu sesiju." });
 };
 
 const forgotPassword = async (req, res) => {
@@ -125,14 +142,14 @@ const changeUserPassword = async (req, res) => {
     "+password +passwordResetTokenHash +passwordResetExpiresAt"
   );
 
-  if (!user) {
+  if (!user || user.isDeleted) {
     throw createHttpError("Vartotojas nerastas.", 401);
   }
 
   const passwordMatches = await user.comparePassword(req.body.currentPassword);
 
   if (!passwordMatches) {
-    throw createHttpError("Dabartinis slaptažodis neteisingas.", 401);
+    throw createHttpError("Dabartinis slaptazodis neteisingas.", 401);
   }
 
   user.password = req.body.newPassword;
@@ -143,18 +160,74 @@ const changeUserPassword = async (req, res) => {
 
   await user.save();
 
-  res.json({ message: "Slaptažodis pakeistas. Prisijunk iš naujo." });
+  res.json({ message: "Slaptazodis pakeistas. Prisijunk is naujo." });
+};
+
+const verifyUserEmail = async (req, res) => {
+  const result = await verifyEmailToken({ token: req.body.token });
+
+  res.json({
+    message: result.message,
+    user: formatProfileResponse(result.user),
+  });
+};
+
+const resendUserEmailVerification = async (req, res) => {
+  const user = await User.findById(req.user._id).select(
+    "+emailVerificationTokenHash +emailVerificationExpiresAt +emailVerificationSentAt"
+  );
+
+  if (!user || user.isDeleted) {
+    throw createHttpError("Vartotojas nerastas.", 404);
+  }
+
+  if (getEmailVerificationDto(user).emailVerified) {
+    return res.json({ message: "El. pastas jau patvirtintas.", emailVerificationEmailSent: false });
+  }
+
+  const result = await sendVerificationForUser({ user });
+
+  res.json({
+    message: result.sent
+      ? "Patvirtinimo laiskas issiustas."
+      : "Patvirtinimo laisko issiusti nepavyko. Bandyk dar karta veliau.",
+    emailVerificationEmailSent: Boolean(result.sent),
+  });
+};
+
+const exportCurrentUserData = async (req, res) => {
+  const payload = await buildUserDataExport(req.user);
+  const stamp = new Date().toISOString().slice(0, 10);
+
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.setHeader("Content-Disposition", `attachment; filename="stilloak-user-data-${stamp}.json"`);
+  res.setHeader("Cache-Control", "no-store");
+  res.json(payload);
+};
+
+const deleteCurrentUser = async (req, res) => {
+  const result = await deleteCurrentUserAccount({
+    userId: req.user._id,
+    currentPassword: req.body.currentPassword,
+    confirmationText: req.body.confirmationText,
+  });
+
+  res.json(result);
 };
 
 module.exports = {
   changeUserPassword,
+  deleteCurrentUser,
+  exportCurrentUserData,
   forgotPassword,
   formatAuthResponse,
   formatProfileResponse,
   registerUser,
   loginUser,
   logoutUser,
+  resendUserEmailVerification,
   signToken,
   getCurrentUser,
   resetUserPassword,
+  verifyUserEmail,
 };

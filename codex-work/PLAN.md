@@ -85,15 +85,23 @@ Pastaba 2026-08-24: ankstesni Verslo etapo darbai lieka dokumentuoti. Nauji Priv
 
 ## Likę tolesni etapai
 
-- [ ] El. pašto patvirtinimas.
+- [x] El. pašto patvirtinimas.
 - [ ] Payment failure el. laiškas.
 - [ ] Prenumeratos atšaukimo el. laiškas.
-- [ ] Paskyros ištrynimas.
-- [ ] Vartotojo duomenų eksportas.
+- [x] Paskyros ištrynimas.
+- [x] Vartotojo duomenų eksportas.
 - [x] Stripe Customer Portal.
 - [x] Pilnas prenumeratos savitarnos srautas per Stripe Customer Portal.
 - [ ] Teisiniai puslapiai ir realūs rekvizitai.
 - [ ] Produkcinė beta su rankiniu production deploy, Stripe Live ir produkcinės DB patvirtinimu.
+
+## Asmeninio plano paskyros gyvavimo ciklo matrica
+
+- Ištrinama savitarnoje: `SavingsStudioProfile`, `SavingsEntry`, `SavingsBudget`, `SavingsGoal`, `RecurringExpense`, `SavingsStudioAuditLog` įrašai pagal `req.user._id`.
+- Anonimizuojama savitarnoje: `User` tampa tombstone įrašu (`isDeleted`, `deletedAt`), vardas ir el. paštas pakeičiami, slaptažodis perrašomas negrąžinamu atsitiktiniu hash, reset ir email verification tokenai išvalomi, `authVersion` padidinamas.
+- Laikinai išsaugoma: `Order`, `Payment`, `Subscription`, `DigitalProductPurchase`, invoice numeriai, sumos, datos ir būsenos, nes tai finansiniai/audito įrašai.
+- Šiame etape neliečiama: `Store`, Business Studio, `Product` ir seller/business savininko duomenys. Admin, Store savininko arba Product / seller-owned verslo objekto savininko savitarnos trynimas blokuojamas ir nukreipiamas į pagalbą.
+- Reikalingas savininko arba teisininko sprendimas: galutinis finansinių dokumentų saugojimo terminas, kurie Order/customer kontaktiniai laukai gali būti anonimizuojami nepažeidžiant apskaitos, galutiniai teisiniai puslapiai ir realūs rekvizitai.
 
 Jeigu milestone validacija nepraeina:
 

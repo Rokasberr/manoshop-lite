@@ -346,7 +346,7 @@ const resolveUserIdForStripeSubscription = async (subscription) => {
   if (metadataUserId) {
     const metadataUser = await User.findById(metadataUserId);
 
-    if (!metadataUser) {
+    if (!metadataUser || metadataUser.isDeleted) {
       return "";
     }
 
@@ -372,6 +372,12 @@ const resolveUserIdForStripeSubscription = async (subscription) => {
     : null;
 
   if (subscriptionRecord?.user) {
+    const subscriptionUser = await User.findById(subscriptionRecord.user);
+
+    if (!subscriptionUser || subscriptionUser.isDeleted) {
+      return "";
+    }
+
     return subscriptionRecord.user.toString();
   }
 
@@ -379,7 +385,7 @@ const resolveUserIdForStripeSubscription = async (subscription) => {
     ? await User.findOne({ "subscription.stripeCustomerId": stripeCustomerId })
     : null;
 
-  return user?._id?.toString() || "";
+  return user && !user.isDeleted ? user._id?.toString() || "" : "";
 };
 
 const syncInvoicePayment = async ({ stripe, invoice, status }) => {
@@ -408,7 +414,7 @@ const syncInvoicePayment = async ({ stripe, invoice, status }) => {
     const user = stripeCustomerId
       ? await User.findOne({ "subscription.stripeCustomerId": stripeCustomerId })
       : null;
-    userId = user?._id?.toString() || "";
+    userId = user && !user.isDeleted ? user._id?.toString() || "" : "";
   }
 
   if (!userId || !invoice.id) {

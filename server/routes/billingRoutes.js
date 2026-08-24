@@ -1,7 +1,7 @@
 const express = require("express");
 
 const asyncHandler = require("../middleware/asyncHandler");
-const { protect } = require("../middleware/authMiddleware");
+const { protect, requireVerifiedEmail } = require("../middleware/authMiddleware");
 const { createWindowRateLimiter } = require("../middleware/rateLimit");
 const { validateBillingSessionPayload } = require("../middleware/requestValidation");
 const {
@@ -33,11 +33,17 @@ const billingInvoicesLimiter = createWindowRateLimiter({
   message: "Per daug prenumeratos sąskaitų užklausų. Bandyk dar kartą po minutės.",
 });
 
-router.post("/create-payment-session", protect, validateBillingSessionPayload, asyncHandler(createPaymentSession));
-router.post("/create-portal-session", protect, billingPortalLimiter, asyncHandler(createCustomerPortalSession));
+router.post(
+  "/create-payment-session",
+  protect,
+  requireVerifiedEmail,
+  validateBillingSessionPayload,
+  asyncHandler(createPaymentSession)
+);
+router.post("/create-portal-session", protect, requireVerifiedEmail, billingPortalLimiter, asyncHandler(createCustomerPortalSession));
 router.post("/activate-demo-plan", protect, asyncHandler(activateDemoPlan));
-router.post("/sync-stripe-membership", protect, billingSyncLimiter, asyncHandler(syncStripeMembership));
-router.get("/subscription-invoices", protect, billingInvoicesLimiter, asyncHandler(listSubscriptionInvoices));
+router.post("/sync-stripe-membership", protect, requireVerifiedEmail, billingSyncLimiter, asyncHandler(syncStripeMembership));
+router.get("/subscription-invoices", protect, requireVerifiedEmail, billingInvoicesLimiter, asyncHandler(listSubscriptionInvoices));
 router.get("/me", protect, asyncHandler(getBillingProfile));
 
 module.exports = router;

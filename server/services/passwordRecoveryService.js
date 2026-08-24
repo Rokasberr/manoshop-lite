@@ -80,7 +80,7 @@ const requestPasswordReset = async ({
   }
 
   const user = await resolveQuery(
-    userModel.findOne({ email: normalizedEmail }),
+    userModel.findOne({ email: normalizedEmail, isDeleted: { $ne: true } }),
     "+passwordResetTokenHash +passwordResetExpiresAt"
   );
 
@@ -147,6 +147,7 @@ const resetPassword = async ({
     {
       passwordResetTokenHash: tokenHash,
       passwordResetExpiresAt: { $gt: changedAt },
+      isDeleted: { $ne: true },
     },
     {
       $set: {

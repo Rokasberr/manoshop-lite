@@ -2,6 +2,7 @@ const path = require("path");
 
 const { getDigitalProductById } = require("../config/digitalProducts");
 const DigitalProductPurchase = require("../models/DigitalProductPurchase");
+const User = require("../models/User");
 const { buildIdempotencyKey } = require("./stripeCheckoutService");
 const { ensureStripeCustomerForUser } = require("./stripeCustomerService");
 const { getStripeClient, resolveClientUrl } = require("../utils/stripeClient");
@@ -152,6 +153,12 @@ const syncDigitalProductPurchaseFromSession = async (session) => {
   const userId = metadata.userId || session.client_reference_id || "";
 
   if (!product || !userId) {
+    return null;
+  }
+
+  const user = await User.findById(userId);
+
+  if (!user || user.isDeleted) {
     return null;
   }
 

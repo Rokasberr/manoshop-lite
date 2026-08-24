@@ -266,10 +266,10 @@ test("logout updates only req.user._id and invalidates old authVersion tokens", 
       const res = makeResponse();
       await logoutUser({ user: { _id: "user-1" }, body: { _id: "attacker" } }, res);
       assert.deepEqual(updates[0], {
-        filter: { _id: "user-1" },
+        filter: { _id: "user-1", isDeleted: { $ne: true } },
         update: { $inc: { authVersion: 1 } },
       });
-      assert.match(res.body.message, /visų aktyvių sesijų/);
+      assert.match(res.body.message, /aktyviu sesiju/);
     }
   );
 });
