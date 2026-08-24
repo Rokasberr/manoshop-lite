@@ -1,7 +1,7 @@
 ﻿import { Download } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import EmptyState from "../components/EmptyState";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -9,6 +9,7 @@ import SectionTitle from "../components/SectionTitle";
 import StatusBadge from "../components/admin/StatusBadge";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
+import authService from "../services/authService";
 import billingService from "../services/billingService";
 import orderService from "../services/orderService";
 import {
@@ -20,8 +21,24 @@ import {
 } from "../utils/membership";
 import { formatCurrency } from "../utils/currency";
 
+const passwordCopy = {
+  title: "Paskyros saugumas",
+  text: "Pakeitus slaptažodį visos aktyvios sesijos bus atjungtos.",
+  currentPassword: "Dabartinis slaptažodis",
+  newPassword: "Naujas slaptažodis",
+  confirmPassword: "Pakartok naują slaptažodį",
+  submit: "Pakeisti slaptažodį",
+  loading: "Keičiama...",
+  required: "Užpildyk visus slaptažodžio laukus.",
+  length: "Naujas slaptažodis turi būti 6-128 simbolių.",
+  mismatch: "Nauji slaptažodžiai nesutampa.",
+  success: "Slaptažodis pakeistas. Prisijunk iš naujo.",
+  fail: "Slaptažodžio pakeisti nepavyko.",
+};
+
 const ProfilePage = () => {
-  const { user, refreshProfile } = useAuth();
+  const navigate = useNavigate();
+  const { user, refreshProfile, logout } = useAuth();
   const { language, t } = useLanguage();
   const copy = t("profile");
   const [orders, setOrders] = useState([]);
@@ -30,6 +47,14 @@ const ProfilePage = () => {
   const [downloadingInvoiceId, setDownloadingInvoiceId] = useState("");
   const [downloadingDigitalKey, setDownloadingDigitalKey] = useState("");
   const [syncingMembership, setSyncingMembership] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordSuccess, setPasswordSuccess] = useState("");
+  const [changingPassword, setChangingPassword] = useState(false);
   const normalizedRole = normalizeUserRole(user);
   const profileRole = isAdminUser(user)
     ? "admin"
@@ -111,6 +136,56 @@ const ProfilePage = () => {
     }
   };
 
+  const handlePasswordChange = (field, value) => {
+    setPasswordForm((currentForm) => ({ ...currentForm, [field]: value }));
+  };
+
+  const handleChangePassword = async (event) => {
+    event.preventDefault();
+
+    if (changingPassword) {
+      return;
+    }
+
+    setPasswordError("");
+    setPasswordSuccess("");
+
+    if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+      setPasswordError(passwordCopy.required);
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 6 || passwordForm.newPassword.length > 128) {
+      setPasswordError(passwordCopy.length);
+      return;
+    }
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordError(passwordCopy.mismatch);
+      return;
+    }
+
+    try {
+      setChangingPassword(true);
+      const result = await authService.changePassword({
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword,
+      });
+      const message = result.message || passwordCopy.success;
+      setPasswordSuccess(message);
+      setPasswordForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
+      await logout({ skipServer: true });
+      navigate("/login", { replace: true, state: { message } });
+    } catch (changeError) {
+      const backendMessage = changeError.response?.data?.message;
+      const safeBackendMessage =
+        changeError.response?.status < 500 && typeof backendMessage === "string" ? backendMessage : "";
+      setPasswordError(safeBackendMessage || passwordCopy.fail);
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
       <SectionTitle
@@ -186,6 +261,85 @@ const ProfilePage = () => {
               </button>
             )}
           </div>
+
+          <form className="panel min-w-0 space-y-4 p-6" onSubmit={handleChangePassword}>
+            <div>
+              <p className="eyebrow">{passwordCopy.title}</p>
+              <p className="mt-3 text-sm text-muted">{passwordCopy.text}</p>
+            </div>
+
+            {passwordError && (
+              <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-300">
+                {passwordError}
+              </div>
+            )}
+
+            {passwordSuccess && (
+              <div aria-live="polite" className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-200">
+                {passwordSuccess}
+              </div>
+            )}
+
+            <div>
+              <label htmlFor="profile-current-password" className="mb-2 block text-sm font-semibold">
+                {passwordCopy.currentPassword}
+              </label>
+              <input
+                id="profile-current-password"
+                name="currentPassword"
+                className="input-field"
+                type="password"
+                autoComplete="current-password"
+                required
+                value={passwordForm.currentPassword}
+                onChange={(event) => handlePasswordChange("currentPassword", event.target.value)}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="profile-new-password" className="mb-2 block text-sm font-semibold">
+                {passwordCopy.newPassword}
+              </label>
+              <input
+                id="profile-new-password"
+                name="newPassword"
+                className="input-field"
+                type="password"
+                autoComplete="new-password"
+                minLength={6}
+                maxLength={128}
+                required
+                value={passwordForm.newPassword}
+                onChange={(event) => handlePasswordChange("newPassword", event.target.value)}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="profile-confirm-password" className="mb-2 block text-sm font-semibold">
+                {passwordCopy.confirmPassword}
+              </label>
+              <input
+                id="profile-confirm-password"
+                name="confirmPassword"
+                className="input-field"
+                type="password"
+                autoComplete="new-password"
+                minLength={6}
+                maxLength={128}
+                required
+                value={passwordForm.confirmPassword}
+                onChange={(event) => handlePasswordChange("confirmPassword", event.target.value)}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={changingPassword}
+              className="button-primary w-full max-w-full justify-center whitespace-normal disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {changingPassword ? passwordCopy.loading : passwordCopy.submit}
+            </button>
+          </form>
         </div>
 
         <div className="panel p-6">

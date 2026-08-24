@@ -21,6 +21,11 @@ const ResetPasswordPage = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (loading) {
+      return;
+    }
+
     setMessage("");
     setError("");
 
@@ -29,7 +34,7 @@ const ResetPasswordPage = () => {
       return;
     }
 
-    if (formData.password.length < 6) {
+    if (formData.password.length < 6 || formData.password.length > 128) {
       setError(copy.passwordLength);
       return;
     }
@@ -68,32 +73,44 @@ const ResetPasswordPage = () => {
         </div>
 
         {message && (
-          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-200">
+          <div aria-live="polite" className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-200">
             {message}
           </div>
         )}
 
         {error && (
-          <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-300">
+          <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-300">
             {error}
           </div>
         )}
 
         <div>
-          <label className="mb-2 block text-sm font-semibold">{copy.password}</label>
+          <label htmlFor="reset-password" className="mb-2 block text-sm font-semibold">{copy.password}</label>
           <input
+            id="reset-password"
+            name="password"
             className="input-field"
             type="password"
+            autoComplete="new-password"
+            minLength={6}
+            maxLength={128}
+            required
             value={formData.password}
             onChange={(event) => handleChange("password", event.target.value)}
           />
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-semibold">{copy.confirmPassword}</label>
+          <label htmlFor="reset-confirm-password" className="mb-2 block text-sm font-semibold">{copy.confirmPassword}</label>
           <input
+            id="reset-confirm-password"
+            name="confirmPassword"
             className="input-field"
             type="password"
+            autoComplete="new-password"
+            minLength={6}
+            maxLength={128}
+            required
             value={formData.confirmPassword}
             onChange={(event) => handleChange("confirmPassword", event.target.value)}
           />
