@@ -83,7 +83,7 @@ const requirePlan = (...allowedPlans) => (req, res, next) => {
   const normalizedAllowedPlans = allowedPlans.map(normalizePlan);
 
   if (!normalizedAllowedPlans.includes(normalizedPlan)) {
-    return next(createHttpError("Siam planui si zona neprieinama.", 403));
+    return next(createHttpError("Šiam planui ši zona neprieinama.", 403));
   }
 
   return next();
@@ -110,7 +110,7 @@ const requireVerifiedEmail = (req, res, next) => {
     return next();
   }
 
-  return next(createHttpError("Patvirtink el. pasta pries tesiant si veiksma.", 403));
+  return next(createHttpError("Patvirtink el. paštą prieš tęsiant šį veiksmą.", 403));
 };
 
 module.exports = {

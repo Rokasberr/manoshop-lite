@@ -31,7 +31,7 @@ const BLOCKING_STRIPE_STATUSES = new Set([
 ]);
 const DELETABLE_STRIPE_STATUSES = new Set(["canceled", "incomplete_expired", "inactive"]);
 const BUSINESS_OWNERSHIP_BLOCK_MESSAGE =
-  "Verslo arba pardavejo objektu savininko paskyrai reikia rankines pagalbos.";
+  "Verslo arba pardavėjo objektų savininko paskyrai reikia rankinės pagalbos.";
 
 const lean = (query) => (typeof query?.lean === "function" ? query.lean() : query);
 const sortLimitLean = (query, sort, limit = EXPORT_LIMIT) => {
@@ -175,7 +175,7 @@ const buildUserDataExport = async (user) => {
     payments: (payments || []).map(serializePayment),
     subscriptions: (subscriptions || []).map(serializeSubscriptionRecord),
     retentionNotice:
-      "Finansiniai ir apskaitos irasai eksportuojami be vidiniu Stripe ID ir gali buti saugomi pagal teisinius reikalavimus.",
+      "Finansiniai ir apskaitos įrašai eksportuojami be vidinių Stripe ID ir gali būti saugomi pagal teisinius reikalavimus.",
   };
 };
 
@@ -207,7 +207,7 @@ const assertNoBusinessOwnership = async (userId) => {
       Boolean(await Store.exists({ owner: userId })) ||
       Boolean(await hasProductOwnership(userId));
   } catch (_error) {
-    throw createHttpError("Verslo nuosavybes patikros nepavyko. Paskyra neistrinta.", 503);
+    throw createHttpError("Verslo nuosavybės patikros nepavyko. Paskyra neištrinta.", 503);
   }
 
   if (ownsBusinessObject) {
@@ -227,7 +227,7 @@ const assertStripeDeletionAllowed = async (user) => {
   try {
     subscription = await getStripeClient().subscriptions.retrieve(stripeSubscriptionId);
   } catch (_error) {
-    throw createHttpError("Stripe busenos patikrinti nepavyko. Paskyra neistrinta.", 503);
+    throw createHttpError("Stripe būsenos patikrinti nepavyko. Paskyra neištrinta.", 503);
   }
 
   const status = String(subscription?.status || "").toLowerCase();
@@ -240,15 +240,15 @@ const assertStripeDeletionAllowed = async (user) => {
     BLOCKING_STRIPE_STATUSES.has(status) ||
     (cancelAtPeriodEnd && currentPeriodEnd && currentPeriodEnd > new Date())
   ) {
-    throw createHttpError("Pirma atsauk prenumerata Stripe Customer Portal, tada galesi istrinti paskyra.", 409);
+    throw createHttpError("Pirma atšauk prenumeratą Stripe Customer Portal, tada galėsi ištrinti paskyrą.", 409);
   }
 
   if (!DELETABLE_STRIPE_STATUSES.has(status)) {
-    throw createHttpError("Stripe prenumeratos busena neleidzia saugiai istrinti paskyros.", 409);
+    throw createHttpError("Stripe prenumeratos būsena neleidžia saugiai ištrinti paskyros.", 409);
   }
 
   if (getStripeId(subscription.customer) && getStripeId(subscription.customer) !== user.subscription?.stripeCustomerId) {
-    throw createHttpError("Stripe prenumeratos nuosavybes patikra nepavyko.", 409);
+    throw createHttpError("Stripe prenumeratos nuosavybės patikra nepavyko.", 409);
   }
 };
 
@@ -267,7 +267,7 @@ const anonymizeUser = async (user, options = {}) => {
   const anonymousSuffix = `${user._id.toString()}-${deletedAt.getTime()}`;
   const randomPasswordHash = await bcrypt.hash(`deleted-${anonymousSuffix}-${Math.random()}`, 10);
 
-  user.name = "Istrinta paskyra";
+  user.name = "Ištrinta paskyra";
   user.email = `deleted-${anonymousSuffix}@deleted.local`;
   user.password = randomPasswordHash;
   user.passwordResetTokenHash = "";
@@ -311,13 +311,13 @@ const deleteCurrentUserAccount = async ({ userId, currentPassword, confirmationT
   }
 
   if (isAdminUser(user)) {
-    throw createHttpError("Admin paskyros savitarnoje istrinti negalima. Susisiek su pagalba.", 403);
+    throw createHttpError("Admin paskyros savitarnoje ištrinti negalima. Susisiek su pagalba.", 403);
   }
 
   await assertNoBusinessOwnership(user._id);
 
   if (!(await user.comparePassword(currentPassword))) {
-    throw createHttpError("Dabartinis slaptazodis neteisingas.", 401);
+    throw createHttpError("Dabartinis slaptažodis neteisingas.", 401);
   }
 
   await assertStripeDeletionAllowed(user);
@@ -340,7 +340,7 @@ const deleteCurrentUserAccount = async ({ userId, currentPassword, confirmationT
   }
 
   return {
-    message: "Paskyra istrinta. Asmeniniai Saving Studio duomenys pasalinti, o finansiniai irasai saugomi pagal apskaitos poreikius.",
+    message: "Paskyra ištrinta. Asmeniniai Saving Studio duomenys pašalinti, o finansiniai įrašai saugomi pagal apskaitos poreikius.",
   };
 };
 

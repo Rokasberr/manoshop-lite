@@ -100,12 +100,10 @@ const Footer = () => {
             {copy.columns.contact}
           </Link>
           <div className="mt-4 space-y-3 text-sm text-white/58">
+            <p>{copy.links.contactPrompt}</p>
             <a href="mailto:hello@stilloak-studio.com" className="block transition hover:text-white">
               hello@stilloak-studio.com
             </a>
-            <p>+370 600 12345</p>
-            <p>{copy.links.location}</p>
-            <p>{copy.links.hours}</p>
           </div>
           <Link to="/contact" className="mt-5 inline-flex text-sm font-medium accent-text transition hover:opacity-80">
             {copy.links.visitContact}
