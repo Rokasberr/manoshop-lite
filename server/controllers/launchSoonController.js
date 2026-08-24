@@ -1,9 +1,9 @@
 const { addEmailToBrevoWaitlist } = require("../services/brevoWaitlistService");
 
-const allowedFocusValues = new Set(["default", "digital", "journal"]);
+const allowedFocusValues = new Set(["default", "digital", "journal", "business"]);
 
 const notifyLaunchSoonInterest = async (req, res) => {
-  const email = req.body?.email?.trim().toLowerCase();
+  const email = String(req.body?.email || "").trim().toLowerCase();
   const focus = req.body?.focus?.trim().toLowerCase() || "default";
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -16,7 +16,7 @@ const notifyLaunchSoonInterest = async (req, res) => {
     throw new Error("Neteisinga launch sekcijos reikšmė.");
   }
 
-  await addEmailToBrevoWaitlist({ email });
+  await addEmailToBrevoWaitlist({ email, focus });
 
   res.status(201).json({
     message: "Susidomėjimas išsaugotas. Parašysime, kai ši sekcija atsidarys.",

@@ -1,11 +1,18 @@
 import { ArrowRight, BookOpenText, Download } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 
 import { useLanguage } from "../context/LanguageContext";
 import launchSoonService from "../services/launchSoonService";
+import { normalizePlan } from "../utils/membership";
 
 const launchCardsBase = [
+  {
+    key: "business",
+    icon: ArrowRight,
+    status: "Paleidžiama netrukus",
+    target: "Ribota beta",
+  },
   {
     key: "digital",
     icon: Download,
@@ -38,6 +45,11 @@ const launchCopy = {
         title: "Nario naujienos atvertos aktyviems nariams.",
         text: "Užrakintas nario atnaujinimų sluoksnis renka platformos naujienas, resursų pristatymus ir nario erdvių pokyčius vienoje vietoje.",
       },
+      business: {
+        eyebrow: "Paleidžiama netrukus",
+        title: "Verslas planas matomas, o Business Studio ruošiama ribotai beta versijai.",
+        text: "Verslas kainuoja 44,99 €/mėn., tačiau Stripe Checkout dar nepradėtas. Palik el. paštą ir pranešime apie startą.",
+      },
     },
     cardsTitle: "Kas ruošiama ir kas jau veikia",
     cardsText:
@@ -56,6 +68,13 @@ const launchCopy = {
         description:
           "Nario naujienų zona renka narystės, resursų, produktų ir nario erdvių pokyčius aktyviems nariams.",
         bullets: ["Narystės atnaujinimai", "Aiškesnis resursų ritmas", "Užrakinta nario patirtis"],
+      },
+      business: {
+        eyebrow: "Verslas",
+        title: "Business Studio ribota beta",
+        description:
+          "Business Studio ruošiama ribotai beta versijai. Esamos beta, Verslas ir administratoriaus prieigos neatšaukiamos.",
+        bullets: ["44,99 €/mėn. kaina lieka matoma", "Stripe Checkout dar nepradėtas", "Pranešimas apie startą be mokėjimo"],
       },
     },
     statusLabel: "Statusas",
@@ -92,6 +111,11 @@ const launchCopy = {
         title: "Member news is open for active members.",
         text: "The locked updates layer gathers platform news, resource releases, and member-space changes in one place.",
       },
+      business: {
+        eyebrow: "Launch soon",
+        title: "The Business plan is visible while Business Studio is prepared for a limited beta.",
+        text: "Business remains priced at 44,99 €/mo, but Stripe Checkout has not started yet. Leave your email and we will notify you at launch.",
+      },
     },
     cardsTitle: "What is being prepared and what is live",
     cardsText:
@@ -110,6 +134,13 @@ const launchCopy = {
         description:
           "Member news gathers membership, resource, product, and member-space changes for active members.",
         bullets: ["Membership updates", "Clearer resource rhythm", "Locked member experience"],
+      },
+      business: {
+        eyebrow: "Business",
+        title: "Business Studio limited beta",
+        description:
+          "Business Studio is being prepared for a limited beta. Existing beta, Business, and admin access is not revoked.",
+        bullets: ["44,99 €/mo stays visible", "Stripe Checkout has not started", "Launch notification without payment"],
       },
     },
     statusLabel: "Status",
@@ -136,17 +167,33 @@ const launchCopy = {
 });
 
 const notifyStorageKey = "stilloak_launch_soon_interest";
+const allowedFocusValues = new Set(["default", "digital", "journal", "business"]);
+
+const normalizeFocus = (value) => {
+  const normalized = String(value || "").trim().toLowerCase();
+  const focusValue =
+    normalized === "business" || normalizePlan(normalized) === "private_business" ? "business" : normalized;
+  return allowedFocusValues.has(focusValue) ? focusValue : "default";
+};
 
 const LaunchSoonPage = ({ focus = "default" }) => {
   const { language } = useLanguage();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const copy = launchCopy[language] || launchCopy.lt;
-  const content = copy.focus[focus] || copy.focus.default;
-  const [email, setEmail] = useState("");
+  const activeFocus = normalizeFocus(searchParams.get("focus") || location.state?.focus || focus);
+  const content = copy.focus[activeFocus] || copy.focus.default;
+  const [email, setEmail] = useState(String(location.state?.email || "").trim().toLowerCase());
   const [notifyState, setNotifyState] = useState("idle");
   const [notifyMessage, setNotifyMessage] = useState("");
 
   const handleNotifySubmit = async (event) => {
     event.preventDefault();
+
+    if (notifyState === "loading") {
+      return;
+    }
+
     const normalizedEmail = email.trim().toLowerCase();
     const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
 
@@ -162,14 +209,14 @@ const LaunchSoonPage = ({ focus = "default" }) => {
 
       const response = await launchSoonService.notifyInterest({
         email: normalizedEmail,
-        focus,
+        focus: activeFocus,
       });
 
       localStorage.setItem(
         notifyStorageKey,
         JSON.stringify({
           email: normalizedEmail,
-          focus,
+          focus: activeFocus,
           submittedAt: new Date().toISOString(),
         })
       );
@@ -228,7 +275,7 @@ const LaunchSoonPage = ({ focus = "default" }) => {
           {launchCardsBase.map((card) => {
             const localizedCard = copy.cards[card.key];
             const Icon = card.icon;
-            const isFocused = focus === card.key;
+            const isFocused = activeFocus === card.key;
 
             return (
               <article
@@ -284,6 +331,7 @@ const LaunchSoonPage = ({ focus = "default" }) => {
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="email@example.com"
+                disabled={notifyState === "loading"}
                 className="w-full rounded-full border border-white/10 bg-white/6 px-5 py-4 text-sm text-white outline-none placeholder:text-white/34"
               />
               <div className="flex flex-wrap gap-3">

@@ -100,6 +100,18 @@ Pastaba 2026-08-24: ankstesni Verslo etapo darbai lieka dokumentuoti. Nauji Priv
 - [ ] Teisininkas dar turi peržiūrėti tekstus, vartotojo atsisakymo teisės formuluotes, saugojimo terminus, tarptautinius perdavimus ir apskaitos pareigas.
 - [ ] Production aplinkoje dar reikia sukonfigūruoti viešus `VITE_*` rekvizitus ir patvirtinti realius Vercel, Render, MongoDB Atlas, Stripe, Brevo/SMTP regionus bei sutartinius dokumentus.
 
+## Milestone 7 – Verslo plano „Netrukus“ režimas
+
+- [x] Sukurtas vienas kanoninis launch flag šaltinis `shared/launchFeatures.cjs`; klientas ir serveris jį naudoja tiesiogiai arba per serverio wrapperį, o `BUSINESS_PLAN_SALES_ENABLED` pagal nutylėjimą yra `false`.
+- [x] Serveris blokuoja `private_business` ir legacy `privatus_verslas` Stripe Checkout prieš `UserConsent` rezervavimą, Stripe kliento gavimą, Stripe customer sukūrimą, Checkout session ir prenumeratos / mokėjimo pakeitimus; valdomas atsakymas yra 409 su tekstu „Verslo plano pardavimas dar nepradėtas.“
+- [x] Demo lieka nemokamas vidinis aktyvavimas, o Asmeninis lieka 14,99 €/mėn. Stripe testinis kelias.
+- [x] Verslo kortelė lieka matoma kaip „Verslas“, rodo 44,99 €/mėn., planuojamų funkcijų santrauką, „Paleidžiama netrukus“ būseną ir „Pranešti apie startą“ CTA vietoje mokėjimo CTA.
+- [x] Pricing, registracijos Business pasirinkimas ir Profile senas Business state nukreipia į `/launch-soon?focus=business`, nekviečia `billingService.createPaymentSession` ir nesukuria prenumeratos sutikimo.
+- [x] Launch-soon srautas papildytas `business` focus reikšme, normalizuoja el. paštą, blokuoja dvigubą formos submit ir pažymi susidomėjimą Verslo planu per waitlist adapterio atributą.
+- [x] Business Studio prieigos politika nepakeista: Demo ir Asmeninis lieka užrakinti, esamas aktyvus Verslas / beta ir administratorius nepraranda prieigos.
+- [x] Tiksliniai testai pridėti `server/tests/businessPlanComingSoon.test.js`; padengta flag būsena, shared šaltinis, serverio ankstyvas blokavimas, legacy aliasas, Demo, Asmeninis mock checkout, Pricing CTA, Register/Profile keliai, launch-soon srautas, Business Studio prieigos nepriklausomumas ir mobile-safe CTA statinė regresija.
+- [ ] Business Studio beta ir Verslo pardavimo įjungimas bus atskiras patikrintas etapas; ši šaka ir legal šaka dar nejungiamos į `main`.
+
 ## Stop-and-fix taisyklė
 
 ## Likę tolesni etapai
@@ -111,6 +123,7 @@ Pastaba 2026-08-24: ankstesni Verslo etapo darbai lieka dokumentuoti. Nauji Priv
 - [x] Vartotojo duomenų eksportas.
 - [x] Stripe Customer Portal.
 - [x] Pilnas prenumeratos savitarnos srautas per Stripe Customer Portal.
+- [x] Verslo pardavimas išjungtas per saugų „Paleidžiama netrukus“ režimą, išlaikant esamas Verslas / beta / admin prieigas.
 - [ ] Teisiniai puslapiai ir realūs rekvizitai: technologiškai įgyvendinta, bet realūs savininko rekvizitai ir teisininko peržiūra dar būtini.
 - [ ] Produkcinė beta su rankiniu production deploy, Stripe Live ir produkcinės DB patvirtinimu.
 

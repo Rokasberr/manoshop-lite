@@ -13,6 +13,7 @@
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
+import launchFeatures from "../../../shared/launchFeatures.cjs";
 import FloatingMarketNumbers from "./FloatingMarketNumbers";
 import { getLocalizedSubscriptionPlans } from "../constants/subscriptionPlans";
 import { useLanguage } from "../context/LanguageContext";
@@ -35,6 +36,7 @@ const sectionHrefs = ["#funkcijos", "#narystes", "#rinkiniai", "#atsiliepimai"];
 const kitIcons = [WalletCards, Target, BriefcaseBusiness];
 const dashboardCardIcons = [WalletCards, Target, FileText, BriefcaseBusiness];
 const dashboardCardProgress = [68, 74, 52, 86];
+const businessPlanSalesEnabled = launchFeatures.BUSINESS_PLAN_SALES_ENABLED === true;
 
 const formatPlanPrice = (value, intervalLabel) => {
   const amount = Number(value || 0);
@@ -402,8 +404,9 @@ const MembershipPlanCard = ({
   const Icon = meta.icon;
   const isFeatured = plan.id === "personal";
   const isPrivate = plan.id === "private_business";
+  const isBusinessComingSoon = isPrivate && !businessPlanSalesEnabled;
   const isCurrentPlan = currentPlanId === plan.id;
-  const ActionIcon = plan.provider === "stripe" ? CreditCard : ArrowRight;
+  const ActionIcon = isBusinessComingSoon ? ArrowRight : plan.provider === "stripe" ? CreditCard : ArrowRight;
 
   const cardStyle = isFeatured
     ? {
@@ -438,7 +441,7 @@ const MembershipPlanCard = ({
     ) : (
       <>
         <ActionIcon size={16} className="shrink-0" />
-        <span>{meta.cta}</span>
+        <span>{isBusinessComingSoon ? "Pranešti apie startą" : meta.cta}</span>
       </>
     );
 
@@ -456,7 +459,7 @@ const MembershipPlanCard = ({
                     : "border-[rgb(164_220_190/0.34)] bg-[rgb(164_220_190/0.12)] text-[rgb(194_239_211)]"
                 }`}
               >
-                {plan.badge}
+                {isBusinessComingSoon ? "Paleidžiama netrukus" : plan.badge}
               </span>
             )}
           </div>
@@ -468,6 +471,11 @@ const MembershipPlanCard = ({
       </div>
 
       <p className="mt-4 text-sm leading-6 text-white/66">{plan.description}</p>
+      {isBusinessComingSoon && (
+        <p className="mt-3 rounded-lg border border-[rgb(226_202_145/0.28)] bg-[rgb(226_202_145/0.1)] px-3 py-2 text-sm font-semibold leading-6 text-[rgb(244_224_174)]">
+          Business Studio ruošiama ribotai beta versijai.
+        </p>
+      )}
 
       <div className="mt-4 flex items-center gap-3 rounded-lg border border-[rgb(226_202_145/0.22)] bg-[rgb(226_202_145/0.09)] px-3 py-2.5">
         <Sparkles size={16} className="shrink-0 text-[rgb(226_202_145)]" />
@@ -501,7 +509,7 @@ const MembershipPlanCard = ({
           </button>
         ) : (
           <Link
-            to="/pricing"
+            to={isBusinessComingSoon ? "/launch-soon?focus=business" : "/pricing"}
             className={`inline-flex min-h-[52px] w-full items-center justify-center gap-2 rounded-lg px-5 py-3.5 text-center text-sm font-semibold transition duration-200 hover:-translate-y-0.5 ${actionClass}`}
           >
             {actionContent}

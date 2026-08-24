@@ -1,10 +1,36 @@
 ﻿# Stilloak Studio autonomous status
 
-PROJECT_STATE: PERSONAL_LEGAL_TRUST_TECH_LOCAL_VALIDATED_PENDING_OWNER_LEGAL_INPUT
+PROJECT_STATE: BUSINESS_PLAN_COMING_SOON_LOCAL_VALIDATED
 
 ## Dabartinis milestone
 
-Milestone 6 – Asmeninio plano teisinės informacijos, sutikimų ir produkcinio pasitikėjimo technologinis sluoksnis lokaliai įgyvendintas. Projektas nėra pažymėtas kaip teisiškai galutinai paruoštas: savininkas dar turi pateikti realius paslaugos teikėjo rekvizitus, o teisininkas turi peržiūrėti galutinius tekstus, vartotojų teisių formuluotes, saugojimo terminus, tarptautinius perdavimus ir apskaitos pareigas.
+Milestone 7 – Verslo plano „Netrukus“ režimas įgyvendinamas šakoje `fix/business-plan-coming-soon-20260824`. Tikslas: Demo ir Asmeninis gali būti paleisti, o Verslo planas lieka matomas su 44,99 €/mėn. kaina, bet pardavimas ir Stripe Checkout išjungti iki atskiro Business Studio beta / pardavimo įjungimo etapo. Esamos aktyvios Verslas, beta ir administratoriaus prieigos neatšaukiamos.
+
+## 2026-08-24 – Verslo plano „Netrukus“ režimas
+
+Atlikta šiame etape:
+
+- Prieš pakeitimus patikrinta: `git branch --show-current` grąžino `fix/business-plan-coming-soon-20260824`, `git status --short` buvo tuščias, `git log -5 --oneline` rodė `28ac953 feat(legal): add legal pages and consent safeguards` viršuje.
+- Perskaityti `AGENTS.md`, `codex-work/SPEC.md`, `codex-work/PLAN.md`, `codex-work/IMPLEMENT.md`, `codex-work/STATUS.md`.
+- Inventorizuoti Verslo plano pirkimo pradžios keliai: `PricingPage`, `RegisterPage`, `ProfilePage`, `MembershipPricingShowcase`, `Navbar`, `MemberAreaPage`, `billingService`, `server/controllers/billingController.js`, `server/routes/billingRoutes.js`, `server/config/subscriptionPlans.js`, `server/config/planAccess.js`, `client/src/utils/membership.js`, Business Studio route guardai, `LaunchSoonPage`, `launchSoonService` ir `launchSoonController`.
+- Sukurtas vienas kanoninis launch flag šaltinis `shared/launchFeatures.cjs`; serveris naudoja `server/config/launchFeatures.js`, klientas importuoja tą patį shared CJS šaltinį. `BUSINESS_PLAN_SALES_ENABLED = false`.
+- `createPaymentSession` blokuoja `private_business` ir legacy `privatus_verslas` prieš `UserConsent`, Stripe klientą, Stripe customer ir Checkout session. Atsakymas: 409 „Verslo plano pardavimas dar nepradėtas.“
+- Kainodaroje Verslas lieka matomas su „Verslas“, 44,99 €/mėn., planuojamų funkcijų santrauka, „Paleidžiama netrukus“ ir „Pranešti apie startą“. Verslo CTA veda į `/launch-soon?focus=business`, o Demo ir Asmeninio mygtukai neliečiami.
+- Registracijos Business pasirinkimas po paskyros sukūrimo nukreipia į `/launch-soon?focus=business` su el. pašto prefill per router state; Profile senas Business state rodo „Pranešti apie startą“ ir nekviečia Checkout.
+- Launch-soon srautas papildytas `business` focus: el. paštas normalizuojamas, dvigubas submit blokuojamas, susidomėjimas pažymimas waitlist adapterio `STILL_OAK_LAUNCH_FOCUS` atributu. Testuose realūs laiškai nesiunčiami.
+- Business Studio prieigos politika nekeista: Demo ir Asmeninis neturi Business Studio, aktyvus Verslas ir admin išlaiko prieigą; pardavimo flag nėra prieigos atšaukimo mechanizmas.
+- Tiksliniai testai prieš dokumentacijos įrašą: `node --test server/tests/businessPlanComingSoon.test.js server/tests/membershipPricing.test.js server/tests/accessControlP1.test.js server/tests/businessWorkspaceUi.test.js server/tests/billingSync.test.js server/tests/billingSelfService.test.js server/tests/clientRoutesP1.test.js` PASS 56/56.
+- Galutinė lokali validacija: `npm.cmd test` PASS 256/256; `npm.cmd run lint` PASS, patikrinti 122 backend JavaScript failai; `npm.cmd run typecheck` PASS, patikrinti 122 backend JavaScript failai, TypeScript projekto nėra; `npm.cmd run build` PASS, Vite 8.2.1 build sugeneravo `client/dist`; `git diff --check` PASS be whitespace klaidų, tik LF/CRLF normalizavimo įspėjimai.
+
+Paleidimo būsena:
+
+- Demo parduodamas nemokamai.
+- Asmeninis paruoštas 14,99 €/mėn. testiniam Stripe keliui.
+- Verslo pardavimas išjungtas, nors planas matomas.
+- Business Studio beta ir pardavimo įjungimas bus atskiras etapas.
+- Realūs VMI / paslaugos teikėjo rekvizitai vis dar nepateikti.
+- Legal šaka ir ši nuo jos priklausanti šaka dar nejungiamos į `main`.
+- Production deploy, Stripe Live, produkcinė DB, realūs laiškai, `.env`, commit, push, merge, reset ir clean nevykdyti.
 
 ## 2026-08-24 – Asmeninio plano legal / trust etapas
 

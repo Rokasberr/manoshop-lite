@@ -2,6 +2,7 @@ const User = require("../models/User");
 const Payment = require("../models/Payment");
 const Subscription = require("../models/Subscription");
 const { LEGAL_DOCUMENT_VERSION, consentTypes } = require("../config/legalDocuments");
+const { BUSINESS_PLAN_SALES_ENABLED } = require("../config/launchFeatures");
 const { getPlanById, normalizePlanId } = require("../config/subscriptionPlans");
 const {
   syncStripeOrderFromSession,
@@ -37,6 +38,9 @@ const {
 const { getStripeClient, resolveClientUrl } = require("../utils/stripeClient");
 const { createHttpError } = require("../utils/httpError");
 
+const BUSINESS_PLAN_SALES_DISABLED_MESSAGE = "Verslo plano pardavimas dar nepradėtas.";
+const isBusinessPlanCheckout = (planId) => normalizePlanId(planId) === "private_business";
+
 const createPaymentSession = async (req, res) => {
   const { planId, provider = "stripe", acceptedSubscriptionTerms = false } = req.body;
   const requestedPlanId = String(planId || "").trim().toLowerCase();
@@ -51,6 +55,10 @@ const createPaymentSession = async (req, res) => {
   if (!plan || plan.provider !== "stripe") {
     res.status(400);
     throw new Error("Pasirinktas planas negalioja Stripe checkout srautui.");
+  }
+
+  if (!BUSINESS_PLAN_SALES_ENABLED && isBusinessPlanCheckout(requestedPlanId)) {
+    throw createHttpError(BUSINESS_PLAN_SALES_DISABLED_MESSAGE, 409);
   }
 
   if (!plan.priceId) {

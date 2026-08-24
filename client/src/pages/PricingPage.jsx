@@ -7,8 +7,11 @@ import Seo from "../components/Seo";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import billingService from "../services/billingService";
+import launchFeatures from "../../../shared/launchFeatures.cjs";
 import { createCheckoutAttemptKey } from "../utils/checkoutAttempt";
 import { normalizePlan } from "../utils/membership";
+
+const businessPlanSalesEnabled = launchFeatures.BUSINESS_PLAN_SALES_ENABLED === true;
 
 const PricingPage = () => {
   const navigate = useNavigate();
@@ -21,6 +24,13 @@ const PricingPage = () => {
   const [checkoutAttemptKey, setCheckoutAttemptKey] = useState("");
 
   const handleChoosePlan = async (plan) => {
+    if (plan.id === "private_business" && !businessPlanSalesEnabled) {
+      navigate("/launch-soon?focus=business", {
+        state: { email: user?.email || "", focus: "business" },
+      });
+      return;
+    }
+
     if (!user) {
       navigate("/register", { state: { from: location.pathname, selectedPlan: plan.id } });
       return;

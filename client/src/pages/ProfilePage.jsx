@@ -128,6 +128,8 @@ const ProfilePage = () => {
     (subscription.status === "active" || subscription.status === "trialing") &&
     Boolean(subscription.cancelAtPeriodEnd);
   const isUnverified = user?.emailVerificationRequired === true && user?.emailVerified !== true;
+  const selectedPlanFromState = normalizePlan(location.state?.selectedPlan || "");
+  const hasBusinessPlanSelection = selectedPlanFromState === "private_business";
 
   useEffect(() => {
     refreshProfile();
@@ -442,7 +444,11 @@ const ProfilePage = () => {
                 {resendingVerification ? "Siunčiama..." : "Siųsti patvirtinimo laišką dar kartą"}
               </button>
               {location.state?.selectedPlan && (
-                <p className="mt-3 text-xs text-muted">Pasirinktas planas išsaugotas. Po patvirtinimo grįžk į kainodarą ir tęsk saugų apmokėjimą.</p>
+                <p className="mt-3 text-xs text-muted">
+                  {hasBusinessPlanSelection
+                    ? "Pasirinktas Verslas planas išsaugotas. Paleidžiama netrukus."
+                    : "Pasirinktas planas išsaugotas. Po patvirtinimo grįžk į kainodarą ir tęsk saugų apmokėjimą."}
+                </p>
               )}
               {location.state?.pendingProductId && (
                 <p className="mt-3 text-xs text-muted">Pasirinktas produktas išsaugotas. Po patvirtinimo grįžk į skaitmeninių produktų puslapį.</p>
@@ -494,9 +500,20 @@ const ProfilePage = () => {
                 {openingPortal ? "Atidaroma..." : hasPaymentIssue ? "Sutvarkyti mokėjimą" : "Valdyti prenumeratą ir sąskaitas"}
               </button>
             ) : (
-              <Link to="/pricing" className="button-secondary mt-6 inline-flex w-full justify-center whitespace-normal sm:w-auto">
-                {t("common.buttons.managePlan")}
-              </Link>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <Link to="/pricing" className="button-secondary inline-flex w-full justify-center whitespace-normal sm:w-auto">
+                  {t("common.buttons.managePlan")}
+                </Link>
+                {hasBusinessPlanSelection && (
+                  <Link
+                    to="/launch-soon?focus=business"
+                    state={{ email: user?.email || "", focus: "business" }}
+                    className="button-primary inline-flex w-full justify-center whitespace-normal sm:w-auto"
+                  >
+                    Pranešti apie startą
+                  </Link>
+                )}
+              </div>
             )}
             <div className="mt-4 flex flex-wrap gap-3 text-sm">
               <Link to="/subscription-terms" className="font-semibold accent-text">

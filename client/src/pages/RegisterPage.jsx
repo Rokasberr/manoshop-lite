@@ -6,6 +6,7 @@ import Seo from "../components/Seo";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import billingService from "../services/billingService";
+import { normalizePlan } from "../utils/membership";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -77,6 +78,14 @@ const RegisterPage = () => {
       if (purchaseProductId) {
         toast.success("Paskyra sukurta. Pries pirkima patvirtink el. pasta.");
         navigate("/profile", { state: { pendingProductId: purchaseProductId } });
+        return;
+      }
+
+      if (normalizePlan(selectedPlan) === "private_business") {
+        toast.success("Paskyra sukurta. Verslas: Paleidžiama netrukus.");
+        navigate("/launch-soon?focus=business", {
+          state: { email: formData.email.trim().toLowerCase(), focus: "business" },
+        });
         return;
       }
 
