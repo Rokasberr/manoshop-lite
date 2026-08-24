@@ -29,6 +29,7 @@ const SavingsStudioProfile = require("../models/SavingsStudioProfile");
 const Store = require("../models/Store");
 const Product = require("../models/Product");
 const User = require("../models/User");
+const UserConsent = require("../models/UserConsent");
 
 const root = path.resolve(__dirname, "..", "..");
 
@@ -92,6 +93,20 @@ const deletionModelStubs = ({ user, storeExists = false, productCount = 0, delet
   [RecurringExpense, { deleteMany: async (query) => deleteCalls.push(["recurring", query]) }],
   [SavingsStudioAuditLog, { deleteMany: async (query) => deleteCalls.push(["audit", query]) }],
 ];
+
+const queryResult = (value) => ({
+  sort() {
+    return this;
+  },
+  limit() {
+    return this;
+  },
+  lean: async () => value,
+});
+
+const findOneResult = (value) => ({
+  lean: async () => value,
+});
 
 test("email verification creates only hashed one-time token state and safe DTO", async () => {
   process.env.EMAIL_VERIFICATION_TOKEN_TTL_HOURS = "24";
@@ -255,11 +270,15 @@ test("user data export and account deletion services whitelist data and retain f
 
   assert.match(exportSource, /schemaVersion: "2026-08-account-export-v1"/);
   assert.match(exportSource, /exportGeneratedAt/);
+  assert.match(exportSource, /UserConsent\.find\(\{ user: userId \}\)/);
+  assert.match(exportSource, /const serializeUserConsent/);
+  assert.match(exportSource, /consentRetentionNotice/);
   assert.match(exportSource, /passwordResetTokenHash/);
   assert.doesNotMatch(exportSource, /stripeCustomerId: payment\.stripeCustomerId|stripeSubscriptionId: subscription\.stripeSubscriptionId/);
   assert.match(exportSource, /SavingsEntry\.deleteMany\(\{ user: userId \}/);
   assert.match(exportSource, /SavingsStudioAuditLog\.deleteMany\(\{ user: userId \}/);
   assert.doesNotMatch(exportSource, /Order\.deleteMany|Payment\.deleteMany|Subscription\.deleteMany|DigitalProductPurchase\.deleteMany/);
+  assert.doesNotMatch(exportSource, /UserConsent\.deleteMany|UserConsent\.deleteOne/);
   assert.match(exportSource, /Store\.exists\(\{ owner: userId \}\)/);
   assert.match(exportSource, /Product\.collection\.countDocuments/);
   assert.match(exportSource, /sellerId/);
@@ -272,6 +291,89 @@ test("user data export and account deletion services whitelist data and retain f
   assert.match(profileSource, /Atsisiųsti mano duomenis/);
   assert.match(profileSource, /Siųsti patvirtinimo laišką dar kartą/);
   assert.doesNotMatch(profileSource, /window\.confirm/);
+});
+
+test("user data export returns only own consent history without internal fields", async () => {
+  const { buildUserDataExport } = require("../services/accountLifecycleService");
+  const user = {
+    _id: "user-export-1",
+    name: "Ona",
+    email: "ona@example.test",
+    role: "customer",
+    subscription: { plan: "personal", status: "active" },
+  };
+  let consentQuery = null;
+
+  await withModelStubs(
+    [
+      [SavingsStudioProfile, { findOne: () => findOneResult(null) }],
+      [SavingsEntry, { find: () => queryResult([]) }],
+      [SavingsBudget, { find: () => queryResult([]) }],
+      [SavingsGoal, { find: () => queryResult([]) }],
+      [RecurringExpense, { find: () => queryResult([]) }],
+      [SavingsStudioAuditLog, { find: () => queryResult([]) }],
+      [require("../models/Subscription"), { find: () => queryResult([]) }],
+      [require("../models/Payment"), { find: () => queryResult([]) }],
+      [require("../models/DigitalProductPurchase"), { find: () => queryResult([]) }],
+      [require("../models/Order"), { find: () => queryResult([]) }],
+      [
+        UserConsent,
+        {
+          find: (query) => {
+            consentQuery = query;
+            return queryResult([
+              {
+                _id: "consent-own",
+                user: "user-export-1",
+                consentKey: "digital-product:user-export-1:personal-budget-system:2026-08-24-personal-legal-trust",
+                type: "digital_content_immediate_access",
+                documentVersion: "2026-08-24-personal-legal-trust",
+                acceptedAt: new Date("2026-08-24T09:00:00.000Z"),
+                subscriptionPlan: "",
+                productId: "personal-budget-system",
+                status: "checkout_created",
+                stripeSessionId: "cs_internal",
+                purchase: "purchase_internal",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              },
+            ]);
+          },
+        },
+      ],
+    ],
+    async () => {
+      const result = await buildUserDataExport(user);
+
+      assert.equal(consentQuery.user, user._id);
+      assert.deepEqual(result.consents, [
+        {
+          type: "digital_content_immediate_access",
+          documentVersion: "2026-08-24-personal-legal-trust",
+          acceptedAt: "2026-08-24T09:00:00.000Z",
+          subscriptionPlan: "",
+          productId: "personal-budget-system",
+          status: "checkout_created",
+        },
+      ]);
+
+      const serialized = JSON.stringify(result.consents);
+      assert.doesNotMatch(serialized, /consentKey|stripeSessionId|purchase_internal|consent-own|createdAt|updatedAt|__v/);
+      assert.match(result.consentRetentionNotice, /tombstone/);
+    }
+  );
+});
+
+test("UserConsent retention policy does not reactivate tombstone accounts", async () => {
+  const accountLifecycleSource = fs.readFileSync(path.join(root, "server", "services", "accountLifecycleService.js"), "utf8");
+  const authControllerSource = fs.readFileSync(path.join(root, "server", "controllers", "authController.js"), "utf8");
+  const authMiddlewareSource = fs.readFileSync(path.join(root, "server", "middleware", "authMiddleware.js"), "utf8");
+
+  assert.doesNotMatch(accountLifecycleSource, /UserConsent\.(deleteMany|deleteOne|updateMany)\(/);
+  assert.match(accountLifecycleSource, /user\.isDeleted = true/);
+  assert.match(accountLifecycleSource, /user\.authVersion = Number\(user\.authVersion \|\| 0\) \+ 1/);
+  assert.match(authControllerSource, /isDeleted: \{ \$ne: true \}/);
+  assert.match(authMiddlewareSource, /user\.isDeleted/);
 });
 
 test("Store owner cannot self-delete account", async () => {

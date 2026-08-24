@@ -11,6 +11,7 @@ import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import adminDigitalProductService from "../services/adminDigitalProductService";
 import digitalProductService from "../services/digitalProductService";
+import { createCheckoutAttemptKey } from "../utils/checkoutAttempt";
 
 const DigitalProductsPage = () => {
   const navigate = useNavigate();
@@ -24,6 +25,9 @@ const DigitalProductsPage = () => {
   const [isLoadingPurchases, setIsLoadingPurchases] = useState(false);
   const [purchaseLoadingId, setPurchaseLoadingId] = useState("");
   const [downloadLoadingKey, setDownloadLoadingKey] = useState("");
+  const [pendingDigitalProduct, setPendingDigitalProduct] = useState(null);
+  const [acceptedImmediateAccess, setAcceptedImmediateAccess] = useState(false);
+  const [checkoutAttemptKey, setCheckoutAttemptKey] = useState("");
   const [adminPreview, setAdminPreview] = useState(null);
   const [adminPreviewLoadingId, setAdminPreviewLoadingId] = useState("");
   const [adminDownloadLoadingKey, setAdminDownloadLoadingKey] = useState("");
@@ -94,14 +98,44 @@ const DigitalProductsPage = () => {
     }
 
     try {
-      setPurchaseLoadingId(product.id);
-      const session = await digitalProductService.createCheckoutSession(product.id);
+      const attemptKey = createCheckoutAttemptKey();
+      setCheckoutAttemptKey(attemptKey);
+      setPendingDigitalProduct(product);
+      setAcceptedImmediateAccess(false);
+    } catch (error) {
+      toast.error(error.message || t("common.toast.purchaseReadyFailed"));
+    }
+  };
+
+  const handleConfirmDigitalPurchase = async () => {
+    if (!pendingDigitalProduct || purchaseLoadingId) {
+      return;
+    }
+
+    if (!acceptedImmediateAccess) {
+      toast.error("Prieš pirkimą reikia atskiro skaitmeninio turinio sutikimo.");
+      return;
+    }
+
+    if (!checkoutAttemptKey) {
+      toast.error("Nepavyko saugiai paruosti checkout bandymo. Uzdaryk langa ir bandyk dar karta.");
+      return;
+    }
+
+    try {
+      setPurchaseLoadingId(pendingDigitalProduct.id);
+      const session = await digitalProductService.createCheckoutSession(pendingDigitalProduct.id, {
+        acceptedDigitalContentImmediateAccess: true,
+        attemptKey: checkoutAttemptKey,
+      });
 
       if (session.alreadyPurchased) {
         setPurchasedProductIds((currentIds) =>
-          currentIds.includes(product.id) ? currentIds : [...currentIds, product.id]
+          currentIds.includes(pendingDigitalProduct.id) ? currentIds : [...currentIds, pendingDigitalProduct.id]
         );
         toast.success(t("common.toast.purchaseAlreadyOwned"));
+        setPendingDigitalProduct(null);
+        setCheckoutAttemptKey("");
         return;
       }
 
@@ -393,6 +427,72 @@ const DigitalProductsPage = () => {
           </div>
         </div>
       )}
+      {pendingDigitalProduct ? (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-4 backdrop-blur-sm sm:items-center">
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="digital-consent-title"
+            className="w-full max-w-2xl rounded-lg border border-white/[0.18] bg-[#071310] p-5 text-white shadow-[0_32px_110px_rgba(0,0,0,0.45)] sm:p-6"
+          >
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#f2d99a]">Skaitmeninio turinio sutikimas</p>
+            <h2 id="digital-consent-title" className="mt-3 font-display text-3xl font-bold">
+              {pendingDigitalProduct.title}
+            </h2>
+            <div className="mt-5 grid gap-3 text-sm leading-6 text-white/[0.78]">
+              <p>
+                Kaina: <strong className="text-[#f8e6b1]">{pendingDigitalProduct.priceLabel}</strong>
+              </p>
+              <p>
+                Formatas: <strong className="text-white">{(pendingDigitalProduct.formats || ["XLSX"]).join(" + ")}</strong>.
+                Pagrindinės savybės: {pendingDigitalProduct.description}
+              </p>
+              <p>
+                Prieš mokėjimą perskaityk{" "}
+                <Link to="/terms" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#f8e6b1]">
+                  Naudojimo sąlygas
+                </Link>
+                ,{" "}
+                <Link to="/digital-content-terms" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#f8e6b1]">
+                  Skaitmeninio turinio sąlygas
+                </Link>{" "}
+                ir{" "}
+                <Link to="/refund-policy" target="_blank" rel="noopener noreferrer" className="font-semibold text-[#f8e6b1]">
+                  grąžinimo tvarką
+                </Link>
+                .
+              </p>
+            </div>
+            <label className="mt-5 flex items-start gap-3 rounded-lg border border-white/[0.16] bg-white/[0.08] p-4 text-sm leading-6 text-white/[0.82]">
+              <input
+                type="checkbox"
+                className="mt-1 h-5 w-5 shrink-0 rounded border-white/[0.24] accent-[#e2ca91] focus:outline-none focus:ring-2 focus:ring-[#e2ca91]"
+                checked={acceptedImmediateAccess}
+                onChange={(event) => setAcceptedImmediateAccess(event.target.checked)}
+              />
+              <span>
+                Aiškiai sutinku, kad skaitmeninis turinys būtų pradėtas teikti iškart po sėkmingo mokėjimo, ir suprantu,
+                kad pradėjus teikimą galiu prarasti teisę atsisakyti nuotolinės sutarties, kiek tai leidžia taikoma teisė.
+              </span>
+            </label>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <button type="button" onClick={() => { setPendingDigitalProduct(null); setCheckoutAttemptKey(""); }} className="hero-outline-button">
+                Grįžti
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDigitalPurchase}
+                disabled={!acceptedImmediateAccess || purchaseLoadingId === pendingDigitalProduct.id}
+                className="button-primary disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {purchaseLoadingId === pendingDigitalProduct.id
+                  ? "Ruošiamas checkout..."
+                  : `Pirkti ir mokėti ${pendingDigitalProduct.priceLabel}`}
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </div>
   );
 };

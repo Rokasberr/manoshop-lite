@@ -5,6 +5,7 @@ const validateRegisterInput = (req, _res, next) => {
   const name = String(req.body?.name || "").trim();
   const email = normalizeEmail(req.body?.email);
   const password = String(req.body?.password || "");
+  const acceptedTermsAndPrivacy = req.body?.acceptedTermsAndPrivacy === true;
 
   if (name.length < 2 || name.length > 80) {
     return next(createHttpError("Vardui reikia 2-80 simbolių.", 400));
@@ -20,8 +21,13 @@ const validateRegisterInput = (req, _res, next) => {
     return next(createHttpError(passwordError, 400));
   }
 
+  if (!acceptedTermsAndPrivacy) {
+    return next(createHttpError("Registracijai reikia patvirtinti Naudojimo salygas ir Privatumo politika.", 400));
+  }
+
   req.body.name = name;
   req.body.email = email;
+  req.body.acceptedTermsAndPrivacy = true;
   next();
 };
 

@@ -498,6 +498,14 @@ const ProfilePage = () => {
                 {t("common.buttons.managePlan")}
               </Link>
             )}
+            <div className="mt-4 flex flex-wrap gap-3 text-sm">
+              <Link to="/subscription-terms" className="font-semibold accent-text">
+                Prenumeratos sąlygos
+              </Link>
+              <Link to="/subscription-cancellation" className="font-semibold accent-text">
+                Atšaukimo tvarka
+              </Link>
+            </div>
             {hasActiveMembership(user) && (
               <Link to="/members/savings-studio" className="button-secondary mt-4 inline-flex w-full justify-center whitespace-normal sm:w-auto">
                 {t("common.buttons.openStudio")}
@@ -549,6 +557,9 @@ const ProfilePage = () => {
 
           <div className="panel min-w-0 p-6">
             <p className="eyebrow">Mano duomenys</p>
+            <Link to="/data-rights" className="mt-2 inline-flex text-sm font-semibold accent-text">
+              Duomenų teisės ir paskyros ištrynimo informacija
+            </Link>
             <h2 className="mt-4 font-display text-2xl font-bold">Duomenų eksportas</h2>
             <p className="mt-3 text-sm text-muted">
               Atsisiųsk struktūruotą paskyros, Saving Studio, prenumeratos, pirkimų ir užsakymų JSON kopiją.

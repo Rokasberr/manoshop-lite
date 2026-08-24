@@ -47,7 +47,7 @@ const InfoPage = ({ page }) => {
             <h1 className="mt-8 max-w-3xl font-display text-5xl font-bold leading-[0.94] sm:text-6xl">
               {page.title}
             </h1>
-            <p className="mt-6 max-w-2xl text-base leading-7 text-white/72 sm:text-lg">{page.summary}</p>
+            <p className="mt-6 max-w-2xl break-words text-base leading-7 text-white/72 sm:text-lg">{page.summary}</p>
             <p className="mt-6 text-xs uppercase tracking-[0.28em] text-white/40">
               {copy.lastUpdated} {page.lastUpdated}
             </p>
@@ -73,13 +73,13 @@ const InfoPage = ({ page }) => {
         ) : null}
         <div className="grid gap-5">
           {page.sections.map((section) => (
-            <article key={section.heading} className="marketing-card p-6 sm:p-8">
-              <h2 className="font-display text-3xl font-bold tracking-[-0.03em] text-[rgb(28,24,20)]">
+            <article key={section.heading} className="marketing-card min-w-0 max-w-full p-6 sm:p-8">
+              <h2 className="break-words font-display text-3xl font-bold tracking-[-0.03em] text-[rgb(28,24,20)]">
                 {section.heading}
               </h2>
 
               {section.paragraphs?.map((paragraph) => (
-                <p key={paragraph} className="mt-4 max-w-3xl text-base leading-7 text-muted">
+                <p key={paragraph} className="mt-4 max-w-3xl break-words text-base leading-7 text-muted">
                   {paragraph}
                 </p>
               ))}
@@ -87,9 +87,9 @@ const InfoPage = ({ page }) => {
               {section.bullets?.length ? (
                 <div className="mt-5 grid gap-3">
                   {section.bullets.map((bullet) => (
-                    <div key={bullet} className="flex items-start gap-3 rounded-[20px] bg-[rgb(249,245,238)] px-4 py-4">
+                    <div key={bullet} className="flex min-w-0 max-w-full items-start gap-3 rounded-[20px] bg-[rgb(249,245,238)] px-4 py-4">
                       <CheckCircle2 size={18} className="mt-0.5 shrink-0" style={{ color: "rgb(var(--accent))" }} />
-                      <p className="text-sm leading-6 text-[rgb(78,68,57)]">{bullet}</p>
+                      <p className="min-w-0 break-words text-sm leading-6 text-[rgb(78,68,57)]">{bullet}</p>
                     </div>
                   ))}
                 </div>

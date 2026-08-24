@@ -1,10 +1,19 @@
 const path = require("path");
 
 const { getDigitalProductById } = require("../config/digitalProducts");
+const { LEGAL_DOCUMENT_VERSION, consentTypes } = require("../config/legalDocuments");
 const DigitalProductPurchase = require("../models/DigitalProductPurchase");
+const UserConsent = require("../models/UserConsent");
 const User = require("../models/User");
 const { buildIdempotencyKey } = require("./stripeCheckoutService");
 const { ensureStripeCustomerForUser } = require("./stripeCustomerService");
+const {
+  attachStripeSessionToConsent,
+  buildConsentKey,
+  markConsentCheckoutFailed,
+  reserveUserConsent,
+  validateCheckoutAttemptKey,
+} = require("./userConsentService");
 const { getStripeClient, resolveClientUrl } = require("../utils/stripeClient");
 
 const paidStatus = "paid";
@@ -41,7 +50,13 @@ const hasPurchasedProduct = async (userId, productId) => {
   return Boolean(purchase);
 };
 
-const createDigitalProductCheckoutSession = async ({ user, productId, origin, idempotencyKey }) => {
+const createDigitalProductCheckoutSession = async ({
+  user,
+  productId,
+  acceptedDigitalContentImmediateAccess,
+  origin,
+  idempotencyKey,
+}) => {
   const product = getDigitalProductById(productId);
 
   if (!product) {
@@ -59,60 +74,109 @@ const createDigitalProductCheckoutSession = async ({ user, productId, origin, id
     };
   }
 
+  if (acceptedDigitalContentImmediateAccess !== true) {
+    const error = new Error("Pries skaitmeninio produkto checkout reikia atskiro sutikimo del nedelsiamo skaitmeninio turinio teikimo.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const checkoutAttemptKey = validateCheckoutAttemptKey(idempotencyKey);
+
+  if (!checkoutAttemptKey) {
+    const error = new Error("Checkout bandymo raktas neteisingas arba per ilgas.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  let consent;
+
+  try {
+    consent = await reserveUserConsent({
+      userId: user._id,
+      type: consentTypes.DIGITAL_CONTENT_IMMEDIATE_ACCESS,
+      consentKey: buildConsentKey("digital-product", user._id, product.id, LEGAL_DOCUMENT_VERSION, checkoutAttemptKey),
+      productId: product.id,
+    });
+  } catch (_error) {
+    const error = new Error("Skaitmeninio turinio sutikimo issaugoti nepavyko. Checkout nesukurtas.");
+    error.statusCode = 503;
+    throw error;
+  }
+
   const stripe = getStripeClient();
   const clientUrl = resolveClientUrl(origin);
-  const stripeCustomerId = await ensureStripeCustomerForUser(stripe, user);
+  let stripeCustomerId;
+
+  try {
+    stripeCustomerId = await ensureStripeCustomerForUser(stripe, user);
+  } catch (error) {
+    await markConsentCheckoutFailed({ consentId: consent._id }).catch(() => {});
+    throw error;
+  }
+
   const successUrl = `${clientUrl}/digital-products?purchase=success&product=${encodeURIComponent(
     product.id
   )}&session_id={CHECKOUT_SESSION_ID}`;
   const cancelUrl = `${clientUrl}/digital-products?purchase=cancel&product=${encodeURIComponent(product.id)}`;
 
-  const session = await stripe.checkout.sessions.create(
-    {
-      mode: "payment",
-      customer: stripeCustomerId,
-      client_reference_id: user._id.toString(),
-      success_url: successUrl,
-      cancel_url: cancelUrl,
-      metadata: {
-        type: "digital_product",
-        checkoutType: "digital_product",
-        userId: user._id.toString(),
-        productId: product.id,
-      },
-      payment_intent_data: {
+  let session;
+
+  try {
+    session = await stripe.checkout.sessions.create(
+      {
+        mode: "payment",
+        customer: stripeCustomerId,
+        client_reference_id: user._id.toString(),
+        success_url: successUrl,
+        cancel_url: cancelUrl,
         metadata: {
           type: "digital_product",
+          checkoutType: "digital_product",
           userId: user._id.toString(),
           productId: product.id,
         },
-      },
-      line_items: [
-        {
-          quantity: 1,
-          price_data: {
-            currency: product.currency,
-            unit_amount: product.priceCents,
-            product_data: {
-              name: product.title,
-              metadata: {
-                productId: product.id,
+        payment_intent_data: {
+          metadata: {
+            type: "digital_product",
+            userId: user._id.toString(),
+            productId: product.id,
+          },
+        },
+        line_items: [
+          {
+            quantity: 1,
+            price_data: {
+              currency: product.currency,
+              unit_amount: product.priceCents,
+              product_data: {
+                name: product.title,
+                metadata: {
+                  productId: product.id,
+                },
               },
             },
           },
-        },
-      ],
-    },
-    {
-      idempotencyKey: buildIdempotencyKey(
-        "digital-product-checkout",
-        [user._id, product.id, idempotencyKey || Date.now()],
-        idempotencyKey
-      ),
-    }
-  );
+        ],
+      },
+      {
+        idempotencyKey: buildIdempotencyKey(
+          "digital-product-checkout",
+          [user._id, product.id, consent.consentKey],
+          consent.consentKey
+        ),
+      }
+    );
+  } catch (error) {
+    await markConsentCheckoutFailed({ consentId: consent._id }).catch(() => {});
+    throw error;
+  }
 
-  await DigitalProductPurchase.findOneAndUpdate(
+  await attachStripeSessionToConsent({
+    consentId: consent._id,
+    stripeSessionId: session.id,
+  });
+
+  const purchase = await DigitalProductPurchase.findOneAndUpdate(
     {
       user: user._id,
       productId: product.id,
@@ -135,6 +199,12 @@ const createDigitalProductCheckoutSession = async ({ user, productId, origin, id
       setDefaultsOnInsert: true,
     }
   );
+
+  await attachStripeSessionToConsent({
+    consentId: consent._id,
+    stripeSessionId: session.id,
+    purchase: purchase?._id || null,
+  });
 
   return {
     session,
@@ -165,7 +235,7 @@ const syncDigitalProductPurchaseFromSession = async (session) => {
   const amountTotal = Number(session.amount_total ?? product.priceCents);
   const currency = String(session.currency || product.currency || "eur").toLowerCase();
 
-  return DigitalProductPurchase.findOneAndUpdate(
+  const purchase = await DigitalProductPurchase.findOneAndUpdate(
     {
       user: userId,
       productId: product.id,
@@ -186,6 +256,22 @@ const syncDigitalProductPurchaseFromSession = async (session) => {
       setDefaultsOnInsert: true,
     }
   );
+
+  await UserConsent.updateMany(
+    {
+      user: userId,
+      type: consentTypes.DIGITAL_CONTENT_IMMEDIATE_ACCESS,
+      productId: product.id,
+      stripeSessionId: session.id,
+    },
+    {
+      $set: {
+        purchase: purchase?._id || null,
+      },
+    }
+  );
+
+  return purchase;
 };
 
 const resolveDigitalProductFilePath = (product, format) => {

@@ -1,5 +1,6 @@
 export const COOKIE_CONSENT_STORAGE_KEY = "stilloak_cookie_consent";
 export const COOKIE_CONSENT_VERSION = "2026-05-20";
+export const HAS_NON_ESSENTIAL_COOKIE_SCRIPTS = false;
 
 export const COOKIE_CATEGORIES = ["necessary", "functional", "analytics", "marketing"];
 

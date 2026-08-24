@@ -5,8 +5,17 @@ const getPurchases = async () => {
   return data;
 };
 
-const createCheckoutSession = async (productId) => {
-  const { data } = await api.post("/digital-products/checkout", { productId });
+const createCheckoutSession = async (productId, options = {}) => {
+  const { data } = await api.post(
+    "/digital-products/checkout",
+    {
+      productId,
+      acceptedDigitalContentImmediateAccess: options.acceptedDigitalContentImmediateAccess === true,
+    },
+    {
+      headers: options.attemptKey ? { "Idempotency-Key": options.attemptKey } : {},
+    }
+  );
   return data;
 };
 

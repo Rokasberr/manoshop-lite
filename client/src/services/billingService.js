@@ -1,7 +1,9 @@
 import api from "./api";
 
-const createPaymentSession = async (payload) => {
-  const { data } = await api.post("/billing/create-payment-session", payload);
+const createPaymentSession = async (payload, options = {}) => {
+  const { data } = await api.post("/billing/create-payment-session", payload, {
+    headers: options.attemptKey ? { "Idempotency-Key": options.attemptKey } : {},
+  });
   return data;
 };
 

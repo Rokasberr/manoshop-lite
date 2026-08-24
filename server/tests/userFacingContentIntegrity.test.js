@@ -80,11 +80,13 @@ test("main user-facing content files are free from common mojibake fragments", (
 
 test("visible footer and contact content do not expose demo contact details", () => {
   const footerSource = readProjectFile("client", "src", "components", "Footer.jsx");
+  const legalConfigSource = readProjectFile("client", "src", "config", "legal.js");
   const translationsSource = readProjectFile("client", "src", "i18n", "translations.js");
   const infoPagesSource = readProjectFile("client", "src", "content", "infoPages.js");
   const visibleContactSources = [footerSource, translationsSource, infoPagesSource].join("\n");
 
-  assert.match(footerSource, /hello@stilloak-studio\.com/);
+  assert.match(footerSource, /serviceProvider\.supportEmail/);
+  assert.match(legalConfigSource, /hello@stilloak-studio\.com/);
   assert.match(footerSource, /copy\.links\.contactPrompt/);
   assert.match(translationsSource, /contactPrompt: "Susisiekite el\. paštu"/);
   assert.doesNotMatch(visibleContactSources, /\+370 600 12345/);

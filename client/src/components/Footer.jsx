@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { serviceProvider } from "../config/legal";
 import { useCookieConsent } from "../context/CookieConsentContext";
 import { useLanguage } from "../context/LanguageContext";
 
@@ -21,6 +22,8 @@ const Footer = () => {
         { label: copy.links.secureCheckout, to: "/secure-checkout" },
         { label: copy.links.receiptArchive, to: "/receipt-archive" },
         { label: copy.links.memberPricing, to: "/member-pricing" },
+        { label: "Prenumeratos sąlygos", to: "/subscription-terms" },
+        { label: "Atšaukimo tvarka", to: "/subscription-cancellation" },
         { label: copy.links.privateSupport, to: "/private-support" },
       ],
     },
@@ -29,9 +32,11 @@ const Footer = () => {
       items: [
         { label: copy.links.shipping, to: "/shipping" },
         { label: copy.links.returns, to: "/returns" },
+        { label: "Grąžinimo politika", to: "/refund-policy" },
         { label: copy.links.privacy, to: "/privacy" },
         { label: copy.links.cookiePolicy, to: "/cookie-policy" },
         { label: copy.links.digitalDownloadPolicy, to: "/digital-download-policy" },
+        { label: "Duomenų teisės", to: "/data-rights" },
         { label: copy.links.terms, to: "/terms" },
       ],
     },
@@ -101,8 +106,8 @@ const Footer = () => {
           </Link>
           <div className="mt-4 space-y-3 text-sm text-white/58">
             <p>{copy.links.contactPrompt}</p>
-            <a href="mailto:hello@stilloak-studio.com" className="block transition hover:text-white">
-              hello@stilloak-studio.com
+            <a href={`mailto:${serviceProvider.supportEmail}`} className="block break-words transition hover:text-white">
+              {serviceProvider.supportEmail}
             </a>
           </div>
           <Link to="/contact" className="mt-5 inline-flex text-sm font-medium accent-text transition hover:opacity-80">

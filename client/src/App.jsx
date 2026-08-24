@@ -85,9 +85,14 @@ const App = () => (
         <Route path="/contact" element={<InfoPage page={infoPages.contact} />} />
         <Route path="/shipping" element={<InfoPage page={infoPages.shipping} />} />
         <Route path="/returns" element={<InfoPage page={infoPages.returns} />} />
+        <Route path="/refund-policy" element={<InfoPage page={infoPages.refundPolicy} />} />
         <Route path="/privacy" element={<InfoPage page={infoPages.privacy} />} />
         <Route path="/cookie-policy" element={<InfoPage page={infoPages.cookiePolicy} />} />
         <Route path="/digital-download-policy" element={<InfoPage page={infoPages.digitalDownloadPolicy} />} />
+        <Route path="/digital-content-terms" element={<InfoPage page={infoPages.digitalDownloadPolicy} />} />
+        <Route path="/subscription-terms" element={<InfoPage page={infoPages.subscriptionTerms} />} />
+        <Route path="/subscription-cancellation" element={<InfoPage page={infoPages.subscriptionCancellation} />} />
+        <Route path="/data-rights" element={<InfoPage page={infoPages.dataRights} />} />
         <Route path="/terms" element={<InfoPage page={infoPages.terms} />} />
 
         <Route element={<ProtectedRoute />}>

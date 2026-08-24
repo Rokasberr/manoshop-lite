@@ -17,10 +17,14 @@ const getDigitalProductPurchases = async (req, res) => {
 };
 
 const createDigitalProductCheckout = async (req, res) => {
-  const { productId = "" } = req.body || {};
+  const {
+    productId = "",
+    acceptedDigitalContentImmediateAccess = false,
+  } = req.body || {};
   const checkout = await createDigitalProductCheckoutSession({
     user: req.user,
     productId,
+    acceptedDigitalContentImmediateAccess,
     origin: req.headers.origin,
     idempotencyKey: req.headers["idempotency-key"],
   });

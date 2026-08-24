@@ -20,6 +20,7 @@ const RegisterPage = () => {
     email: "",
     password: "",
     confirmPassword: "",
+    acceptedTermsAndPrivacy: false,
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -50,6 +51,11 @@ const RegisterPage = () => {
       return;
     }
 
+    if (!formData.acceptedTermsAndPrivacy) {
+      setError("Registracijai reikia patvirtinti, kad susipažinai su Naudojimo sąlygomis ir Privatumo politika.");
+      return;
+    }
+
     try {
       setLoading(true);
       setError("");
@@ -57,6 +63,7 @@ const RegisterPage = () => {
         name: formData.name.trim(),
         email: formData.email.trim(),
         password: formData.password,
+        acceptedTermsAndPrivacy: formData.acceptedTermsAndPrivacy,
       });
 
       if (selectedPlan === "basic") {
@@ -179,6 +186,32 @@ const RegisterPage = () => {
               />
             </div>
           </div>
+
+          <label
+            htmlFor="register-legal-consent"
+            className="flex min-w-0 items-start gap-3 rounded-lg border border-[rgb(var(--line))] bg-[rgb(var(--surface-soft))] p-4 text-sm leading-6 text-muted"
+          >
+            <input
+              id="register-legal-consent"
+              name="acceptedTermsAndPrivacy"
+              type="checkbox"
+              className="mt-1 h-5 w-5 shrink-0 rounded border-[rgb(var(--line))] accent-[rgb(var(--accent-strong))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-strong))]"
+              checked={formData.acceptedTermsAndPrivacy}
+              onChange={(event) => handleChange("acceptedTermsAndPrivacy", event.target.checked)}
+              required
+            />
+            <span className="min-w-0">
+              Patvirtinu, kad susipažinau su{" "}
+              <Link to="/terms" target="_blank" rel="noopener noreferrer" className="font-semibold accent-text">
+                Naudojimo sąlygomis
+              </Link>{" "}
+              ir{" "}
+              <Link to="/privacy" target="_blank" rel="noopener noreferrer" className="font-semibold accent-text">
+                Privatumo politika
+              </Link>
+              .
+            </span>
+          </label>
 
           <button type="submit" disabled={loading} className="button-primary w-full">
             {loading ? copy.loading : copy.submit}

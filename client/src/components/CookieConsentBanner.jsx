@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 import { useCookieConsent } from "../context/CookieConsentContext";
 import { useLanguage } from "../context/LanguageContext";
-import { COOKIE_CATEGORIES, DEFAULT_COOKIE_CATEGORIES } from "../utils/cookieConsent";
+import { COOKIE_CATEGORIES, DEFAULT_COOKIE_CATEGORIES, HAS_NON_ESSENTIAL_COOKIE_SCRIPTS } from "../utils/cookieConsent";
 
 const CookieToggle = ({ category, copy, enabled, disabled, onToggle }) => (
   <div className="rounded-lg border border-[rgb(var(--line))] bg-[rgb(var(--surface))] p-4 shadow-sm">
@@ -163,7 +163,7 @@ const CookieConsentBanner = () => {
 
   return (
     <>
-      {!hasSavedConsent && !isPreferencesOpen ? (
+      {HAS_NON_ESSENTIAL_COOKIE_SCRIPTS && !hasSavedConsent && !isPreferencesOpen ? (
         <div className="fixed inset-x-0 bottom-0 z-[80] px-4 pb-4 sm:px-6">
           <section className="mx-auto max-w-6xl rounded-[28px] border border-[rgb(var(--line))] bg-[rgb(var(--surface))] p-4 shadow-[0_24px_70px_rgba(13,24,21,0.22)] sm:p-5">
             <div className="grid gap-4 lg:grid-cols-[auto_1fr_auto] lg:items-center">

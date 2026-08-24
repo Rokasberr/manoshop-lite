@@ -14,6 +14,7 @@ const SavingsStudioProfile = require("../models/SavingsStudioProfile");
 const Store = require("../models/Store");
 const Subscription = require("../models/Subscription");
 const User = require("../models/User");
+const UserConsent = require("../models/UserConsent");
 const { getStripeClient } = require("../utils/stripeClient");
 const { createHttpError } = require("../utils/httpError");
 const { isAdminUser } = require("../utils/userRole");
@@ -119,6 +120,15 @@ const serializeDigitalPurchase = (purchase) => ({
   updatedAt: safeDate(purchase.updatedAt),
 });
 
+const serializeUserConsent = (consent) => ({
+  type: consent.type,
+  documentVersion: consent.documentVersion,
+  acceptedAt: safeDate(consent.acceptedAt),
+  subscriptionPlan: consent.subscriptionPlan || "",
+  productId: consent.productId || "",
+  status: consent.status || "accepted",
+});
+
 const buildUserDataExport = async (user) => {
   const userId = user._id;
   const [
@@ -132,6 +142,7 @@ const buildUserDataExport = async (user) => {
     payments,
     purchases,
     orders,
+    userConsents,
   ] = await Promise.all([
     lean(SavingsStudioProfile.findOne({ user: userId })),
     sortLimitLean(SavingsEntry.find({ user: userId }), { date: -1, createdAt: -1 }),
@@ -143,6 +154,7 @@ const buildUserDataExport = async (user) => {
     sortLimitLean(Payment.find({ user: userId }), { createdAt: -1 }),
     sortLimitLean(DigitalProductPurchase.find({ user: userId }), { createdAt: -1 }),
     sortLimitLean(Order.find({ $or: [{ user: userId }, { buyer: userId }] }), { createdAt: -1 }),
+    sortLimitLean(UserConsent.find({ user: userId }), { acceptedAt: -1, createdAt: -1 }),
   ]);
 
   return {
@@ -174,6 +186,9 @@ const buildUserDataExport = async (user) => {
     orders: (orders || []).map(serializeOrder),
     payments: (payments || []).map(serializePayment),
     subscriptions: (subscriptions || []).map(serializeSubscriptionRecord),
+    consents: (userConsents || []).map(serializeUserConsent),
+    consentRetentionNotice:
+      "UserConsent irasai paliekami prie tombstone paskyros kaip teisinis ir audito irodymas; galutini saugojimo termina turi patvirtinti savininkas arba teisininkas.",
     retentionNotice:
       "Finansiniai ir apskaitos įrašai eksportuojami be vidinių Stripe ID ir gali būti saugomi pagal teisinius reikalavimus.",
   };

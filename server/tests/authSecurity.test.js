@@ -5,6 +5,7 @@ const test = require("node:test");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
+const UserConsent = require("../models/UserConsent");
 const {
   changeUserPassword,
   formatAuthResponse,
@@ -59,6 +60,23 @@ const withUserStubs = async (stubs, callback) => {
   }
 };
 
+const withUserConsentStubs = async (stubs, callback) => {
+  const originals = {};
+
+  for (const [key, value] of Object.entries(stubs)) {
+    originals[key] = UserConsent[key];
+    UserConsent[key] = value;
+  }
+
+  try {
+    return await callback();
+  } finally {
+    for (const [key, value] of Object.entries(originals)) {
+      UserConsent[key] = value;
+    }
+  }
+};
+
 test("registration validation trims name, lowercases email, enforces password bounds, and ignores privileged fields", async () => {
   const result = await runMiddleware(validateRegisterInput, {
     name: "  Ona Oak  ",
@@ -69,6 +87,7 @@ test("registration validation trims name, lowercases email, enforces password bo
     subscription: { plan: "private_business" },
     stripeCustomerId: "cus_secret",
     authVersion: 99,
+    acceptedTermsAndPrivacy: true,
   });
 
   assert.equal(result.error, undefined);
@@ -113,11 +132,23 @@ test("register assigns server role, returns safe DTO, and converts duplicate ema
           password: "secret123",
           role: "admin",
           subscription: { plan: "private_business" },
+          acceptedTermsAndPrivacy: true,
         },
       };
       const res = makeResponse();
 
-      await registerUser(req, res);
+      await withUserConsentStubs(
+        {
+          findOneAndUpdate: async (filter, update, options) => {
+            assert.equal(options.upsert, true);
+            assert.match(filter.consentKey, /^registration:/);
+            return { _id: "consent-1", ...update.$setOnInsert };
+          },
+        },
+        async () => {
+        await registerUser(req, res);
+        }
+      );
 
       assert.equal(res.statusCode, 201);
       assert.equal(res.body.user.role, "customer");
@@ -142,12 +173,121 @@ test("register assigns server role, returns safe DTO, and converts duplicate ema
       },
     },
     async () => {
-      await assert.rejects(
-        () => registerUser({ body: { name: "Ona", email: "ona@example.com", password: "secret123" } }, makeResponse()),
-        (error) => error.statusCode === 409 && !/E11000|collection/.test(error.message)
+      await withUserConsentStubs(
+        {
+          findOneAndUpdate: async (filter, update) => ({ _id: "consent-duplicate", ...update.$setOnInsert, consentKey: filter.consentKey }),
+          deleteOne: async () => ({ deletedCount: 1 }),
+        },
+        async () => {
+          await assert.rejects(
+            () =>
+              registerUser(
+                {
+                  body: {
+                    name: "Ona",
+                    email: "ona@example.com",
+                    password: "secret123",
+                    acceptedTermsAndPrivacy: true,
+                  },
+                },
+                makeResponse()
+              ),
+            (error) => error.statusCode === 409 && !/E11000|collection/.test(error.message)
+          );
+        }
       );
     }
   );
+});
+
+test("registration consent persistence failure does not create a login-capable account", async () => {
+  let createCalled = false;
+
+  await withUserStubs(
+    {
+      findOne: async () => null,
+      create: async () => {
+        createCalled = true;
+        throw new Error("User.create must not run when consent reservation fails");
+      },
+    },
+    async () => {
+      await withUserConsentStubs(
+        {
+          findOneAndUpdate: async () => {
+            throw new Error("consent db down");
+          },
+        },
+        async () => {
+          await assert.rejects(
+            () =>
+              registerUser(
+                {
+                  body: {
+                    name: "Ona",
+                    email: "ona@example.com",
+                    password: "secret123",
+                    acceptedTermsAndPrivacy: true,
+                  },
+                },
+                makeResponse()
+              ),
+            (error) =>
+              error.statusCode === 503 &&
+              /sutikimo issaugoti nepavyko/i.test(error.message) &&
+              !/consent db down/i.test(error.message)
+          );
+        }
+      );
+    }
+  );
+
+  assert.equal(createCalled, false);
+});
+
+test("registration duplicate user failure compensates reserved consent without returning raw errors", async () => {
+  let deleteQuery = null;
+
+  await withUserStubs(
+    {
+      findOne: async () => null,
+      create: async () => {
+        const error = new Error("E11000 duplicate key error collection users");
+        error.code = 11000;
+        throw error;
+      },
+    },
+    async () => {
+      await withUserConsentStubs(
+        {
+          findOneAndUpdate: async (filter, update) => ({ _id: "consent-1", ...update.$setOnInsert, consentKey: filter.consentKey }),
+          deleteOne: async (query) => {
+            deleteQuery = query;
+            return { deletedCount: 1 };
+          },
+        },
+        async () => {
+          await assert.rejects(
+            () =>
+              registerUser(
+                {
+                  body: {
+                    name: "Ona",
+                    email: "ona@example.com",
+                    password: "secret123",
+                    acceptedTermsAndPrivacy: true,
+                  },
+                },
+                makeResponse()
+              ),
+            (error) => error.statusCode === 409 && !/E11000|collection/.test(error.message)
+          );
+        }
+      );
+    }
+  );
+
+  assert.match(deleteQuery.consentKey, /^registration:/);
 });
 
 test("login uses one safe failure for missing and wrong-password users and returns a safe DTO", async () => {

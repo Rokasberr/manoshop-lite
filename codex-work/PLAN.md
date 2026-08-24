@@ -81,6 +81,25 @@ Pastaba 2026-08-24: ankstesni Verslo etapo darbai lieka dokumentuoti. Nauji Priv
 - [x] Visos likusios problemos suklasifikuotos pagal svarbą: React Router moderate major migracija, naršyklinio screenshot aplinkos ribojimas ir authenticated browser smoke be realių credentials palikti kaip nekritinės / owner sprendimo rizikos.
 - [x] STATUS.md nustatytas tikslus galutinis statusas.
 
+## Milestone 6 – Asmeninio plano teisinė informacija ir pasitikėjimas
+
+- [x] Centralizuotas viešų paslaugos teikėjo rekvizitų šaltinis `client/src/config/legal.js`, su `VITE_SERVICE_PROVIDER_*`, `VITE_SUPPORT_EMAIL`, `VITE_LEGAL_EFFECTIVE_DATE` ir `VITE_LEGAL_VERSION` įrašais `client/.env.example`.
+- [x] Sukurti arba sutvarkyti teisiniai puslapiai: privatumo politika, naudojimo sąlygos, slapukų ir naršyklės saugyklos politika, prenumeratos sąlygos, prenumeratos atšaukimo tvarka, grąžinimo politika, skaitmeninio turinio sąlygos, kontaktai / paslaugos teikėjas ir duomenų teisės / paskyros ištrynimas.
+- [x] Registracijoje pridėtas privalomas terms/privacy checkbox, o serveris atmeta registraciją be `acceptedTermsAndPrivacy` ir įrašo `UserConsent` su dokumentų versija bei laiku.
+- [x] Mokamos prenumeratos Checkout prieš Stripe rodo planą, kainą, automatinį atnaujinimą, atšaukimą ir prenumeratos sąlygų nuorodą; serveris reikalauja `acceptedSubscriptionTerms` ir įrašo sutikimą.
+- [x] Skaitmeninio produkto Checkout prieš Stripe rodo kainą, formatą, savybes ir sąlygų / grąžinimo nuorodas; serveris reikalauja atskiro `acceptedDigitalContentImmediateAccess` sutikimo ir įrašo vartotojo, produkto, versijos, laiko bei Stripe session / purchase ryšį.
+- [x] Cookie bannerio automatinis rodymas išjungtas, nes kode nerasta aktyvių nebūtinų analytics / marketing skriptų; politika dokumentuoja faktinį `localStorage` naudojimą ir tai, kad JWT localStorage nėra slapukas.
+- [x] Teisinės nuorodos pasiekiamos per Footer, registraciją, kainodarą prieš Checkout, skaitmeninio produkto pirkimą, Profile ir kontaktų puslapį.
+- [x] Tiksliniai testai pridėti `server/tests/legalTrust.test.js`, papildyta `server/tests/authValidation.test.js`.
+- [x] Legal / trust hardening: registracijos sutikimas patvariai rezervuojamas pries aktyvios paskyros sukurima, verification laiskas siunciamas tik po sekmingo vartotojo ir sutikimo issaugojimo, o kompensuojantis rezervuoto sutikimo istrynimas dublikuoto vartotojo klaidoje apdorojamas be zaliu klaidu.
+- [x] Stripe Checkout hardening: mokamos prenumeratos ir skaitmeninio produkto sutikimai rezervuojami pries Stripe session kurima per stabilu `consentKey`; po sekmingo Checkout tas pats `UserConsent` irasas papildomas Stripe session ID, o Stripe klaida palieka tik audito irasa be pirkimo/prieigos suteikimo.
+- [x] Checkout attempt idempotency hardening: klientas kiekvienam naujam modal patvirtinimui generuoja nauja kriptografini attempt rakta, serveris ji validuoja ir hashuoja i `UserConsent.consentKey` kartu su checkout tipu, vartotoju, planu arba produktu ir dokumentu versija; tas pats attempt yra retry, naujas attempt yra naujas auditinis bandymas.
+- [x] Dokumentu versijos hardening: klientas ir serveris naudoja bendra `shared/legalDocuments.cjs`, o `VITE_LEGAL_VERSION` gali buti tik suderinta production patikra, ne atskiras tiesos saltinis.
+- [x] UserConsent lifecycle: duomenu eksportas grazina tik saugia savo vartotojo sutikimu istorija; paskyros istrynimas `UserConsent` netrina ir nereaktyvuoja tombstone paskyros; galutini saugojimo termina turi patvirtinti savininkas arba teisininkas.
+- [ ] Savininkas dar turi pateikti realius paslaugos teikėjo rekvizitus; be jų pardavimų paleidimas nepažymimas teisiškai paruoštu.
+- [ ] Teisininkas dar turi peržiūrėti tekstus, vartotojo atsisakymo teisės formuluotes, saugojimo terminus, tarptautinius perdavimus ir apskaitos pareigas.
+- [ ] Production aplinkoje dar reikia sukonfigūruoti viešus `VITE_*` rekvizitus ir patvirtinti realius Vercel, Render, MongoDB Atlas, Stripe, Brevo/SMTP regionus bei sutartinius dokumentus.
+
 ## Stop-and-fix taisyklė
 
 ## Likę tolesni etapai
@@ -92,7 +111,7 @@ Pastaba 2026-08-24: ankstesni Verslo etapo darbai lieka dokumentuoti. Nauji Priv
 - [x] Vartotojo duomenų eksportas.
 - [x] Stripe Customer Portal.
 - [x] Pilnas prenumeratos savitarnos srautas per Stripe Customer Portal.
-- [ ] Teisiniai puslapiai ir realūs rekvizitai.
+- [ ] Teisiniai puslapiai ir realūs rekvizitai: technologiškai įgyvendinta, bet realūs savininko rekvizitai ir teisininko peržiūra dar būtini.
 - [ ] Produkcinė beta su rankiniu production deploy, Stripe Live ir produkcinės DB patvirtinimu.
 
 ## Asmeninio plano transakciniai el. laiškai

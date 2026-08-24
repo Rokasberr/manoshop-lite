@@ -1,8 +1,44 @@
 ﻿# Stilloak Studio autonomous status
 
-PROJECT_STATE: PERSONAL_STRIPE_SELF_SERVICE_LOCAL_VALIDATED
+PROJECT_STATE: PERSONAL_LEGAL_TRUST_TECH_LOCAL_VALIDATED_PENDING_OWNER_LEGAL_INPUT
 
 ## Dabartinis milestone
+
+Milestone 6 – Asmeninio plano teisinės informacijos, sutikimų ir produkcinio pasitikėjimo technologinis sluoksnis lokaliai įgyvendintas. Projektas nėra pažymėtas kaip teisiškai galutinai paruoštas: savininkas dar turi pateikti realius paslaugos teikėjo rekvizitus, o teisininkas turi peržiūrėti galutinius tekstus, vartotojų teisių formuluotes, saugojimo terminus, tarptautinius perdavimus ir apskaitos pareigas.
+
+## 2026-08-24 – Asmeninio plano legal / trust etapas
+
+Technologiškai įgyvendinta:
+
+- Centralizuotas viešų rekvizitų šaltinis `client/src/config/legal.js`; `client/.env.example` papildytas `VITE_SERVICE_PROVIDER_NAME`, `VITE_SERVICE_PROVIDER_TYPE`, `VITE_SERVICE_PROVIDER_CODE`, `VITE_SERVICE_PROVIDER_VAT_CODE`, `VITE_SERVICE_PROVIDER_ADDRESS`, `VITE_SERVICE_PROVIDER_EMAIL`, `VITE_SUPPORT_EMAIL`, `VITE_SERVICE_PROVIDER_PHONE`, `VITE_SERVICE_PROVIDER_WEBSITE`, `VITE_LEGAL_EFFECTIVE_DATE`, `VITE_LEGAL_VERSION`.
+- Sukurtas `LEGAL_OWNER_INPUT.md` su savininko užpildytinais viešais rekvizitais, naudojimo vietomis ir production paleidimo blokatoriais.
+- Perrašyti teisiniai / informaciniai puslapiai pagal realų kodą: privatumo politika, naudojimo sąlygos, slapukų ir naršyklės saugyklos politika, prenumeratos sąlygos, prenumeratos atšaukimo tvarka, grąžinimo politika, skaitmeninio turinio sąlygos, kontaktai / paslaugos teikėjas ir duomenų teisių / paskyros ištrynimo informacija.
+- Pridėtas `UserConsent` modelis ir `server/config/legalDocuments.js`; registracijos, prenumeratos ir skaitmeninio turinio sutikimai fiksuoja laiką, dokumentų versiją, sutikimo rūšį, vartotoją ir, kai taikoma, produktą, Stripe session arba purchase ryšį.
+- Registracija frontend turi privalomą nepažymėtą terms/privacy checkbox su saugiai naujame tab'e atsidarančiomis nuorodomis; backend atmeta registraciją be `acceptedTermsAndPrivacy`.
+- Mokamos prenumeratos checkout prieš Stripe rodo planą, 14,99 €/mėn. arba 44,99 €/mėn. kainą, automatinį atnaujinimą, atšaukimą ir prenumeratos sąlygų nuorodą; backend reikalauja `acceptedSubscriptionTerms`.
+- Skaitmeninio produkto checkout prieš Stripe rodo kainą, formatą, savybes ir sąlygų / grąžinimo nuorodas; backend reikalauja atskiro `acceptedDigitalContentImmediateAccess` sutikimo ir nepriima kliento kainos ar Stripe Price ID.
+- Cookie bannerio automatinis rodymas išjungtas, nes aktyviame kode nerasta nebūtinų analytics / marketing skriptų; politika dokumentuoja `localStorage` naudojimą, įskaitant JWT / user auth, krepšelį, kalbą, temą ir UI būsenas.
+- Teisinės nuorodos pasiekiamos Footer, registracijoje, kainodaros prieš-checkout dialoge, skaitmeninio produkto prieš-checkout dialoge, Profile ir kontaktų puslapyje.
+- Paskutinis legal / trust hardening: registracija nebelaikoma sekminga be patvariai rezervuoto `UserConsent`, verification laiskas siunciamas tik po sekmingo vartotojo ir sutikimo issaugojimo, o dublikuoto vartotojo klaidoje rezervuotas sutikimas kompensuojamai salinamas be zaliu klaidu.
+- Prenumeratos ir skaitmeninio produkto Checkout srautai rezervuoja stabilu `UserConsent.consentKey` pries Stripe session kurima; po sekmingo Stripe atsako tas pats irasas gauna session ID, Stripe klaida pazymima `checkout_failed`, o pirkimas/prieiga vis tiek nustatomi tik pagal patikima Stripe webhook.
+- Checkout attempt idempotency hardening: klientas per `crypto.randomUUID()` su saugiu `getRandomValues` fallback sukuria nauja attempt rakta kiekvienam naujam vartotojo patvirtintam prenumeratos arba skaitmeninio produkto Checkout bandymui; dvigubas submit ir retry naudoja ta pati state rakta. Serveris atmeta netinkama arba per ilga `Idempotency-Key` pries Stripe ir hashuoja ji i riboto ilgio `UserConsent.consentKey` kartu su checkout tipu, vartotoju, planu arba produktu ir dokumentu versija. Naujas modal patvirtinimas gauna nauja rakta, nauja `acceptedAt` ir gali kurti nauja Stripe session, todel sena uzdaryta arba pasibaigusi sesija nenaudojama naujam bandymui.
+- Dokumentu versija centralizuota `shared/legalDocuments.cjs`: serveris ja naudoja tiesiogiai, klientas ja importuoja ir privalomai tikrina, kad production `VITE_LEGAL_VERSION` nesiskirtu.
+- `GET /api/auth/export-data` itraukia tik saugia savo vartotojo sutikimu istorija: tipa, dokumentu versija, priemimo laika, plana arba produkto identifikatoriu ir busena. `DELETE /api/auth/account` paprastu `UserConsent` irasu netrina ir ju nenaudoja kaip trynimo blokatoriaus; irasai lieka tik prie anonimizuotos tombstone paskyros kaip audito irodymas, kol savininkas arba teisininkas patvirtins galutini termina.
+- Tikslinė validacija iki STATUS įrašo: `node --test server/tests/legalTrust.test.js server/tests/authValidation.test.js server/tests/stripeCheckoutService.test.js server/tests/clientRoutesP1.test.js server/tests/membershipPricing.test.js` PASS 30/30.
+- Galutinė lokali validacija: `npm.cmd test` PASS 234/234; `npm.cmd run lint` PASS, patikrinti 119 backend JavaScript failų; `npm.cmd run typecheck` PASS, patikrinti 119 backend JavaScript failų, TypeScript projekto nėra; `npm.cmd run build` PASS, Vite 8.2.1 build sugeneravo `client/dist`; `git diff --check` PASS be whitespace klaidų, tik LF/CRLF normalizavimo įspėjimai.
+
+Savininko dar pateiktina:
+
+- Realus paslaugos teikėjo pavadinimas arba vardas, veiklos forma, juridinio asmens arba individualios veiklos numeris, registruotos veiklos adresas, viešas kontaktinis el. paštas, pagalbos el. paštas.
+- PVM kodas, jei taikomas, ir telefonas, jei bus viešinamas.
+
+Teisininko dar peržiūrėtina:
+
+- Privatumo politikos teisiniai pagrindai, duomenų saugojimo terminai, tarptautinių perdavimų formuluotės, vartotojo atsisakymo teisės / skaitmeninio turinio sutikimo tekstai, grąžinimų taisyklės, apskaitos dokumentų saugojimas ir paslaugos teikėjo rekvizitų pateikimas.
+
+Produkcijoje dar sukonfigūruotina:
+
+- Vieši `VITE_*` rekvizitai frontend aplinkoje, serverio `LEGAL_DOCUMENT_VERSION` suderinimas keičiant dokumentus, realūs Vercel / Render / MongoDB Atlas / Stripe / Brevo arba SMTP regionai ir sutartiniai dokumentai. Production deploy, Stripe Live, reali DB, realūs mokėjimai, realūs laiškai, commit, push, merge, reset ir clean šiame etape nevykdyti.
 
 Milestone 2 – Asmeninio plano Stripe prenumeratos savitarnos etapas lokaliai baigtas ir validuotas. Customer Portal, sync be Checkout `sessionId`, saugus subscription DTO, prenumeratos sąskaitų santrauka ir webhook būsenų testai įgyvendinti; pilna vietinė testų/lint/typecheck/build validacija praėjo.
 

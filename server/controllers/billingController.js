@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Payment = require("../models/Payment");
 const Subscription = require("../models/Subscription");
+const { LEGAL_DOCUMENT_VERSION, consentTypes } = require("../config/legalDocuments");
 const { getPlanById, normalizePlanId } = require("../config/subscriptionPlans");
 const {
   syncStripeOrderFromSession,
@@ -26,11 +27,18 @@ const {
   sendSubscriptionPaymentIssueEmail,
   sendSubscriptionPaymentSucceededEmail,
 } = require("../services/transactionalEmailService");
+const {
+  attachStripeSessionToConsent,
+  buildConsentKey,
+  markConsentCheckoutFailed,
+  reserveUserConsent,
+  validateCheckoutAttemptKey,
+} = require("../services/userConsentService");
 const { getStripeClient, resolveClientUrl } = require("../utils/stripeClient");
 const { createHttpError } = require("../utils/httpError");
 
 const createPaymentSession = async (req, res) => {
-  const { planId, provider = "stripe" } = req.body;
+  const { planId, provider = "stripe", acceptedSubscriptionTerms = false } = req.body;
   const requestedPlanId = String(planId || "").trim().toLowerCase();
 
   if (provider !== "stripe") {
@@ -48,6 +56,29 @@ const createPaymentSession = async (req, res) => {
   if (!plan.priceId) {
     res.status(500);
     throw new Error(`Stripe kainos ID nesukonfigūruotas planui: ${plan.id}.`);
+  }
+
+  if (acceptedSubscriptionTerms !== true) {
+    throw createHttpError("Pries mokama prenumeratos checkout reikia patvirtinti prenumeratos salygas.", 400);
+  }
+
+  const checkoutAttemptKey = validateCheckoutAttemptKey(req.headers["idempotency-key"]);
+
+  if (!checkoutAttemptKey) {
+    throw createHttpError("Checkout bandymo raktas neteisingas arba per ilgas.", 400);
+  }
+
+  let consent;
+
+  try {
+    consent = await reserveUserConsent({
+      userId: req.user._id,
+      type: consentTypes.SUBSCRIPTION_CHECKOUT_NOTICE,
+      consentKey: buildConsentKey("subscription", req.user._id, plan.id, LEGAL_DOCUMENT_VERSION, checkoutAttemptKey),
+      subscriptionPlan: plan.id,
+    });
+  } catch (_error) {
+    throw createHttpError("Prenumeratos sutikimo issaugoti nepavyko. Checkout nesukurtas.", 503);
   }
 
   const stripe = getStripeClient();
@@ -77,12 +108,24 @@ const createPaymentSession = async (req, res) => {
     line_items: [{ price: plan.priceId, quantity: 1 }],
   };
 
-  const session = await stripe.checkout.sessions.create(sessionPayload, {
-    idempotencyKey: buildIdempotencyKey(
-      "subscription-checkout",
-      [req.user._id, plan.id, req.headers["idempotency-key"] || Date.now()],
-      req.headers["idempotency-key"]
-    ),
+  let session;
+
+  try {
+    session = await stripe.checkout.sessions.create(sessionPayload, {
+      idempotencyKey: buildIdempotencyKey(
+        "subscription-checkout",
+        [req.user._id, plan.id, consent.consentKey],
+        consent.consentKey
+      ),
+    });
+  } catch (error) {
+    await markConsentCheckoutFailed({ consentId: consent._id }).catch(() => {});
+    throw error;
+  }
+
+  await attachStripeSessionToConsent({
+    consentId: consent._id,
+    stripeSessionId: session.id,
   });
 
   res.status(201).json({

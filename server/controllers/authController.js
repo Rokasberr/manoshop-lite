@@ -1,6 +1,9 @@
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 
 const User = require("../models/User");
+const UserConsent = require("../models/UserConsent");
+const { consentTypes } = require("../config/legalDocuments");
 const { buildUserDataExport, deleteCurrentUserAccount } = require("../services/accountLifecycleService");
 const {
   getEmailVerificationDto,
@@ -9,6 +12,7 @@ const {
 } = require("../services/emailVerificationService");
 const { requestPasswordReset, resetPassword } = require("../services/passwordRecoveryService");
 const { serializeSubscription } = require("../services/stripeMembershipService");
+const { buildConsentKey, reserveUserConsent } = require("../services/userConsentService");
 const { createHttpError } = require("../utils/httpError");
 const { normalizeUserRole } = require("../utils/userRole");
 
@@ -60,9 +64,26 @@ const registerUser = async (req, res) => {
   }
 
   let user;
+  const userId = new mongoose.Types.ObjectId();
+  const registrationConsentKey = buildConsentKey(
+    "registration",
+    userId.toString(),
+    consentTypes.REGISTRATION_TERMS_PRIVACY
+  );
+
+  try {
+    await reserveUserConsent({
+      userId,
+      type: consentTypes.REGISTRATION_TERMS_PRIVACY,
+      consentKey: registrationConsentKey,
+    });
+  } catch (_error) {
+    throw createHttpError("Registracijos sutikimo issaugoti nepavyko. Paskyra nesukurta.", 503);
+  }
 
   try {
     user = await User.create({
+      _id: userId,
       name,
       email,
       password,
@@ -70,6 +91,8 @@ const registerUser = async (req, res) => {
       emailVerificationRequired: true,
     });
   } catch (error) {
+    await UserConsent.deleteOne({ consentKey: registrationConsentKey }).catch(() => {});
+
     if (error?.code === 11000) {
       throw createHttpError(DUPLICATE_EMAIL_MESSAGE, 409);
     }
