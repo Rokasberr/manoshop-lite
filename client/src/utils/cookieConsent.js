@@ -1,6 +1,19 @@
 export const COOKIE_CONSENT_STORAGE_KEY = "stilloak_cookie_consent";
-export const COOKIE_CONSENT_VERSION = "2026-05-20";
-export const HAS_NON_ESSENTIAL_COOKIE_SCRIPTS = false;
+export const COOKIE_CONSENT_VERSION = "2026-08-25";
+
+const readPublicEnv = (key) => {
+  if (typeof import.meta === "undefined" || !import.meta.env) {
+    return "";
+  }
+
+  return String(import.meta.env[key] || "").trim();
+};
+
+export const HAS_ANALYTICS_COOKIE_SCRIPTS = Boolean(readPublicEnv("VITE_GA_MEASUREMENT_ID"));
+export const HAS_MARKETING_COOKIE_SCRIPTS = Boolean(
+  readPublicEnv("VITE_GOOGLE_ADS_CONVERSION_ID") || readPublicEnv("VITE_META_PIXEL_ID")
+);
+export const HAS_NON_ESSENTIAL_COOKIE_SCRIPTS = HAS_ANALYTICS_COOKIE_SCRIPTS || HAS_MARKETING_COOKIE_SCRIPTS;
 
 export const COOKIE_CATEGORIES = ["necessary", "functional", "analytics", "marketing"];
 

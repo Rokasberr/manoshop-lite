@@ -272,7 +272,7 @@ export const infoPages = {
           "sutarties vykdymas: paskyra, prenumerata, skaitmeninis produktas, sąskaitos ir pagalba",
           "teisinė prievolė: finansinių ir apskaitos įrašų saugojimas",
           "teisėtas interesas: saugumas, sukčiavimo prevencija, paslaugos stabilumas ir ginčų sprendimas",
-          "sutikimas: registracijos dokumentų patvirtinimas, skaitmeninio turinio pradėjimas iškart, nebūtini slapukai arba analitika, jei ateityje būtų įjungta",
+          "sutikimas: registracijos dokumentų patvirtinimas, skaitmeninio turinio pradėjimas iškart, nebūtina analitika ir reklamos konversijų matavimas",
         ],
       },
       {
@@ -283,6 +283,7 @@ export const infoPages = {
           "Render - backend talpinimas pagal projekto konfigūraciją",
           "Vercel - frontend talpinimas pagal projekto dokumentaciją",
           "Brevo arba SMTP tiekėjas - transakciniai el. laiškai ir, jei naudojama, launch soon kontaktų sąrašas",
+          "Google Analytics, Google Ads arba Meta Pixel - tik jei sukonfigūruoti vieši matavimo ID ir vartotojas duoda atitinkamą sutikimą",
         ],
       },
       {
@@ -310,9 +311,10 @@ export const infoPages = {
   cookiePolicy: {
     title: "Slapukų ir naršyklės saugyklos politika",
     eyebrow: "Teisinė informacija",
-    summary: "Šiuo metu kodas nerodo aktyvių analitikos ar reklamos skriptų. Naudojama naršyklės saugykla autentifikacijai, krepšeliui, kalbai, temai ir produkto UI būsenoms.",
-    lastUpdated: updated,
-    highlights: ["JWT localStorage nėra slapukas", "Analitikos skriptų kode nerasta", "Prieš ateities analitiką reikės sutikimų valdymo"],
+    summary:
+      "Nebūtina analitika ir reklamos konversijų matavimas įkeliami tik tada, kai sukonfigūruoti vieši matavimo ID ir vartotojas duoda atitinkamą sutikimą. Naudojama naršyklės saugykla autentifikacijai, krepšeliui, kalbai, temai ir produkto UI būsenoms.",
+    lastUpdated: "2026-08-25",
+    highlights: ["JWT localStorage nėra slapukas", "Analitika blokuojama iki sutikimo", "Reklamos konversijos matuojamos tik su marketing sutikimu"],
     sections: [
       {
         heading: "Kas naudojama dabar",
@@ -326,8 +328,9 @@ export const infoPages = {
       {
         heading: "Slapukai ir trečiųjų šalių skriptai",
         paragraphs: [
-          "Aktyviame kode nerasta Google Analytics, Meta Pixel, Hotjar, Plausible ar reklamos embed skriptų. Stripe Checkout veikia nukreipiant į Stripe mokėjimo aplinką, o Vercel / Render infrastruktūra gali turėti techninius logus paslaugos veikimui.",
-          "Kadangi nebūtini slapukai ar analitika šiuo metu faktiškai nepaleidžiami, sutikimų langas neturi būti naudojamas klaidinančiai. Jei ateityje bus prijungta analitika ar reklama, ji turi būti blokuojama iki aiškaus pasirinkimo ir vartotojas turi galėti sutikimą pakeisti.",
+          "Google Analytics gali būti naudojama puslapių peržiūroms tik su analitikos sutikimu ir tik jei sukonfigūruotas viešas VITE_GA_MEASUREMENT_ID. Google Ads ir Meta Pixel konversijos gali būti naudojamos tik su marketing sutikimu ir tik jei sukonfigūruoti vieši matavimo ID.",
+          "Be atitinkamo sutikimo šie trečiųjų šalių skriptai neįkeliami. Jei vartotojas atmeta nebūtinuosius slapukus, produktas turi toliau veikti be analitikos ir reklamos matavimo.",
+          "Stripe Checkout veikia nukreipiant į Stripe mokėjimo aplinką, o Vercel / Render infrastruktūra gali turėti techninius logus paslaugos veikimui.",
         ],
       },
     ],

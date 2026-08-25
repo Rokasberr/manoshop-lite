@@ -112,6 +112,17 @@ Pastaba 2026-08-24: ankstesni Verslo etapo darbai lieka dokumentuoti. Nauji Priv
 - [x] Tiksliniai testai pridėti `server/tests/businessPlanComingSoon.test.js`; padengta flag būsena, shared šaltinis, serverio ankstyvas blokavimas, legacy aliasas, Demo, Asmeninis mock checkout, Pricing CTA, Register/Profile keliai, launch-soon srautas, Business Studio prieigos nepriklausomumas ir mobile-safe CTA statinė regresija.
 - [ ] Business Studio beta ir Verslo pardavimo įjungimas bus atskiras patikrintas etapas; ši šaka ir legal šaka dar nejungiamos į `main`.
 
+## Milestone 8 – Asmeninio plano privatumo saugi analitika ir konversijos
+
+- [x] Slapukų sutikimo šaltinis pervestas į konfigūruojamą režimą: banneris rodomas pirmo apsilankymo metu, kol nėra išsaugoto pasirinkimo, o be viešų nebūtinų matavimo įrankių `VITE_*` ID trečiųjų šalių skriptai neįkeliami.
+- [x] Analytics pagrindas pridėtas klientui per `client/src/utils/analytics.js`: Google Analytics puslapių peržiūros įkeliamos tik su `analytics` sutikimu, Google Ads ir Meta Pixel tik su `marketing` sutikimu.
+- [x] Route pageview matavimas prijungtas `Layout` lygyje, nekeičiant auth, Stripe, serverio webhook ar planų guard logikos.
+- [x] Reklamos konversijų matavimas pridėtas tik patvirtintiems srautams: aktyvuota mokama prenumerata, apmokėtas order checkout ir skaitmeninio produkto Stripe grįžimas.
+- [x] `.env.example` papildytas tik viešais measurement ID placeholderiais: `VITE_GA_MEASUREMENT_ID`, `VITE_GOOGLE_ADS_CONVERSION_ID`, `VITE_GOOGLE_ADS_CONVERSION_LABEL`, `VITE_META_PIXEL_ID`; paslapčių nepridėta.
+- [x] Privatumo ir slapukų politikos tekstai atnaujinti pagal faktinę būseną: matavimo skriptai nepradedami be sutikimo ir konfigūracijos.
+- [x] Tiksliniai testai pridėti `server/tests/analyticsConsent.test.js`, o legal/responsive statinės regresijos atnaujintos naujam `Layout` ir cookie consent elgesiui.
+- [x] Praeina validacija: tiksliniai analytics/legal testai, `npm.cmd test` 264/264, `npm.cmd run lint`, `npm.cmd run typecheck`, `npm.cmd run build`, `git diff --check`.
+
 ## Stop-and-fix taisyklė
 
 ## Likę tolesni etapai

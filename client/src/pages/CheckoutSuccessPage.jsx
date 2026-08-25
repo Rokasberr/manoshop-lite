@@ -1,5 +1,5 @@
 import { CheckCircle2, Clock3, Download } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useSearchParams } from "react-router-dom";
 
@@ -7,8 +7,10 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import SectionTitle from "../components/SectionTitle";
 import Seo from "../components/Seo";
 import { useCart } from "../context/CartContext";
+import { useCookieConsent } from "../context/CookieConsentContext";
 import { useLanguage } from "../context/LanguageContext";
 import orderService from "../services/orderService";
+import { applyTrackingConsent, trackAdConversion } from "../utils/analytics";
 import { formatCurrency } from "../utils/currency";
 
 const CheckoutSuccessPage = () => {
@@ -23,6 +25,8 @@ const CheckoutSuccessPage = () => {
   const [checkoutStatus, setCheckoutStatus] = useState("");
   const [paymentStatus, setPaymentStatus] = useState("");
   const [downloadingInvoice, setDownloadingInvoice] = useState(false);
+  const { categories } = useCookieConsent();
+  const trackedOrderConversion = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -83,6 +87,21 @@ const CheckoutSuccessPage = () => {
   };
 
   const isPaid = paymentStatus === "paid";
+
+  useEffect(() => {
+    if (!isPaid || !order?._id || !categories.marketing || trackedOrderConversion.current) {
+      return;
+    }
+
+    applyTrackingConsent(categories);
+    trackAdConversion({
+      eventName: "store_order",
+      value: Number(order.totalPrice || 0),
+      currency: "EUR",
+      transactionId: order._id,
+    });
+    trackedOrderConversion.current = true;
+  }, [categories, isPaid, order]);
 
   return (
     <div className="space-y-8">

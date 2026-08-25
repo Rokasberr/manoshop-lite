@@ -327,11 +327,15 @@ test("UserConsent reservation uses stable dedupe key and remains safe for retry 
 test("cookie and browser storage policy matches actual scripts", () => {
   const cookieUtil = read("client", "src", "utils", "cookieConsent.js");
   const cookieBanner = read("client", "src", "components", "CookieConsentBanner.jsx");
-  const clientSource = read("client", "src", "main.jsx") + read("client", "src", "App.jsx");
+  const analytics = read("client", "src", "utils", "analytics.js");
+  const layout = read("client", "src", "components", "Layout.jsx");
 
-  assert.match(cookieUtil, /HAS_NON_ESSENTIAL_COOKIE_SCRIPTS = false/);
-  assert.match(cookieBanner, /HAS_NON_ESSENTIAL_COOKIE_SCRIPTS && !hasSavedConsent/);
-  assert.doesNotMatch(clientSource, /gtag|GoogleAnalytics|MetaPixel|fbq|hotjar|plausible/i);
+  assert.match(cookieUtil, /HAS_NON_ESSENTIAL_COOKIE_SCRIPTS = HAS_ANALYTICS_COOKIE_SCRIPTS \|\| HAS_MARKETING_COOKIE_SCRIPTS/);
+  assert.doesNotMatch(cookieBanner, /HAS_NON_ESSENTIAL_COOKIE_SCRIPTS && !hasSavedConsent/);
+  assert.match(cookieBanner, /\{!hasSavedConsent && !isPreferencesOpen \? \(/);
+  assert.match(analytics, /applyTrackingConsent/);
+  assert.match(layout, /if \(!categories\.analytics\)/);
+  assert.doesNotMatch(read("client", "src", "main.jsx") + read("client", "src", "App.jsx"), /gtag|fbq|hotjar|plausible/i);
   assert.match(read("client", "src", "content", "infoPages.js"), /JWT localStorage/);
 });
 

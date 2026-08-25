@@ -1,17 +1,35 @@
+import { useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import CookieConsentBanner from "./CookieConsentBanner";
+import { useCookieConsent } from "../context/CookieConsentContext";
+import { applyTrackingConsent, trackPageView } from "../utils/analytics";
 
 const Layout = () => {
-  const { pathname } = useLocation();
+  const location = useLocation();
+  const { pathname } = location;
+  const { categories } = useCookieConsent();
   const isSavingsStudioWorkspace = pathname === "/members/savings-studio";
   const isBusinessWorkspace = pathname === "/business" || pathname.startsWith("/business/");
   const isWideWorkspace = isSavingsStudioWorkspace || isBusinessWorkspace;
   const mainContainerClassName = isWideWorkspace
     ? "mx-auto w-full max-w-[1800px] px-4 pb-16 pt-6 sm:px-6 lg:px-8 2xl:px-10"
     : "mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8";
+
+  useEffect(() => {
+    applyTrackingConsent(categories);
+  }, [categories]);
+
+  useEffect(() => {
+    if (!categories.analytics) {
+      return;
+    }
+
+    applyTrackingConsent(categories);
+    trackPageView(`${location.pathname}${location.search}`);
+  }, [categories, location.pathname, location.search]);
 
   return (
     <div className="app-surface relative min-h-screen overflow-x-hidden">

@@ -1,5 +1,5 @@
 import { ArrowRight, CheckCircle2, FileSpreadsheet, ShieldCheck, Sparkles, UserPlus, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
@@ -8,15 +8,18 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import Seo from "../components/Seo";
 import { getLocalizedDigitalProducts } from "../constants/digitalProducts";
 import { useAuth } from "../context/AuthContext";
+import { useCookieConsent } from "../context/CookieConsentContext";
 import { useLanguage } from "../context/LanguageContext";
 import adminDigitalProductService from "../services/adminDigitalProductService";
 import digitalProductService from "../services/digitalProductService";
+import { applyTrackingConsent, trackAdConversion } from "../utils/analytics";
 import { createCheckoutAttemptKey } from "../utils/checkoutAttempt";
 
 const DigitalProductsPage = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user, isCheckingAuth } = useAuth();
+  const { categories } = useCookieConsent();
   const { language, t } = useLanguage();
   const copy = t("digitalProductsPage");
   const localizedProducts = useMemo(() => getLocalizedDigitalProducts(language), [language]);
@@ -31,6 +34,7 @@ const DigitalProductsPage = () => {
   const [adminPreview, setAdminPreview] = useState(null);
   const [adminPreviewLoadingId, setAdminPreviewLoadingId] = useState("");
   const [adminDownloadLoadingKey, setAdminDownloadLoadingKey] = useState("");
+  const trackedDigitalPurchaseConversion = useRef("");
 
   useEffect(() => {
     let isMounted = true;
@@ -68,8 +72,22 @@ const DigitalProductsPage = () => {
 
   useEffect(() => {
     const purchaseState = searchParams.get("purchase");
+    const purchasedProductId = searchParams.get("product") || "";
 
     if (purchaseState === "success") {
+      const purchasedProduct = publicProducts.find((product) => product.id === purchasedProductId);
+
+      if (categories.marketing && trackedDigitalPurchaseConversion.current !== purchasedProductId) {
+        applyTrackingConsent(categories);
+        trackAdConversion({
+          eventName: `digital_product_${purchasedProductId || "unknown"}`,
+          value: Number(purchasedProduct?.priceCents || 0) / 100,
+          currency: "EUR",
+          transactionId: `digital:${purchasedProductId || "unknown"}`,
+        });
+        trackedDigitalPurchaseConversion.current = purchasedProductId;
+      }
+
       toast.success(copy.purchaseSuccess);
       setSearchParams({}, { replace: true });
     }
@@ -78,7 +96,7 @@ const DigitalProductsPage = () => {
       toast(copy.purchaseCancel);
       setSearchParams({}, { replace: true });
     }
-  }, [searchParams, setSearchParams]);
+  }, [categories, copy.purchaseCancel, copy.purchaseSuccess, publicProducts, searchParams, setSearchParams]);
 
   useEffect(
     () => () => {

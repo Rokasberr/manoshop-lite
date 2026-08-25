@@ -511,6 +511,8 @@ export const translations = {
       close: "Uždaryti",
       alwaysOn: "Visada įjungta",
       optional: "Pasirenkama",
+      enabled: "įjungta",
+      disabled: "išjungta",
       policyLink: "Skaityti slapukų politiką",
       firstChoiceNote: "Pasirinkimą galėsite pakeisti bet kada puslapio apačioje.",
       categories: {
@@ -1165,6 +1167,8 @@ translations.en = mergeLocale(translations.lt, {
     close: "Close",
     alwaysOn: "Always on",
     optional: "Optional",
+    enabled: "enabled",
+    disabled: "disabled",
     policyLink: "Read cookie policy",
     firstChoiceNote: "You can change your choice anytime from the footer.",
     categories: {
@@ -1719,6 +1723,8 @@ translations.pl = mergeLocale(translations.en, {
     close: "Zamknij",
     alwaysOn: "Zawsze włączone",
     optional: "Opcjonalne",
+    enabled: "włączone",
+    disabled: "wyłączone",
     policyLink: "Przeczytaj politykę cookies",
     firstChoiceNote: "Możesz zmienić wybór w dowolnym momencie w stopce.",
     categories: {
@@ -2017,6 +2023,8 @@ translations.de = mergeLocale(translations.en, {
     close: "Schließen",
     alwaysOn: "Immer aktiv",
     optional: "Optional",
+    enabled: "aktiviert",
+    disabled: "deaktiviert",
     policyLink: "Cookie-Richtlinie lesen",
     firstChoiceNote: "Sie können Ihre Auswahl jederzeit über die Fußzeile ändern.",
     categories: {
@@ -2343,6 +2351,8 @@ translations.fr = mergeLocale(translations.en, {
     close: "Fermer",
     alwaysOn: "Toujours activé",
     optional: "Optionnel",
+    enabled: "activé",
+    disabled: "désactivé",
     policyLink: "Lire la politique cookies",
     firstChoiceNote: "Vous pouvez modifier votre choix à tout moment depuis le pied de page.",
     categories: {
@@ -2632,6 +2642,8 @@ translations.es = mergeLocale(translations.en, {
     close: "Cerrar",
     alwaysOn: "Siempre activas",
     optional: "Opcional",
+    enabled: "activadas",
+    disabled: "desactivadas",
     policyLink: "Leer política de cookies",
     firstChoiceNote: "Puedes cambiar tu elección en cualquier momento desde el pie de página.",
     categories: {

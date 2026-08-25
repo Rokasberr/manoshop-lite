@@ -1,16 +1,20 @@
 import { CheckCircle2, Clock3 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import LoadingSpinner from "../components/LoadingSpinner";
 import SectionTitle from "../components/SectionTitle";
 import { useAuth } from "../context/AuthContext";
+import { useCookieConsent } from "../context/CookieConsentContext";
 import { useLanguage } from "../context/LanguageContext";
 import billingService from "../services/billingService";
+import { subscriptionPlans } from "../constants/subscriptionPlans";
+import { applyTrackingConsent, trackAdConversion } from "../utils/analytics";
 import { hasActiveMembership } from "../utils/membership";
 
 const BillingSuccessPage = () => {
   const { refreshProfile, user } = useAuth();
+  const { categories } = useCookieConsent();
   const { t } = useLanguage();
   const copy = t("billing");
   const navigate = useNavigate();
@@ -19,8 +23,28 @@ const BillingSuccessPage = () => {
   const [statusMessage, setStatusMessage] = useState(copy.checking);
   const [confirmedProfile, setConfirmedProfile] = useState(null);
   const sessionId = searchParams.get("session_id") || "";
+  const trackedSubscriptionConversion = useRef(false);
 
   const isStripeActive = hasActiveMembership(confirmedProfile || user);
+
+  useEffect(() => {
+    if (!isStripeActive || !categories.marketing || trackedSubscriptionConversion.current) {
+      return;
+    }
+
+    const profile = confirmedProfile || user;
+    const planId = profile?.subscription?.plan || "personal";
+    const plan = subscriptionPlans.find((candidate) => candidate.id === planId) || subscriptionPlans.find((candidate) => candidate.id === "personal");
+
+    applyTrackingConsent(categories);
+    trackAdConversion({
+      eventName: `subscription_${plan?.id || "personal"}`,
+      value: Number(plan?.price || 0),
+      currency: "EUR",
+      transactionId: sessionId,
+    });
+    trackedSubscriptionConversion.current = true;
+  }, [categories, confirmedProfile, isStripeActive, sessionId, user]);
 
   useEffect(() => {
     let cancelled = false;

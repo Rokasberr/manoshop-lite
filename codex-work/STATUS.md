@@ -1,10 +1,43 @@
 ﻿# Stilloak Studio autonomous status
 
-PROJECT_STATE: BUSINESS_PLAN_COMING_SOON_LOCAL_VALIDATED
+PROJECT_STATE: PERSONAL_ANALYTICS_CONSENT_LOCAL_VALIDATED
 
 ## Dabartinis milestone
 
-Milestone 7 – Verslo plano „Netrukus“ režimas įgyvendinamas šakoje `fix/business-plan-coming-soon-20260824`. Tikslas: Demo ir Asmeninis gali būti paleisti, o Verslo planas lieka matomas su 44,99 €/mėn. kaina, bet pardavimas ir Stripe Checkout išjungti iki atskiro Business Studio beta / pardavimo įjungimo etapo. Esamos aktyvios Verslas, beta ir administratoriaus prieigos neatšaukiamos.
+Milestone 8 – Asmeninio plano privatumo saugus slapukų sutikimas, analitikos pagrindas ir reklamos konversijų matavimas lokaliai įgyvendintas šakoje `feat/personal-analytics-consent-20260825`. Tikslas: Demo ir Asmeninis gali būti paleisti su konfigūruojamu matavimu, kuris pagal nutylėjimą neįkelia trečiųjų šalių skriptų, o Google Analytics / Google Ads / Meta Pixel paleidžia tik po aiškaus vartotojo sutikimo ir tik su viešais `VITE_*` measurement ID.
+
+## 2026-08-25 – Asmeninio plano analytics / consent etapas
+
+Atlikta šiame etape:
+
+- Prieš pakeitimus patikrinta: `git branch --show-current` grąžino `feat/personal-analytics-consent-20260825`, `git status --short` rodė ankstesnius analytics / consent etapo darbinio medžio pakeitimus, `git log -5 --oneline` rodė `3208ead feat(business): add coming soon sales gate` viršuje.
+- Perskaityti `AGENTS.md`, `codex-work/SPEC.md`, `codex-work/PLAN.md`, `codex-work/IMPLEMENT.md`, `codex-work/STATUS.md`.
+- Inventorizuoti slapukų ir matavimo paviršiai: `CookieConsentContext`, `CookieConsentBanner`, `cookieConsent.js`, `Layout`, `BillingSuccessPage`, `CheckoutSuccessPage`, `DigitalProductsPage`, `PricingPage`, `infoPages.js`, `legalTrust.test.js` ir susiję checkout servisai.
+- `cookieConsent.js` pervestas iš hardcoded `HAS_NON_ESSENTIAL_COOKIE_SCRIPTS = false` į viešų env ID pagrindu skaičiuojamas `HAS_ANALYTICS_COOKIE_SCRIPTS`, `HAS_MARKETING_COOKIE_SCRIPTS` ir `HAS_NON_ESSENTIAL_COOKIE_SCRIPTS`. Be `VITE_GA_MEASUREMENT_ID`, `VITE_GOOGLE_ADS_CONVERSION_ID` arba `VITE_META_PIXEL_ID` jokie nebūtini trečiųjų šalių skriptai neįkeliami.
+- Pagal naują produkcinį reikalavimą slapukų banneris rodomas pirmo apsilankymo metu, kol nėra išsaugoto pasirinkimo; vieši tracking ID toliau valdo tik tai, ar neesminiai Google / Meta skriptai apskritai gali būti įkelti po sutikimo.
+- Bannerio ir pasirinkimų modal dialogo pagrindiniai veiksmai sulyginti vizualiai ir pagal pasiekiamumą: `Atmesti nebūtinuosius`, `Tvarkyti / išsaugoti pasirinkimus` ir `Priimti visus` rodomi tame pačiame trijų stulpelių bloke be stipresnio `button-primary` akcento ant priėmimo.
+- Slapukų banneris sutvirtintas 390×844 telefono viewportui: konteineris turi `w-full`, `overflow-hidden`, `min-w-0`, tekstai leidžia `break-words`, o veiksmo mygtukai naudoja `whitespace-normal`, `max-w-full` ir vieno stulpelio išdėstymą iki `sm`, kad nesukurtų horizontalaus overflow.
+- Slapukų pasirinkimų modalas sutvirtintas klaviatūros ir pagalbinių technologijų naudojimui: `role="dialog"`, `aria-modal`, `aria-labelledby`, `aria-describedby`, pradinis focus ant uždarymo mygtuko, `Escape` uždarymas, `Tab` / `Shift+Tab` focus trap ir focus grąžinimas ankstesniam elementui; kategorijų jungikliai turi lokalizuotą `aria-label` ir `aria-pressed`.
+- Slapukų pasirinkimas saugomas versijuotai per `COOKIE_CONSENT_VERSION`; įrašas turi timestamp ir kategorijas, o senos arba neatpažintos versijos ignoruojamos, kad vartotojas galėtų pasirinkti iš naujo po politikos pokyčių.
+- Vartotojas gali vėliau atšaukti arba pakeisti sutikimą per Footer `Slapukų nustatymai`: modalas užkrauna esamas kategorijas, leidžia išjungti `functional`, `analytics` ir `marketing`, o išsaugojus naujas pasirinkimas pritaikomas adapterio guardams bei Google consent update būsenai.
+- Pridėtas `client/src/utils/analytics.js`: Google Analytics įkeliamas tik su `analytics` sutikimu, Google Ads ir Meta Pixel tik su `marketing` sutikimu; adapteris nenaudoja `document.cookie`, `localStorage.setItem` ar `sessionStorage.setItem` savo matavimo būsenai.
+- Sutvirtintas adapterio lygio slapukų sutikimo valdymas: `trackPageView` ir `trackAdConversion` turi vidinį `currentTrackingConsent` guardą, o pakeitus pasirinkimus esamam `gtag` siunčiamas consent update su `analytics_storage`, `ad_storage`, `ad_user_data` ir `ad_personalization` būsenomis.
+- Google tag paruoštas Consent Mode saugiam startui: prieš pirmą `gtag` konfigūravimą siunčiama `consent default` būsena su `analytics_storage`, `ad_storage`, `ad_user_data` ir `ad_personalization` kaip `denied`, o tik po vartotojo pasirinkimo siunčiamas `consent update`.
+- `Layout` prijungia sutikimo būseną prie adapterio ir siunčia pageview tik kai `categories.analytics === true`; route path ir query įtraukiami per `location.pathname + location.search`.
+- Reklamos konversijos prijungtos tik prie patvirtintų būsenų: `BillingSuccessPage` siunčia subscription conversion po aktyvios mokamos narystės, `CheckoutSuccessPage` siunčia store/order conversion tik kai `paymentStatus === "paid"`, o `DigitalProductsPage` siunčia digital product conversion po Stripe success grįžimo su produkto verte pagal `priceCents`.
+- `client/.env.example` papildytas tik viešais measurement placeholderiais: `VITE_GA_MEASUREMENT_ID`, `VITE_GOOGLE_ADS_CONVERSION_ID`, `VITE_GOOGLE_ADS_CONVERSION_LABEL`, `VITE_META_PIXEL_ID`; paslapčių, Stripe Live ar realių paskyrų reikšmių nepridėta.
+- Slapukų ir privatumo politikos tekstai atnaujinti: dokumentuota, kad Google Analytics / Google Ads / Meta Pixel naudojami tik su konfigūracija ir sutikimu, o produktas turi veikti atmetus nebūtinuosius slapukus.
+- Pridėtas `server/tests/analyticsConsent.test.js`, atnaujinti `server/tests/legalTrust.test.js` ir `server/tests/savingsStudioPersonalUi.test.js`.
+- Validacija: tiksliniai `node --test server/tests/analyticsConsent.test.js server/tests/legalTrust.test.js` PASS 20/20; `npm.cmd test` PASS 264/264; `npm.cmd run lint` PASS, patikrinti 124 backend JavaScript failai; `npm.cmd run typecheck` PASS, patikrinti 124 backend JavaScript failai, TypeScript projekto nėra; `npm.cmd run build` PASS, Vite 8.2.1 build sugeneravo `client/dist`; `git diff --check` PASS be whitespace klaidų, tik CRLF normalizavimo įspėjimai.
+- Po papildomo slapukų sutikimo guardo sutvirtinimo pakartota validacija: `node --test server/tests/analyticsConsent.test.js server/tests/legalTrust.test.js` PASS 20/20; `npm.cmd test` PASS 264/264; `npm.cmd run lint` PASS; `npm.cmd run typecheck` PASS; `npm.cmd run build` PASS; `git diff --check` PASS be whitespace klaidų, tik CRLF normalizavimo įspėjimai.
+- Po Consent Mode default-denied pakeitimo pakartota validacija: `node --test server/tests/analyticsConsent.test.js server/tests/legalTrust.test.js` PASS 20/20; `npm.cmd test` PASS 264/264; `npm.cmd run lint` PASS; `npm.cmd run typecheck` PASS; `npm.cmd run build` PASS; `git diff --check` PASS be whitespace klaidų, tik CRLF normalizavimo įspėjimai.
+- Po 390×844 mobile overflow sutvirtinimo pakartota validacija: `node --test server/tests/analyticsConsent.test.js server/tests/legalTrust.test.js` PASS 20/20; `npm.cmd test` PASS 264/264; `npm.cmd run lint` PASS; `npm.cmd run typecheck` PASS; `npm.cmd run build` PASS; `git diff --check` PASS be whitespace klaidų, tik CRLF normalizavimo įspėjimai.
+
+Paleidimo būsena:
+
+- Pagal nutylėjimą matavimo sluoksnis lieka išjungtas, kol production aplinkoje nėra sukonfigūruoti vieši measurement ID.
+- Production reikės rankiniu būdu patvirtinti galutinius Google Analytics, Google Ads ir Meta Pixel nustatymus, sutikimo tekstus, reklamos paskyrų nuosavybę ir teisinių tekstų peržiūrą.
+- Production deploy, Stripe Live, produkcinė DB, realūs reklamos veiksmai, `.env` reikšmės, commit, push, merge, reset ir clean nevykdyti.
 
 ## 2026-08-24 – Verslo plano „Netrukus“ režimas
 

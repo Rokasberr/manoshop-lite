@@ -92,7 +92,8 @@ test("Layout uses a wide route-aware container for Savings Studio and Business w
   const source = readLayoutSource();
 
   assert.match(source, /import \{ Outlet, useLocation \} from "react-router-dom"/);
-  assert.match(source, /const \{ pathname \} = useLocation\(\)/);
+  assert.match(source, /const location = useLocation\(\)/);
+  assert.match(source, /const \{ pathname \} = location/);
   assert.match(source, /pathname === "\/members\/savings-studio"/);
   assert.match(source, /pathname === "\/business" \|\| pathname\.startsWith\("\/business\/"\)/);
   assert.match(source, /isWideWorkspace[\s\S]*"mx-auto w-full max-w-\[1800px\] px-4 pb-16 pt-6 sm:px-6 lg:px-8 2xl:px-10"/);
