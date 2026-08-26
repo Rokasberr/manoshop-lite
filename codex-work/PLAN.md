@@ -81,6 +81,18 @@ Pastaba 2026-08-24: ankstesni Verslo etapo darbai lieka dokumentuoti. Nauji Priv
 - [x] Visos likusios problemos suklasifikuotos pagal svarbą: React Router moderate major migracija, naršyklinio screenshot aplinkos ribojimas ir authenticated browser smoke be realių credentials palikti kaip nekritinės / owner sprendimo rizikos.
 - [x] STATUS.md nustatytas tikslus galutinis statusas.
 
+## Milestone 6 – Stilloak Web paslaugų svetainė
+
+- [x] Nauja paslaugų svetainė kuriama atskirai nuo esamų `client`, `server`, `shared` ir `database` sistemų.
+- [x] Šaka `feat/stilloak-web-services-20260826` sukurta nuo vietinio `origin/main`; `origin/master` nenaudotas, nes šiame repo faktinė bazė yra `origin/main`.
+- [x] Sukurta savarankiška `web-services` aplikacija su React, Vite, TypeScript, atskiru `package.json`, `.env.example`, SEO failais, README ir Vercel Root Directory paruošimu.
+- [x] Esamas Stilloak logotipas nukopijuotas į `web-services`, be runtime importų iš `client`.
+- [x] Kainos laikomos viename lengvai redaguojamame TypeScript faile `web-services/src/data/pricing.ts`.
+- [x] Kontaktų forma turi validaciją, honeypot apsaugą, privatumo sutikimą, `VITE_WEB_LEAD_ENDPOINT` ir `VITE_WEB_CONTACT_EMAIL`; be endpointo nerodomas netikras sėkmingas išsiuntimas.
+- [x] Svetainėje yra navigacija, hero, CTA, paslaugos, portfolio su vidiniu Stilloak Studio pavyzdžiu, procesas, kainos, DUK, kontaktų forma ir footer.
+- [x] Pridėta lietuviška SEO informacija, canonical, Open Graph, `robots.txt`, `sitemap.xml`, semantinis HTML, focus būsenos, responsive CSS ir `prefers-reduced-motion`.
+- [x] Stilloak Web lokali validacija ir pagrindinės sistemos regresijos patikra praėjo: `web-services` lint/typecheck/build, root lint/typecheck/test/build, HTTP smoke ir `git diff --check`.
+
 ## Stop-and-fix taisyklė
 
 ## Likę tolesni etapai
