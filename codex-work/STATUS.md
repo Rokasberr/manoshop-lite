@@ -1,8 +1,38 @@
 ﻿# Stilloak Studio autonomous status
 
-PROJECT_STATE: PERSONAL_STRIPE_SELF_SERVICE_LOCAL_VALIDATED
+PROJECT_STATE: STILLOAK_WEB_SERVICES_LOCAL_VALIDATED
 
 ## Dabartinis milestone
+
+Milestone 6 – Stilloak Web paslaugų svetainė. Tikslas: atskirame `web-services` kataloge paruošti savarankišką React + Vite + TypeScript svetainę, kuri vėliau bus diegiama kaip atskiras Vercel projektas su Root Directory `web-services`.
+
+## 2026-08-26 – Stilloak Web paslaugų svetainė
+
+Darbas pradėtas pagal naują tikslą sukurti atskirą `web-services` aplikaciją būsimam domenui `https://web.stilloak-studio.com`.
+
+Iki šio įrašo:
+
+- Perskaityti `AGENTS.md`, `codex-work/SPEC.md`, `codex-work/PLAN.md`, `codex-work/IMPLEMENT.md` ir `codex-work/STATUS.md`.
+- Git būsena prieš darbą buvo švari; pradinė šaka buvo `feat/personal-analytics-consent-20260825`.
+- Vartotojo nurodymu `origin/master` daugiau nebenaudotas; faktinė vietinė bazė yra `origin/main`.
+- Sukurta šaka `feat/stilloak-web-services-20260826` nuo vietinio `origin/main`; worktree nenaudotas.
+- `web-services` sukurta kaip visiškai atskira React + Vite + TypeScript aplikacija su savarankišku `package.json`, Vite, TypeScript ir ESLint konfigūracija.
+- Esamas `client/public/favicon.svg` Stilloak logotipas nukopijuotas į `web-services/public/stilloak-logo.svg` ir `web-services/src/assets/stilloak-logo.svg`; runtime importų iš `client` nėra.
+- Sukurta lietuviška paslaugų svetainė su navigacija, hero žinute „Kuriame svetaines, kurios padeda verslui augti.“, CTA „Gauti nemokamą konsultaciją“, paslaugomis, portfolio, procesu, kainomis, DUK, kontaktų forma ir footer.
+- Portfolio skiltyje naudojamas tik vidinis `Stilloak Studio` projekto pavyzdys; netikrų klientų, atsiliepimų, rezultatų ar statistikos nepridėta.
+- Kainodara laikoma `web-services/src/data/pricing.ts`: Landing page nuo 399 €, Verslo svetainė nuo 799 €, Elektroninė parduotuvė nuo 1 499 €, Individuali sistema individualus pasiūlymas, Priežiūra nuo 49 €/mėn.
+- Kontaktų forma turi vardą, el. paštą, neprivalomą įmonę, paslaugą, biudžeto intervalą, projekto aprašymą, privatumo sutikimą, validaciją ir honeypot lauką.
+- Forma naudoja `VITE_WEB_LEAD_ENDPOINT` ir `VITE_WEB_CONTACT_EMAIL`; kai endpointas nenustatytas, nerodomas netikras sėkmingas išsiuntimas ir pasiūlomas el. pašto kontaktas.
+- Pridėta lietuviška `title`, meta description, canonical, Open Graph, `robots.txt`, `sitemap.xml`, semantinis HTML, aiškios focus būsenos, responsive CSS ir `prefers-reduced-motion`.
+- Pridėtas `web-services/README.md` su lokaliomis paleidimo komandomis ir Vercel instrukcijomis, kur Root Directory yra `web-services`.
+- Priklausomybės įdiegtos tik per `npm.cmd install --prefix web-services`; naujo paketo auditas parodė 0 vulnerabilities.
+- Pirminės `web-services` patikros praėjo: `npm.cmd run lint`, `npm.cmd run typecheck`, `npm.cmd run build`.
+- Galutinės `web-services` patikros praėjo po build konfigūracijos sutvarkymo: `npm.cmd run lint`, `npm.cmd run typecheck`, `npm.cmd run build`.
+- Pagrindinės sistemos regresijos patikros praėjo: root `npm.cmd run lint`, `npm.cmd run typecheck`, `npm.cmd test` (224/224), `npm.cmd run build`.
+- `git diff --check` praėjo be whitespace klaidų; rodomi tik CRLF normalizavimo įspėjimai `codex-work` failams.
+- Vietinis Vite dev serveris paleistas su eskalacija dėl sandbox `vite.config.ts` prieigos ribojimo: `http://127.0.0.1:5176/`.
+- HTTP smoke praėjo: `/`, `/robots.txt` ir `/sitemap.xml` grąžino 200.
+- Esamos `client`, `server`, `shared` ir `database` sistemos šiame etape nekeičiamos.
 
 Milestone 2 – Asmeninio plano Stripe prenumeratos savitarnos etapas lokaliai baigtas ir validuotas. Customer Portal, sync be Checkout `sessionId`, saugus subscription DTO, prenumeratos sąskaitų santrauka ir webhook būsenų testai įgyvendinti; pilna vietinė testų/lint/typecheck/build validacija praėjo.
 
