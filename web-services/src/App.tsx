@@ -108,11 +108,28 @@ function App() {
   const updateForm = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((current) => ({ ...current, [key]: value }));
     setErrors((current) => ({ ...current, [key]: undefined }));
+
+    if (status !== "sent") {
+      setStatus("idle");
+      setRequestNumber("");
+    }
+  };
+
+  const startNewOrder = () => {
+    setForm(initialFormState);
+    setErrors({});
     setStatus("idle");
     setRequestNumber("");
+    window.setTimeout(() => {
+      document.getElementById("kontaktai")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 0);
   };
 
   const choosePlan = (packageId: FormState["packageId"]) => {
+    if (status === "sent") {
+      setStatus("idle");
+      setRequestNumber("");
+    }
     updateForm("packageId", packageId);
     window.setTimeout(() => {
       document.getElementById("kontaktai")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -160,7 +177,6 @@ function App() {
       }
 
       setRequestNumber(data.requestNumber || "");
-      setForm(initialFormState);
       setStatus("sent");
     } catch {
       setStatus("error");
@@ -526,7 +542,10 @@ function App() {
             ) : null}
             {status === "sent" ? (
               <div className="form-notice success" role="status">
-                Užsakymas gautas{requestNumber ? ` — jūsų užklausos numeris ${requestNumber}.` : "."}
+                <span>Užsakymas gautas{requestNumber ? ` — jūsų užklausos numeris ${requestNumber}.` : "."}</span>
+                <button className="button button-secondary" type="button" onClick={startNewOrder}>
+                  Pateikti naują užsakymą
+                </button>
               </div>
             ) : null}
             {status === "error" ? (
@@ -536,9 +555,13 @@ function App() {
               </div>
             ) : null}
 
-            <button className="button button-primary form-submit" type="submit" disabled={status === "sending"}>
+            <button
+              className="button button-primary form-submit"
+              type="submit"
+              disabled={status === "sending" || status === "sent"}
+            >
               <Send size={18} aria-hidden="true" />
-              {status === "sending" ? "Siunčiama..." : "Pateikti užsakymą"}
+              {status === "sending" ? "Siunčiama..." : status === "sent" ? "Užsakymas pateiktas" : "Pateikti užsakymą"}
             </button>
             <p className="privacy-note">
               <ShieldCheck size={16} aria-hidden="true" /> Forma siunčia tik jūsų pateiktus projekto ir kontaktinius
