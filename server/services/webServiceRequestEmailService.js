@@ -223,12 +223,36 @@ const sendTransactional = async ({ to, replyTo, email, tags }) => {
 const sendAdminNotification = async ({ to, replyTo, email, tags }) => {
   if (isFullEmailTransportConfigured()) {
     const { user, from } = getTransportConfig();
-    return sendThroughSmtp({
-      to,
-      replyTo,
-      email,
-      fromOverride: user || from,
-    });
+
+    try {
+      return await sendThroughSmtp({
+        to,
+        replyTo,
+        email,
+        fromOverride: user || from,
+      });
+    } catch (smtpError) {
+      if (isBrevoEmailConfigured()) {
+        const result = await sendBrevoTransactionalEmail({
+          to,
+          replyTo,
+          subject: email.subject,
+          text: email.text,
+          html: email.html,
+          tags: [...tags, "smtp-fallback"],
+        });
+
+        return {
+          sent: true,
+          provider: "brevo-api-fallback",
+          messageId: result?.messageId || null,
+          smtpFallback: true,
+          smtpErrorCode: smtpError?.statusCode || null,
+        };
+      }
+
+      throw smtpError;
+    }
   }
 
   return sendTransactional({ to, replyTo, email, tags });
