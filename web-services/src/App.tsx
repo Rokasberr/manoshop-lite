@@ -1,9 +1,10 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   Check,
   Clock3,
   Code2,
+  Globe2,
   Headphones,
   Mail,
   Menu,
@@ -98,20 +99,78 @@ const conceptProjects = [
   {
     className: "concept-architecture",
     kicker: "ARCHITEKTŪRA",
+    brand: "NORTH / FORM",
+    domain: "northform.lt",
     title: "Architektūros studija",
-    meta: "Koncepcinis pavyzdys · Dizainas, Svetainė"
+    headline: "Erdvės, kurios tarnauja žmogui.",
+    description: "Moderni architektūros studijos svetainė su stipria darbų prezentacija ir aiškiu kontaktiniu keliu.",
+    cta: "Peržiūrėti projektus",
+    meta: "Koncepcinis pavyzdys · Dizainas, Svetainė",
+    features: [
+      ["Projektai", "Atrinkti darbai"],
+      ["Studija", "Požiūris ir komanda"],
+      ["Kontaktas", "Aiškus CTA"]
+    ]
   },
   {
     className: "concept-industry",
     kicker: "INDUSTRIJA",
+    brand: "FERRO / LT",
+    domain: "ferro-industries.lt",
     title: "Pramonės įmonė",
-    meta: "Koncepcinis pavyzdys · Dizainas, Svetainė"
+    headline: "Tikslumas, kuriuo galima pasitikėti.",
+    description: "Techninis, solidus įvaizdis su paslaugų struktūra, sertifikatų erdve ir užklausos keliu B2B klientui.",
+    cta: "Gauti pasiūlymą",
+    meta: "Koncepcinis pavyzdys · Dizainas, Svetainė",
+    features: [
+      ["Gamyba", "Aiškios kompetencijos"],
+      ["Kokybė", "Sertifikatai"],
+      ["B2B", "Greita užklausa"]
+    ]
   },
   {
     className: "concept-balance",
-    kicker: "BALANCE",
+    kicker: "GROŽIS",
+    brand: "ÉLAN / STUDIO",
+    domain: "elan-studio.lt",
     title: "Grožio salonas",
-    meta: "Koncepcinis pavyzdys · Dizainas, Svetainė"
+    headline: "Ramybė, estetika ir laikas sau.",
+    description: "Premium grožio paslaugų svetainė su lengvu vizualu, paslaugų pristatymu ir rezervacijos akcentu.",
+    cta: "Rezervuoti vizitą",
+    meta: "Koncepcinis pavyzdys · Dizainas, Svetainė",
+    features: [
+      ["Paslaugos", "Aiškios kategorijos"],
+      ["Kainos", "Lengva peržiūra"],
+      ["Vizitas", "Rezervacijos CTA"]
+    ]
+  }
+];
+
+const trustSignals = [
+  {
+    icon: ShieldCheck,
+    title: "Saugus ryšys",
+    text: "HTTPS ir saugus užklausų perdavimas."
+  },
+  {
+    icon: MonitorSmartphone,
+    title: "Responsive dizainas",
+    text: "Patogu telefone, planšetėje ir kompiuteryje."
+  },
+  {
+    icon: Sparkles,
+    title: "SEO pagrindai",
+    text: "Tvarkinga struktūra paieškos sistemoms."
+  },
+  {
+    icon: Globe2,
+    title: "Domeno prijungimas",
+    text: "Padedame paleisti svetainę jūsų domene."
+  },
+  {
+    icon: Headphones,
+    title: "Pagalba po paleidimo",
+    text: "Lieka aiškus kontaktas ir tolimesnė pagalba."
   }
 ];
 
@@ -157,6 +216,36 @@ function App() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "fallback" | "error">("idle");
   const [requestNumber, setRequestNumber] = useState("");
+
+  useEffect(() => {
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const elements = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
+
+    if (reducedMotion || !("IntersectionObserver" in window)) {
+      elements.forEach((element) => element.classList.add("is-visible"));
+      return undefined;
+    }
+
+    document.documentElement.classList.add("reveal-enabled");
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.14, rootMargin: "0px 0px -5% 0px" }
+    );
+
+    elements.forEach((element) => observer.observe(element));
+
+    return () => {
+      observer.disconnect();
+      document.documentElement.classList.remove("reveal-enabled");
+    };
+  }, []);
 
   const selectedPlan = useMemo(
     () => pricePlans.find((plan) => plan.id === form.packageId) || null,
@@ -384,7 +473,7 @@ function App() {
 
         <section id="paslaugos" className="benefits section" aria-label="Stilloak Web privalumai">
           {benefits.map((benefit) => (
-            <article className="benefit-card" key={benefit.title}>
+            <article className="benefit-card" key={benefit.title} data-reveal>
               <span className="benefit-icon">
                 <benefit.icon size={24} aria-hidden="true" />
               </span>
@@ -397,7 +486,7 @@ function App() {
         </section>
 
         <section id="kainos" className="section pricing-section" aria-labelledby="pricing-title">
-          <div className="section-intro compact-intro">
+          <div className="section-intro compact-intro" data-reveal>
             <span>Kainos</span>
             <h2 id="pricing-title">Pasirinkite tinkamiausią paketą.</h2>
             <p>Aiški bazinė kaina paprastiems projektams ir individualus pasiūlymas sudėtingesniems poreikiams.</p>
@@ -405,7 +494,7 @@ function App() {
 
           <div className="pricing-grid">
             {pricePlans.map((plan) => (
-              <article className={plan.featured ? "price-card price-card-featured" : "price-card"} key={plan.id}>
+              <article className={plan.featured ? "price-card price-card-featured" : "price-card"} key={plan.id} data-reveal>
                 {plan.featured ? <span className="badge">Populiariausias</span> : null}
                 <h3>{plan.name}</h3>
                 <p className="price">{plan.priceLabel}</p>
@@ -430,14 +519,14 @@ function App() {
         </section>
 
         <section id="procesas" className="section process-section" aria-labelledby="process-title">
-          <div className="section-intro compact-intro process-intro">
+          <div className="section-intro compact-intro process-intro" data-reveal>
             <span>Procesas</span>
             <h2 id="process-title">Kaip viskas vyksta</h2>
           </div>
 
           <div className="process-grid">
             {processSteps.map((step, index) => (
-              <article className="process-step" key={step.title}>
+              <article className="process-step" key={step.title} data-reveal>
                 <div className="step-number">{index + 1}</div>
                 <div>
                   <h3>{step.title}</h3>
@@ -449,7 +538,7 @@ function App() {
         </section>
 
         <section id="portfolio" className="section concepts-section" aria-labelledby="concepts-title">
-          <div className="section-intro compact-intro process-intro">
+          <div className="section-intro compact-intro process-intro" data-reveal>
             <span>Vizualinės kryptys</span>
             <h2 id="concepts-title">Pavyzdiniai projektai</h2>
             <p>Šie maketai rodo galimas dizaino kryptis. Tai koncepciniai pavyzdžiai, ne klientų projektai.</p>
@@ -457,16 +546,48 @@ function App() {
 
           <div className="concept-grid">
             {conceptProjects.map((project) => (
-              <article className="concept-card" key={project.title}>
-                <div className={`concept-preview ${project.className}`}>
-                  <span>{project.kicker}</span>
-                  <div className="concept-nav-lines" aria-hidden="true">
-                    <i />
-                    <i />
-                    <i />
+              <article className="concept-card" key={project.title} data-reveal>
+                <div className="portfolio-browser" aria-label={`${project.title} svetainės koncepcija`}>
+                  <div className="portfolio-browser-bar" aria-hidden="true">
+                    <div className="portfolio-browser-dots"><i /><i /><i /></div>
+                    <div className="portfolio-url">{project.domain}</div>
+                    <span />
                   </div>
-                  <strong>{project.title}</strong>
-                  <small>Šiuolaikiška verslo svetainės kryptis</small>
+                  <div className={`portfolio-page ${project.className}`}>
+                    <div className="portfolio-page-nav">
+                      <strong>{project.brand}</strong>
+                      <div className="portfolio-page-links" aria-hidden="true">
+                        <span>Apie</span>
+                        <span>Paslaugos</span>
+                        <span>Kontaktai</span>
+                      </div>
+                      <b>{project.cta}</b>
+                    </div>
+                    <div className="portfolio-page-hero">
+                      <div className="portfolio-page-copy">
+                        <small>{project.kicker}</small>
+                        <strong>{project.headline}</strong>
+                        <p>{project.description}</p>
+                        <span>{project.cta}</span>
+                      </div>
+                      <div className="portfolio-art" aria-hidden="true" />
+                    </div>
+                    <div className="portfolio-feature-row" aria-hidden="true">
+                      {project.features.map(([title, text]) => (
+                        <div className="portfolio-feature" key={title}>
+                          <strong>{title}</strong>
+                          <small>{text}</small>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="portfolio-phone" aria-hidden="true">
+                      <div className="portfolio-phone-screen">
+                        <i />
+                        <strong />
+                        <span />
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div className="concept-meta">
                   <h3>{project.title}</h3>
@@ -477,8 +598,31 @@ function App() {
           </div>
         </section>
 
+        <section className="section trust-section" aria-labelledby="trust-title">
+          <div className="trust-panel" data-reveal>
+            <div className="trust-heading">
+              <div>
+                <h2 id="trust-title">Svetainė paruošiama ne tik gražiai, bet ir tvarkingai.</h2>
+                <p>Pasirūpiname svarbiausiais techniniais ir praktiniais dalykais, kad po paleidimo turėtumėte normaliai veikiančią verslo svetainę.</p>
+              </div>
+              <span>Stilloak Web standartas</span>
+            </div>
+            <div className="trust-grid">
+              {trustSignals.map((signal) => (
+                <article className="trust-item" key={signal.title} data-reveal>
+                  <span className="trust-item-icon">
+                    <signal.icon size={20} aria-hidden="true" />
+                  </span>
+                  <strong>{signal.title}</strong>
+                  <small>{signal.text}</small>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section id="kontaktai" className="section contact-panel" aria-labelledby="contact-title">
-          <div className="contact-copy">
+          <div className="contact-copy" data-reveal>
             <span className="contact-kicker">Pradėkime bendradarbiauti</span>
             <h2 id="contact-title">Užsakykite svetainę</h2>
             <p>
@@ -494,7 +638,17 @@ function App() {
             </a>
           </div>
 
-          <form className="contact-form" onSubmit={submitLead} noValidate>
+          <form className="contact-form" onSubmit={submitLead} noValidate data-reveal>
+            {selectedPlan ? (
+              <div className="selected-plan-summary">
+                <div>
+                  <span>Pasirinktas paketas</span>
+                  <strong>{selectedPlan.name}</strong>
+                </div>
+                <b>{selectedPlan.priceLabel}</b>
+              </div>
+            ) : null}
+
             <div className="field-grid">
               <label>
                 <span>Vardas</span>
