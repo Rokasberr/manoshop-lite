@@ -2,15 +2,18 @@ import { FormEvent, useMemo, useState } from "react";
 import {
   ArrowRight,
   Check,
-  ChevronDown,
+  Clock3,
+  Code2,
+  Headphones,
   Mail,
   Menu,
+  MonitorSmartphone,
+  Rocket,
   Send,
   ShieldCheck,
+  Sparkles,
   X
 } from "lucide-react";
-import logoUrl from "./assets/stilloak-logo.svg";
-import { faqs, processSteps, services, trustItems } from "./data/siteContent";
 import { pricePlans } from "./data/pricing";
 
 type FormState = {
@@ -48,6 +51,69 @@ const contactEmail = import.meta.env.VITE_WEB_CONTACT_EMAIL || "hello@stilloak-s
 const apiBaseUrl = String(import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
 const leadEndpoint =
   import.meta.env.VITE_WEB_LEAD_ENDPOINT || (apiBaseUrl ? `${apiBaseUrl}/web-service-requests` : "");
+
+const benefits = [
+  {
+    icon: Rocket,
+    title: "Greitas paleidimas",
+    text: "Aiški apimtis ir konkretus darbų planas nuo pirmos dienos."
+  },
+  {
+    icon: Sparkles,
+    title: "Modernus dizainas",
+    text: "Švarus vizualas, pritaikytas jūsų verslui ir auditorijai."
+  },
+  {
+    icon: MonitorSmartphone,
+    title: "Pritaikyta telefonui",
+    text: "Patogi patirtis telefone, planšetėje ir kompiuteryje."
+  },
+  {
+    icon: Headphones,
+    title: "Pagalba po paleidimo",
+    text: "Padedame su paleidimu, korekcijomis ir tolimesniais žingsniais."
+  }
+];
+
+const processSteps = [
+  {
+    title: "Užklausa",
+    text: "Pasirenkate paketą ir trumpai papasakojate, ko reikia jūsų verslui."
+  },
+  {
+    title: "Aptarimas",
+    text: "Susisiekiame, patiksliname tikslus, turinį, funkcijas ir terminą."
+  },
+  {
+    title: "Kūrimas",
+    text: "Kuriame dizainą ir svetainę, testuojame bei deriname svarbiausias detales."
+  },
+  {
+    title: "Paleidimas",
+    text: "Prijungiame domeną, paleidžiame svetainę ir perduodame paruoštą rezultatą."
+  }
+];
+
+const conceptProjects = [
+  {
+    className: "concept-architecture",
+    kicker: "ARCHITEKTŪRA",
+    title: "Architektūros studija",
+    meta: "Koncepcinis pavyzdys · Dizainas, Svetainė"
+  },
+  {
+    className: "concept-industry",
+    kicker: "INDUSTRIJA",
+    title: "Pramonės įmonė",
+    meta: "Koncepcinis pavyzdys · Dizainas, Svetainė"
+  },
+  {
+    className: "concept-balance",
+    kicker: "BALANCE",
+    title: "Grožio salonas",
+    meta: "Koncepcinis pavyzdys · Dizainas, Svetainė"
+  }
+];
 
 function validateForm(form: FormState): FormErrors {
   const errors: FormErrors = {};
@@ -130,6 +196,7 @@ function App() {
       setStatus("idle");
       setRequestNumber("");
     }
+
     updateForm("packageId", packageId);
     window.setTimeout(() => {
       document.getElementById("kontaktai")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -185,33 +252,28 @@ function App() {
 
   const navLinks = [
     ["Paslaugos", "#paslaugos"],
-    ["Portfolio", "#portfolio"],
-    ["Procesas", "#procesas"],
     ["Kainos", "#kainos"],
-    ["DUK", "#duk"],
-    ["Užsakymas", "#kontaktai"]
+    ["Procesas", "#procesas"],
+    ["Kontaktai", "#kontaktai"]
   ];
 
   return (
     <div className="site-shell">
       <header className="site-header">
-        <a className="brand" href="#top" aria-label="Stilloak Web pradžia">
-          <img src={logoUrl} alt="" width="44" height="44" />
-          <span>
-            <strong>Stilloak Web</strong>
-            <small>Stilloak Studio paslaugos</small>
-          </span>
+        <a className="wordmark" href="#top" aria-label="Stilloak Web pradžia">
+          <strong>Stilloak</strong>
+          <span>Web</span>
         </a>
 
         <button
-          className="icon-button mobile-menu-button"
+          className="mobile-menu-button"
           type="button"
           aria-label={menuOpen ? "Uždaryti navigaciją" : "Atidaryti navigaciją"}
           aria-expanded={menuOpen}
           aria-controls="primary-navigation"
           onClick={() => setMenuOpen((open) => !open)}
         >
-          {menuOpen ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
+          {menuOpen ? <X size={25} aria-hidden="true" /> : <Menu size={27} aria-hidden="true" />}
         </button>
 
         <nav id="primary-navigation" className={menuOpen ? "nav nav-open" : "nav"} aria-label="Pagrindinė navigacija">
@@ -220,184 +282,214 @@ function App() {
               {label}
             </a>
           ))}
-          <a className="nav-cta" href="#kainos" onClick={() => setMenuOpen(false)}>
-            Užsisakyti
+          <a className="nav-cta" href="#kontaktai" onClick={() => setMenuOpen(false)}>
+            Gauti pasiūlymą <ArrowRight size={17} aria-hidden="true" />
           </a>
         </nav>
       </header>
 
       <main id="top">
-        <section className="hero section" aria-labelledby="hero-title">
-          <div className="hero-content reveal">
-            <p className="eyebrow">Svetainių kūrimas augančiam verslui</p>
-            <h1 id="hero-title">Kuriame svetaines, kurios padeda verslui augti.</h1>
-            <p className="hero-copy">
-              Pasirinkite aiškų paketą su fiksuota pradine kaina arba individualų sprendimą sudėtingesniam projektui.
+        <section className="hero section">
+          <div className="hero-copy-block">
+            <span className="hero-pill">
+              <span className="hero-pill-dot" /> Svetainės, kurios kuria vertę
+            </span>
+            <h1>
+              Svetainės verslui, kurios atrodo profesionaliai ir <em>padeda gauti klientų.</em>
+            </h1>
+            <p>
+              Kuriame modernias, greitas ir patikimas svetaines, pritaikytas jūsų verslui. Nuo idėjos iki
+              paleidimo pasirūpiname visu procesu, kad galėtumėte susitelkti į savo veiklą.
             </p>
             <div className="hero-actions">
-              <a className="button button-primary" href="#kainos">
-                Peržiūrėti paketus <ArrowRight size={18} aria-hidden="true" />
+              <a className="button button-primary" href="#kontaktai">
+                Užsakyti svetainę <ArrowRight size={18} aria-hidden="true" />
               </a>
-              <a className="button button-secondary" href="#portfolio">
-                Peržiūrėti pavyzdį
+              <a className="button button-secondary" href="#kainos">
+                Peržiūrėti kainas <ArrowRight size={18} aria-hidden="true" />
               </a>
             </div>
-            <div className="trust-row" aria-label="Techniniai svetainės principai">
-              {trustItems.map((item) => (
-                <span key={item.label}>
-                  <item.icon size={17} aria-hidden="true" /> {item.label}
-                </span>
-              ))}
+
+            <div className="hero-proof" aria-label="Stilloak Web darbo principai">
+              <div className="proof-icons" aria-hidden="true">
+                <span><ShieldCheck size={18} /></span>
+                <span><Code2 size={18} /></span>
+                <span><MonitorSmartphone size={18} /></span>
+              </div>
+              <div>
+                <strong>Aiški kaina ir procesas</strong>
+                <small>Responsive dizainas · SEO pagrindai · Domeno prijungimas</small>
+              </div>
             </div>
           </div>
 
-          <div className="hero-panel reveal" aria-label="Stilloak Web projekto principų santrauka">
+          <div className="hero-visual" aria-label="Pavyzdinės verslo svetainės vizualas">
             <div className="browser-frame">
-              <div className="browser-top" aria-hidden="true">
-                <span />
-                <span />
-                <span />
+              <div className="browser-toolbar">
+                <div className="browser-dots" aria-hidden="true">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+                <div className="browser-address">yourbusiness.lt</div>
               </div>
-              <div className="browser-body">
-                <div className="mock-nav">
-                  <img src={logoUrl} alt="" width="32" height="32" />
-                  <span />
-                  <span />
-                  <span />
+
+              <div className="preview-site">
+                <div className="preview-nav">
+                  <strong>NATŪRALI</strong>
+                  <div>
+                    <span>Apie mus</span>
+                    <span>Paslaugos</span>
+                    <span>Kontaktai</span>
+                  </div>
+                  <button type="button">Susisiekti</button>
                 </div>
-                <div className="mock-hero">
-                  <p>Aiški vertė</p>
-                  <strong>Vienas procesas nuo pasirinkto paketo iki veikiančios svetainės.</strong>
+
+                <div className="preview-hero">
+                  <div className="preview-copy">
+                    <small>NATŪRALŪS SPRENDIMAI</small>
+                    <strong>Jūsų geresnei kasdienai</strong>
+                    <p>Aiški žinutė, kokybiškas dizainas ir patogi vartotojo patirtis.</p>
+                    <span>Sužinoti daugiau</span>
+                  </div>
+                  <div className="still-life" aria-hidden="true">
+                    <div className="plant-stem stem-one" />
+                    <div className="plant-stem stem-two" />
+                    <div className="leaf leaf-one" />
+                    <div className="leaf leaf-two" />
+                    <div className="leaf leaf-three" />
+                    <div className="bottle" />
+                    <div className="vase" />
+                  </div>
                 </div>
-                <div className="mock-grid">
-                  <span />
-                  <span />
-                  <span />
+              </div>
+
+              <div className="mini-preview-row" aria-hidden="true">
+                <div className="mini-preview mini-build">
+                  <small>STATYBOS</small>
+                  <strong>Aiški struktūra nuo pirmo ekrano</strong>
                 </div>
-                <div className="mock-cta">Aiški kaina ir projekto eiga</div>
+                <div className="mini-preview mini-legal">
+                  <small>PASLAUGOS</small>
+                  <strong>Tvirtas įvaizdis ir pasitikėjimas</strong>
+                </div>
+                <div className="mini-preview mini-interior">
+                  <small>INTERJERAS</small>
+                  <strong>Vizualas, kuris kalba už verslą</strong>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section id="paslaugos" className="section" aria-labelledby="services-title">
-          <div className="section-heading">
-            <p className="eyebrow">Paslaugos</p>
-            <h2 id="services-title">Skaitmeninis pagrindas, pritaikytas realiam verslo etapui.</h2>
-            <p>
-              Nuo mažos reprezentacinės svetainės iki individualios sistemos. Kiekvienas darbas pradedamas nuo
-              aiškaus tikslo ir sutartos apimties.
-            </p>
-          </div>
-          <div className="services-grid">
-            {services.map((service) => (
-              <article className="service-card reveal" key={service.title}>
-                <div className="card-icon">
-                  <service.icon size={24} aria-hidden="true" />
-                </div>
-                <h3>{service.title}</h3>
-                <p>{service.description}</p>
-              </article>
-            ))}
-          </div>
+        <section id="paslaugos" className="benefits section" aria-label="Stilloak Web privalumai">
+          {benefits.map((benefit) => (
+            <article className="benefit-card" key={benefit.title}>
+              <span className="benefit-icon">
+                <benefit.icon size={24} aria-hidden="true" />
+              </span>
+              <div>
+                <h2>{benefit.title}</h2>
+                <p>{benefit.text}</p>
+              </div>
+            </article>
+          ))}
         </section>
 
-        <section id="portfolio" className="section portfolio-section" aria-labelledby="portfolio-title">
-          <div className="portfolio-copy">
-            <p className="eyebrow">Portfolio</p>
-            <h2 id="portfolio-title">Vidinis projektas: Stilloak Studio.</h2>
-            <p>
-              Portfolio pradžiai rodome savo vidinį produktą, nes nekuriame netikrų klientų, atsiliepimų ar rezultatų.
-              Stilloak Studio yra mūsų ilgalaikis skaitmeninių produktų ir narių zonos projektas.
-            </p>
+        <section id="kainos" className="section pricing-section" aria-labelledby="pricing-title">
+          <div className="section-intro compact-intro">
+            <span>Kainos</span>
+            <h2 id="pricing-title">Pasirinkite tinkamiausią paketą.</h2>
+            <p>Aiški bazinė kaina paprastiems projektams ir individualus pasiūlymas sudėtingesniems poreikiams.</p>
           </div>
-          <article className="portfolio-card reveal">
-            <img src={logoUrl} alt="Stilloak Studio logotipas" width="72" height="72" />
-            <div>
-              <p className="eyebrow">Stilloak Studio</p>
-              <h3>Produktinė svetainė su narių zona ir skaitmeninio turinio pagrindu.</h3>
-              <p>
-                Pavyzdys rodo darbo kryptį: aiški prekės ženklo kalba, tvarkinga informacijos architektūra,
-                responsive sąsaja ir pasiruošimas atskiriems komerciniams srautams.
-              </p>
-            </div>
-          </article>
-        </section>
 
-        <section id="procesas" className="section process-section" aria-labelledby="process-title">
-          <div className="section-heading">
-            <p className="eyebrow">Procesas</p>
-            <h2 id="process-title">Darbas vyksta etapais, kad sprendimai būtų aiškūs ir patikrinami.</h2>
-          </div>
-          <div className="process-list">
-            {processSteps.map((step, index) => (
-              <article className="process-step reveal" key={step.title}>
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <h3>{step.title}</h3>
-                <p>{step.text}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section id="kainos" className="section" aria-labelledby="pricing-title">
-          <div className="section-heading">
-            <p className="eyebrow">Kainos</p>
-            <h2 id="pricing-title">Pasirinkite svetainės kūrimo paketą.</h2>
-            <p>
-              Start, Business ir Pro turi aiškią bazinę kainą. Jei projektas nestandartinis, rinkitės „Pagal
-              poreikius“ ir paruošime individualią sąmatą.
-            </p>
-          </div>
           <div className="pricing-grid">
             {pricePlans.map((plan) => (
-              <article className={plan.featured ? "price-card price-card-featured reveal" : "price-card reveal"} key={plan.id}>
+              <article className={plan.featured ? "price-card price-card-featured" : "price-card"} key={plan.id}>
                 {plan.featured ? <span className="badge">Populiariausias</span> : null}
                 <h3>{plan.name}</h3>
                 <p className="price">{plan.priceLabel}</p>
-                <p>{plan.description}</p>
+                <p className="price-description">{plan.description}</p>
                 <ul>
-                  {plan.includes.map((item) => (
+                  {plan.includes.slice(0, 4).map((item) => (
                     <li key={item}>
                       <Check size={17} aria-hidden="true" /> {item}
                     </li>
                   ))}
                 </ul>
-                <button className="button button-secondary" type="button" onClick={() => choosePlan(plan.id)}>
-                  {plan.id === "custom" ? "Aprašyti poreikius" : `Rinktis ${plan.name}`}
+                <button
+                  className={plan.featured ? "button price-button price-button-featured" : "button price-button"}
+                  type="button"
+                  onClick={() => choosePlan(plan.id)}
+                >
+                  {plan.id === "custom" ? "Susisiekti" : "Pasirinkti paketą"}
                 </button>
               </article>
             ))}
           </div>
         </section>
 
-        <section id="duk" className="section faq-section" aria-labelledby="faq-title">
-          <div className="section-heading">
-            <p className="eyebrow">DUK</p>
-            <h2 id="faq-title">Dažniausi klausimai prieš užsakymą.</h2>
+        <section id="procesas" className="section process-section" aria-labelledby="process-title">
+          <div className="section-intro compact-intro process-intro">
+            <span>Procesas</span>
+            <h2 id="process-title">Kaip viskas vyksta</h2>
           </div>
-          <div className="faq-list">
-            {faqs.map((faq) => (
-              <details key={faq.question} className="faq-item">
-                <summary>
-                  {faq.question}
-                  <ChevronDown size={18} aria-hidden="true" />
-                </summary>
-                <p>{faq.answer}</p>
-              </details>
+
+          <div className="process-grid">
+            {processSteps.map((step, index) => (
+              <article className="process-step" key={step.title}>
+                <div className="step-number">{index + 1}</div>
+                <div>
+                  <h3>{step.title}</h3>
+                  <p>{step.text}</p>
+                </div>
+              </article>
             ))}
           </div>
         </section>
 
-        <section id="kontaktai" className="section contact-section" aria-labelledby="contact-title">
+        <section id="portfolio" className="section concepts-section" aria-labelledby="concepts-title">
+          <div className="section-intro compact-intro process-intro">
+            <span>Vizualinės kryptys</span>
+            <h2 id="concepts-title">Pavyzdiniai projektai</h2>
+            <p>Šie maketai rodo galimas dizaino kryptis. Tai koncepciniai pavyzdžiai, ne klientų projektai.</p>
+          </div>
+
+          <div className="concept-grid">
+            {conceptProjects.map((project) => (
+              <article className="concept-card" key={project.title}>
+                <div className={`concept-preview ${project.className}`}>
+                  <span>{project.kicker}</span>
+                  <div className="concept-nav-lines" aria-hidden="true">
+                    <i />
+                    <i />
+                    <i />
+                  </div>
+                  <strong>{project.title}</strong>
+                  <small>Šiuolaikiška verslo svetainės kryptis</small>
+                </div>
+                <div className="concept-meta">
+                  <h3>{project.title}</h3>
+                  <p>{project.meta}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section id="kontaktai" className="section contact-panel" aria-labelledby="contact-title">
           <div className="contact-copy">
-            <p className="eyebrow">Užsakymas</p>
-            <h2 id="contact-title">Pateikite svetainės kūrimo užsakymą.</h2>
+            <span className="contact-kicker">Pradėkime bendradarbiauti</span>
+            <h2 id="contact-title">Užsakykite svetainę</h2>
             <p>
-              Pasirinkite paketą, įveskite kontaktus ir trumpai aprašykite projektą. Užklausa gaus savo numerį ir
-              pateks tiesiai į Stilloak administravimo sistemą.
+              Papasakokite apie savo projektą. Peržiūrėsime poreikį, atsakysime į klausimus ir padėsime pasirinkti
+              tinkamiausią sprendimą.
             </p>
-            <a className="email-link" href={`mailto:${contactEmail}`}>
+            <div className="response-time">
+              <Clock3 size={21} aria-hidden="true" />
+              <span>Atsakome per 24 val.</span>
+            </div>
+            <a className="contact-email" href={`mailto:${contactEmail}`}>
               <Mail size={18} aria-hidden="true" /> {contactEmail}
             </a>
           </div>
@@ -405,48 +497,25 @@ function App() {
           <form className="contact-form" onSubmit={submitLead} noValidate>
             <div className="field-grid">
               <label>
-                Vardas
+                <span>Vardas</span>
                 <input
                   type="text"
                   name="name"
                   autoComplete="name"
+                  placeholder="Jūsų vardas"
                   value={form.name}
                   onChange={(event) => updateForm("name", event.target.value)}
                   aria-invalid={Boolean(errors.name)}
                 />
-                {errors.name ? <span className="field-error">{errors.name}</span> : null}
+                {errors.name ? <small className="field-error">{errors.name}</small> : null}
               </label>
               <label>
-                El. paštas
-                <input
-                  type="email"
-                  name="email"
-                  autoComplete="email"
-                  value={form.email}
-                  onChange={(event) => updateForm("email", event.target.value)}
-                  aria-invalid={Boolean(errors.email)}
-                />
-                {errors.email ? <span className="field-error">{errors.email}</span> : null}
-              </label>
-            </div>
-
-            <div className="field-grid">
-              <label>
-                Telefonas <span className="optional">neprivaloma</span>
-                <input
-                  type="tel"
-                  name="phone"
-                  autoComplete="tel"
-                  value={form.phone}
-                  onChange={(event) => updateForm("phone", event.target.value)}
-                />
-              </label>
-              <label>
-                Įmonė <span className="optional">neprivaloma</span>
+                <span>Įmonė</span>
                 <input
                   type="text"
                   name="company"
                   autoComplete="organization"
+                  placeholder="Įmonės pavadinimas"
                   value={form.company}
                   onChange={(event) => updateForm("company", event.target.value)}
                 />
@@ -455,59 +524,86 @@ function App() {
 
             <div className="field-grid">
               <label>
-                Paketas
+                <span>El. paštas</span>
+                <input
+                  type="email"
+                  name="email"
+                  autoComplete="email"
+                  placeholder="jusu@pastas.lt"
+                  value={form.email}
+                  onChange={(event) => updateForm("email", event.target.value)}
+                  aria-invalid={Boolean(errors.email)}
+                />
+                {errors.email ? <small className="field-error">{errors.email}</small> : null}
+              </label>
+              <label>
+                <span>Telefonas</span>
+                <input
+                  type="tel"
+                  name="phone"
+                  autoComplete="tel"
+                  placeholder="+370..."
+                  value={form.phone}
+                  onChange={(event) => updateForm("phone", event.target.value)}
+                />
+              </label>
+            </div>
+
+            <div className="field-grid">
+              <label>
+                <span>Pasirinktas paketas</span>
                 <select
                   name="packageId"
                   value={form.packageId}
                   onChange={(event) => updateForm("packageId", event.target.value)}
                   aria-invalid={Boolean(errors.packageId)}
                 >
-                  <option value="">Pasirinkite</option>
+                  <option value="">Pasirinkite paketą</option>
                   {pricePlans.map((plan) => (
                     <option key={plan.id} value={plan.id}>
                       {plan.name} — {plan.priceLabel}
                     </option>
                   ))}
                 </select>
-                {errors.packageId ? <span className="field-error">{errors.packageId}</span> : null}
+                {errors.packageId ? <small className="field-error">{errors.packageId}</small> : null}
               </label>
 
               {form.packageId === "custom" ? (
                 <label>
-                  Orientacinis biudžetas
+                  <span>Orientacinis biudžetas</span>
                   <select
                     name="budget"
                     value={form.budget}
                     onChange={(event) => updateForm("budget", event.target.value)}
                     aria-invalid={Boolean(errors.budget)}
                   >
-                    <option value="">Pasirinkite</option>
+                    <option value="">Pasirinkite biudžetą</option>
                     <option value="Iki 1 000 €">Iki 1 000 €</option>
                     <option value="1 000-2 500 €">1 000-2 500 €</option>
                     <option value="2 500-5 000 €">2 500-5 000 €</option>
                     <option value="5 000 €+">5 000 €+</option>
                   </select>
-                  {errors.budget ? <span className="field-error">{errors.budget}</span> : null}
+                  {errors.budget ? <small className="field-error">{errors.budget}</small> : null}
                 </label>
               ) : (
                 <label>
-                  Bazinė kaina
+                  <span>Bazinė kaina</span>
                   <input type="text" value={selectedPlan?.priceLabel || "Pasirinkite paketą"} readOnly />
                 </label>
               )}
             </div>
 
-            <label>
-              Projekto aprašymas
+            <label className="message-field">
+              <span>Projekto aprašymas</span>
               <textarea
                 name="message"
-                rows={6}
-                placeholder="Kuo užsiima jūsų verslas, kokios svetainės reikia ir kokio rezultato tikitės?"
+                rows={5}
+                placeholder="Trumpai papasakokite apie savo projektą, tikslus ir lūkesčius..."
                 value={form.message}
                 onChange={(event) => updateForm("message", event.target.value)}
                 aria-invalid={Boolean(errors.message)}
               />
-              {errors.message ? <span className="field-error">{errors.message}</span> : null}
+              {errors.message ? <small className="field-error">{errors.message}</small> : null}
             </label>
 
             <label className="honeypot" aria-hidden="true">
@@ -532,14 +628,15 @@ function App() {
               />
               <span>Sutinku, kad Stilloak Web susisiektų dėl šios užklausos.</span>
             </label>
-            {errors.consent ? <span className="field-error">{errors.consent}</span> : null}
+            {errors.consent ? <small className="field-error consent-error">{errors.consent}</small> : null}
 
             {status === "fallback" ? (
               <div className="form-notice" role="status">
-                Užsakymų API dar neprijungtas šioje aplinkoje. Susisiekite el. paštu:
+                Užsakymų API šioje aplinkoje neprijungtas. Parašykite el. paštu:
                 <a href={mailtoHref}> {contactEmail}</a>
               </div>
             ) : null}
+
             {status === "sent" ? (
               <div className="form-notice success" role="status">
                 <span>Užsakymas gautas{requestNumber ? ` — jūsų užklausos numeris ${requestNumber}.` : "."}</span>
@@ -548,6 +645,7 @@ function App() {
                 </button>
               </div>
             ) : null}
+
             {status === "error" ? (
               <div className="form-notice error" role="alert">
                 Nepavyko išsiųsti užsakymo. Parašykite el. paštu:
@@ -560,38 +658,32 @@ function App() {
               type="submit"
               disabled={status === "sending" || status === "sent"}
             >
+              <span>{status === "sending" ? "Siunčiama..." : status === "sent" ? "Užsakymas pateiktas" : "Pateikti užsakymą"}</span>
               <Send size={18} aria-hidden="true" />
-              {status === "sending" ? "Siunčiama..." : status === "sent" ? "Užsakymas pateiktas" : "Pateikti užsakymą"}
             </button>
+
             <p className="privacy-note">
-              <ShieldCheck size={16} aria-hidden="true" /> Forma siunčia tik jūsų pateiktus projekto ir kontaktinius
-              duomenis. Fiksuoto paketo kaina patvirtinama serverio pusėje.
+              <ShieldCheck size={15} aria-hidden="true" /> Užsakymo informacija siunčiama saugiai ir patenka į Stilloak administravimo sistemą.
             </p>
           </form>
         </section>
       </main>
 
       <footer className="site-footer">
-        <div>
-          <a className="brand footer-brand" href="#top">
-            <img src={logoUrl} alt="" width="40" height="40" />
-            <span>
-              <strong>Stilloak Web</strong>
-              <small>Svetainės, sistemos ir priežiūra.</small>
-            </span>
+        <div className="footer-brand-block">
+          <a className="wordmark footer-wordmark" href="#top">
+            <strong>Stilloak</strong>
+            <span>Web</span>
           </a>
-          <p>Profesionali Stilloak Studio kryptis interneto svetainių kūrimui ir skaitmeniniams verslo įrankiams.</p>
+          <p>Svetainės, kurios padeda verslui atrodyti profesionaliai ir augti.</p>
         </div>
-        <div className="footer-links" aria-label="Footer navigacija">
-          {navLinks.map(([label, href]) => (
-            <a key={href} href={href}>
-              {label}
-            </a>
-          ))}
-        </div>
-        <div className="footer-contact">
-          <p>Kontaktai</p>
+        <div>
+          <span className="footer-label">El. paštas</span>
           <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
+        </div>
+        <div>
+          <span className="footer-label">Svetainė</span>
+          <a href="https://web.stilloak-studio.com">web.stilloak-studio.com</a>
         </div>
       </footer>
     </div>
