@@ -56,6 +56,8 @@ Jei nei vienas API adresas nenustatytas, forma nerodo netikro sėkmingo išsiunt
 
 `web.stilloak-studio.com` turi būti atskiras Vercel projektas, nors kodas lieka tame pačiame GitHub repository.
 
+Dabartinis Vercel projekto pavadinimas: `web-studio`.
+
 Kuriant projektą:
 
 - Git repository: `Rokasberr/manoshop-lite`
