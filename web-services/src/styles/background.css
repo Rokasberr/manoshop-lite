@@ -1,50 +1,62 @@
-/* Animated Stilloak wave background. Loaded last so the visual layer stays independent of layout logic. */
+/* Animated Stilloak wave background. Loaded after all other visual layers. */
 
 body {
-  background: #f6f0e8;
+  background: #f3ece3;
 }
 
 .site-shell {
   position: relative;
   isolation: isolate;
-  background: transparent;
+  min-height: 100vh;
+  overflow-x: clip;
+  overflow-y: visible;
+  background:
+    linear-gradient(180deg, rgba(255, 252, 247, 0.38), rgba(242, 232, 220, 0.28));
+}
+
+/* Keep all actual site content above the decorative background layers. */
+.site-shell > .site-header,
+.site-shell > main,
+.site-shell > .site-footer {
+  position: relative;
+  z-index: 2;
 }
 
 .site-shell::before {
   position: fixed;
-  inset: -6vh -7vw;
-  z-index: -2;
+  inset: -7vh -8vw;
+  z-index: 0;
   content: "";
   pointer-events: none;
-  background-image:
-    linear-gradient(180deg, rgba(255, 252, 247, 0.22), rgba(247, 239, 229, 0.08)),
-    url("/stilloak-wave-background.webp");
+  background-image: url("../assets/stilloak-wave-background.svg");
   background-repeat: no-repeat;
-  background-position: 50% 48%;
-  background-size: 116% auto;
-  transform: translate3d(0, 0, 0) scale(1.035);
+  background-position: 50% 52%;
+  background-size: cover;
+  opacity: 0.96;
+  transform: translate3d(0, 0, 0) scale(1.045);
   transform-origin: center;
-  animation: stilloak-background-drift 28s ease-in-out infinite alternate;
+  animation: stilloak-background-drift 30s ease-in-out infinite alternate;
   will-change: transform, background-position;
 }
 
 .site-shell::after {
   position: fixed;
-  inset: -14vh -12vw;
-  z-index: -1;
+  inset: -12vh -10vw;
+  z-index: 1;
   content: "";
   pointer-events: none;
   background:
-    radial-gradient(ellipse 54% 24% at 13% 76%, rgba(188, 145, 105, 0.13), transparent 70%),
-    radial-gradient(ellipse 48% 22% at 84% 79%, rgba(178, 126, 83, 0.11), transparent 72%),
-    radial-gradient(ellipse 58% 25% at 53% 93%, rgba(255, 255, 255, 0.3), transparent 72%);
-  filter: blur(8px);
+    radial-gradient(ellipse 42% 20% at 11% 82%, rgba(179, 132, 91, 0.12), transparent 72%),
+    radial-gradient(ellipse 45% 19% at 87% 78%, rgba(170, 119, 76, 0.1), transparent 72%),
+    radial-gradient(ellipse 54% 25% at 50% 22%, rgba(255, 255, 255, 0.44), transparent 72%);
+  filter: blur(10px);
+  opacity: 0.72;
   transform: translate3d(0, 0, 0) scale(1.04);
-  animation: stilloak-wave-veil 36s ease-in-out infinite alternate-reverse;
+  animation: stilloak-wave-veil 38s ease-in-out infinite alternate-reverse;
   will-change: transform;
 }
 
-/* Preserve strong contrast while letting the background remain visible. */
+/* Semi-opaque surfaces keep copy and pricing highly readable. */
 .site-header,
 .hero-pill,
 .hero-proof,
@@ -55,8 +67,8 @@ body {
 .contact-panel,
 .response-time,
 .contact-email {
-  backdrop-filter: blur(13px) saturate(108%);
-  -webkit-backdrop-filter: blur(13px) saturate(108%);
+  backdrop-filter: blur(14px) saturate(108%);
+  -webkit-backdrop-filter: blur(14px) saturate(108%);
 }
 
 .site-header {
@@ -67,32 +79,32 @@ body {
 .hero-proof,
 .response-time,
 .contact-email {
-  background: rgba(255, 253, 249, 0.79);
+  background: rgba(255, 253, 249, 0.82);
 }
 
 .benefit-card,
 .price-card,
 .process-step,
 .concept-card {
-  border-color: rgba(201, 185, 167, 0.72);
+  border-color: rgba(198, 179, 160, 0.76);
   background: rgba(255, 253, 249, 0.9);
   box-shadow:
-    0 15px 38px rgba(73, 50, 33, 0.075),
-    inset 0 1px 0 rgba(255, 255, 255, 0.76);
+    0 16px 40px rgba(72, 49, 32, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82);
 }
 
 .price-card-featured {
-  background: rgba(255, 250, 244, 0.95);
+  background: rgba(255, 250, 244, 0.96);
 }
 
 .contact-panel {
-  background: rgba(250, 245, 238, 0.91);
+  background: rgba(250, 245, 238, 0.92);
 }
 
 .contact-form input,
 .contact-form select,
 .contact-form textarea {
-  background: rgba(255, 253, 249, 0.94);
+  background: rgba(255, 253, 249, 0.95);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
@@ -103,61 +115,61 @@ body {
 .price-card h3,
 .process-step h3,
 .concept-meta h3 {
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.58);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.64);
 }
 
 @keyframes stilloak-background-drift {
   0% {
-    background-position: 48% 47%;
-    transform: translate3d(-0.7vw, 0.4vh, 0) scale(1.035);
+    background-position: 47% 51%;
+    transform: translate3d(-0.8vw, 0.35vh, 0) scale(1.045);
   }
 
   50% {
-    background-position: 51% 50%;
-    transform: translate3d(0.6vw, -0.45vh, 0) scale(1.055);
+    background-position: 50% 53%;
+    transform: translate3d(0.45vw, -0.55vh, 0) scale(1.065);
   }
 
   100% {
-    background-position: 53% 48%;
-    transform: translate3d(1.15vw, 0.55vh, 0) scale(1.04);
+    background-position: 53% 50%;
+    transform: translate3d(1.15vw, 0.5vh, 0) scale(1.05);
   }
 }
 
 @keyframes stilloak-wave-veil {
   0% {
-    transform: translate3d(-1.8vw, 0.3vh, 0) scale(1.03) rotate(-0.25deg);
+    transform: translate3d(-1.4vw, 0.4vh, 0) scale(1.03) rotate(-0.18deg);
   }
 
   50% {
-    transform: translate3d(0.5vw, -1vh, 0) scale(1.055) rotate(0.15deg);
+    transform: translate3d(0.35vw, -0.8vh, 0) scale(1.05) rotate(0.1deg);
   }
 
   100% {
-    transform: translate3d(2vw, 0.5vh, 0) scale(1.04) rotate(0.3deg);
+    transform: translate3d(1.7vw, 0.45vh, 0) scale(1.04) rotate(0.22deg);
   }
 }
 
 @media (max-width: 900px) {
   .site-shell::before {
-    inset: -5vh -18vw;
-    background-position: 50% 48%;
+    inset: -5vh -22vw;
+    background-position: 50% 54%;
     background-size: auto 108vh;
-    animation-duration: 32s;
+    animation-duration: 34s;
   }
 
   .site-shell::after {
-    inset: -12vh -22vw;
-    opacity: 0.85;
-    animation-duration: 40s;
+    inset: -10vh -24vw;
+    opacity: 0.66;
+    animation-duration: 42s;
   }
 }
 
 @media (max-width: 620px) {
   .site-shell::before {
-    inset: -4vh -34vw;
-    background-size: auto 104vh;
-    background-position: 49% 54%;
-    opacity: 0.94;
+    inset: -4vh -44vw;
+    background-position: 50% 56%;
+    background-size: auto 106vh;
+    opacity: 0.98;
   }
 
   .benefit-card,
@@ -165,7 +177,7 @@ body {
   .process-step,
   .concept-card,
   .contact-panel {
-    background: rgba(255, 253, 249, 0.93);
+    background: rgba(255, 253, 249, 0.94);
   }
 }
 
