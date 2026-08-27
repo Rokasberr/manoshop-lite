@@ -682,8 +682,8 @@ function App() {
           <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
         </div>
         <div>
-          <span className="footer-label">Svetainė</span>
-          <a href="https://web.stilloak-studio.com">web.stilloak-studio.com</a>
+          <span className="footer-label">Stilloak Studio</span>
+          <p>© 2026 Stilloak Studio. Visos teisės saugomos.</p>
         </div>
       </footer>
     </div>
