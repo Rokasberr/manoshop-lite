@@ -16,8 +16,9 @@ import { pricePlans } from "./data/pricing";
 type FormState = {
   name: string;
   email: string;
+  phone: string;
   company: string;
-  service: string;
+  packageId: string;
   budget: string;
   message: string;
   consent: boolean;
@@ -26,11 +27,17 @@ type FormState = {
 
 type FormErrors = Partial<Record<keyof FormState, string>>;
 
+type LeadResponse = {
+  requestNumber?: string;
+  message?: string;
+};
+
 const initialFormState: FormState = {
   name: "",
   email: "",
+  phone: "",
   company: "",
-  service: "",
+  packageId: "",
   budget: "",
   message: "",
   consent: false,
@@ -38,11 +45,14 @@ const initialFormState: FormState = {
 };
 
 const contactEmail = import.meta.env.VITE_WEB_CONTACT_EMAIL || "hello@stilloak-studio.com";
-const leadEndpoint = import.meta.env.VITE_WEB_LEAD_ENDPOINT || "";
+const apiBaseUrl = String(import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+const leadEndpoint =
+  import.meta.env.VITE_WEB_LEAD_ENDPOINT || (apiBaseUrl ? `${apiBaseUrl}/web-service-requests` : "");
 
 function validateForm(form: FormState): FormErrors {
   const errors: FormErrors = {};
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const selectedPlan = pricePlans.find((plan) => plan.id === form.packageId);
 
   if (form.website.trim()) {
     errors.website = "Forma negali būti pateikta.";
@@ -56,12 +66,12 @@ function validateForm(form: FormState): FormErrors {
     errors.email = "Įrašykite teisingą el. pašto adresą.";
   }
 
-  if (!form.service) {
-    errors.service = "Pasirinkite paslaugą.";
+  if (!selectedPlan) {
+    errors.packageId = "Pasirinkite svetainės kūrimo paketą.";
   }
 
-  if (!form.budget) {
-    errors.budget = "Pasirinkite biudžeto intervalą.";
+  if (form.packageId === "custom" && !form.budget) {
+    errors.budget = "Pasirinkite orientacinį biudžetą.";
   }
 
   if (form.message.trim().length < 20) {
@@ -80,19 +90,33 @@ function App() {
   const [form, setForm] = useState<FormState>(initialFormState);
   const [errors, setErrors] = useState<FormErrors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "fallback" | "error">("idle");
+  const [requestNumber, setRequestNumber] = useState("");
+
+  const selectedPlan = useMemo(
+    () => pricePlans.find((plan) => plan.id === form.packageId) || null,
+    [form.packageId]
+  );
 
   const mailtoHref = useMemo(() => {
-    const subject = encodeURIComponent("Nemokama konsultacija dėl svetainės");
+    const subject = encodeURIComponent("Svetainės kūrimo užklausa");
     const body = encodeURIComponent(
-      `Sveiki,\n\nNoriu pasikalbėti dėl svetainės kūrimo.\n\nPaslauga: ${form.service || "-"}\nBiudžetas: ${form.budget || "-"}\nĮmonė: ${form.company || "-"}\n\nProjekto aprašymas:\n${form.message || "-"}`
+      `Sveiki,\n\nNoriu užsakyti svetainės kūrimą.\n\nPaketas: ${selectedPlan?.name || "-"}\nKaina: ${selectedPlan?.priceLabel || "-"}\nBiudžetas: ${form.budget || "-"}\nĮmonė: ${form.company || "-"}\nTelefonas: ${form.phone || "-"}\n\nProjekto aprašymas:\n${form.message || "-"}`
     );
     return `mailto:${contactEmail}?subject=${subject}&body=${body}`;
-  }, [form.budget, form.company, form.message, form.service]);
+  }, [form.budget, form.company, form.message, form.phone, selectedPlan]);
 
   const updateForm = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((current) => ({ ...current, [key]: value }));
     setErrors((current) => ({ ...current, [key]: undefined }));
     setStatus("idle");
+    setRequestNumber("");
+  };
+
+  const choosePlan = (packageId: FormState["packageId"]) => {
+    updateForm("packageId", packageId);
+    window.setTimeout(() => {
+      document.getElementById("kontaktai")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 0);
   };
 
   const submitLead = async (event: FormEvent<HTMLFormElement>) => {
@@ -111,6 +135,7 @@ function App() {
     }
 
     setStatus("sending");
+    setRequestNumber("");
 
     try {
       const response = await fetch(leadEndpoint, {
@@ -119,18 +144,22 @@ function App() {
         body: JSON.stringify({
           name: form.name.trim(),
           email: form.email.trim(),
+          phone: form.phone.trim(),
           company: form.company.trim() || null,
-          service: form.service,
-          budget: form.budget,
+          packageId: form.packageId,
+          budget: form.packageId === "custom" ? form.budget : "",
           message: form.message.trim(),
-          source: "stilloak-web-services"
+          website: form.website
         })
       });
 
+      const data = (await response.json().catch(() => ({}))) as LeadResponse;
+
       if (!response.ok) {
-        throw new Error("Lead endpoint returned an error");
+        throw new Error(data.message || "Lead endpoint returned an error");
       }
 
+      setRequestNumber(data.requestNumber || "");
       setForm(initialFormState);
       setStatus("sent");
     } catch {
@@ -144,7 +173,7 @@ function App() {
     ["Procesas", "#procesas"],
     ["Kainos", "#kainos"],
     ["DUK", "#duk"],
-    ["Kontaktai", "#kontaktai"]
+    ["Užsakymas", "#kontaktai"]
   ];
 
   return (
@@ -175,8 +204,8 @@ function App() {
               {label}
             </a>
           ))}
-          <a className="nav-cta" href="#kontaktai" onClick={() => setMenuOpen(false)}>
-            Konsultacija
+          <a className="nav-cta" href="#kainos" onClick={() => setMenuOpen(false)}>
+            Užsisakyti
           </a>
         </nav>
       </header>
@@ -187,12 +216,11 @@ function App() {
             <p className="eyebrow">Svetainių kūrimas augančiam verslui</p>
             <h1 id="hero-title">Kuriame svetaines, kurios padeda verslui augti.</h1>
             <p className="hero-copy">
-              Stilloak Web padeda paversti paslaugą aiškiu skaitmeniniu keliu: nuo pirmo įspūdžio iki užklausos,
-              pirkimo ar veikiančio vidinio įrankio.
+              Pasirinkite aiškų paketą su fiksuota pradine kaina arba individualų sprendimą sudėtingesniam projektui.
             </p>
             <div className="hero-actions">
-              <a className="button button-primary" href="#kontaktai">
-                Gauti nemokamą konsultaciją <ArrowRight size={18} aria-hidden="true" />
+              <a className="button button-primary" href="#kainos">
+                Peržiūrėti paketus <ArrowRight size={18} aria-hidden="true" />
               </a>
               <a className="button button-secondary" href="#portfolio">
                 Peržiūrėti pavyzdį
@@ -223,14 +251,14 @@ function App() {
                 </div>
                 <div className="mock-hero">
                   <p>Aiški vertė</p>
-                  <strong>Vienas puslapis, vienas tikslas, mažiau trinties.</strong>
+                  <strong>Vienas procesas nuo pasirinkto paketo iki veikiančios svetainės.</strong>
                 </div>
                 <div className="mock-grid">
                   <span />
                   <span />
                   <span />
                 </div>
-                <div className="mock-cta">Užklausa be perteklinio triukšmo</div>
+                <div className="mock-cta">Aiški kaina ir projekto eiga</div>
               </div>
             </div>
           </div>
@@ -241,8 +269,8 @@ function App() {
             <p className="eyebrow">Paslaugos</p>
             <h2 id="services-title">Skaitmeninis pagrindas, pritaikytas realiam verslo etapui.</h2>
             <p>
-              Nuo mažo kampanijos puslapio iki individualios sistemos. Kiekvienas darbas pradedamas nuo aiškios
-              paskirties, ne nuo dizaino dekoracijų.
+              Nuo mažos reprezentacinės svetainės iki individualios sistemos. Kiekvienas darbas pradedamas nuo
+              aiškaus tikslo ir sutartos apimties.
             </p>
           </div>
           <div className="services-grid">
@@ -299,15 +327,18 @@ function App() {
         <section id="kainos" className="section" aria-labelledby="pricing-title">
           <div className="section-heading">
             <p className="eyebrow">Kainos</p>
-            <h2 id="pricing-title">Pradinės kainos pagal darbo apimtį.</h2>
-            <p>Aiški pradinė sąmata padeda greitai suprasti kryptį, o galutinė kaina nustatoma po trumpos analizės.</p>
+            <h2 id="pricing-title">Pasirinkite svetainės kūrimo paketą.</h2>
+            <p>
+              Start, Business ir Pro turi aiškią bazinę kainą. Jei projektas nestandartinis, rinkitės „Pagal
+              poreikius“ ir paruošime individualią sąmatą.
+            </p>
           </div>
           <div className="pricing-grid">
             {pricePlans.map((plan) => (
               <article className={plan.featured ? "price-card price-card-featured reveal" : "price-card reveal"} key={plan.id}>
-                {plan.featured ? <span className="badge">Dažnas pasirinkimas</span> : null}
+                {plan.featured ? <span className="badge">Populiariausias</span> : null}
                 <h3>{plan.name}</h3>
-                <p className="price">{plan.price}</p>
+                <p className="price">{plan.priceLabel}</p>
                 <p>{plan.description}</p>
                 <ul>
                   {plan.includes.map((item) => (
@@ -316,6 +347,9 @@ function App() {
                     </li>
                   ))}
                 </ul>
+                <button className="button button-secondary" type="button" onClick={() => choosePlan(plan.id)}>
+                  {plan.id === "custom" ? "Aprašyti poreikius" : `Rinktis ${plan.name}`}
+                </button>
               </article>
             ))}
           </div>
@@ -324,7 +358,7 @@ function App() {
         <section id="duk" className="section faq-section" aria-labelledby="faq-title">
           <div className="section-heading">
             <p className="eyebrow">DUK</p>
-            <h2 id="faq-title">Dažniausi klausimai prieš pirmą pokalbį.</h2>
+            <h2 id="faq-title">Dažniausi klausimai prieš užsakymą.</h2>
           </div>
           <div className="faq-list">
             {faqs.map((faq) => (
@@ -341,11 +375,11 @@ function App() {
 
         <section id="kontaktai" className="section contact-section" aria-labelledby="contact-title">
           <div className="contact-copy">
-            <p className="eyebrow">Kontaktai</p>
-            <h2 id="contact-title">Gauti nemokamą konsultaciją.</h2>
+            <p className="eyebrow">Užsakymas</p>
+            <h2 id="contact-title">Pateikite svetainės kūrimo užsakymą.</h2>
             <p>
-              Aprašykite, kokios svetainės ar sistemos reikia. Jei užklausų endpointas dar neprijungtas, forma
-              nukreips į el. paštą ir aiškiai neimituos sėkmingo išsiuntimo.
+              Pasirinkite paketą, įveskite kontaktus ir trumpai aprašykite projektą. Užklausa gaus savo numerį ir
+              pateks tiesiai į Stilloak administravimo sistemą.
             </p>
             <a className="email-link" href={`mailto:${contactEmail}`}>
               <Mail size={18} aria-hidden="true" /> {contactEmail}
@@ -380,52 +414,71 @@ function App() {
               </label>
             </div>
 
-            <label>
-              Įmonė <span className="optional">neprivaloma</span>
-              <input
-                type="text"
-                name="company"
-                autoComplete="organization"
-                value={form.company}
-                onChange={(event) => updateForm("company", event.target.value)}
-              />
-            </label>
+            <div className="field-grid">
+              <label>
+                Telefonas <span className="optional">neprivaloma</span>
+                <input
+                  type="tel"
+                  name="phone"
+                  autoComplete="tel"
+                  value={form.phone}
+                  onChange={(event) => updateForm("phone", event.target.value)}
+                />
+              </label>
+              <label>
+                Įmonė <span className="optional">neprivaloma</span>
+                <input
+                  type="text"
+                  name="company"
+                  autoComplete="organization"
+                  value={form.company}
+                  onChange={(event) => updateForm("company", event.target.value)}
+                />
+              </label>
+            </div>
 
             <div className="field-grid">
               <label>
-                Paslauga
+                Paketas
                 <select
-                  name="service"
-                  value={form.service}
-                  onChange={(event) => updateForm("service", event.target.value)}
-                  aria-invalid={Boolean(errors.service)}
+                  name="packageId"
+                  value={form.packageId}
+                  onChange={(event) => updateForm("packageId", event.target.value)}
+                  aria-invalid={Boolean(errors.packageId)}
                 >
                   <option value="">Pasirinkite</option>
-                  {services.map((service) => (
-                    <option key={service.title} value={service.title}>
-                      {service.title}
+                  {pricePlans.map((plan) => (
+                    <option key={plan.id} value={plan.id}>
+                      {plan.name} — {plan.priceLabel}
                     </option>
                   ))}
                 </select>
-                {errors.service ? <span className="field-error">{errors.service}</span> : null}
+                {errors.packageId ? <span className="field-error">{errors.packageId}</span> : null}
               </label>
-              <label>
-                Biudžeto intervalas
-                <select
-                  name="budget"
-                  value={form.budget}
-                  onChange={(event) => updateForm("budget", event.target.value)}
-                  aria-invalid={Boolean(errors.budget)}
-                >
-                  <option value="">Pasirinkite</option>
-                  <option value="Iki 500 €">Iki 500 €</option>
-                  <option value="500-1 000 €">500-1 000 €</option>
-                  <option value="1 000-2 500 €">1 000-2 500 €</option>
-                  <option value="2 500-5 000 €">2 500-5 000 €</option>
-                  <option value="5 000 €+">5 000 €+</option>
-                </select>
-                {errors.budget ? <span className="field-error">{errors.budget}</span> : null}
-              </label>
+
+              {form.packageId === "custom" ? (
+                <label>
+                  Orientacinis biudžetas
+                  <select
+                    name="budget"
+                    value={form.budget}
+                    onChange={(event) => updateForm("budget", event.target.value)}
+                    aria-invalid={Boolean(errors.budget)}
+                  >
+                    <option value="">Pasirinkite</option>
+                    <option value="Iki 1 000 €">Iki 1 000 €</option>
+                    <option value="1 000-2 500 €">1 000-2 500 €</option>
+                    <option value="2 500-5 000 €">2 500-5 000 €</option>
+                    <option value="5 000 €+">5 000 €+</option>
+                  </select>
+                  {errors.budget ? <span className="field-error">{errors.budget}</span> : null}
+                </label>
+              ) : (
+                <label>
+                  Bazinė kaina
+                  <input type="text" value={selectedPlan?.priceLabel || "Pasirinkite paketą"} readOnly />
+                </label>
+              )}
             </div>
 
             <label>
@@ -433,6 +486,7 @@ function App() {
               <textarea
                 name="message"
                 rows={6}
+                placeholder="Kuo užsiima jūsų verslas, kokios svetainės reikia ir kokio rezultato tikitės?"
                 value={form.message}
                 onChange={(event) => updateForm("message", event.target.value)}
                 aria-invalid={Boolean(errors.message)}
@@ -466,29 +520,29 @@ function App() {
 
             {status === "fallback" ? (
               <div className="form-notice" role="status">
-                Užklausų endpointas dar nenustatytas. Susisiekite el. paštu:
+                Užsakymų API dar neprijungtas šioje aplinkoje. Susisiekite el. paštu:
                 <a href={mailtoHref}> {contactEmail}</a>
               </div>
             ) : null}
             {status === "sent" ? (
               <div className="form-notice success" role="status">
-                Užklausa išsiųsta per sukonfigūruotą endpointą.
+                Užsakymas gautas{requestNumber ? ` — jūsų užklausos numeris ${requestNumber}.` : "."}
               </div>
             ) : null}
             {status === "error" ? (
               <div className="form-notice error" role="alert">
-                Nepavyko išsiųsti užklausos. Parašykite el. paštu:
+                Nepavyko išsiųsti užsakymo. Parašykite el. paštu:
                 <a href={mailtoHref}> {contactEmail}</a>
               </div>
             ) : null}
 
             <button className="button button-primary form-submit" type="submit" disabled={status === "sending"}>
               <Send size={18} aria-hidden="true" />
-              {status === "sending" ? "Siunčiama..." : "Gauti nemokamą konsultaciją"}
+              {status === "sending" ? "Siunčiama..." : "Pateikti užsakymą"}
             </button>
             <p className="privacy-note">
-              <ShieldCheck size={16} aria-hidden="true" /> Forma siunčia tik jūsų pateiktus duomenis ir nenaudoja
-              paslėptų rinkodaros sutikimų.
+              <ShieldCheck size={16} aria-hidden="true" /> Forma siunčia tik jūsų pateiktus projekto ir kontaktinius
+              duomenis. Fiksuoto paketo kaina patvirtinama serverio pusėje.
             </p>
           </form>
         </section>

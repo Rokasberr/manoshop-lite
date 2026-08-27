@@ -1,6 +1,7 @@
 import {
   BarChart3,
   FileText,
+  Globe2,
   Instagram,
   Lightbulb,
   LogOut,
@@ -38,6 +39,11 @@ const adminNavigation = [
     label: "Užsakymai",
     to: "/admin/orders",
     icon: ShoppingCart,
+  },
+  {
+    label: "Web užsakymai",
+    to: "/admin/web-orders",
+    icon: Globe2,
   },
   {
     label: "Instagram",
@@ -105,7 +111,7 @@ const AdminShell = ({ previewMode = false }) => {
       <div className="dashboard-sidebar-card mt-8">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-600">Administravimo erdvė</p>
         <p className="mt-3 text-sm leading-6 text-slate-600">
-          Viena vieta produktams, užsakymams, pajamoms ir klientų aktyvumui stebėti.
+          Viena vieta produktams, užsakymams, Web projektams, pajamoms ir klientų aktyvumui stebėti.
         </p>
         <Link to="/" className="dashboard-button-secondary mt-5 w-full justify-center">
           <Store size={16} />
@@ -140,7 +146,7 @@ const AdminShell = ({ previewMode = false }) => {
           </div>
 
           <div className="flex items-center gap-3">
-          <div className="hidden rounded-2xl border border-slate-200 bg-white px-4 py-3 text-right shadow-sm sm:block">
+            <div className="hidden rounded-2xl border border-slate-200 bg-white px-4 py-3 text-right shadow-sm sm:block">
               <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Erdvė</p>
               <p className="mt-1 text-sm font-medium text-slate-700">
                 {previewMode ? "Peržiūros režimas" : isAdminUser(user) ? "Administratorius" : "Narys"}
