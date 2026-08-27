@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const { getWebServicePlan } = require("../config/webServicePlans");
 const WebServiceRequest = require("../models/WebServiceRequest");
 const { STATUS_OPTIONS } = require("../models/WebServiceRequest");
+const { sendWebServiceRequestEmails } = require("../services/webServiceRequestEmailService");
 const { createHttpError } = require("../utils/httpError");
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -76,6 +77,13 @@ const createWebServiceRequest = async (req, res) => {
       name: request.packageName,
       basePrice: request.basePrice,
     },
+  });
+
+  sendWebServiceRequestEmails(request).catch((error) => {
+    const causes = Array.isArray(error?.causes)
+      ? error.causes.map((cause) => cause?.message || String(cause)).join(" | ")
+      : error?.message || String(error);
+    console.error(`[web-orders] ${request.requestNumber} el. pašto pranešimų klaida: ${causes}`);
   });
 };
 
