@@ -28,6 +28,10 @@ const infoPageCopy = {
   infoPageCopy[languageCode] = infoPageCopy.en;
 });
 
+const OLD_CONTACT_EMAIL = "hello@stilloak-studio.com";
+const CONTACT_EMAIL = "rokas@stilloak-studio.com";
+const withCurrentContactEmail = (text = "") => text.replaceAll(OLD_CONTACT_EMAIL, CONTACT_EMAIL);
+
 const InfoPage = ({ page }) => {
   const location = useLocation();
   const { language, isLithuanian } = useLanguage();
@@ -80,7 +84,7 @@ const InfoPage = ({ page }) => {
 
               {section.paragraphs?.map((paragraph) => (
                 <p key={paragraph} className="mt-4 max-w-3xl text-base leading-7 text-muted">
-                  {paragraph}
+                  {withCurrentContactEmail(paragraph)}
                 </p>
               ))}
 
@@ -89,7 +93,7 @@ const InfoPage = ({ page }) => {
                   {section.bullets.map((bullet) => (
                     <div key={bullet} className="flex items-start gap-3 rounded-[20px] bg-[rgb(249,245,238)] px-4 py-4">
                       <CheckCircle2 size={18} className="mt-0.5 shrink-0" style={{ color: "rgb(var(--accent))" }} />
-                      <p className="text-sm leading-6 text-[rgb(78,68,57)]">{bullet}</p>
+                      <p className="text-sm leading-6 text-[rgb(78,68,57)]">{withCurrentContactEmail(bullet)}</p>
                     </div>
                   ))}
                 </div>
