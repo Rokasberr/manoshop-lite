@@ -78,7 +78,7 @@ const createWebServiceRequest = async (req, res) => {
     basePrice: plan.basePrice,
     budget: plan.id === "custom" ? budget : "",
     message,
-    source: attribution.source,
+    source: "stilloak-web-services",
     attribution,
   });
 
