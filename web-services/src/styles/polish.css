@@ -1,0 +1,482 @@
+/* Final visual polish layer for Stilloak Web. Loaded after main.css. */
+
+html {
+  scroll-padding-top: 112px;
+}
+
+::selection {
+  color: #fffaf6;
+  background: #80563a;
+}
+
+/* Brand mark: reuse the existing Stilloak logo without changing app logic. */
+.site-header .wordmark,
+.footer-wordmark {
+  align-items: center;
+  letter-spacing: -0.045em;
+}
+
+.site-header .wordmark::before,
+.footer-wordmark::before {
+  flex: 0 0 auto;
+  content: "";
+  background: url("../assets/stilloak-logo.svg") center / contain no-repeat;
+}
+
+.site-header .wordmark::before {
+  width: 31px;
+  height: 31px;
+  margin-right: 3px;
+}
+
+.footer-wordmark::before {
+  width: 42px;
+  height: 42px;
+  margin-right: 5px;
+  filter: drop-shadow(0 5px 14px rgba(0, 0, 0, 0.16));
+}
+
+.site-header {
+  border-color: rgba(184, 164, 143, 0.62);
+  box-shadow:
+    0 13px 38px rgba(72, 51, 33, 0.075),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.site-header::after {
+  position: absolute;
+  right: 18px;
+  bottom: -1px;
+  left: 18px;
+  height: 1px;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(154, 103, 68, 0.18), transparent);
+  pointer-events: none;
+}
+
+.nav a,
+.button {
+  outline: none;
+}
+
+.nav a:focus-visible,
+.button:focus-visible,
+.mobile-menu-button:focus-visible,
+.contact-form input:focus-visible,
+.contact-form select:focus-visible,
+.contact-form textarea:focus-visible,
+.site-footer a:focus-visible {
+  outline: 3px solid rgba(154, 103, 68, 0.24);
+  outline-offset: 3px;
+}
+
+.nav-cta,
+.button-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-cta::before,
+.button-primary::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.14) 48%, transparent 66%);
+  transform: translateX(-120%);
+  transition: transform 520ms ease;
+  pointer-events: none;
+}
+
+.nav-cta:hover::before,
+.button-primary:hover:not(:disabled)::before {
+  transform: translateX(120%);
+}
+
+.nav-cta svg,
+.button svg {
+  transition: transform 180ms ease;
+}
+
+.nav-cta:hover svg,
+.button:hover:not(:disabled) svg {
+  transform: translateX(3px);
+}
+
+/* Hero micro-details */
+.hero-pill {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.hero-proof {
+  padding: 12px 14px 12px 10px;
+  border: 1px solid rgba(211, 196, 180, 0.72);
+  border-radius: 14px;
+  background: rgba(255, 253, 249, 0.52);
+  box-shadow: 0 8px 25px rgba(74, 51, 33, 0.045);
+}
+
+.browser-frame {
+  box-shadow:
+    0 24px 70px rgba(74, 51, 33, 0.13),
+    0 2px 0 rgba(255, 255, 255, 0.8) inset;
+  transition: transform 260ms ease, box-shadow 260ms ease;
+}
+
+.hero-visual:hover .browser-frame {
+  transform: translateY(-3px);
+  box-shadow:
+    0 31px 80px rgba(74, 51, 33, 0.16),
+    0 2px 0 rgba(255, 255, 255, 0.8) inset;
+}
+
+.browser-address {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.browser-address::before {
+  width: 6px;
+  height: 6px;
+  content: "";
+  border-radius: 50%;
+  background: #55936b;
+  box-shadow: 0 0 0 3px rgba(85, 147, 107, 0.1);
+}
+
+.mini-preview {
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.mini-preview:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(55, 39, 27, 0.16);
+}
+
+/* Cards feel less template-like and more tactile. */
+.benefit-card,
+.price-card,
+.concept-card {
+  position: relative;
+}
+
+.benefit-card {
+  transition: background 180ms ease, transform 180ms ease;
+}
+
+.benefit-card:hover {
+  z-index: 1;
+  background: rgba(255, 253, 249, 0.98);
+  transform: translateY(-2px);
+}
+
+.benefit-icon {
+  box-shadow: inset 0 0 0 1px rgba(161, 113, 77, 0.08);
+}
+
+.price-card {
+  transition: transform 190ms ease, box-shadow 190ms ease, border-color 190ms ease;
+}
+
+.price-card:hover {
+  transform: translateY(-4px);
+  border-color: #cdb9a6;
+  box-shadow: 0 19px 42px rgba(74, 51, 33, 0.12);
+}
+
+.price-card-featured {
+  box-shadow:
+    0 19px 44px rgba(113, 72, 43, 0.13),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.price-card-featured::before {
+  position: absolute;
+  top: 0;
+  right: 24px;
+  left: 24px;
+  height: 2px;
+  content: "";
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, #a9724c, transparent);
+}
+
+.concept-card {
+  isolation: isolate;
+}
+
+.concept-card::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  border-radius: inherit;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.45) inset;
+  pointer-events: none;
+}
+
+/* Contact panel: make security and ownership clearer. */
+.contact-panel {
+  position: relative;
+  overflow: hidden;
+  border-color: #d7cabd;
+  box-shadow:
+    0 18px 48px rgba(74, 51, 33, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.contact-panel::before {
+  position: absolute;
+  top: -110px;
+  right: -80px;
+  width: 260px;
+  height: 260px;
+  content: "";
+  border: 1px solid rgba(169, 120, 83, 0.11);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 30px rgba(169, 120, 83, 0.035),
+    0 0 0 62px rgba(169, 120, 83, 0.022);
+  pointer-events: none;
+}
+
+.contact-copy,
+.contact-form {
+  position: relative;
+  z-index: 1;
+}
+
+.response-time,
+.contact-email {
+  width: fit-content;
+  padding: 7px 10px;
+  border: 1px solid rgba(210, 195, 180, 0.7);
+  border-radius: 999px;
+  background: rgba(255, 253, 249, 0.54);
+}
+
+.contact-form input,
+.contact-form select,
+.contact-form textarea {
+  box-shadow: inset 0 1px 2px rgba(52, 39, 29, 0.025);
+}
+
+.contact-form input:hover,
+.contact-form select:hover,
+.contact-form textarea:hover {
+  border-color: #cab7a4;
+}
+
+.contact-form input[readonly] {
+  color: #74685e;
+  background: rgba(246, 240, 233, 0.78);
+}
+
+.privacy-note {
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 12px;
+  border: 1px solid rgba(113, 157, 125, 0.35);
+  border-radius: 10px;
+  color: #50665a;
+  background: rgba(235, 246, 238, 0.64);
+  font-size: 10px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.privacy-note svg {
+  flex: 0 0 auto;
+  color: #4f8a62;
+}
+
+.privacy-note::after {
+  margin-left: auto;
+  content: "HTTPS";
+  padding: 4px 7px;
+  border: 1px solid rgba(79, 138, 98, 0.28);
+  border-radius: 999px;
+  color: #3f7651;
+  background: rgba(255, 255, 255, 0.55);
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.consent-field {
+  padding: 2px 0;
+}
+
+.form-notice.success {
+  box-shadow: inset 3px 0 0 #5d9a70;
+}
+
+.form-notice.error {
+  box-shadow: inset 3px 0 0 #b65c4b;
+}
+
+/* Footer: remove duplicated URL and replace it with useful trust information. */
+.site-footer {
+  position: relative;
+  grid-template-columns: 1.45fr 0.85fr 1fr;
+  overflow: hidden;
+  padding-top: 38px;
+  padding-bottom: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.045);
+  background:
+    radial-gradient(circle at 88% 18%, rgba(174, 122, 84, 0.11), transparent 27%),
+    linear-gradient(135deg, #141719, #202427);
+}
+
+.site-footer::before {
+  position: absolute;
+  top: 0;
+  right: 38px;
+  left: 38px;
+  height: 1px;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(194, 148, 112, 0.34), transparent);
+}
+
+/* Existing third footer column only repeats the current domain, so hide it. */
+.site-footer > div:nth-child(3) {
+  display: none;
+}
+
+/* Replace the removed duplicate with a security/trust block. */
+.site-footer::after {
+  display: flex;
+  align-items: center;
+  min-height: 58px;
+  padding: 13px 15px 13px 39px;
+  border: 1px solid rgba(139, 180, 151, 0.18);
+  border-radius: 13px;
+  content: "Saugus HTTPS ryšys\A Užklausa perduodama šifruotu ryšiu";
+  white-space: pre-line;
+  color: #c5d7ca;
+  background:
+    radial-gradient(circle at 20px 21px, #65a576 0 4px, transparent 5px),
+    rgba(255, 255, 255, 0.035);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
+}
+
+.footer-brand-block {
+  min-width: 0;
+}
+
+.footer-brand-block p {
+  margin-top: 13px;
+}
+
+.site-footer > div:nth-child(2) {
+  padding-left: 4px;
+}
+
+.site-footer a:not(.wordmark) {
+  width: fit-content;
+  border-bottom: 1px solid transparent;
+  transition: color 160ms ease, border-color 160ms ease;
+}
+
+.site-footer a:not(.wordmark):hover {
+  color: #fff;
+  border-color: rgba(190, 145, 111, 0.6);
+}
+
+.footer-label::after {
+  display: block;
+  width: 26px;
+  height: 1px;
+  margin-top: 8px;
+  content: "";
+  background: #9a6a49;
+  opacity: 0.7;
+}
+
+/* Fine details and accessibility. */
+@media (hover: hover) {
+  .contact-email:hover,
+  .response-time:hover {
+    border-color: #c9b5a1;
+    background: rgba(255, 253, 249, 0.78);
+  }
+}
+
+@media (max-width: 900px) {
+  .site-header .wordmark::before {
+    width: 29px;
+    height: 29px;
+  }
+
+  .site-footer {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .site-footer::after {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 620px) {
+  .site-header {
+    padding-left: 14px;
+  }
+
+  .site-header .wordmark {
+    font-size: 21px;
+  }
+
+  .site-header .wordmark::before {
+    width: 27px;
+    height: 27px;
+  }
+
+  .hero-proof {
+    border-radius: 12px;
+  }
+
+  .privacy-note {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .privacy-note::after {
+    margin-left: 22px;
+  }
+
+  .site-footer {
+    grid-template-columns: 1fr;
+    gap: 21px;
+    padding: 30px 22px;
+  }
+
+  .footer-wordmark::before {
+    width: 38px;
+    height: 38px;
+  }
+
+  .site-footer::after {
+    grid-column: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .browser-frame,
+  .mini-preview,
+  .benefit-card,
+  .price-card,
+  .button svg,
+  .nav-cta svg {
+    transform: none !important;
+  }
+
+  .nav-cta::before,
+  .button-primary::before {
+    display: none;
+  }
+}
