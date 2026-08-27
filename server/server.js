@@ -17,6 +17,7 @@ const launchSoonRoutes = require("./routes/launchSoonRoutes");
 const businessRoutes = require("./routes/businessRoutes");
 const storeRoutes = require("./routes/storeRoutes");
 const memberResourceRoutes = require("./routes/memberResourceRoutes");
+const webServiceRequestRoutes = require("./routes/webServiceRequestRoutes");
 const { validateEnvironment } = require("./config/env");
 const { startSavingsStudioSummaryScheduler } = require("./services/savingsStudioScheduler");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
@@ -114,6 +115,7 @@ app.use("/api/launch-soon", launchSoonRoutes);
 app.use("/api/business", businessRoutes);
 app.use("/api/stores", storeRoutes);
 app.use("/api/member-resources", memberResourceRoutes);
+app.use("/api/web-service-requests", webServiceRequestRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
