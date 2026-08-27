@@ -101,8 +101,8 @@ const Footer = () => {
           </Link>
           <div className="mt-4 space-y-3 text-sm text-white/58">
             <p>{copy.links.contactPrompt}</p>
-            <a href="mailto:hello@stilloak-studio.com" className="block transition hover:text-white">
-              hello@stilloak-studio.com
+            <a href="mailto:rokas@stilloak-studio.com" className="block transition hover:text-white">
+              rokas@stilloak-studio.com
             </a>
           </div>
           <Link to="/contact" className="mt-5 inline-flex text-sm font-medium accent-text transition hover:opacity-80">
