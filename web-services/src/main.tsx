@@ -6,6 +6,7 @@ import "./styles/main.css";
 import "./styles/polish.css";
 import "./styles/cookies.css";
 import "./styles/background.css";
+import "./styles/experience.css";
 
 createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
