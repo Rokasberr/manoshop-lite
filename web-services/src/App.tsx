@@ -16,6 +16,7 @@ import {
   X
 } from "lucide-react";
 import { pricePlans } from "./data/pricing";
+import { getLeadAttribution } from "./lib/leadAttribution";
 
 type FormState = {
   name: string;
@@ -322,7 +323,8 @@ function App() {
           packageId: form.packageId,
           budget: form.packageId === "custom" ? form.budget : "",
           message: form.message.trim(),
-          website: form.website
+          website: form.website,
+          attribution: getLeadAttribution()
         })
       });
 
