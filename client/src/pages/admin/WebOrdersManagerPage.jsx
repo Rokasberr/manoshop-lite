@@ -31,7 +31,8 @@ const statusLabels = {
 };
 
 const sourceLabel = (request) => {
-  const source = request.attribution?.source || request.source || "direct";
+  const legacySource = request.source === "stilloak-web-services" ? "direct" : request.source;
+  const source = request.attribution?.source || legacySource || "direct";
   const medium = request.attribution?.medium || "none";
   return medium && medium !== "none" ? `${source} / ${medium}` : source;
 };
