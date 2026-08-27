@@ -30,6 +30,12 @@ const statusLabels = {
   lost: "Prarastas",
 };
 
+const sourceLabel = (request) => {
+  const source = request.attribution?.source || request.source || "direct";
+  const medium = request.attribution?.medium || "none";
+  return medium && medium !== "none" ? `${source} / ${medium}` : source;
+};
+
 const WebOrdersManagerPage = () => {
   const [requests, setRequests] = useState([]);
   const [drafts, setDrafts] = useState({});
@@ -121,7 +127,7 @@ const WebOrdersManagerPage = () => {
       <AdminPageHeader
         eyebrow="Stilloak Web"
         title="Svetainių užsakymai"
-        description="Visos užklausos iš web.stilloak-studio.com vienoje vietoje: kontaktai, pasirinktas paketas, projekto aprašymas, kaina ir pardavimo būsena."
+        description="Visos užklausos iš web.stilloak-studio.com vienoje vietoje: kontaktai, paketas, projekto vertė, pardavimo būsena ir reklamos / lankytojo šaltinis."
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -176,6 +182,7 @@ const WebOrdersManagerPage = () => {
             {requests.map((request) => {
               const draft = drafts[request._id] || {};
               const displayedPrice = request.finalPrice ?? request.basePrice;
+              const attribution = request.attribution || {};
 
               return (
                 <article key={request._id} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
@@ -186,6 +193,9 @@ const WebOrdersManagerPage = () => {
                         <StatusBadge status={request.status} />
                         <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
                           {request.packageName}
+                        </span>
+                        <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                          Šaltinis: {sourceLabel(request)}
                         </span>
                       </div>
 
@@ -215,6 +225,25 @@ const WebOrdersManagerPage = () => {
                           <p className="mt-1 font-semibold text-slate-950">
                             {displayedPrice == null ? "Nenustatyta" : formatCurrency(displayedPrice)}
                           </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-5 grid gap-4 rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4 md:grid-cols-2 xl:grid-cols-4">
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700/70">Source / medium</p>
+                          <p className="mt-1 text-sm font-semibold text-slate-900">{sourceLabel(request)}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700/70">Kampanija</p>
+                          <p className="mt-1 break-words text-sm text-slate-700">{attribution.campaign || "—"}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700/70">Landing page</p>
+                          <p className="mt-1 break-all text-sm text-slate-700">{attribution.landingPage || "—"}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700/70">Referrer</p>
+                          <p className="mt-1 break-all text-sm text-slate-700">{attribution.referrer || "—"}</p>
                         </div>
                       </div>
 
