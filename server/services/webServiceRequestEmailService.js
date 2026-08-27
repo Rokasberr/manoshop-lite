@@ -13,6 +13,8 @@ const {
 } = require("../utils/brevoEmail");
 
 const COMPANY_NAME = process.env.COMPANY_NAME?.trim() || "Stilloak Studio";
+const WEB_ORDERS_FROM_EMAIL =
+  process.env.WEB_ORDERS_FROM_EMAIL?.trim() || "Stilloak Studio <hello@stilloak-studio.com>";
 
 const escapeHtml = (value) =>
   String(value ?? "")
@@ -199,7 +201,7 @@ const sendThroughSmtp = async ({ to, replyTo, email, fromOverride = "" }) => {
   return { sent: true, provider: "smtp" };
 };
 
-const sendTransactional = async ({ to, replyTo, email, tags }) => {
+const sendTransactional = async ({ to, replyTo, email, tags, senderOverride = null }) => {
   if (isBrevoEmailConfigured()) {
     const result = await sendBrevoTransactionalEmail({
       to,
@@ -208,6 +210,7 @@ const sendTransactional = async ({ to, replyTo, email, tags }) => {
       text: email.text,
       html: email.html,
       tags,
+      senderOverride,
     });
 
     return { sent: true, provider: "brevo-api", messageId: result?.messageId || null };
@@ -221,41 +224,46 @@ const sendTransactional = async ({ to, replyTo, email, tags }) => {
 };
 
 const sendAdminNotification = async ({ to, replyTo, email, tags }) => {
-  if (isFullEmailTransportConfigured()) {
-    const { user, from } = getTransportConfig();
-
+  if (isBrevoEmailConfigured()) {
     try {
-      return await sendThroughSmtp({
+      const result = await sendBrevoTransactionalEmail({
         to,
-        replyTo,
-        email,
-        fromOverride: user || from,
+        subject: email.subject,
+        text: email.text,
+        tags: [...tags, "plain-text"],
+        senderOverride: WEB_ORDERS_FROM_EMAIL,
       });
-    } catch (smtpError) {
-      if (isBrevoEmailConfigured()) {
-        const result = await sendBrevoTransactionalEmail({
-          to,
-          replyTo,
-          subject: email.subject,
-          text: email.text,
-          html: email.html,
-          tags: [...tags, "smtp-fallback"],
-        });
 
-        return {
-          sent: true,
-          provider: "brevo-api-fallback",
-          messageId: result?.messageId || null,
-          smtpFallback: true,
-          smtpErrorCode: smtpError?.statusCode || null,
-        };
+      return {
+        sent: true,
+        provider: "brevo-api",
+        messageId: result?.messageId || null,
+        plainText: true,
+      };
+    } catch (brevoError) {
+      if (!isFullEmailTransportConfigured()) {
+        throw brevoError;
       }
-
-      throw smtpError;
     }
   }
 
-  return sendTransactional({ to, replyTo, email, tags });
+  if (isFullEmailTransportConfigured()) {
+    const { user, from } = getTransportConfig();
+    return sendThroughSmtp({
+      to,
+      replyTo,
+      email,
+      fromOverride: user || from,
+    });
+  }
+
+  return sendTransactional({
+    to,
+    replyTo,
+    email,
+    tags,
+    senderOverride: WEB_ORDERS_FROM_EMAIL,
+  });
 };
 
 const sendWebServiceRequestEmails = async (request) => {
@@ -270,6 +278,7 @@ const sendWebServiceRequestEmails = async (request) => {
       replyTo: adminReplyTo,
       email: customerEmail,
       tags: ["web-orders", "customer-confirmation"],
+      senderOverride: WEB_ORDERS_FROM_EMAIL,
     }),
   ];
 
