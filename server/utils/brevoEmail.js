@@ -61,7 +61,7 @@ const normalizeBrevoEmailError = (error) => {
   if (/sender.*not.*verified|sender.*invalid|from.*invalid|not a valid sender|unauthorized sender/.test(combined)) {
     error.statusCode = 400;
     error.message =
-      "Siuntėjas dar nepatvirtintas. Brevo pusėje patvirtink domeną arba senderį hello@stilloak-studio.com.";
+      "Siuntėjas dar nepatvirtintas. Brevo pusėje patvirtink domeną arba senderį rokas@stilloak-studio.com.";
     return error;
   }
 
