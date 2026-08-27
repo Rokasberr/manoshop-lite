@@ -65,6 +65,11 @@ export default function CookieConsentBanner() {
     setPreferencesOpen(false);
   };
 
+  const openPreferences = () => {
+    setDraft(readConsent() || DEFAULT_CONSENT);
+    setPreferencesOpen(true);
+  };
+
   const rejectNonEssential = () => save(DEFAULT_CONSENT);
   const acceptAll = () => save({ necessary: true, analytics: true, marketing: true });
 
@@ -87,7 +92,7 @@ export default function CookieConsentBanner() {
               <button className="cookie-button cookie-button-ghost" type="button" onClick={rejectNonEssential}>
                 Tik būtini
               </button>
-              <button className="cookie-button cookie-button-ghost" type="button" onClick={() => setPreferencesOpen(true)}>
+              <button className="cookie-button cookie-button-ghost" type="button" onClick={openPreferences}>
                 <SlidersHorizontal size={15} /> Nustatymai
               </button>
               <button className="cookie-button cookie-button-primary" type="button" onClick={acceptAll}>
@@ -96,6 +101,12 @@ export default function CookieConsentBanner() {
             </div>
           </section>
         </div>
+      ) : null}
+
+      {savedConsent && !preferencesOpen ? (
+        <button className="cookie-reopen" type="button" onClick={openPreferences}>
+          <Cookie size={14} /> Slapukų nustatymai
+        </button>
       ) : null}
 
       {preferencesOpen ? (
