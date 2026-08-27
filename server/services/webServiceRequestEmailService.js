@@ -2,6 +2,7 @@ const {
   getEmailTransport,
   getTransportConfig,
   isEmailTransportConfigured,
+  isFullEmailTransportConfigured,
   normalizeEmailTransportError,
 } = require("../utils/emailTransport");
 const {
@@ -159,16 +160,17 @@ const buildAdminEmail = (request) => {
   return { subject, text, html };
 };
 
-const sendThroughSmtp = async ({ to, replyTo, email }) => {
+const sendThroughSmtp = async ({ to, replyTo, email, fromOverride = "" }) => {
   const { from, socketTimeout = 15000 } = getTransportConfig();
   const transport = getEmailTransport();
   const maxWaitMs = Math.max(socketTimeout, 15000);
+  const effectiveFrom = fromOverride || from;
   let timeoutId = null;
 
   try {
     await Promise.race([
       transport.sendMail({
-        from,
+        from: effectiveFrom,
         to,
         ...(replyTo ? { replyTo } : {}),
         subject: email.subject,
@@ -218,6 +220,20 @@ const sendTransactional = async ({ to, replyTo, email, tags }) => {
   return sendThroughSmtp({ to, replyTo, email });
 };
 
+const sendAdminNotification = async ({ to, replyTo, email, tags }) => {
+  if (isFullEmailTransportConfigured()) {
+    const { user, from } = getTransportConfig();
+    return sendThroughSmtp({
+      to,
+      replyTo,
+      email,
+      fromOverride: user || from,
+    });
+  }
+
+  return sendTransactional({ to, replyTo, email, tags });
+};
+
 const sendWebServiceRequestEmails = async (request) => {
   const adminRecipient = getNotificationRecipient();
   const adminReplyTo = adminRecipient ? { email: adminRecipient, name: "Stilloak Web" } : null;
@@ -235,7 +251,7 @@ const sendWebServiceRequestEmails = async (request) => {
 
   if (adminRecipient) {
     tasks.push(
-      sendTransactional({
+      sendAdminNotification({
         to: adminRecipient,
         replyTo: request.email ? { email: request.email, name: request.name || "" } : null,
         email: adminEmail,
