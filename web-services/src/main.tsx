@@ -4,6 +4,7 @@ import App from "./App";
 import CookieConsentBanner from "./components/CookieConsentBanner";
 import "./styles/main.css";
 import "./styles/polish.css";
+import "./styles/cookies.css";
 
 createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
