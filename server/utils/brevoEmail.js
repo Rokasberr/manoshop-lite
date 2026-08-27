@@ -22,6 +22,21 @@ const parseEmailIdentity = (rawValue = "") => {
   };
 };
 
+const normalizeEmailIdentity = (identity) => {
+  if (!identity) {
+    return { email: "", name: "" };
+  }
+
+  if (typeof identity === "string") {
+    return parseEmailIdentity(identity);
+  }
+
+  return {
+    email: String(identity.email || "").trim(),
+    name: String(identity.name || "").trim(),
+  };
+};
+
 const getBrevoEmailConfig = () => {
   const apiKey = process.env.BREVO_API_KEY?.trim() || "";
   const sender = parseEmailIdentity(process.env.EMAIL_FROM);
@@ -102,8 +117,11 @@ const sendBrevoTransactionalEmail = async ({
   text,
   replyTo = null,
   tags = [],
+  senderOverride = null,
 }) => {
-  const { apiKey, sender, timeoutMs } = getBrevoEmailConfig();
+  const { apiKey, sender: configuredSender, timeoutMs } = getBrevoEmailConfig();
+  const overrideSender = normalizeEmailIdentity(senderOverride);
+  const sender = overrideSender.email ? overrideSender : configuredSender;
 
   if (!apiKey || !sender.email) {
     const error = new Error("Brevo API nėra sukonfigūruotas. Užpildyk BREVO_API_KEY ir EMAIL_FROM.");
@@ -119,6 +137,12 @@ const sendBrevoTransactionalEmail = async ({
     throw error;
   }
 
+  if (!html && !text) {
+    const error = new Error("Brevo laiškui reikia HTML arba tekstinio turinio.");
+    error.statusCode = 400;
+    throw error;
+  }
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -130,8 +154,8 @@ const sendBrevoTransactionalEmail = async ({
       },
       to: recipients,
       subject,
-      htmlContent: html,
-      textContent: text,
+      ...(html ? { htmlContent: html } : {}),
+      ...(text ? { textContent: text } : {}),
       ...(replyTo ? { replyTo } : {}),
       ...(tags.length ? { tags } : {}),
     };
