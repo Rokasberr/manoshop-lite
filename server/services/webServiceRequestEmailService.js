@@ -37,7 +37,7 @@ const formatPrice = (value) => {
 const getNotificationRecipient = () => {
   const configuredRecipient = process.env.WEB_ORDERS_NOTIFY_EMAIL?.trim() || "";
   if (configuredRecipient) {
-    return configuredRecipient;
+    return parseEmailIdentity(configuredRecipient).email;
   }
 
   const brevoSender = getBrevoEmailConfig().sender;
@@ -220,13 +220,14 @@ const sendTransactional = async ({ to, replyTo, email, tags }) => {
 
 const sendWebServiceRequestEmails = async (request) => {
   const adminRecipient = getNotificationRecipient();
+  const adminReplyTo = adminRecipient ? { email: adminRecipient, name: "Stilloak Web" } : null;
   const customerEmail = buildCustomerEmail(request);
   const adminEmail = buildAdminEmail(request);
 
   const tasks = [
     sendTransactional({
       to: request.email,
-      replyTo: adminRecipient || null,
+      replyTo: adminReplyTo,
       email: customerEmail,
       tags: ["web-orders", "customer-confirmation"],
     }),
