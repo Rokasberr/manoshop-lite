@@ -26,17 +26,9 @@ function readConsent(): Consent | null {
 }
 
 export default function CookieConsentBanner() {
-  const [loaded, setLoaded] = useState(false);
-  const [savedConsent, setSavedConsent] = useState<Consent | null>(null);
+  const [savedConsent, setSavedConsent] = useState<Consent | null>(() => readConsent());
   const [preferencesOpen, setPreferencesOpen] = useState(false);
-  const [draft, setDraft] = useState<Consent>(DEFAULT_CONSENT);
-
-  useEffect(() => {
-    const stored = readConsent();
-    setSavedConsent(stored);
-    setDraft(stored || DEFAULT_CONSENT);
-    setLoaded(true);
-  }, []);
+  const [draft, setDraft] = useState<Consent>(() => readConsent() || DEFAULT_CONSENT);
 
   useEffect(() => {
     const openSettings = () => {
@@ -72,8 +64,6 @@ export default function CookieConsentBanner() {
 
   const rejectNonEssential = () => save(DEFAULT_CONSENT);
   const acceptAll = () => save({ necessary: true, analytics: true, marketing: true });
-
-  if (!loaded) return null;
 
   return (
     <>
