@@ -5,6 +5,8 @@ const WebServiceRequest = require("../models/WebServiceRequest");
 const { STATUS_OPTIONS, CONTACT_TYPE_OPTIONS } = require("../models/WebServiceRequest");
 const { buildIdempotencyKey } = require("../services/stripeCheckoutService");
 const { syncWebServiceDepositFromSession } = require("../services/webServiceDepositService");
+const { syncWebServiceFinalPaymentFromSession } = require("../services/webServiceFinalPaymentService");
+const { sendWebServiceFinalPaymentEmail } = require("../services/webServiceFinalPaymentEmailService");
 const { sendWebServiceProposalEmail } = require("../services/webServiceProposalEmailService");
 const { sendWebServiceRequestEmails } = require("../services/webServiceRequestEmailService");
 const { createHttpError } = require("../utils/httpError");
@@ -116,6 +118,12 @@ const serializePublicProposal = (request) => ({
     amount: request.depositAmount,
     status: request.depositStatus,
     paidAt: request.depositPaidAt,
+  },
+  finalPayment: {
+    amount: request.finalPaymentAmount,
+    status: request.finalPaymentStatus,
+    requestedAt: request.finalPaymentRequestedAt,
+    paidAt: request.finalPaymentPaidAt,
   },
 });
 
@@ -504,6 +512,80 @@ const syncAdminWebServiceDeposit = async (req, res) => {
   res.json(await WebServiceRequest.findById(request._id));
 };
 
+const requestAdminWebServiceFinalPayment = async (req, res) => {
+  const request = await WebServiceRequest.findById(req.params.id);
+  if (!request) throw createHttpError("Web užsakymas nerastas.", 404);
+  if (request.proposalStatus !== "accepted" || request.depositStatus !== "paid") {
+    throw createHttpError("Likusios sumos galima prašyti tik po patvirtinto pasiūlymo ir gauto avanso.", 409);
+  }
+  if (request.finalPaymentStatus === "paid") throw createHttpError("Projektas jau apmokėtas pilnai.", 409);
+
+  const amount = Math.round((Number(request.proposalPrice || 0) - Number(request.depositAmount || 0)) * 100) / 100;
+  if (amount <= 0) throw createHttpError("Likusios mokėti sumos nėra.", 409);
+
+  const token = buildProposalToken();
+  const now = new Date();
+  const proposalUrl = `${getWebPublicUrl()}/pasiulymas/${token}`;
+  request.proposalTokenHash = hashProposalToken(token);
+  request.finalPaymentAmount = amount;
+  request.finalPaymentStatus = "requested";
+  request.finalPaymentRequestedAt = now;
+  request.finalPaymentPaidAt = null;
+  request.stripeFinalCheckoutSessionId = "";
+  request.stripeFinalPaymentIntentId = "";
+  request.finalTestInvoiceNumber = "";
+  request.finalTestInvoiceStatus = "not_created";
+  request.finalTestInvoiceSentAt = null;
+  request.nextAction = "Laukti likusios projekto sumos apmokėjimo";
+  request.nextActionAt = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+  request.contactHistory.push({ type: "email", note: `Paprašyta apmokėti likusią ${amount} € projekto sumą.`, happenedAt: now });
+  await request.save();
+
+  let emailResult;
+  try {
+    emailResult = await sendWebServiceFinalPaymentEmail({ request, proposalUrl });
+  } catch (error) {
+    console.error(`[web-final-payment] ${request.requestNumber} laiško klaida: ${error.message}`);
+    emailResult = { sent: false, error: error.message };
+  }
+  res.status(201).json({ request, proposalUrl, email: emailResult });
+};
+
+const createPublicWebServiceFinalPaymentSession = async (req, res) => {
+  const { request, token } = await findProposalByToken(req.params.token);
+  if (!request.finalPaymentRequestedAt || !["requested", "pending", "paid"].includes(request.finalPaymentStatus)) {
+    throw createHttpError("Galutinis mokėjimas dar neparuoštas.", 409);
+  }
+  if (request.finalPaymentStatus === "paid") return res.json({ alreadyPaid: true, proposal: serializePublicProposal(request) });
+  const stripe = getWebServiceStripeClient();
+  const publicUrl = getWebPublicUrl();
+  const session = await stripe.checkout.sessions.create({
+    mode: "payment",
+    customer_email: request.email,
+    success_url: `${publicUrl}/pasiulymas/${token}?payment=final-success&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${publicUrl}/pasiulymas/${token}?payment=final-cancel`,
+    metadata: { checkoutType: "web_service_final_payment", requestId: request._id.toString(), requestNumber: request.requestNumber },
+    payment_intent_data: { metadata: { checkoutType: "web_service_final_payment", requestId: request._id.toString(), requestNumber: request.requestNumber } },
+    line_items: [{ quantity: 1, price_data: { currency: "eur", unit_amount: Math.round(request.finalPaymentAmount * 100), product_data: { name: `Stilloak Web projekto likutis — ${request.requestNumber}`, description: `Galutinis atsiskaitymas už ${request.packageName}` } } }],
+  }, { idempotencyKey: buildIdempotencyKey("web-service-final-payment", [request._id, request.finalPaymentRequestedAt?.toISOString(), request.finalPaymentAmount], req.headers["idempotency-key"]) });
+  request.finalPaymentStatus = "pending";
+  request.stripeFinalCheckoutSessionId = session.id;
+  await request.save();
+  res.status(201).json({ url: session.url, sessionId: session.id });
+};
+
+const confirmPublicWebServiceFinalPayment = async (req, res) => {
+  const { request } = await findProposalByToken(req.params.token);
+  const sessionId = cleanString(req.body?.sessionId, 255);
+  if (!sessionId || sessionId !== request.stripeFinalCheckoutSessionId) throw createHttpError("Stripe apmokėjimo sesija neatitinka šio projekto.", 400);
+  const session = await getWebServiceStripeClient().checkout.sessions.retrieve(sessionId);
+  if (session.metadata?.checkoutType !== "web_service_final_payment" || session.metadata?.requestId !== request._id.toString() || session.metadata?.requestNumber !== request.requestNumber) {
+    throw createHttpError("Stripe sesijos duomenys neatitinka projekto.", 400);
+  }
+  await syncWebServiceFinalPaymentFromSession(session);
+  res.json(serializePublicProposal(await WebServiceRequest.findById(request._id)));
+};
+
 module.exports = {
   acceptPublicWebServiceProposal,
   confirmPublicWebServiceDeposit,
@@ -514,4 +596,7 @@ module.exports = {
   sendAdminWebServiceProposal,
   syncAdminWebServiceDeposit,
   updateAdminWebServiceRequest,
+  requestAdminWebServiceFinalPayment,
+  createPublicWebServiceFinalPaymentSession,
+  confirmPublicWebServiceFinalPayment,
 };

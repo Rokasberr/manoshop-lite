@@ -18,9 +18,9 @@ const buildTestInvoiceNumber = (request, paymentType = "deposit") => {
 const createWebServiceTestInvoicePdfBuffer = ({ request, paymentType = "deposit" }) => {
   const isFinal = paymentType === "final";
   const amount = isFinal
-    ? Math.max(Number(request.proposalPrice || 0) - Number(request.depositAmount || 0), 0)
+    ? Number(request.finalPaymentAmount ?? Math.max(Number(request.proposalPrice || 0) - Number(request.depositAmount || 0), 0))
     : Number(request.depositAmount || 0);
-  const paidAt = isFinal ? request.finalPaidAt : request.depositPaidAt;
+  const paidAt = isFinal ? request.finalPaymentPaidAt : request.depositPaidAt;
   const invoiceNumber = buildTestInvoiceNumber(request, paymentType);
   const commands = [];
   const addText = (x, y, text, size = 11, font = "F1") => {

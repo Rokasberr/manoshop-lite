@@ -28,10 +28,15 @@ const markBankTransferPaid = async (requestId) => {
   );
   return response.data;
 };
+const requestFinalPayment = async (requestId) => {
+  const response = await api.post(`/web-service-requests/${requestId}/proposal/final-payment/request`);
+  return response.data;
+};
 
 export default {
   getAdminRequests,
   markBankTransferPaid,
+  requestFinalPayment,
   sendProposal,
   syncDeposit,
   updateRequest,

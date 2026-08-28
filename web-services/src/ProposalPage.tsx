@@ -30,6 +30,7 @@ type PublicProposal = {
     status: string;
     paidAt: string | null;
   };
+  finalPayment: { amount: number | null; status: string; requestedAt: string | null; paidAt: string | null };
 };
 
 type ProposalPageProps = {
@@ -77,8 +78,9 @@ function ProposalPage({ token }: ProposalPageProps) {
         const payment = params.get("payment");
         const sessionId = params.get("session_id");
 
-        if (payment === "success" && sessionId) {
-          const confirmResponse = await fetch(`${endpoint}/deposit/confirm`, {
+        if ((payment === "success" || payment === "final-success") && sessionId) {
+          const confirmPath = payment === "final-success" ? "final-payment/confirm" : "deposit/confirm";
+          const confirmResponse = await fetch(`${endpoint}/${confirmPath}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ sessionId }),
@@ -88,16 +90,14 @@ function ProposalPage({ token }: ProposalPageProps) {
             const confirmed = (await confirmResponse.json()) as PublicProposal;
             setProposal(confirmed);
             setAcceptedName(confirmed.proposal.acceptedName || confirmed.customer.name || "");
-            setPaymentMessage(
-              confirmed.deposit.status === "paid"
-                ? "Avansas sėkmingai gautas. Susisieksime dėl projekto starto."
-                : "Stripe mokėjimas dar tvirtinamas."
-            );
+            setPaymentMessage(payment === "final-success"
+              ? (confirmed.finalPayment.status === "paid" ? "Galutinis mokėjimas sėkmingai gautas. Ačiū!" : "Stripe mokėjimas dar tvirtinamas.")
+              : (confirmed.deposit.status === "paid" ? "Avansas sėkmingai gautas. Susisieksime dėl projekto starto." : "Stripe mokėjimas dar tvirtinamas."));
             return;
           }
         }
 
-        if (payment === "cancel") {
+        if (payment === "cancel" || payment === "final-cancel") {
           setPaymentMessage("Apmokėjimas atšauktas. Galite pabandyti dar kartą.");
         }
 
@@ -167,6 +167,22 @@ function ProposalPage({ token }: ProposalPageProps) {
     }
   };
 
+  const startFinalPayment = async () => {
+    if (!endpoint || !proposal) return;
+    try {
+      setPaying(true);
+      setError("");
+      const response = await fetch(`${endpoint}/final-payment`, { method: "POST" });
+      const data = await response.json().catch(() => ({})) as { url?: string; alreadyPaid?: boolean; proposal?: PublicProposal; message?: string };
+      if (!response.ok) throw new Error(data.message || "Nepavyko atidaryti galutinio apmokėjimo.");
+      if (data.alreadyPaid && data.proposal) { setProposal(data.proposal); setPaymentMessage("Projektas jau apmokėtas pilnai."); return; }
+      if (!data.url) throw new Error("Stripe apmokėjimo nuoroda negauta.");
+      window.location.assign(data.url);
+    } catch (paymentError) {
+      setError(paymentError instanceof Error ? paymentError.message : "Nepavyko atidaryti apmokėjimo.");
+    } finally { setPaying(false); }
+  };
+
   if (loading) {
     return (
       <main className="proposal-shell proposal-centered">
@@ -192,6 +208,8 @@ function ProposalPage({ token }: ProposalPageProps) {
   const isExpired = proposal.proposal.status === "expired";
   const isAccepted = proposal.proposal.status === "accepted";
   const isPaid = proposal.deposit.status === "paid";
+  const finalRequested = ["requested", "pending", "paid"].includes(proposal.finalPayment?.status);
+  const finalPaid = proposal.finalPayment?.status === "paid";
 
   return (
     <main className="proposal-shell">
@@ -252,10 +270,12 @@ function ProposalPage({ token }: ProposalPageProps) {
           </p>
 
           {isPaid ? (
-            <div className="proposal-paid-box">
-              <CheckCircle2 size={22} />
-              <div><strong>Avansas apmokėtas</strong><span>{formatCurrency(proposal.deposit.amount)}</span></div>
-            </div>
+            <>
+              <div className="proposal-paid-box"><CheckCircle2 size={22} /><div><strong>Avansas apmokėtas</strong><span>{formatCurrency(proposal.deposit.amount)}</span></div></div>
+              {finalRequested ? (finalPaid ?
+                <div className="proposal-paid-box"><CheckCircle2 size={22} /><div><strong>Projektas apmokėtas pilnai</strong><span>{formatCurrency(proposal.finalPayment.amount)}</span></div></div>
+                : <button className="proposal-primary-button" type="button" disabled={paying} onClick={startFinalPayment}>{paying ? <Loader2 className="proposal-spinner" size={19} /> : <CreditCard size={19} />}{paying ? "Atidaromas Stripe..." : `Apmokėti likutį · ${formatCurrency(proposal.finalPayment.amount)}`}</button>) : null}
+            </>
           ) : (
             <button className="proposal-primary-button" type="button" disabled={paying} onClick={startDepositPayment}>
               {paying ? <Loader2 className="proposal-spinner" size={19} /> : <CreditCard size={19} />}
