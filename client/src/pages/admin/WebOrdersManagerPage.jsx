@@ -137,7 +137,7 @@ const WebOrdersManagerPage = () => {
         proposalPrice: draft.proposalPrice === "" ? null : Number(draft.proposalPrice),
         finalPrice: draft.finalPrice === "" ? null : Number(draft.finalPrice),
         nextAction: draft.nextAction,
-        nextActionAt: draft.nextActionAt || null,
+        nextActionAt: draft.nextActionAt ? new Date(draft.nextActionAt).toISOString() : null,
         dueDate: draft.dueDate || null,
         internalNotes: draft.internalNotes,
       });
@@ -370,7 +370,7 @@ const WebOrdersManagerPage = () => {
                           />
                           <button
                             type="button"
-                            className="dashboard-button-secondary justify-center"
+                            className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
                             disabled={contactSavingId === request._id}
                             onClick={() => handleAddContact(request._id)}
                           >
