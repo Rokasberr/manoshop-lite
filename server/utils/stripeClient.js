@@ -4,7 +4,7 @@ const {
   isAllowedOrigin,
 } = require("./originMatcher");
 
-const getStripeClient = () => {
+const createStripeClient = (secretKey, envName) => {
   let Stripe;
 
   try {
@@ -15,12 +15,20 @@ const getStripeClient = () => {
     throw error;
   }
 
-  if (!process.env.STRIPE_SECRET_KEY) {
-    throw new Error("STRIPE_SECRET_KEY nerastas. Patikrink server/.env failą.");
+  if (!secretKey) {
+    throw new Error(`${envName} nerastas. Patikrink serverio aplinkos kintamuosius.`);
   }
 
-  return new Stripe(process.env.STRIPE_SECRET_KEY);
+  return new Stripe(secretKey);
 };
+
+const getStripeClient = () => createStripeClient(process.env.STRIPE_SECRET_KEY, "STRIPE_SECRET_KEY");
+
+const getWebServiceStripeClient = () =>
+  createStripeClient(
+    process.env.STRIPE_WEB_SERVICE_SECRET_KEY,
+    "STRIPE_WEB_SERVICE_SECRET_KEY"
+  );
 
 const resolveClientUrl = (preferredOrigin = "") => {
   const configuredOrigins = getConfiguredOrigins();
@@ -34,5 +42,6 @@ const resolveClientUrl = (preferredOrigin = "") => {
 
 module.exports = {
   getStripeClient,
+  getWebServiceStripeClient,
   resolveClientUrl,
 };

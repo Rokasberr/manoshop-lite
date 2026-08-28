@@ -7,7 +7,7 @@ const {
   markStripeWebhookEventFailed,
   markStripeWebhookEventProcessed,
 } = require("../services/webhookEventService");
-const { getStripeClient } = require("../utils/stripeClient");
+const { getWebServiceStripeClient } = require("../utils/stripeClient");
 
 const getStripeId = (value) => (typeof value === "string" ? value : value?.id || "");
 
@@ -15,7 +15,7 @@ const handleWebServiceStripeWebhook = async (req, res) => {
   let event;
 
   try {
-    const stripe = getStripeClient();
+    const stripe = getWebServiceStripeClient();
     const signature = req.headers["stripe-signature"];
     const endpointSecret = process.env.STRIPE_WEB_SERVICE_WEBHOOK_SECRET;
     const tolerance = Number(process.env.STRIPE_WEBHOOK_TOLERANCE_SECONDS || 300);
