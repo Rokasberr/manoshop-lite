@@ -6,6 +6,10 @@ PROJECT_STATE: STILLOAK_WEB_SERVICES_LOCAL_VALIDATED
 
 Milestone 6 – Stilloak Web paslaugų svetainė. Tikslas: atskirame `web-services` kataloge paruošti savarankišką React + Vite + TypeScript svetainę, kuri vėliau bus diegiama kaip atskiras Vercel projektas su Root Directory `web-services`.
 
+## 2026-08-28 – Web mokėjimų administravimo papildymai
+
+Administratoriaus pasiūlymų kortelėje pridėta avanso ir likučio mokėjimų istorija su suma, mokėjimo būdu, data ir testinės PDF sąskaitos būsena. Apmokėto avanso arba likučio testinę PDF sąskaitą galima saugiai išsiųsti pakartotinai; neapmokėtai daliai endpointas grąžina konfliktą. Likutį galima pažymėti gautu banko pavedimu: prieš tai patikrinama ir, jei reikia, uždaroma neapmokėta Stripe sesija, išsaugomas `bank_transfer` būdas, projektas pažymimas pilnai apmokėtu ir bandoma išsiųsti galutinė testinė PDF sąskaita. Analogiškai testinė PDF siunčiama ir administratoriui patvirtinus avanso pavedimą; laiško klaida nepanaikina jau patvirtinto mokėjimo ir lieka matoma kaip `failed`, kad būtų galima siųsti dar kartą. Stripe Live ir tikros apskaitos sąskaitos neįjungtos.
+
 ## 2026-08-28 – Likusios projekto sumos Stripe testinis srautas
 
 Po gauto avanso administratorius gali sugeneruoti ir el. paštu išsiųsti naują privačią likučio mokėjimo nuorodą; ankstesnis pasiūlymo tokenas pakeičiamas ir nebegalioja. Likutis skaičiuojamas serveryje kaip pasiūlymo kaina minus avansas. Viešame pasiūlymo puslapyje rodomas atskiras Stripe Checkout mygtukas, o galutinio mokėjimo sesijos metadata, būsena ir PaymentIntent saugomi atskirai nuo avanso. Patvirtintas webhook pažymi projektą pilnai apmokėtu ir išsiunčia antrą testinę PDF sąskaitą su žyma `TESTINE SASKAITA - NEGALIOJA`; neapmokėta pasibaigusi sesija grąžinama į `requested`. Stripe Live ir tikros apskaitos sąskaitos neįjungtos.

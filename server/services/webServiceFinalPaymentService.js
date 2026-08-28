@@ -22,6 +22,7 @@ const syncWebServiceFinalPaymentFromSession = async (session, { expired = false 
 
   if (session.payment_status !== "paid" || !sameAmount(request.finalPaymentAmount, session.amount_total)) return request;
   request.finalPaymentStatus = "paid";
+  request.finalPaymentMethod = "stripe";
   request.finalPaymentPaidAt = request.finalPaymentPaidAt || new Date();
   request.stripeFinalCheckoutSessionId = session.id || request.stripeFinalCheckoutSessionId;
   request.stripeFinalPaymentIntentId = getStripeId(session.payment_intent) || request.stripeFinalPaymentIntentId;

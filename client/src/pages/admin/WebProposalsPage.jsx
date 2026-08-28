@@ -54,6 +54,8 @@ const WebProposalsPage = () => {
   const [syncingId, setSyncingId] = useState("");
   const [markingPaidId, setMarkingPaidId] = useState("");
   const [requestingFinalId, setRequestingFinalId] = useState("");
+  const [finalBankPaidId, setFinalBankPaidId] = useState("");
+  const [resendingInvoiceKey, setResendingInvoiceKey] = useState("");
   const [filter, setFilter] = useState("active");
 
   const loadRequests = async () => {
@@ -192,6 +194,30 @@ const WebProposalsPage = () => {
     } finally { setRequestingFinalId(""); }
   };
 
+  const handleMarkFinalBankPaid = async (request) => {
+    if (!window.confirm(`Patvirtinti, kad ${formatCurrency(request.finalPaymentAmount)} likutis gautas banko pavedimu?`)) return;
+    try {
+      setFinalBankPaidId(request._id);
+      const updated = await webServiceRequestService.markFinalBankTransferPaid(request._id);
+      setRequests((current) => current.map((item) => item._id === request._id ? updated : item));
+      toast.success("Likutis pažymėtas apmokėtu; testinė PDF sąskaita paruošta siuntimui.");
+    } catch (markError) {
+      toast.error(markError.response?.data?.message || "Nepavyko pažymėti likučio apmokėtu.");
+    } finally { setFinalBankPaidId(""); }
+  };
+
+  const handleResendInvoice = async (request, paymentType) => {
+    const key = `${request._id}-${paymentType}`;
+    try {
+      setResendingInvoiceKey(key);
+      const result = await webServiceRequestService.resendTestInvoice(request._id, paymentType);
+      setRequests((current) => current.map((item) => item._id === request._id ? result.request : item));
+      toast.success("Testinė PDF sąskaita išsiųsta pakartotinai.");
+    } catch (sendError) {
+      toast.error(sendError.response?.data?.message || "Nepavyko pakartotinai išsiųsti PDF sąskaitos.");
+    } finally { setResendingInvoiceKey(""); }
+  };
+
   const copyProposalUrl = async (requestId) => {
     const url = proposalUrls[requestId];
     if (!url) return;
@@ -322,6 +348,22 @@ const WebProposalsPage = () => {
                         </div>
                       ) : null}
 
+                      {depositStatus === "paid" ? (
+                        <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+                          <p className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">Mokėjimų istorija</p>
+                          <div className="mt-3 space-y-3 text-sm">
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                              <div><strong>Avansas · {formatCurrency(request.depositAmount)}</strong><p className="text-xs text-slate-500">{paymentMethodLabels[request.depositPaymentMethod] || request.depositPaymentMethod || "—"} · {request.depositPaidAt ? new Date(request.depositPaidAt).toLocaleString("lt-LT") : "—"}</p><p className="text-xs text-slate-500">PDF: {request.depositTestInvoiceStatus === "sent" ? `išsiųstas ${request.depositTestInvoiceSentAt ? new Date(request.depositTestInvoiceSentAt).toLocaleString("lt-LT") : ""}` : request.depositTestInvoiceStatus || "nesukurtas"}</p></div>
+                              <button type="button" className="dashboard-button-secondary" disabled={resendingInvoiceKey === `${request._id}-deposit`} onClick={() => handleResendInvoice(request, "deposit")}>{resendingInvoiceKey === `${request._id}-deposit` ? "Siunčiama..." : "Siųsti PDF dar kartą"}</button>
+                            </div>
+                            {finalPaymentStatus !== "not_requested" ? <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-3">
+                              <div><strong>Likutis · {formatCurrency(request.finalPaymentAmount)}</strong><p className="text-xs text-slate-500">{finalPaymentStatus === "paid" ? (paymentMethodLabels[request.finalPaymentMethod] || request.finalPaymentMethod || "—") : finalPaymentLabels[finalPaymentStatus]}{request.finalPaymentPaidAt ? ` · ${new Date(request.finalPaymentPaidAt).toLocaleString("lt-LT")}` : ""}</p><p className="text-xs text-slate-500">PDF: {request.finalTestInvoiceStatus === "sent" ? `išsiųstas ${request.finalTestInvoiceSentAt ? new Date(request.finalTestInvoiceSentAt).toLocaleString("lt-LT") : ""}` : request.finalTestInvoiceStatus || "nesukurtas"}</p></div>
+                              {finalPaymentStatus === "paid" ? <button type="button" className="dashboard-button-secondary" disabled={resendingInvoiceKey === `${request._id}-final`} onClick={() => handleResendInvoice(request, "final")}>{resendingInvoiceKey === `${request._id}-final` ? "Siunčiama..." : "Siųsti PDF dar kartą"}</button> : null}
+                            </div> : null}
+                          </div>
+                        </div>
+                      ) : null}
+
                       {proposalUrl ? (
                         <div className="mt-5 rounded-2xl border border-sky-100 bg-sky-50/60 p-4">
                           <p className="text-xs font-semibold uppercase tracking-[0.15em] text-sky-700">Nauja kliento nuoroda</p>
@@ -433,6 +475,9 @@ const WebProposalsPage = () => {
                         <button type="button" className="dashboard-button-primary w-full justify-center" disabled={requestingFinalId === request._id} onClick={() => handleRequestFinalPayment(request)}>
                           {requestingFinalId === request._id ? "Siunčiama..." : finalPaymentStatus === "not_requested" ? "Prašyti likusio mokėjimo" : "Siųsti naują likučio nuorodą"}
                         </button>
+                      ) : null}
+                      {depositStatus === "paid" && ["requested", "pending"].includes(finalPaymentStatus) ? (
+                        <button type="button" className="dashboard-button-secondary w-full justify-center" disabled={finalBankPaidId === request._id} onClick={() => handleMarkFinalBankPaid(request)}>{finalBankPaidId === request._id ? "Žymima..." : "Pažymėti likutį gautu pavedimu"}</button>
                       ) : null}
                     </div>
                   </div>

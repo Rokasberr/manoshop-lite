@@ -120,3 +120,19 @@ test("Web proposals use server-controlled pricing, tokenized acceptance and Stri
   assert.match(adminAppSource, /path="web-proposals"/);
   assert.match(adminShellSource, /label: "Web pasiūlymai"/);
 });
+
+test("Web proposal admin supports payment history, final bank transfer and test invoice resend", () => {
+  const routesSource = readRepoFile("server", "routes", "webServiceRequestRoutes.js");
+  const modelSource = readRepoFile("server", "models", "WebServiceRequest.js");
+  const adminSource = readRepoFile("client", "src", "pages", "admin", "WebProposalsPage.jsx");
+  const invoiceController = readRepoFile("server", "controllers", "webServiceTestInvoiceController.js");
+
+  assert.match(routesSource, /final-payment\/bank-transfer\/paid/);
+  assert.match(routesSource, /test-invoice\/resend/);
+  assert.match(modelSource, /finalPaymentMethod:/);
+  assert.match(invoiceController, /depositStatus !== "paid"/);
+  assert.match(invoiceController, /finalPaymentStatus !== "paid"/);
+  assert.match(adminSource, /Mokėjimų istorija/);
+  assert.match(adminSource, /Siųsti PDF dar kartą/);
+  assert.match(adminSource, /Pažymėti likutį gautu pavedimu/);
+});

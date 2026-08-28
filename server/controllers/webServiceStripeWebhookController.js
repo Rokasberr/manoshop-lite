@@ -8,26 +8,14 @@ const {
   markStripeWebhookEventProcessed,
 } = require("../services/webhookEventService");
 const { getWebServiceStripeClient } = require("../utils/stripeClient");
-const { sendWebServiceTestInvoiceEmail } = require("../services/webServiceTestInvoiceEmailService");
+const { deliverWebServiceTestInvoice } = require("../services/webServiceTestInvoiceEmailService");
 const { syncWebServiceFinalPaymentFromSession } = require("../services/webServiceFinalPaymentService");
 
 const sendTestInvoiceOnce = async (request, paymentType) => {
   const prefix = paymentType === "deposit" ? "deposit" : "final";
   const statusField = `${prefix}TestInvoiceStatus`;
   if (request?.[statusField] !== "sent") {
-    request[statusField] = "processing";
-    await request.save();
-    try {
-      const delivery = await sendWebServiceTestInvoiceEmail({ request, paymentType });
-      request[`${prefix}TestInvoiceNumber`] = delivery.invoiceNumber;
-      request[statusField] = "sent";
-      request[`${prefix}TestInvoiceSentAt`] = new Date();
-      await request.save();
-    } catch (error) {
-      request[statusField] = "failed";
-      await request.save();
-      throw error;
-    }
+    await deliverWebServiceTestInvoice({ request, paymentType });
   }
 };
 

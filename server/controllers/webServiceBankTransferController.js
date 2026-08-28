@@ -6,6 +6,8 @@ const {
   getWebBankTransferDetails,
 } = require("../config/webServicePayments");
 const { syncWebServiceDepositFromSession } = require("../services/webServiceDepositService");
+const { syncWebServiceFinalPaymentFromSession } = require("../services/webServiceFinalPaymentService");
+const { deliverWebServiceTestInvoice } = require("../services/webServiceTestInvoiceEmailService");
 const { createHttpError } = require("../utils/httpError");
 const { getWebServiceStripeClient } = require("../utils/stripeClient");
 
@@ -121,6 +123,59 @@ const markAdminWebServiceBankTransferPaid = async (req, res) => {
   });
 
   await request.save();
+  try {
+    await deliverWebServiceTestInvoice({ request, paymentType: "deposit" });
+  } catch (error) {
+    console.error(`[web-bank-transfer] ${request.requestNumber} avanso PDF laiško klaida: ${error.message}`);
+  }
+  res.json(request);
+};
+
+const retireExistingStripeFinalSession = async (request) => {
+  if (!request.stripeFinalCheckoutSessionId || request.finalPaymentStatus === "paid") return request;
+  try {
+    const stripe = getWebServiceStripeClient();
+    const session = await stripe.checkout.sessions.retrieve(request.stripeFinalCheckoutSessionId);
+    if (session.payment_status === "paid") {
+      await syncWebServiceFinalPaymentFromSession(session);
+      return WebServiceRequest.findById(request._id);
+    }
+    if (session.status === "open") await stripe.checkout.sessions.expire(session.id);
+    request.finalPaymentStatus = "requested";
+    request.stripeFinalCheckoutSessionId = "";
+    request.contactHistory.push({ type: "note", note: "Ankstesnė neapmokėta Stripe likučio sesija uždaryta pereinant prie banko pavedimo.", happenedAt: new Date() });
+    await request.save();
+  } catch (error) {
+    console.warn(`[web-bank-transfer] Nepavyko uždaryti likučio Stripe sesijos: ${error.message}`);
+  }
+  return request;
+};
+
+const markAdminWebServiceFinalBankTransferPaid = async (req, res) => {
+  let request = await WebServiceRequest.findById(req.params.id);
+  if (!request) throw createHttpError("Web užsakymas nerastas.", 404);
+  if (request.depositStatus !== "paid" || !request.finalPaymentRequestedAt) {
+    throw createHttpError("Pirmiausia turi būti gautas avansas ir paprašytas likučio mokėjimas.", 409);
+  }
+  if (!request.finalPaymentAmount || request.finalPaymentAmount <= 0) throw createHttpError("Likusio mokėjimo suma nenustatyta.", 409);
+  if (request.finalPaymentStatus === "paid") return res.json(request);
+
+  request = await retireExistingStripeFinalSession(request);
+  if (request.finalPaymentStatus === "paid") return res.json(request);
+  const now = new Date();
+  request.finalPaymentStatus = "paid";
+  request.finalPaymentMethod = "bank_transfer";
+  request.finalPaymentPaidAt = now;
+  request.status = "completed";
+  request.nextAction = "Projektas apmokėtas pilnai";
+  request.nextActionAt = null;
+  request.contactHistory.push({ type: "note", note: `Patvirtinta likusi ${request.finalPaymentAmount} € projekto suma banko pavedimu.`, happenedAt: now });
+  await request.save();
+  try {
+    await deliverWebServiceTestInvoice({ request, paymentType: "final" });
+  } catch (error) {
+    console.error(`[web-bank-transfer] ${request.requestNumber} likučio PDF laiško klaida: ${error.message}`);
+  }
   res.json(request);
 };
 
@@ -137,5 +192,6 @@ const requireWebStripeDepositsEnabled = (req, _res, next) => {
 module.exports = {
   getPublicWebServiceBankTransfer,
   markAdminWebServiceBankTransferPaid,
+  markAdminWebServiceFinalBankTransferPaid,
   requireWebStripeDepositsEnabled,
 };

@@ -21,8 +21,10 @@ const {
 const {
   getPublicWebServiceBankTransfer,
   markAdminWebServiceBankTransferPaid,
+  markAdminWebServiceFinalBankTransferPaid,
   requireWebStripeDepositsEnabled,
 } = require("../controllers/webServiceBankTransferController");
+const { resendAdminWebServiceTestInvoice } = require("../controllers/webServiceTestInvoiceController");
 
 const router = express.Router();
 
@@ -96,6 +98,8 @@ router.post(
   validateObjectId("id"),
   asyncHandler(markAdminWebServiceBankTransferPaid)
 );
+router.post("/:id/proposal/final-payment/bank-transfer/paid", protect, adminOnly, validateObjectId("id"), asyncHandler(markAdminWebServiceFinalBankTransferPaid));
+router.post("/:id/proposal/test-invoice/resend", protect, adminOnly, validateObjectId("id"), asyncHandler(resendAdminWebServiceTestInvoice));
 router.patch(
   "/:id",
   protect,

@@ -66,4 +66,24 @@ const sendWebServiceTestInvoiceEmail = async ({ request, paymentType = "deposit"
   }
 };
 
-module.exports = { sendWebServiceTestInvoiceEmail };
+const deliverWebServiceTestInvoice = async ({ request, paymentType = "deposit" }) => {
+  const prefix = paymentType === "final" ? "final" : "deposit";
+  const statusField = `${prefix}TestInvoiceStatus`;
+  request[statusField] = "processing";
+  await request.save();
+
+  try {
+    const delivery = await sendWebServiceTestInvoiceEmail({ request, paymentType });
+    request[`${prefix}TestInvoiceNumber`] = delivery.invoiceNumber;
+    request[statusField] = "sent";
+    request[`${prefix}TestInvoiceSentAt`] = new Date();
+    await request.save();
+    return delivery;
+  } catch (error) {
+    request[statusField] = "failed";
+    await request.save();
+    throw error;
+  }
+};
+
+module.exports = { deliverWebServiceTestInvoice, sendWebServiceTestInvoiceEmail };
