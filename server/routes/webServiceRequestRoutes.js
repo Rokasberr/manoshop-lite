@@ -6,15 +6,17 @@ const { createWindowRateLimiter } = require("../middleware/rateLimit");
 const { validateObjectId } = require("../middleware/requestValidation");
 const {
   acceptPublicWebServiceProposal,
-  confirmPublicWebServiceDeposit,
-  createPublicWebServiceDepositSession,
   createWebServiceRequest,
   getAdminWebServiceRequests,
   getPublicWebServiceProposal,
   sendAdminWebServiceProposal,
-  syncAdminWebServiceDeposit,
   updateAdminWebServiceRequest,
 } = require("../controllers/webServiceRequestController");
+const {
+  confirmPublicWebServiceDeposit,
+  createPublicWebServiceDepositSession,
+  syncAdminWebServiceDeposit,
+} = require("../controllers/webServiceStripeDepositController");
 const {
   getPublicWebServiceBankTransfer,
   markAdminWebServiceBankTransferPaid,
