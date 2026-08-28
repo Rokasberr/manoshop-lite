@@ -142,11 +142,7 @@ function ProposalPage({ token }: ProposalPageProps) {
   }, [endpoint]);
 
   useEffect(() => {
-    if (!endpoint || proposal?.proposal.status !== "accepted" || proposal.deposit.status === "paid") {
-      setBankPayment(null);
-      setBankPaymentError("");
-      return;
-    }
+    if (!endpoint || proposal?.proposal.status !== "accepted" || proposal.deposit.status === "paid") return;
 
     let cancelled = false;
     const loadBankPayment = async () => {
@@ -340,8 +336,8 @@ function ProposalPage({ token }: ProposalPageProps) {
               <div className="proposal-bank-heading">
                 <span className="proposal-bank-icon"><Landmark size={20} /></span>
                 <div>
-                  <strong>Avansas banko pavedimu</strong>
-                  <span>Peržiūrėkite rekvizitus ir atlikite pavedimą savo banke.</span>
+                  <strong>Apmokėti {bankPayment.deposit.percent}% avansą</strong>
+                  <span>Avansas banko pavedimu · peržiūrėkite rekvizitus ir atlikite pavedimą savo banke.</span>
                 </div>
               </div>
 
