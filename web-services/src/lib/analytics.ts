@@ -70,8 +70,9 @@ export const initializeAnalytics = () => {
 };
 
 export const trackAnalyticsEvent = (eventName: string, parameters: Record<string, unknown> = {}) => {
-  if (!initialized || !hasAnalyticsConsent()) return;
+  if (!initialized || !hasAnalyticsConsent()) return false;
   getAnalyticsWindow().gtag?.("event", eventName, parameters);
+  return true;
 };
 
 export { CONSENT_EVENT };
