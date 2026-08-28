@@ -15,6 +15,11 @@ const {
   syncAdminWebServiceDeposit,
   updateAdminWebServiceRequest,
 } = require("../controllers/webServiceRequestController");
+const {
+  getPublicWebServiceBankTransfer,
+  markAdminWebServiceBankTransferPaid,
+  requireWebStripeDepositsEnabled,
+} = require("../controllers/webServiceBankTransferController");
 
 const router = express.Router();
 
@@ -41,6 +46,11 @@ const publicProposalActionLimiter = createWindowRateLimiter({
 
 router.post("/", publicRequestLimiter, asyncHandler(createWebServiceRequest));
 router.get("/proposal/:token", publicProposalLimiter, asyncHandler(getPublicWebServiceProposal));
+router.get(
+  "/proposal/:token/bank-transfer",
+  publicProposalLimiter,
+  asyncHandler(getPublicWebServiceBankTransfer)
+);
 router.post(
   "/proposal/:token/accept",
   publicProposalActionLimiter,
@@ -49,6 +59,7 @@ router.post(
 router.post(
   "/proposal/:token/deposit",
   publicProposalActionLimiter,
+  requireWebStripeDepositsEnabled,
   asyncHandler(createPublicWebServiceDepositSession)
 );
 router.post(
@@ -71,6 +82,13 @@ router.post(
   adminOnly,
   validateObjectId("id"),
   asyncHandler(syncAdminWebServiceDeposit)
+);
+router.post(
+  "/:id/proposal/deposit/bank-transfer/paid",
+  protect,
+  adminOnly,
+  validateObjectId("id"),
+  asyncHandler(markAdminWebServiceBankTransferPaid)
 );
 router.patch(
   "/:id",

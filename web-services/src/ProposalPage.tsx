@@ -1,5 +1,13 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { CheckCircle2, CreditCard, FileCheck2, Loader2, ShieldCheck } from "lucide-react";
+import {
+  CheckCircle2,
+  Copy,
+  CreditCard,
+  FileCheck2,
+  Landmark,
+  Loader2,
+  ShieldCheck,
+} from "lucide-react";
 
 type PublicProposal = {
   requestNumber: string;
@@ -26,6 +34,25 @@ type PublicProposal = {
   };
 };
 
+type BankTransferResponse = {
+  requestNumber: string;
+  deposit: {
+    percent: number;
+    amount: number | null;
+    status: string;
+    paidAt: string | null;
+  };
+  bankTransfer: {
+    beneficiary: string;
+    iban: string;
+    bic: string;
+    bankName: string;
+    currency: string;
+    reference: string;
+  };
+  stripeEnabled: boolean;
+};
+
 type ProposalPageProps = {
   token: string;
 };
@@ -42,6 +69,8 @@ const formatDate = (value: string | null) =>
 
 function ProposalPage({ token }: ProposalPageProps) {
   const [proposal, setProposal] = useState<PublicProposal | null>(null);
+  const [bankPayment, setBankPayment] = useState<BankTransferResponse | null>(null);
+  const [bankPaymentError, setBankPaymentError] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [acceptedName, setAcceptedName] = useState("");
@@ -49,6 +78,7 @@ function ProposalPage({ token }: ProposalPageProps) {
   const [accepting, setAccepting] = useState(false);
   const [paying, setPaying] = useState(false);
   const [paymentMessage, setPaymentMessage] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const endpoint = useMemo(
     () => (apiBaseUrl ? `${apiBaseUrl}/web-service-requests/proposal/${token}` : ""),
@@ -92,7 +122,7 @@ function ProposalPage({ token }: ProposalPageProps) {
         }
 
         if (payment === "cancel") {
-          setPaymentMessage("Apmokėjimas atšauktas. Galite pabandyti dar kartą.");
+          setPaymentMessage("Apmokėjimas atšauktas. Galite pasirinkti banko pavedimą.");
         }
 
         const response = await fetch(endpoint);
@@ -110,6 +140,34 @@ function ProposalPage({ token }: ProposalPageProps) {
 
     load();
   }, [endpoint]);
+
+  useEffect(() => {
+    if (!endpoint || proposal?.proposal.status !== "accepted" || proposal.deposit.status === "paid") return;
+
+    let cancelled = false;
+    const loadBankPayment = async () => {
+      try {
+        setBankPaymentError("");
+        const response = await fetch(`${endpoint}/bank-transfer`);
+        const data = (await response.json().catch(() => ({}))) as BankTransferResponse & {
+          message?: string;
+        };
+        if (!response.ok) throw new Error(data.message || "Banko pavedimo duomenų nepavyko užkrauti.");
+        if (!cancelled) setBankPayment(data);
+      } catch (bankError) {
+        if (!cancelled) {
+          setBankPaymentError(
+            bankError instanceof Error ? bankError.message : "Banko pavedimo duomenų nepavyko užkrauti."
+          );
+        }
+      }
+    };
+
+    loadBankPayment();
+    return () => {
+      cancelled = true;
+    };
+  }, [endpoint, proposal?.deposit.status, proposal?.proposal.status]);
 
   const acceptProposal = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -158,6 +216,29 @@ function ProposalPage({ token }: ProposalPageProps) {
       setError(paymentError instanceof Error ? paymentError.message : "Nepavyko atidaryti apmokėjimo.");
     } finally {
       setPaying(false);
+    }
+  };
+
+  const copyBankPayment = async () => {
+    if (!bankPayment) return;
+    const { bankTransfer } = bankPayment;
+    const text = [
+      `Suma: ${formatCurrency(bankPayment.deposit.amount)}`,
+      `Gavėjas: ${bankTransfer.beneficiary}`,
+      `IBAN: ${bankTransfer.iban}`,
+      bankTransfer.bankName ? `Bankas: ${bankTransfer.bankName}` : "",
+      bankTransfer.bic ? `BIC / SWIFT: ${bankTransfer.bic}` : "",
+      `Mokėjimo paskirtis: ${bankTransfer.reference}`,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      setPaymentMessage("Nepavyko automatiškai nukopijuoti. Nukopijuokite rekvizitus rankiniu būdu.");
     }
   };
 
@@ -250,11 +331,47 @@ function ProposalPage({ token }: ProposalPageProps) {
               <CheckCircle2 size={22} />
               <div><strong>Avansas apmokėtas</strong><span>{formatCurrency(proposal.deposit.amount)}</span></div>
             </div>
+          ) : bankPayment ? (
+            <div className="proposal-bank-box">
+              <div className="proposal-bank-heading">
+                <span className="proposal-bank-icon"><Landmark size={20} /></span>
+                <div>
+                  <strong>Apmokėti {bankPayment.deposit.percent}% avansą</strong>
+                  <span>Avansas banko pavedimu · peržiūrėkite rekvizitus ir atlikite pavedimą savo banke.</span>
+                </div>
+              </div>
+
+              <div className="proposal-bank-amount">
+                <span>Mokėtina suma</span>
+                <strong>{formatCurrency(bankPayment.deposit.amount)}</strong>
+              </div>
+
+              <dl className="proposal-bank-details">
+                <div><dt>Gavėjas</dt><dd>{bankPayment.bankTransfer.beneficiary}</dd></div>
+                <div><dt>IBAN</dt><dd>{bankPayment.bankTransfer.iban}</dd></div>
+                {bankPayment.bankTransfer.bankName ? <div><dt>Bankas</dt><dd>{bankPayment.bankTransfer.bankName}</dd></div> : null}
+                {bankPayment.bankTransfer.bic ? <div><dt>BIC / SWIFT</dt><dd>{bankPayment.bankTransfer.bic}</dd></div> : null}
+                <div><dt>Mokėjimo paskirtis</dt><dd>{bankPayment.bankTransfer.reference}</dd></div>
+              </dl>
+
+              <button className="proposal-secondary-button proposal-copy-payment" type="button" onClick={copyBankPayment}>
+                <Copy size={17} /> {copied ? "Nukopijuota" : "Nukopijuoti mokėjimo duomenis"}
+              </button>
+              <p className="proposal-bank-note">
+                Gavę pavedimą jį patvirtinsime ir susisieksime dėl projekto starto.
+              </p>
+
+              {bankPayment.stripeEnabled ? (
+                <button className="proposal-primary-button" type="button" disabled={paying} onClick={startDepositPayment}>
+                  {paying ? <Loader2 className="proposal-spinner" size={19} /> : <CreditCard size={19} />}
+                  {paying ? "Atidaromas Stripe..." : "Mokėti kortele per Stripe"}
+                </button>
+              ) : null}
+            </div>
           ) : (
-            <button className="proposal-primary-button" type="button" disabled={paying} onClick={startDepositPayment}>
-              {paying ? <Loader2 className="proposal-spinner" size={19} /> : <CreditCard size={19} />}
-              {paying ? "Atidaromas Stripe..." : `Apmokėti ${proposal.deposit.percent}% avansą · ${formatCurrency(proposal.deposit.amount)}`}
-            </button>
+            <div className="proposal-notice">
+              {bankPaymentError || "Kraunami banko pavedimo duomenys..."}
+            </div>
           )}
         </section>
       ) : (

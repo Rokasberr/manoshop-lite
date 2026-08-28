@@ -27,6 +27,11 @@ const depositLabels = {
   refunded: "Grąžintas",
 };
 
+const paymentMethodLabels = {
+  bank_transfer: "Banko pavedimas",
+  stripe: "Stripe",
+};
+
 const buildDraft = (request) => ({
   proposalPrice: request.proposalPrice ?? request.finalPrice ?? request.basePrice ?? "",
   proposalSummary:
@@ -46,6 +51,7 @@ const WebProposalsPage = () => {
   const [error, setError] = useState("");
   const [sendingId, setSendingId] = useState("");
   const [syncingId, setSyncingId] = useState("");
+  const [markingPaidId, setMarkingPaidId] = useState("");
   const [filter, setFilter] = useState("active");
 
   const loadRequests = async () => {
@@ -150,6 +156,26 @@ const WebProposalsPage = () => {
     }
   };
 
+  const handleMarkBankTransferPaid = async (request) => {
+    const confirmed = window.confirm(
+      `Patvirtinti, kad gautas ${formatCurrency(request.depositAmount)} avansas pavedimu už ${request.requestNumber}?`
+    );
+    if (!confirmed) return;
+
+    try {
+      setMarkingPaidId(request._id);
+      const updated = await webServiceRequestService.markBankTransferPaid(request._id);
+      setRequests((current) =>
+        current.map((item) => (item._id === request._id ? updated : item))
+      );
+      toast.success("Avansas pažymėtas gautu banko pavedimu.");
+    } catch (markError) {
+      toast.error(markError.response?.data?.message || "Nepavyko pažymėti avanso gautu.");
+    } finally {
+      setMarkingPaidId("");
+    }
+  };
+
   const copyProposalUrl = async (requestId) => {
     const url = proposalUrls[requestId];
     if (!url) return;
@@ -166,7 +192,7 @@ const WebProposalsPage = () => {
       <AdminPageHeader
         eyebrow="Stilloak Web"
         title="Pasiūlymai ir avansai"
-        description="Paruošk komercinį pasiūlymą, gauk kliento patvirtinimą ir 50 % avansą per Stripe. Kaina ir mokėjimo suma nustatoma tik serveryje."
+        description="Paruošk pasiūlymą, gauk kliento patvirtinimą ir avansą banko pavedimu. Kortelės avansai lieka išjungti, kol juos sąmoningai aktyvuosime."
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -262,6 +288,11 @@ const WebProposalsPage = () => {
                           <p className="mt-1 font-semibold text-slate-950">
                             {request.depositAmount ? `${request.depositPercent}% · ${formatCurrency(request.depositAmount)}` : "—"}
                           </p>
+                          {request.depositPaymentMethod ? (
+                            <p className="mt-1 text-xs text-slate-500">
+                              {paymentMethodLabels[request.depositPaymentMethod] || request.depositPaymentMethod}
+                            </p>
+                          ) : null}
                         </div>
                       </div>
 
@@ -357,6 +388,17 @@ const WebProposalsPage = () => {
                         {sendingId === request._id ? "Siunčiama..." : proposalStatus === "draft" ? "Paruošti ir išsiųsti" : "Atnaujinti ir išsiųsti naują"}
                       </button>
 
+                      {proposalStatus === "accepted" && depositStatus !== "paid" ? (
+                        <button
+                          type="button"
+                          className="dashboard-button-secondary w-full justify-center"
+                          disabled={markingPaidId === request._id}
+                          onClick={() => handleMarkBankTransferPaid(request)}
+                        >
+                          {markingPaidId === request._id ? "Žymima..." : "Pažymėti avansą gautu pavedimu"}
+                        </button>
+                      ) : null}
+
                       {request.stripeDepositCheckoutSessionId && depositStatus !== "paid" ? (
                         <button
                           type="button"
@@ -364,7 +406,7 @@ const WebProposalsPage = () => {
                           disabled={syncingId === request._id}
                           onClick={() => handleSyncDeposit(request._id)}
                         >
-                          {syncingId === request._id ? "Tikrinama..." : "Patikrinti avanso mokėjimą"}
+                          {syncingId === request._id ? "Tikrinama..." : "Patikrinti ankstesnį Stripe mokėjimą"}
                         </button>
                       ) : null}
                     </div>

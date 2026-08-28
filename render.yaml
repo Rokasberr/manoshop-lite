@@ -34,6 +34,16 @@ services:
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
         sync: false
+      - key: WEB_STRIPE_DEPOSITS_ENABLED
+        value: "false"
+      - key: WEB_BANK_TRANSFER_BENEFICIARY
+        sync: false
+      - key: WEB_BANK_TRANSFER_IBAN
+        sync: false
+      - key: WEB_BANK_TRANSFER_BIC
+        sync: false
+      - key: WEB_BANK_TRANSFER_BANK_NAME
+        sync: false
       - key: STRIPE_PRICE_ASMENINIS
         sync: false
       - key: STRIPE_PRICE_PRIVATUS_VERSLAS

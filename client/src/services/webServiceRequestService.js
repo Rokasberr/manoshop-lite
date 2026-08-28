@@ -22,8 +22,16 @@ const syncDeposit = async (requestId) => {
   return response.data;
 };
 
+const markBankTransferPaid = async (requestId) => {
+  const response = await api.post(
+    `/web-service-requests/${requestId}/proposal/deposit/bank-transfer/paid`
+  );
+  return response.data;
+};
+
 export default {
   getAdminRequests,
+  markBankTransferPaid,
   sendProposal,
   syncDeposit,
   updateRequest,
