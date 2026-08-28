@@ -9,6 +9,7 @@ import {
   Mail,
   Menu,
   MonitorSmartphone,
+  Phone,
   Rocket,
   Send,
   ShieldCheck,
@@ -50,6 +51,8 @@ const initialFormState: FormState = {
 };
 
 const contactEmail = import.meta.env.VITE_WEB_CONTACT_EMAIL || "hello@stilloak-studio.com";
+const contactPhone = "+370 638 43445";
+const contactPhoneHref = "tel:+37063843445";
 const apiBaseUrl = String(import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
 const leadEndpoint =
   import.meta.env.VITE_WEB_LEAD_ENDPOINT || (apiBaseUrl ? `${apiBaseUrl}/web-service-requests` : "");
@@ -638,6 +641,9 @@ function App() {
             <a className="contact-email" href={`mailto:${contactEmail}`}>
               <Mail size={18} aria-hidden="true" /> {contactEmail}
             </a>
+            <a className="contact-email" href={contactPhoneHref}>
+              <Phone size={18} aria-hidden="true" /> {contactPhone}
+            </a>
           </div>
 
           <form className="contact-form" onSubmit={submitLead} noValidate data-reveal>
@@ -834,8 +840,10 @@ function App() {
           <p>Svetainės, kurios padeda verslui atrodyti profesionaliai ir augti.</p>
         </div>
         <div>
-          <span className="footer-label">El. paštas</span>
+          <span className="footer-label">Kontaktai</span>
           <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
+          <br />
+          <a href={contactPhoneHref}>{contactPhone}</a>
         </div>
         <div>
           <span className="footer-label">Stilloak Studio</span>
