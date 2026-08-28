@@ -18,7 +18,11 @@ export default function FooterLinksPortal() {
   const [footer, setFooter] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
-    setFooter(document.querySelector<HTMLElement>(".site-footer"));
+    const frame = window.requestAnimationFrame(() => {
+      setFooter(document.querySelector<HTMLElement>(".site-footer"));
+    });
+
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   if (!footer) return null;
