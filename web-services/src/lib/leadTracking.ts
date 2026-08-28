@@ -34,11 +34,16 @@ export const installLeadTracking = () => {
     const response = await nativeFetch(input, nextInit);
 
     if (response.ok) {
-      trackAnalyticsEvent("generate_lead", {
+      const parameters = {
         lead_source: attribution.source,
         lead_medium: attribution.medium,
         campaign: attribution.campaign || undefined
-      });
+      };
+
+      // GA4 recommended event used as the primary lead conversion.
+      trackAnalyticsEvent("generate_lead", parameters);
+      // Custom funnel event kept for straightforward Stilloak reporting.
+      trackAnalyticsEvent("lead_submit", parameters);
     }
 
     return response;
