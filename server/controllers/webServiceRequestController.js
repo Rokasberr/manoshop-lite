@@ -3,16 +3,23 @@ const crypto = require("crypto");
 const { getWebServicePlan } = require("../config/webServicePlans");
 const WebServiceRequest = require("../models/WebServiceRequest");
 const { STATUS_OPTIONS, CONTACT_TYPE_OPTIONS } = require("../models/WebServiceRequest");
+const { buildIdempotencyKey } = require("../services/stripeCheckoutService");
+const { syncWebServiceDepositFromSession } = require("../services/webServiceDepositService");
+const { sendWebServiceProposalEmail } = require("../services/webServiceProposalEmailService");
 const { sendWebServiceRequestEmails } = require("../services/webServiceRequestEmailService");
 const { createHttpError } = require("../utils/httpError");
+const { getStripeClient } = require("../utils/stripeClient");
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PROPOSAL_TOKEN_PATTERN = /^[a-f0-9]{64}$/i;
 const INITIAL_FOLLOW_UP_HOURS = {
   start: 8,
   business: 4,
   pro: 2,
   custom: 2,
 };
+const DEFAULT_PROPOSAL_TERMS =
+  "Darbų apimtis, terminas ir kaina galioja pagal šį pasiūlymą. Darbai pradedami gavus sutartą avansą. Papildomi darbai ar apimties pakeitimai derinami atskirai.";
 
 const cleanString = (value, maxLength = 5000) =>
   String(value || "").trim().slice(0, maxLength);
@@ -30,7 +37,7 @@ const cleanAttribution = (raw = {}) => ({
 });
 
 const parseNullablePrice = (rawPrice, errorMessage) => {
-  if (rawPrice === null || rawPrice === "") return null;
+  if (rawPrice === null || rawPrice === "" || rawPrice === undefined) return null;
   const price = Number(rawPrice);
   if (!Number.isFinite(price) || price < 0 || price > 1_000_000) {
     throw createHttpError(errorMessage, 400);
@@ -47,6 +54,22 @@ const parseNullableDate = (rawDate, errorMessage) => {
   return date;
 };
 
+const parseDepositPercent = (rawValue) => {
+  const value = Number(rawValue ?? 50);
+  if (!Number.isFinite(value) || value < 10 || value > 100) {
+    throw createHttpError("Avanso procentas turi būti nuo 10 iki 100.", 400);
+  }
+  return Math.round(value);
+};
+
+const parseExpiryDays = (rawValue) => {
+  const value = Number(rawValue ?? 14);
+  if (!Number.isFinite(value) || value < 1 || value > 60) {
+    throw createHttpError("Pasiūlymo galiojimas turi būti nuo 1 iki 60 dienų.", 400);
+  }
+  return Math.round(value);
+};
+
 const buildRequestNumber = () => {
   const year = new Date().getFullYear();
   const token = crypto.randomBytes(4).toString("hex").toUpperCase();
@@ -56,6 +79,67 @@ const buildRequestNumber = () => {
 const getInitialNextActionAt = (planId, now = Date.now()) => {
   const hours = INITIAL_FOLLOW_UP_HOURS[planId] || INITIAL_FOLLOW_UP_HOURS.start;
   return new Date(now + hours * 60 * 60 * 1000);
+};
+
+const buildProposalToken = () => crypto.randomBytes(32).toString("hex");
+const hashProposalToken = (token) => crypto.createHash("sha256").update(token).digest("hex");
+const getWebPublicUrl = () =>
+  (process.env.WEB_SERVICES_PUBLIC_URL?.trim() || "https://web.stilloak-studio.com").replace(/\/+$/, "");
+
+const calculateDeposit = (price, percent) => Math.round(Number(price) * Number(percent) * 100) / 10000;
+
+const serializePublicProposal = (request) => ({
+  requestNumber: request.requestNumber,
+  customer: {
+    name: request.name,
+    company: request.company || "",
+  },
+  package: {
+    id: request.packageId,
+    name: request.packageName,
+  },
+  proposal: {
+    price: request.proposalPrice,
+    summary: request.proposalSummary,
+    scope: request.proposalScope,
+    terms: request.proposalTerms,
+    status: request.proposalStatus,
+    sentAt: request.proposalSentAt,
+    viewedAt: request.proposalViewedAt,
+    acceptedAt: request.proposalAcceptedAt,
+    acceptedName: request.proposalAcceptedName,
+    expiresAt: request.proposalExpiresAt,
+    termsVersion: request.proposalTermsVersion,
+  },
+  deposit: {
+    percent: request.depositPercent,
+    amount: request.depositAmount,
+    status: request.depositStatus,
+    paidAt: request.depositPaidAt,
+  },
+});
+
+const findProposalByToken = async (rawToken) => {
+  const token = cleanString(rawToken, 80);
+  if (!PROPOSAL_TOKEN_PATTERN.test(token)) {
+    throw createHttpError("Pasiūlymo nuoroda negalioja.", 404);
+  }
+
+  const request = await WebServiceRequest.findOne({ proposalTokenHash: hashProposalToken(token) });
+  if (!request) {
+    throw createHttpError("Pasiūlymas nerastas arba nuoroda nebegalioja.", 404);
+  }
+
+  if (
+    request.proposalExpiresAt &&
+    request.proposalExpiresAt.getTime() < Date.now() &&
+    !["accepted", "declined"].includes(request.proposalStatus)
+  ) {
+    request.proposalStatus = "expired";
+    await request.save();
+  }
+
+  return { request, token };
 };
 
 const validatePublicPayload = (body = {}) => {
@@ -201,8 +285,233 @@ const updateAdminWebServiceRequest = async (req, res) => {
   res.json(request);
 };
 
+const sendAdminWebServiceProposal = async (req, res) => {
+  const request = await WebServiceRequest.findById(req.params.id);
+  if (!request) throw createHttpError("Web užsakymas nerastas.", 404);
+  if (request.depositStatus === "paid") {
+    throw createHttpError("Avansas jau apmokėtas. Naujo pasiūlymo siųsti nebegalima.", 409);
+  }
+
+  const fallbackPrice = request.proposalPrice ?? request.finalPrice ?? request.basePrice;
+  const proposalPrice = parseNullablePrice(
+    Object.prototype.hasOwnProperty.call(req.body || {}, "proposalPrice")
+      ? req.body.proposalPrice
+      : fallbackPrice,
+    "Netinkama pasiūlymo kaina."
+  );
+  const summary = cleanString(req.body?.proposalSummary, 3000);
+  const scope = cleanString(req.body?.proposalScope, 5000);
+  const terms = cleanString(req.body?.proposalTerms, 5000) || DEFAULT_PROPOSAL_TERMS;
+  const depositPercent = parseDepositPercent(req.body?.depositPercent);
+  const expiryDays = parseExpiryDays(req.body?.expiryDays);
+
+  if (!proposalPrice || proposalPrice <= 0) {
+    throw createHttpError("Prieš siunčiant pasiūlymą nustatykite projekto kainą.", 400);
+  }
+  if (summary.length < 20) {
+    throw createHttpError("Pasiūlymo santrauka turi būti bent 20 simbolių.", 400);
+  }
+  if (scope.length < 20) {
+    throw createHttpError("Darbų apimtis turi būti bent 20 simbolių.", 400);
+  }
+
+  const token = buildProposalToken();
+  const now = new Date();
+  const proposalUrl = `${getWebPublicUrl()}/pasiulymas/${token}`;
+
+  request.proposalPrice = proposalPrice;
+  request.proposalSummary = summary;
+  request.proposalScope = scope;
+  request.proposalTerms = terms;
+  request.proposalStatus = "sent";
+  request.proposalTokenHash = hashProposalToken(token);
+  request.proposalSentAt = now;
+  request.proposalViewedAt = null;
+  request.proposalAcceptedAt = null;
+  request.proposalAcceptedName = "";
+  request.proposalExpiresAt = new Date(now.getTime() + expiryDays * 24 * 60 * 60 * 1000);
+  request.depositPercent = depositPercent;
+  request.depositAmount = calculateDeposit(proposalPrice, depositPercent);
+  request.depositStatus = "not_requested";
+  request.stripeDepositCheckoutSessionId = "";
+  request.stripeDepositPaymentIntentId = "";
+  request.depositPaidAt = null;
+  request.status = "proposal_sent";
+  request.nextAction = "Laukti kliento pasiūlymo patvirtinimo";
+  request.nextActionAt = new Date(now.getTime() + Math.min(3, expiryDays) * 24 * 60 * 60 * 1000);
+  request.contactHistory.push({
+    type: "proposal",
+    note: `Išsiųstas ${proposalPrice} € pasiūlymas; avansas ${depositPercent}%.`,
+    happenedAt: now,
+  });
+
+  await request.save();
+
+  let emailResult;
+  try {
+    emailResult = await sendWebServiceProposalEmail({ request, proposalUrl });
+  } catch (error) {
+    console.error(`[web-proposal] ${request.requestNumber} pasiūlymo laiško klaida: ${error.message}`);
+    emailResult = { sent: false, error: error.message };
+  }
+
+  res.status(201).json({ request, proposalUrl, email: emailResult });
+};
+
+const getPublicWebServiceProposal = async (req, res) => {
+  const { request } = await findProposalByToken(req.params.token);
+
+  if (request.proposalStatus === "sent") {
+    request.proposalStatus = "viewed";
+    request.proposalViewedAt = request.proposalViewedAt || new Date();
+    await request.save();
+  }
+
+  res.json(serializePublicProposal(request));
+};
+
+const acceptPublicWebServiceProposal = async (req, res) => {
+  const { request } = await findProposalByToken(req.params.token);
+
+  if (request.proposalStatus === "expired") {
+    throw createHttpError("Pasiūlymo galiojimo laikas baigėsi.", 410);
+  }
+  if (request.proposalStatus === "declined") {
+    throw createHttpError("Šis pasiūlymas buvo atmestas.", 409);
+  }
+
+  if (request.proposalStatus !== "accepted") {
+    const acceptedName = cleanString(req.body?.acceptedName, 160);
+    if (acceptedName.length < 2 || req.body?.acceptedTerms !== true) {
+      throw createHttpError("Patvirtinkite vardą ir sutikimą su pasiūlymo sąlygomis.", 400);
+    }
+
+    const now = new Date();
+    request.proposalStatus = "accepted";
+    request.proposalAcceptedAt = now;
+    request.proposalAcceptedName = acceptedName;
+    request.status = "accepted";
+    request.nextAction = "Laukti projekto avanso apmokėjimo";
+    request.nextActionAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    request.contactHistory.push({
+      type: "proposal",
+      note: `Klientas ${acceptedName} patvirtino pasiūlymą ir jo sąlygas.`,
+      happenedAt: now,
+    });
+    await request.save();
+  }
+
+  res.json(serializePublicProposal(request));
+};
+
+const createPublicWebServiceDepositSession = async (req, res) => {
+  const { request, token } = await findProposalByToken(req.params.token);
+
+  if (request.proposalStatus !== "accepted") {
+    throw createHttpError("Pirmiausia patvirtinkite pasiūlymą.", 409);
+  }
+  if (request.depositStatus === "paid") {
+    return res.json({ alreadyPaid: true, proposal: serializePublicProposal(request) });
+  }
+  if (!request.depositAmount || request.depositAmount <= 0) {
+    throw createHttpError("Avanso suma nenustatyta.", 409);
+  }
+
+  const stripe = getStripeClient();
+  const publicUrl = getWebPublicUrl();
+  const session = await stripe.checkout.sessions.create(
+    {
+      mode: "payment",
+      customer_email: request.email,
+      success_url: `${publicUrl}/pasiulymas/${token}?payment=success&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${publicUrl}/pasiulymas/${token}?payment=cancel`,
+      metadata: {
+        checkoutType: "web_service_deposit",
+        requestId: request._id.toString(),
+        requestNumber: request.requestNumber,
+      },
+      payment_intent_data: {
+        metadata: {
+          checkoutType: "web_service_deposit",
+          requestId: request._id.toString(),
+          requestNumber: request.requestNumber,
+        },
+      },
+      line_items: [
+        {
+          quantity: 1,
+          price_data: {
+            currency: "eur",
+            unit_amount: Math.round(request.depositAmount * 100),
+            product_data: {
+              name: `Stilloak Web projekto avansas — ${request.requestNumber}`,
+              description: `${request.depositPercent}% avansas už ${request.packageName}`,
+            },
+          },
+        },
+      ],
+    },
+    {
+      idempotencyKey: buildIdempotencyKey(
+        "web-service-deposit",
+        [request._id, request.proposalAcceptedAt?.toISOString(), request.depositAmount],
+        req.headers["idempotency-key"]
+      ),
+    }
+  );
+
+  request.depositStatus = "pending";
+  request.stripeDepositCheckoutSessionId = session.id;
+  await request.save();
+
+  res.status(201).json({ url: session.url, sessionId: session.id });
+};
+
+const confirmPublicWebServiceDeposit = async (req, res) => {
+  const { request } = await findProposalByToken(req.params.token);
+  const sessionId = cleanString(req.body?.sessionId, 255);
+
+  if (!sessionId || sessionId !== request.stripeDepositCheckoutSessionId) {
+    throw createHttpError("Stripe apmokėjimo sesija neatitinka šio pasiūlymo.", 400);
+  }
+
+  const stripe = getStripeClient();
+  const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+  if (
+    session.metadata?.checkoutType !== "web_service_deposit" ||
+    session.metadata?.requestId !== request._id.toString() ||
+    session.metadata?.requestNumber !== request.requestNumber
+  ) {
+    throw createHttpError("Stripe sesijos duomenys neatitinka pasiūlymo.", 400);
+  }
+
+  await syncWebServiceDepositFromSession(session);
+  const current = await WebServiceRequest.findById(request._id);
+  res.json(serializePublicProposal(current));
+};
+
+const syncAdminWebServiceDeposit = async (req, res) => {
+  const request = await WebServiceRequest.findById(req.params.id);
+  if (!request) throw createHttpError("Web užsakymas nerastas.", 404);
+  if (!request.stripeDepositCheckoutSessionId) {
+    throw createHttpError("Šiam pasiūlymui Stripe avanso sesija dar nesukurta.", 409);
+  }
+
+  const stripe = getStripeClient();
+  const session = await stripe.checkout.sessions.retrieve(request.stripeDepositCheckoutSessionId);
+  await syncWebServiceDepositFromSession(session, { expired: session.status === "expired" });
+  res.json(await WebServiceRequest.findById(request._id));
+};
+
 module.exports = {
+  acceptPublicWebServiceProposal,
+  confirmPublicWebServiceDeposit,
+  createPublicWebServiceDepositSession,
   createWebServiceRequest,
   getAdminWebServiceRequests,
+  getPublicWebServiceProposal,
+  sendAdminWebServiceProposal,
+  syncAdminWebServiceDeposit,
   updateAdminWebServiceRequest,
 };
