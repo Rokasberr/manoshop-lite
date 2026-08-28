@@ -11,6 +11,18 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const cleanString = (value, maxLength = 5000) =>
   String(value || "").trim().slice(0, maxLength);
 
+const cleanAttribution = (raw = {}) => ({
+  source: cleanString(raw.source, 100).toLowerCase() || "direct",
+  medium: cleanString(raw.medium, 100).toLowerCase() || "none",
+  campaign: cleanString(raw.campaign, 160),
+  content: cleanString(raw.content, 160),
+  term: cleanString(raw.term, 160),
+  referrer: cleanString(raw.referrer, 500),
+  landingPage: cleanString(raw.landingPage, 500),
+  gclid: cleanString(raw.gclid, 200),
+  fbclid: cleanString(raw.fbclid, 200),
+});
+
 const buildRequestNumber = () => {
   const year = new Date().getFullYear();
   const token = crypto.randomBytes(4).toString("hex").toUpperCase();
@@ -26,6 +38,7 @@ const validatePublicPayload = (body = {}) => {
   const budget = cleanString(body.budget, 80);
   const message = cleanString(body.message, 5000);
   const website = cleanString(body.website, 200);
+  const attribution = cleanAttribution(body.attribution);
   const plan = getWebServicePlan(packageId);
 
   if (website) {
@@ -48,11 +61,11 @@ const validatePublicPayload = (body = {}) => {
     throw createHttpError("Trumpai aprašykite projektą bent keliais sakiniais.", 400);
   }
 
-  return { name, email, phone, company, budget, message, plan };
+  return { name, email, phone, company, budget, message, plan, attribution };
 };
 
 const createWebServiceRequest = async (req, res) => {
-  const { name, email, phone, company, budget, message, plan } = validatePublicPayload(req.body);
+  const { name, email, phone, company, budget, message, plan, attribution } = validatePublicPayload(req.body);
 
   const request = await WebServiceRequest.create({
     requestNumber: buildRequestNumber(),
@@ -66,6 +79,7 @@ const createWebServiceRequest = async (req, res) => {
     budget: plan.id === "custom" ? budget : "",
     message,
     source: "stilloak-web-services",
+    attribution,
   });
 
   res.status(201).json({

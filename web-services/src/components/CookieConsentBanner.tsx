@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Check, Cookie, ShieldCheck, SlidersHorizontal, X } from "lucide-react";
+import { CONSENT_EVENT } from "../lib/analytics";
 
 type Consent = {
   necessary: true;
@@ -52,6 +53,7 @@ export default function CookieConsentBanner() {
 
   const save = (next: Consent) => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    window.dispatchEvent(new CustomEvent(CONSENT_EVENT, { detail: next }));
     setSavedConsent(next);
     setDraft(next);
     setPreferencesOpen(false);
