@@ -23,6 +23,9 @@ const { startSavingsStudioSummaryScheduler } = require("./services/savingsStudio
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const securityHeaders = require("./middleware/securityHeaders");
 const { handleStripeWebhook } = require("./controllers/billingController");
+const {
+  handleWebServiceStripeWebhook,
+} = require("./controllers/webServiceStripeWebhookController");
 const { getConfiguredOrigins, isAllowedOrigin } = require("./utils/originMatcher");
 
 dotenv.config({ path: path.resolve(__dirname, ".env") });
@@ -67,6 +70,11 @@ app.post(
   "/api/billing/webhook",
   express.raw({ type: "application/json" }),
   handleStripeWebhook
+);
+app.post(
+  "/api/web-service-stripe/webhook",
+  express.raw({ type: "application/json" }),
+  handleWebServiceStripeWebhook
 );
 
 app.use(
