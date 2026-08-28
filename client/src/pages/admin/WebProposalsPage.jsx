@@ -28,6 +28,8 @@ const depositLabels = {
 };
 const finalPaymentLabels = { not_requested: "Likutis neprašytas", requested: "Laukiama likučio", pending: "Mokėjimas pradėtas", paid: "Pilnai apmokėta", failed: "Nepavyko", refunded: "Grąžintas" };
 
+const projectStageLabels = { awaiting_deposit: "Laukia avanso", in_progress: "Darbai vykdomi", client_review: "Kliento peržiūra", awaiting_final_payment: "Laukia likučio", completed: "Užbaigta" };
+
 const paymentMethodLabels = {
   bank_transfer: "Banko pavedimas",
   stripe: "Stripe",
@@ -56,6 +58,7 @@ const WebProposalsPage = () => {
   const [requestingFinalId, setRequestingFinalId] = useState("");
   const [finalBankPaidId, setFinalBankPaidId] = useState("");
   const [resendingInvoiceKey, setResendingInvoiceKey] = useState("");
+  const [updatingStageId, setUpdatingStageId] = useState("");
   const [filter, setFilter] = useState("active");
 
   const loadRequests = async () => {
@@ -218,6 +221,19 @@ const WebProposalsPage = () => {
     } finally { setResendingInvoiceKey(""); }
   };
 
+  const handleProjectStage = async (requestId, projectStage) => {
+    try {
+      setUpdatingStageId(requestId);
+      const updated = await webServiceRequestService.updateRequest(requestId, { projectStage });
+      setRequests((current) => current.map((item) => item._id === requestId ? updated : item));
+      toast.success("Projekto etapas atnaujintas.");
+    } catch (stageError) {
+      toast.error(stageError.response?.data?.message || "Nepavyko atnaujinti projekto etapo.");
+    } finally {
+      setUpdatingStageId("");
+    }
+  };
+
   const copyProposalUrl = async (requestId) => {
     const url = proposalUrls[requestId];
     if (!url) return;
@@ -292,6 +308,7 @@ const WebProposalsPage = () => {
               const depositStatus = request.depositStatus || "not_requested";
               const finalPaymentStatus = request.finalPaymentStatus || "not_requested";
               const proposalUrl = proposalUrls[request._id] || "";
+              const projectStage = request.projectStage || "awaiting_deposit";
 
               return (
                 <article key={request._id} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
@@ -309,6 +326,7 @@ const WebProposalsPage = () => {
                           {depositLabels[depositStatus] || depositStatus}
                         </span>
                         {depositStatus === "paid" ? <span className={`rounded-full px-3 py-1 text-xs font-semibold ${finalPaymentStatus === "paid" ? "bg-emerald-50 text-emerald-700" : "bg-violet-50 text-violet-700"}`}>{finalPaymentLabels[finalPaymentStatus] || finalPaymentStatus}</span> : null}
+                        <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">{projectStageLabels[projectStage] || projectStage}</span>
                       </div>
 
                       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -376,6 +394,11 @@ const WebProposalsPage = () => {
                     </div>
 
                     <div className="w-full shrink-0 space-y-4 xl:w-[440px]">
+                      <label className="block text-sm font-medium text-slate-700">Projekto etapas
+                        <select className="select-field mt-2 w-full" value={projectStage} disabled={updatingStageId === request._id} onChange={(event) => handleProjectStage(request._id, event.target.value)}>
+                          {Object.entries(projectStageLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                        </select>
+                      </label>
                       <label className="block text-sm font-medium text-slate-700">
                         Projekto kaina, €
                         <input

@@ -2,7 +2,7 @@ const crypto = require("crypto");
 
 const { getWebServicePlan } = require("../config/webServicePlans");
 const WebServiceRequest = require("../models/WebServiceRequest");
-const { STATUS_OPTIONS, CONTACT_TYPE_OPTIONS } = require("../models/WebServiceRequest");
+const { STATUS_OPTIONS, CONTACT_TYPE_OPTIONS, PROJECT_STAGE_OPTIONS } = require("../models/WebServiceRequest");
 const { buildIdempotencyKey } = require("../services/stripeCheckoutService");
 const { syncWebServiceDepositFromSession } = require("../services/webServiceDepositService");
 const { syncWebServiceFinalPaymentFromSession } = require("../services/webServiceFinalPaymentService");
@@ -247,6 +247,16 @@ const updateAdminWebServiceRequest = async (req, res) => {
     request.status = status;
   }
 
+  if (Object.prototype.hasOwnProperty.call(req.body || {}, "projectStage")) {
+    const projectStage = cleanString(req.body.projectStage, 40).toLowerCase();
+    if (!PROJECT_STAGE_OPTIONS.includes(projectStage)) {
+      throw createHttpError("Netinkamas projekto etapas.", 400);
+    }
+    request.projectStage = projectStage;
+    if (projectStage === "completed") request.status = "completed";
+    else if (request.status === "completed") request.status = "in_progress";
+  }
+
   if (Object.prototype.hasOwnProperty.call(req.body || {}, "proposalPrice")) {
     request.proposalPrice = parseNullablePrice(req.body.proposalPrice, "Netinkama pasiūlymo kaina.");
   }
@@ -399,6 +409,7 @@ const acceptPublicWebServiceProposal = async (req, res) => {
     request.proposalAcceptedAt = now;
     request.proposalAcceptedName = acceptedName;
     request.status = "accepted";
+    request.projectStage = "awaiting_deposit";
     request.nextAction = "Laukti projekto avanso apmokėjimo";
     request.nextActionAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
     request.contactHistory.push({
@@ -529,6 +540,7 @@ const requestAdminWebServiceFinalPayment = async (req, res) => {
   request.proposalTokenHash = hashProposalToken(token);
   request.finalPaymentAmount = amount;
   request.finalPaymentStatus = "requested";
+  request.projectStage = "awaiting_final_payment";
   request.finalPaymentRequestedAt = now;
   request.finalPaymentPaidAt = null;
   request.stripeFinalCheckoutSessionId = "";

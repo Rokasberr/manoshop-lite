@@ -136,3 +136,27 @@ test("Web proposal admin supports payment history, final bank transfer and test 
   assert.match(adminSource, /Siųsti PDF dar kartą/);
   assert.match(adminSource, /Pažymėti likutį gautu pavedimu/);
 });
+
+
+test("Web projects expose stages, payment reminders and completion handover", () => {
+  const modelSource = readRepoFile("server", "models", "WebServiceRequest.js");
+  const controllerSource = readRepoFile("server", "controllers", "webServiceRequestController.js");
+  const schedulerSource = readRepoFile("server", "services", "webServicePaymentReminderScheduler.js");
+  const lifecycleEmailSource = readRepoFile("server", "services", "webServiceLifecycleEmailService.js");
+  const webhookSource = readRepoFile("server", "controllers", "webServiceStripeWebhookController.js");
+  const serverSource = readRepoFile("server", "server.js");
+  const adminSource = readRepoFile("client", "src", "pages", "admin", "WebProposalsPage.jsx");
+
+  assert.match(modelSource, /PROJECT_STAGE_OPTIONS/);
+  assert.match(modelSource, /depositReminderSentAt:/);
+  assert.match(modelSource, /finalPaymentReminderSentAt:/);
+  assert.match(modelSource, /handoverEmailStatus:/);
+  assert.match(controllerSource, /PROJECT_STAGE_OPTIONS\.includes\(projectStage\)/);
+  assert.match(schedulerSource, /findOneAndUpdate/);
+  assert.match(schedulerSource, /REMINDER_AFTER_DAYS = 3/);
+  assert.match(lifecycleEmailSource, /deliverWebServiceHandoverEmail/);
+  assert.match(webhookSource, /deliverWebServiceHandoverEmail\(request\)/);
+  assert.match(serverSource, /startWebServicePaymentReminderScheduler\(\)/);
+  assert.match(adminSource, /Projekto etapas/);
+  assert.match(adminSource, /Kliento peržiūra/);
+});

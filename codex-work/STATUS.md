@@ -2,6 +2,10 @@
 
 PROJECT_STATE: STILLOAK_WEB_SERVICES_LOCAL_VALIDATED
 
+## 2026-08-28 – Projektų etapai, mokėjimų priminimai ir perdavimas
+
+Pridėti atskiri projekto etapai: laukia avanso, darbai vykdomi, kliento peržiūra, laukia likučio ir užbaigta. Administratorius etapą gali keisti pasiūlymų puslapyje, o mokėjimų srautai automatiškai perveda į vykdomą, laukiančio likučio arba užbaigtą etapą. Serverio scheduleris kas valandą tikrina neapmokėtus avansus ir likučius; pirmas priminimas siunčiamas po 3 dienų, kartojamas ne dažniau kaip kas 3 dienas, o DB claim apsaugo nuo dubliuoto siuntimo. Po pilno Stripe arba bankinio apmokėjimo siunčiamas projekto užbaigimo ir perdavimo laiškas, išsaugant jo būseną bei laiką. Laiške sąmoningai nesiunčiami slaptažodžiai ar prieigos raktai. Stripe Live ir tikros apskaitos sąskaitos neįjungtos.
+
 ## Dabartinis milestone
 
 Milestone 6 – Stilloak Web paslaugų svetainė. Tikslas: atskirame `web-services` kataloge paruošti savarankišką React + Vite + TypeScript svetainę, kuri vėliau bus diegiama kaip atskiras Vercel projektas su Root Directory `web-services`.

@@ -27,6 +27,7 @@ const syncWebServiceFinalPaymentFromSession = async (session, { expired = false 
   request.stripeFinalCheckoutSessionId = session.id || request.stripeFinalCheckoutSessionId;
   request.stripeFinalPaymentIntentId = getStripeId(session.payment_intent) || request.stripeFinalPaymentIntentId;
   request.status = "completed";
+  request.projectStage = "completed";
   request.nextAction = "Projektas apmokėtas pilnai";
   request.nextActionAt = null;
   const note = "Gauta likusi projekto suma per Stripe.";

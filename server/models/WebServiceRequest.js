@@ -19,6 +19,7 @@ const DEPOSIT_STATUS_OPTIONS = ["not_requested", "pending", "paid", "failed", "r
 const DEPOSIT_PAYMENT_METHOD_OPTIONS = ["", "stripe", "bank_transfer"];
 const TEST_INVOICE_STATUS_OPTIONS = ["not_created", "processing", "sent", "failed"];
 const FINAL_PAYMENT_STATUS_OPTIONS = ["not_requested", "requested", "pending", "paid", "failed", "refunded"];
+const PROJECT_STAGE_OPTIONS = ["awaiting_deposit", "in_progress", "client_review", "awaiting_final_payment", "completed"];
 
 const attributionSchema = new mongoose.Schema(
   {
@@ -106,6 +107,11 @@ const webServiceRequestSchema = new mongoose.Schema(
     finalTestInvoiceNumber: { type: String, trim: true, maxlength: 100, default: "" },
     finalTestInvoiceStatus: { type: String, enum: TEST_INVOICE_STATUS_OPTIONS, default: "not_created" },
     finalTestInvoiceSentAt: { type: Date, default: null },
+    projectStage: { type: String, enum: PROJECT_STAGE_OPTIONS, default: "awaiting_deposit", index: true },
+    depositReminderSentAt: { type: Date, default: null },
+    finalPaymentReminderSentAt: { type: Date, default: null },
+    handoverEmailStatus: { type: String, enum: TEST_INVOICE_STATUS_OPTIONS, default: "not_created" },
+    handoverEmailSentAt: { type: Date, default: null },
     finalPrice: { type: Number, min: 0, default: null },
     nextAction: { type: String, trim: true, maxlength: 500, default: "" },
     nextActionAt: { type: Date, default: null, index: true },
@@ -131,3 +137,5 @@ module.exports.DEPOSIT_STATUS_OPTIONS = DEPOSIT_STATUS_OPTIONS;
 module.exports.DEPOSIT_PAYMENT_METHOD_OPTIONS = DEPOSIT_PAYMENT_METHOD_OPTIONS;
 module.exports.TEST_INVOICE_STATUS_OPTIONS = TEST_INVOICE_STATUS_OPTIONS;
 module.exports.FINAL_PAYMENT_STATUS_OPTIONS = FINAL_PAYMENT_STATUS_OPTIONS;
+
+module.exports.PROJECT_STAGE_OPTIONS = PROJECT_STAGE_OPTIONS;

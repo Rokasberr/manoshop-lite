@@ -40,6 +40,7 @@ const syncWebServiceDepositFromSession = async (session, { expired = false } = {
   if (!sameAmount(request.depositAmount, session.amount_total)) return request;
 
   request.depositStatus = "paid";
+  request.projectStage = "in_progress";
   request.depositPaymentMethod = "stripe";
   request.depositPaidAt = request.depositPaidAt || new Date();
   request.stripeDepositCheckoutSessionId = session.id || request.stripeDepositCheckoutSessionId;

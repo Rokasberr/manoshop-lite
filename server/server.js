@@ -20,6 +20,7 @@ const memberResourceRoutes = require("./routes/memberResourceRoutes");
 const webServiceRequestRoutes = require("./routes/webServiceRequestRoutes");
 const { validateEnvironment } = require("./config/env");
 const { startSavingsStudioSummaryScheduler } = require("./services/savingsStudioScheduler");
+const { startWebServicePaymentReminderScheduler } = require("./services/webServicePaymentReminderScheduler");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const securityHeaders = require("./middleware/securityHeaders");
 const { handleStripeWebhook } = require("./controllers/billingController");
@@ -167,6 +168,7 @@ const startServer = async () => {
     await connectDatabase();
     await listen();
     startSavingsStudioSummaryScheduler();
+    startWebServicePaymentReminderScheduler();
   } catch (error) {
     if (error.code !== "EADDRINUSE") {
       console.error("Nepavyko paleisti serverio:", error.message);
