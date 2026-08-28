@@ -46,6 +46,11 @@ const adminNavigation = [
     icon: Globe2,
   },
   {
+    label: "Web pasiūlymai",
+    to: "/admin/web-proposals",
+    icon: FileText,
+  },
+  {
     label: "Instagram",
     to: "/admin/instagram-generator",
     icon: Instagram,
