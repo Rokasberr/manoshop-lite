@@ -16,6 +16,7 @@ import "./styles/experience.css";
 import "./styles/proposal.css";
 import "./styles/mobile-menu-fix.css";
 import "./styles/footer-refresh.css";
+import "./styles/footer-mobile-polish.css";
 
 captureLeadAttribution();
 initializeAnalytics();
