@@ -34,8 +34,12 @@ services:
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
         sync: false
+      - key: STRIPE_WEB_SERVICE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEB_SERVICE_WEBHOOK_SECRET
+        sync: false
       - key: WEB_STRIPE_DEPOSITS_ENABLED
-        value: "false"
+        value: "true"
       - key: WEB_SERVICE_STRIPE_LIVE_ENABLED
         value: "false"
       - key: WEB_BANK_TRANSFER_BENEFICIARY
