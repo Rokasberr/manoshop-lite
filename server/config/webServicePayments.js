@@ -21,7 +21,7 @@ const getWebBankTransferDetails = (requestNumber = "") => {
 };
 
 const getWebStripeKeyMode = () => {
-  const secretKey = normalize(process.env.STRIPE_SECRET_KEY);
+  const secretKey = normalize(process.env.STRIPE_WEB_SERVICE_SECRET_KEY);
   if (secretKey.startsWith("sk_test_")) return "test";
   if (secretKey.startsWith("sk_live_")) return "live";
   return "unconfigured";

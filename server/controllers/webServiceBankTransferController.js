@@ -7,7 +7,7 @@ const {
 } = require("../config/webServicePayments");
 const { syncWebServiceDepositFromSession } = require("../services/webServiceDepositService");
 const { createHttpError } = require("../utils/httpError");
-const { getStripeClient } = require("../utils/stripeClient");
+const { getWebServiceStripeClient } = require("../utils/stripeClient");
 
 const PROPOSAL_TOKEN_PATTERN = /^[a-f0-9]{64}$/i;
 
@@ -32,7 +32,7 @@ const retireExistingStripeDepositSession = async (request) => {
   if (!request.stripeDepositCheckoutSessionId || request.depositStatus === "paid") return request;
 
   try {
-    const stripe = getStripeClient();
+    const stripe = getWebServiceStripeClient();
     const session = await stripe.checkout.sessions.retrieve(request.stripeDepositCheckoutSessionId);
 
     if (session.payment_status === "paid") {

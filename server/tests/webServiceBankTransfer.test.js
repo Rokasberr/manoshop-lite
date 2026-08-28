@@ -53,7 +53,7 @@ test("Bank transfer details stay server-configured and include request-specific 
 test("Stripe web deposits are opt-in and test mode does not require the live unlock", () => {
   withEnv(
     {
-      STRIPE_SECRET_KEY: "sk_test_example",
+      STRIPE_WEB_SERVICE_SECRET_KEY: "sk_test_example",
       WEB_STRIPE_DEPOSITS_ENABLED: null,
       WEB_SERVICE_STRIPE_LIVE_ENABLED: null,
     },
@@ -63,7 +63,7 @@ test("Stripe web deposits are opt-in and test mode does not require the live unl
   );
   withEnv(
     {
-      STRIPE_SECRET_KEY: "sk_test_example",
+      STRIPE_WEB_SERVICE_SECRET_KEY: "sk_test_example",
       WEB_STRIPE_DEPOSITS_ENABLED: "true",
       WEB_SERVICE_STRIPE_LIVE_ENABLED: "false",
     },
