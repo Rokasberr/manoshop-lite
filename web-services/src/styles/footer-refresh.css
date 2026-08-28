@@ -1,0 +1,204 @@
+/* Stilloak Web footer refresh.
+   Loaded last so the footer stays consistent across existing responsive layers. */
+.site-footer {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(210px, 0.8fr) minmax(210px, 0.8fr);
+  gap: 44px;
+  align-items: start;
+  width: min(100% - 48px, 1240px);
+  margin: 58px auto 24px;
+  padding: 42px 44px 30px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  color: #f8f1e9;
+  background:
+    radial-gradient(circle at 12% -10%, rgba(177, 119, 78, 0.24), transparent 36%),
+    linear-gradient(135deg, #221d19 0%, #171513 58%, #211914 100%);
+  box-shadow: 0 22px 58px rgba(51, 35, 25, 0.18);
+}
+
+.site-footer::before {
+  position: absolute;
+  top: 0;
+  right: 44px;
+  left: 44px;
+  height: 1px;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(211, 158, 116, 0.55), transparent);
+}
+
+.site-footer > div {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.site-footer .footer-brand-block {
+  max-width: 430px;
+}
+
+.site-footer .footer-wordmark {
+  display: inline-flex;
+  margin-bottom: 18px;
+  color: #fffaf4;
+}
+
+.site-footer .footer-wordmark strong {
+  color: #fffaf4;
+}
+
+.site-footer .footer-wordmark span {
+  color: #d3a078;
+}
+
+.site-footer .footer-brand-block > p {
+  max-width: 390px;
+  margin: 0;
+  color: #bfb4aa;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.site-footer .footer-label {
+  display: block;
+  margin-bottom: 15px;
+  color: #d3a078;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+/* Public-facing wording: clearer than the previous generic labels. */
+.site-footer > div:nth-child(2) .footer-label,
+.site-footer > div:nth-child(3) .footer-label {
+  font-size: 0;
+}
+
+.site-footer > div:nth-child(2) .footer-label::after {
+  content: "Susisiekti";
+  font-size: 11px;
+}
+
+.site-footer > div:nth-child(3) .footer-label::after {
+  content: "Informacija";
+  font-size: 11px;
+}
+
+.site-footer > div:nth-child(2) {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.site-footer > div:nth-child(2) br {
+  display: none;
+}
+
+.site-footer > div:nth-child(2) a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 6px 0;
+  color: #f5ede5;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.site-footer > div:nth-child(2) a::before {
+  width: 7px;
+  height: 7px;
+  margin-right: 11px;
+  flex: 0 0 auto;
+  border: 1px solid #ca8f61;
+  border-radius: 50%;
+  content: "";
+  box-shadow: 0 0 0 4px rgba(202, 143, 97, 0.08);
+}
+
+.site-footer > div:nth-child(2) a:hover {
+  color: #e5b28b;
+  transform: translateX(2px);
+}
+
+.site-footer > div:nth-child(3) p {
+  max-width: 260px;
+  margin: 0;
+  color: #aaa097;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.site-footer > div:nth-child(3)::after {
+  display: block;
+  width: 42px;
+  height: 2px;
+  margin-top: 18px;
+  border-radius: 999px;
+  content: "";
+  background: #9b6744;
+  opacity: 0.8;
+}
+
+@media (max-width: 900px) {
+  .site-footer {
+    grid-template-columns: minmax(0, 1.2fr) minmax(200px, 0.8fr);
+    gap: 34px 40px;
+    padding: 36px 34px 28px;
+  }
+
+  .site-footer .footer-brand-block {
+    grid-column: 1 / -1;
+    max-width: 540px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+}
+
+@media (max-width: 620px) {
+  .site-footer {
+    grid-template-columns: 1fr;
+    gap: 0;
+    width: min(100% - 28px, 1240px);
+    margin-top: 42px;
+    margin-bottom: 14px;
+    padding: 30px 24px 24px;
+    border-radius: 22px;
+  }
+
+  .site-footer::before {
+    right: 24px;
+    left: 24px;
+  }
+
+  .site-footer .footer-brand-block {
+    grid-column: auto;
+    padding-bottom: 25px;
+  }
+
+  .site-footer > div:nth-child(2),
+  .site-footer > div:nth-child(3) {
+    padding-top: 24px;
+  }
+
+  .site-footer > div:nth-child(2) {
+    padding-bottom: 22px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .site-footer > div:nth-child(2) a {
+    min-height: 38px;
+    font-size: 14px;
+  }
+
+  .site-footer > div:nth-child(3) p {
+    max-width: none;
+  }
+}
