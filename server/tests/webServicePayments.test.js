@@ -8,7 +8,7 @@ const {
 } = require("../config/webServicePayments");
 
 const ENV_KEYS = [
-  "STRIPE_SECRET_KEY",
+  "STRIPE_WEB_SERVICE_SECRET_KEY",
   "WEB_STRIPE_DEPOSITS_ENABLED",
   "WEB_SERVICE_STRIPE_LIVE_ENABLED",
 ];
@@ -38,7 +38,7 @@ const withPaymentEnv = (values, callback) => {
 test("Stilloak Web Stripe deposits stay off when the master switch is disabled", () => {
   withPaymentEnv(
     {
-      STRIPE_SECRET_KEY: "sk_test_example",
+      STRIPE_WEB_SERVICE_SECRET_KEY: "sk_test_example",
       WEB_STRIPE_DEPOSITS_ENABLED: "false",
       WEB_SERVICE_STRIPE_LIVE_ENABLED: "false",
     },
@@ -52,7 +52,7 @@ test("Stilloak Web Stripe deposits stay off when the master switch is disabled",
 test("Stilloak Web can use Stripe test keys without unlocking live payments", () => {
   withPaymentEnv(
     {
-      STRIPE_SECRET_KEY: "sk_test_example",
+      STRIPE_WEB_SERVICE_SECRET_KEY: "sk_test_example",
       WEB_STRIPE_DEPOSITS_ENABLED: "true",
       WEB_SERVICE_STRIPE_LIVE_ENABLED: "false",
     },
@@ -72,7 +72,7 @@ test("Stilloak Web can use Stripe test keys without unlocking live payments", ()
 test("Stilloak Web refuses a live Stripe key until the separate live safety flag is enabled", () => {
   withPaymentEnv(
     {
-      STRIPE_SECRET_KEY: "sk_live_example",
+      STRIPE_WEB_SERVICE_SECRET_KEY: "sk_live_example",
       WEB_STRIPE_DEPOSITS_ENABLED: "true",
       WEB_SERVICE_STRIPE_LIVE_ENABLED: "false",
     },
@@ -87,7 +87,7 @@ test("Stilloak Web refuses a live Stripe key until the separate live safety flag
 test("Stilloak Web live Stripe requires both payment switches and a live key", () => {
   withPaymentEnv(
     {
-      STRIPE_SECRET_KEY: "sk_live_example",
+      STRIPE_WEB_SERVICE_SECRET_KEY: "sk_live_example",
       WEB_STRIPE_DEPOSITS_ENABLED: "true",
       WEB_SERVICE_STRIPE_LIVE_ENABLED: "true",
     },
@@ -106,7 +106,7 @@ test("Stilloak Web live Stripe requires both payment switches and a live key", (
 test("Stilloak Web fails closed for a missing or unknown Stripe secret key", () => {
   withPaymentEnv(
     {
-      STRIPE_SECRET_KEY: undefined,
+      STRIPE_WEB_SERVICE_SECRET_KEY: undefined,
       WEB_STRIPE_DEPOSITS_ENABLED: "true",
       WEB_SERVICE_STRIPE_LIVE_ENABLED: "true",
     },
