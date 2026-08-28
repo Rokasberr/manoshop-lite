@@ -30,6 +30,9 @@ const statusLabels = {
   lost: "Prarastas",
 };
 
+const OPEN_STATUSES = new Set(["new", "contacted", "qualifying", "proposal_sent"]);
+const PIPELINE_STATUSES = new Set(["new", "contacted", "qualifying", "proposal_sent", "accepted"]);
+
 const contactTypeOptions = [
   ["note", "Pastaba"],
   ["email", "El. laiškas"],
@@ -63,6 +66,41 @@ const toDateInput = (value) => {
   return new Date(date.getTime() - offset).toISOString().slice(0, 10);
 };
 
+const getLeadPriority = (request) => {
+  let score = 0;
+
+  if (["pro", "custom"].includes(request.packageId)) score += 3;
+  else if (request.packageId === "business") score += 2;
+  else score += 1;
+
+  if (request.company) score += 1;
+  if (request.phone) score += 1;
+  if (request.budget) score += 1;
+  if (request.attribution?.gclid || request.attribution?.fbclid) score += 1;
+
+  if (score >= 5) {
+    return { score, label: "Aukštas", className: "bg-rose-50 text-rose-700" };
+  }
+  if (score >= 3) {
+    return { score, label: "Vidutinis", className: "bg-amber-50 text-amber-700" };
+  }
+  return { score, label: "Normalus", className: "bg-slate-100 text-slate-600" };
+};
+
+const isOverdue = (request, now = Date.now()) =>
+  Boolean(
+    request.nextActionAt &&
+      OPEN_STATUSES.has(request.status) &&
+      new Date(request.nextActionAt).getTime() < now
+  );
+
+const needsAttention = (request, now = Date.now()) =>
+  OPEN_STATUSES.has(request.status) &&
+  (request.status === "new" || !request.nextActionAt || isOverdue(request, now));
+
+const pipelineValueFor = (request) =>
+  Number(request.finalPrice ?? request.proposalPrice ?? request.basePrice ?? 0) || 0;
+
 const buildDraft = (request) => ({
   status: request.status,
   proposalPrice: request.proposalPrice ?? "",
@@ -83,6 +121,7 @@ const WebOrdersManagerPage = () => {
   const [savingId, setSavingId] = useState("");
   const [contactSavingId, setContactSavingId] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [attentionFilter, setAttentionFilter] = useState("");
 
   const loadRequests = async () => {
     try {
@@ -104,17 +143,46 @@ const WebOrdersManagerPage = () => {
   }, [statusFilter]);
 
   const stats = useMemo(() => {
-    const openStatuses = new Set(["new", "contacted", "qualifying", "proposal_sent"]);
-    const followUps = requests.filter((request) => request.nextActionAt && openStatuses.has(request.status));
     const now = Date.now();
+    const open = requests.filter((request) => OPEN_STATUSES.has(request.status));
+    const followUps = open.filter((request) => request.nextActionAt);
 
     return {
       total: requests.length,
-      open: requests.filter((request) => openStatuses.has(request.status)).length,
-      followUps: followUps.length,
-      overdue: followUps.filter((request) => new Date(request.nextActionAt).getTime() < now).length,
+      open: open.length,
+      attention: open.filter((request) => needsAttention(request, now)).length,
+      overdue: followUps.filter((request) => isOverdue(request, now)).length,
+      pipelineValue: requests
+        .filter((request) => PIPELINE_STATUSES.has(request.status))
+        .reduce((sum, request) => sum + pipelineValueFor(request), 0),
     };
   }, [requests]);
+
+  const displayedRequests = useMemo(() => {
+    const now = Date.now();
+    const filtered = requests.filter((request) => {
+      if (attentionFilter === "attention") return needsAttention(request, now);
+      if (attentionFilter === "overdue") return isOverdue(request, now);
+      return true;
+    });
+
+    return [...filtered].sort((a, b) => {
+      const overdueDifference = Number(isOverdue(b, now)) - Number(isOverdue(a, now));
+      if (overdueDifference) return overdueDifference;
+
+      const attentionDifference = Number(needsAttention(b, now)) - Number(needsAttention(a, now));
+      if (attentionDifference) return attentionDifference;
+
+      const priorityDifference = getLeadPriority(b).score - getLeadPriority(a).score;
+      if (priorityDifference) return priorityDifference;
+
+      const aFollowUp = a.nextActionAt ? new Date(a.nextActionAt).getTime() : Number.POSITIVE_INFINITY;
+      const bFollowUp = b.nextActionAt ? new Date(b.nextActionAt).getTime() : Number.POSITIVE_INFINITY;
+      if (aFollowUp !== bFollowUp) return aFollowUp - bFollowUp;
+
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }, [attentionFilter, requests]);
 
   const updateDraft = (requestId, key, value) => {
     setDrafts((current) => ({
@@ -122,6 +190,18 @@ const WebOrdersManagerPage = () => {
       [requestId]: {
         ...current[requestId],
         [key]: value,
+      },
+    }));
+  };
+
+  const setQuickFollowUp = (requestId, hours) => {
+    const nextDate = new Date(Date.now() + hours * 60 * 60 * 1000);
+    setDrafts((current) => ({
+      ...current,
+      [requestId]: {
+        ...current[requestId],
+        nextAction: current[requestId]?.nextAction || "Susisiekti su klientu",
+        nextActionAt: toDateTimeLocal(nextDate),
       },
     }));
   };
@@ -196,15 +276,16 @@ const WebOrdersManagerPage = () => {
       <AdminPageHeader
         eyebrow="Stilloak Web"
         title="Svetainių užsakymai"
-        description="CRM darbo vieta Web užklausoms: kontaktai, paketas, pasiūlymo vertė, kitas veiksmas, terminai, kontaktų istorija ir lankytojo šaltinis."
+        description="CRM V3 automatiškai suplanuoja pirmą follow-up, prioritetizuoja vertingiausius lead'us ir pirmiausia rodo tai, kam reikia tavo dėmesio."
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {[
           ["Rodoma", stats.total],
           ["Aktyvūs lead'ai", stats.open],
-          ["Su follow-up", stats.followUps],
+          ["Reikia dėmesio", stats.attention],
           ["Vėluoja", stats.overdue],
+          ["Pipeline vertė", formatCurrency(stats.pipelineValue)],
         ].map(([label, value]) => (
           <div key={label} className="dashboard-panel p-5">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{label}</p>
@@ -214,23 +295,35 @@ const WebOrdersManagerPage = () => {
       </div>
 
       <div className="dashboard-panel p-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="dashboard-eyebrow">Pipeline</p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-slate-950">Visi Web užsakymai</h2>
+            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-slate-950">Web pardavimų eilė</h2>
+            <p className="mt-2 text-sm text-slate-500">Vėluojantys ir aukštesnio prioriteto lead'ai automatiškai keliami į viršų.</p>
           </div>
-          <select
-            className="select-field min-w-56"
-            value={statusFilter}
-            onChange={(event) => setStatusFilter(event.target.value)}
-          >
-            <option value="">Visos būsenos</option>
-            {statusOptions.map((status) => (
-              <option key={status} value={status}>
-                {statusLabels[status]}
-              </option>
-            ))}
-          </select>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <select
+              className="select-field min-w-52"
+              value={attentionFilter}
+              onChange={(event) => setAttentionFilter(event.target.value)}
+            >
+              <option value="">Visi lead'ai</option>
+              <option value="attention">Reikia dėmesio</option>
+              <option value="overdue">Tik vėluojantys</option>
+            </select>
+            <select
+              className="select-field min-w-56"
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value)}
+            >
+              <option value="">Visos būsenos</option>
+              {statusOptions.map((status) => (
+                <option key={status} value={status}>
+                  {statusLabels[status]}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {loading ? (
@@ -241,23 +334,35 @@ const WebOrdersManagerPage = () => {
           <div className="mt-6">
             <EmptyState
               title="Web užsakymų kol kas nėra"
-              description="Kai klientas pateiks užsakymą per web.stilloak-studio.com, jis atsiras čia."
+              description="Kai klientas pateiks užsakymą per web.stilloak-studio.com, jis atsiras čia ir automatiškai gaus pirmą follow-up."
               actionLabel="Atnaujinti"
               actionTo="/admin/web-orders"
             />
           </div>
+        ) : !displayedRequests.length ? (
+          <div className="mt-6 rounded-2xl border border-dashed border-slate-200 p-8 text-center text-sm text-slate-500">
+            Pagal pasirinktą filtrą lead'ų nėra.
+          </div>
         ) : (
           <div className="mt-6 space-y-5">
-            {requests.map((request) => {
+            {displayedRequests.map((request) => {
               const draft = drafts[request._id] || {};
               const displayedPrice = request.finalPrice ?? request.proposalPrice ?? request.basePrice;
               const attribution = request.attribution || {};
               const contactHistory = [...(request.contactHistory || [])].sort(
                 (a, b) => new Date(b.happenedAt || b.createdAt) - new Date(a.happenedAt || a.createdAt)
               );
+              const priority = getLeadPriority(request);
+              const overdue = isOverdue(request);
+              const attention = needsAttention(request);
 
               return (
-                <article key={request._id} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+                <article
+                  key={request._id}
+                  className={`rounded-3xl border bg-white p-5 shadow-sm sm:p-6 ${
+                    overdue ? "border-rose-300 ring-1 ring-rose-100" : attention ? "border-amber-200" : "border-slate-200"
+                  }`}
+                >
                   <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-3">
@@ -266,6 +371,12 @@ const WebOrdersManagerPage = () => {
                         <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
                           {request.packageName}
                         </span>
+                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${priority.className}`}>
+                          Prioritetas: {priority.label}
+                        </span>
+                        {overdue ? (
+                          <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700">Follow-up vėluoja</span>
+                        ) : null}
                         <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
                           Šaltinis: {sourceLabel(request)}
                         </span>
@@ -300,7 +411,7 @@ const WebOrdersManagerPage = () => {
                         </div>
                       </div>
 
-                      <div className="mt-5 grid gap-4 rounded-2xl border border-amber-100 bg-amber-50/50 p-4 md:grid-cols-3">
+                      <div className={`mt-5 grid gap-4 rounded-2xl border p-4 md:grid-cols-3 ${overdue ? "border-rose-200 bg-rose-50/60" : "border-amber-100 bg-amber-50/50"}`}>
                         <div>
                           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-amber-700/70">Kitas veiksmas</p>
                           <p className="mt-1 text-sm font-semibold text-slate-900">{request.nextAction || "Nenustatytas"}</p>
@@ -447,15 +558,29 @@ const WebOrdersManagerPage = () => {
                         />
                       </label>
 
-                      <label className="block text-sm font-medium text-slate-700">
-                        Follow-up data
-                        <input
-                          className="input-field mt-2 w-full"
-                          type="datetime-local"
-                          value={draft.nextActionAt || ""}
-                          onChange={(event) => updateDraft(request._id, "nextActionAt", event.target.value)}
-                        />
-                      </label>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700">
+                          Follow-up data
+                          <input
+                            className="input-field mt-2 w-full"
+                            type="datetime-local"
+                            value={draft.nextActionAt || ""}
+                            onChange={(event) => updateDraft(request._id, "nextActionAt", event.target.value)}
+                          />
+                        </label>
+                        <div className="mt-2 grid grid-cols-3 gap-2">
+                          {[[2, "+2 val."], [24, "Rytoj"], [72, "+3 d."]].map(([hours, label]) => (
+                            <button
+                              key={label}
+                              type="button"
+                              className="rounded-lg border border-slate-200 bg-white px-2 py-2 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
+                              onClick={() => setQuickFollowUp(request._id, hours)}
+                            >
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
 
                       <label className="block text-sm font-medium text-slate-700">
                         Projekto terminas

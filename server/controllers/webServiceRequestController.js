@@ -7,6 +7,12 @@ const { sendWebServiceRequestEmails } = require("../services/webServiceRequestEm
 const { createHttpError } = require("../utils/httpError");
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const INITIAL_FOLLOW_UP_HOURS = {
+  start: 8,
+  business: 4,
+  pro: 2,
+  custom: 2,
+};
 
 const cleanString = (value, maxLength = 5000) =>
   String(value || "").trim().slice(0, maxLength);
@@ -45,6 +51,11 @@ const buildRequestNumber = () => {
   const year = new Date().getFullYear();
   const token = crypto.randomBytes(4).toString("hex").toUpperCase();
   return `WEB-${year}-${token}`;
+};
+
+const getInitialNextActionAt = (planId, now = Date.now()) => {
+  const hours = INITIAL_FOLLOW_UP_HOURS[planId] || INITIAL_FOLLOW_UP_HOURS.start;
+  return new Date(now + hours * 60 * 60 * 1000);
 };
 
 const validatePublicPayload = (body = {}) => {
@@ -98,6 +109,8 @@ const createWebServiceRequest = async (req, res) => {
     message,
     source: "stilloak-web-services",
     attribution,
+    nextAction: "Susisiekti su klientu",
+    nextActionAt: getInitialNextActionAt(plan.id),
   });
 
   res.status(201).json({
