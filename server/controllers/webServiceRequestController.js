@@ -8,7 +8,7 @@ const { syncWebServiceDepositFromSession } = require("../services/webServiceDepo
 const { sendWebServiceProposalEmail } = require("../services/webServiceProposalEmailService");
 const { sendWebServiceRequestEmails } = require("../services/webServiceRequestEmailService");
 const { createHttpError } = require("../utils/httpError");
-const { getStripeClient } = require("../utils/stripeClient");
+const { getWebServiceStripeClient } = require("../utils/stripeClient");
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PROPOSAL_TOKEN_PATTERN = /^[a-f0-9]{64}$/i;
@@ -417,7 +417,7 @@ const createPublicWebServiceDepositSession = async (req, res) => {
     throw createHttpError("Avanso suma nenustatyta.", 409);
   }
 
-  const stripe = getStripeClient();
+  const stripe = getWebServiceStripeClient();
   const publicUrl = getWebPublicUrl();
   const session = await stripe.checkout.sessions.create(
     {
@@ -475,7 +475,7 @@ const confirmPublicWebServiceDeposit = async (req, res) => {
     throw createHttpError("Stripe apmokėjimo sesija neatitinka šio pasiūlymo.", 400);
   }
 
-  const stripe = getStripeClient();
+  const stripe = getWebServiceStripeClient();
   const session = await stripe.checkout.sessions.retrieve(sessionId);
 
   if (
@@ -498,7 +498,7 @@ const syncAdminWebServiceDeposit = async (req, res) => {
     throw createHttpError("Šiam pasiūlymui Stripe avanso sesija dar nesukurta.", 409);
   }
 
-  const stripe = getStripeClient();
+  const stripe = getWebServiceStripeClient();
   const session = await stripe.checkout.sessions.retrieve(request.stripeDepositCheckoutSessionId);
   await syncWebServiceDepositFromSession(session, { expired: session.status === "expired" });
   res.json(await WebServiceRequest.findById(request._id));
