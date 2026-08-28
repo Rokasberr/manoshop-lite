@@ -21,14 +21,15 @@ const makeRequest = (overrides = {}) => ({
   ...overrides,
 });
 
-test("customer confirmation contains request number, package and price", () => {
+test("customer confirmation contains request number, package, price and brand", () => {
   const email = buildCustomerEmail(makeRequest());
 
   assert.match(email.subject, /WEB-2026-ABC12345/);
   assert.match(email.text, /Business/);
   assert.match(email.text, /599/);
-  assert.match(email.html, /Užsakymas gautas/);
+  assert.match(email.html, /Užklausa sėkmingai gauta/);
   assert.match(email.html, /WEB-2026-ABC12345/);
+  assert.match(email.html, /stilloak-logo\.svg/);
 });
 
 test("admin notification contains customer contact details and project description", () => {
@@ -39,9 +40,10 @@ test("admin notification contains customer contact details and project descripti
   assert.match(email.text, /\+37060000000/);
   assert.match(email.html, /UAB Test/);
   assert.match(email.html, /reprezentacinės svetainės/);
+  assert.match(email.html, /stilloak-logo\.svg/);
 });
 
-test("email html escapes customer supplied markup", () => {
+test("email html escapes customer supplied markup while allowing trusted brand markup", () => {
   const request = makeRequest({
     name: '<script>alert("x")</script>',
     company: "A&B <b>Test</b>",
@@ -51,10 +53,10 @@ test("email html escapes customer supplied markup", () => {
   const customer = buildCustomerEmail(request);
   const admin = buildAdminEmail(request);
 
-  assert.doesNotMatch(customer.html, /<script>/i);
-  assert.doesNotMatch(admin.html, /<img/i);
+  assert.doesNotMatch(customer.html, /<script>alert/i);
+  assert.doesNotMatch(admin.html, /<img\s+src=x/i);
   assert.match(customer.html, /&lt;script&gt;/i);
-  assert.match(admin.html, /&lt;img/i);
+  assert.match(admin.html, /&lt;img src=x onerror=alert\(1\)&gt;/i);
 });
 
 test("custom project price is rendered as pagal poreikius", () => {

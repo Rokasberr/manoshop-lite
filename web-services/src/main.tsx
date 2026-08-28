@@ -12,6 +12,7 @@ import "./styles/cookies.css";
 import "./styles/background.css";
 import "./styles/experience.css";
 import "./styles/proposal.css";
+import "./styles/mobile-menu-fix.css";
 
 captureLeadAttribution();
 initializeAnalytics();
