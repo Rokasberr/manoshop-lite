@@ -1,5 +1,6 @@
 const express = require("express");
 
+const { areWebStripeDepositsEnabled } = require("../config/webServicePayments");
 const asyncHandler = require("../middleware/asyncHandler");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
 const { createWindowRateLimiter } = require("../middleware/rateLimit");
@@ -15,11 +16,7 @@ const {
   syncAdminWebServiceDeposit,
   updateAdminWebServiceRequest,
 } = require("../controllers/webServiceRequestController");
-const {
-  getPublicWebServiceBankTransfer,
-  markAdminWebServiceBankTransferPaid,
-  requireWebStripeDepositsEnabled,
-} = require("../controllers/webServiceBankTransferController");
+const { createHttpError } = require("../utils/httpError");
 
 const router = express.Router();
 
@@ -44,13 +41,15 @@ const publicProposalActionLimiter = createWindowRateLimiter({
   message: "Per daug veiksmų per trumpą laiką. Pabandykite vėliau.",
 });
 
+const requireWebStripeDepositsEnabled = (_req, _res, next) => {
+  if (!areWebStripeDepositsEnabled()) {
+    throw createHttpError("Stripe avanso mokėjimas šiuo metu neįjungtas.", 409);
+  }
+  next();
+};
+
 router.post("/", publicRequestLimiter, asyncHandler(createWebServiceRequest));
 router.get("/proposal/:token", publicProposalLimiter, asyncHandler(getPublicWebServiceProposal));
-router.get(
-  "/proposal/:token/bank-transfer",
-  publicProposalLimiter,
-  asyncHandler(getPublicWebServiceBankTransfer)
-);
 router.post(
   "/proposal/:token/accept",
   publicProposalActionLimiter,
@@ -82,13 +81,6 @@ router.post(
   adminOnly,
   validateObjectId("id"),
   asyncHandler(syncAdminWebServiceDeposit)
-);
-router.post(
-  "/:id/proposal/deposit/bank-transfer/paid",
-  protect,
-  adminOnly,
-  validateObjectId("id"),
-  asyncHandler(markAdminWebServiceBankTransferPaid)
 );
 router.patch(
   "/:id",
