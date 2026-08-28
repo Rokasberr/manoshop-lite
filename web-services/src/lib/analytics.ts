@@ -7,7 +7,7 @@ const siteVerification = String(import.meta.env.VITE_GOOGLE_SITE_VERIFICATION ||
 let initialized = false;
 
 type AnalyticsWindow = Window & {
-  dataLayer?: unknown[][];
+  dataLayer?: IArguments[];
   gtag?: (...args: unknown[]) => void;
 };
 
@@ -37,16 +37,12 @@ const loadGoogleAnalytics = () => {
 
   const analyticsWindow = getAnalyticsWindow();
   analyticsWindow.dataLayer = analyticsWindow.dataLayer || [];
-  analyticsWindow.gtag = (...args: unknown[]) => {
-    analyticsWindow.dataLayer?.push(args);
+  const queueGoogleAnalyticsCommand: (...args: unknown[]) => void = function () {
+    // Google gtag's official bootstrap queues the function's arguments object.
+    // eslint-disable-next-line prefer-rest-params
+    analyticsWindow.dataLayer?.push(arguments);
   };
-
-  analyticsWindow.gtag("js", new Date());
-  analyticsWindow.gtag("config", measurementId, {
-    anonymize_ip: true,
-    page_title: document.title,
-    page_location: window.location.href
-  });
+  analyticsWindow.gtag = queueGoogleAnalyticsCommand;
 
   if (!document.querySelector(`script[data-stilloak-ga="${measurementId}"]`)) {
     const script = document.createElement("script");
@@ -55,6 +51,13 @@ const loadGoogleAnalytics = () => {
     script.dataset.stilloakGa = measurementId;
     document.head.appendChild(script);
   }
+
+  analyticsWindow.gtag("js", new Date());
+  analyticsWindow.gtag("config", measurementId, {
+    anonymize_ip: true,
+    page_title: document.title,
+    page_location: window.location.href
+  });
 
   initialized = true;
 };
