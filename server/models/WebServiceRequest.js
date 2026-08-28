@@ -16,6 +16,7 @@ const STATUS_OPTIONS = [
 const CONTACT_TYPE_OPTIONS = ["note", "email", "call", "meeting", "proposal"];
 const PROPOSAL_STATUS_OPTIONS = ["draft", "sent", "viewed", "accepted", "declined", "expired"];
 const DEPOSIT_STATUS_OPTIONS = ["not_requested", "pending", "paid", "failed", "refunded"];
+const DEPOSIT_PAYMENT_METHOD_OPTIONS = ["", "stripe", "bank_transfer"];
 
 const attributionSchema = new mongoose.Schema(
   {
@@ -78,6 +79,11 @@ const webServiceRequestSchema = new mongoose.Schema(
     depositPercent: { type: Number, min: 10, max: 100, default: 50 },
     depositAmount: { type: Number, min: 0, default: null },
     depositStatus: { type: String, enum: DEPOSIT_STATUS_OPTIONS, default: "not_requested", index: true },
+    depositPaymentMethod: {
+      type: String,
+      enum: DEPOSIT_PAYMENT_METHOD_OPTIONS,
+      default: "",
+    },
     stripeDepositCheckoutSessionId: { type: String, trim: true, maxlength: 255, default: "" },
     stripeDepositPaymentIntentId: { type: String, trim: true, maxlength: 255, default: "" },
     depositPaidAt: { type: Date, default: null },
@@ -103,3 +109,4 @@ module.exports.STATUS_OPTIONS = STATUS_OPTIONS;
 module.exports.CONTACT_TYPE_OPTIONS = CONTACT_TYPE_OPTIONS;
 module.exports.PROPOSAL_STATUS_OPTIONS = PROPOSAL_STATUS_OPTIONS;
 module.exports.DEPOSIT_STATUS_OPTIONS = DEPOSIT_STATUS_OPTIONS;
+module.exports.DEPOSIT_PAYMENT_METHOD_OPTIONS = DEPOSIT_PAYMENT_METHOD_OPTIONS;
