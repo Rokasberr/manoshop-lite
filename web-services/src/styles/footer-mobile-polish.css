@@ -1,0 +1,306 @@
+/* Final Stilloak Web footer layout polish.
+   Loaded after footer-refresh.css so navigation/legal links stay readable on mobile. */
+.site-footer {
+  grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
+  gap: 34px 56px;
+  padding: 46px 48px 30px;
+}
+
+.site-footer .footer-brand-block {
+  max-width: 500px;
+}
+
+.site-footer .footer-brand-block > p {
+  max-width: 440px;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+/* Contact section */
+.site-footer > div:nth-child(2) {
+  align-self: stretch;
+  padding-left: 18px;
+}
+
+.site-footer > div:nth-child(2) .footer-label::after {
+  content: "Susisiekti";
+  font-size: 12px;
+  letter-spacing: 0.16em;
+}
+
+.site-footer > div:nth-child(2) a {
+  width: 100%;
+  min-height: 48px;
+  gap: 13px;
+  padding: 7px 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.site-footer > div:nth-child(2) a::before {
+  display: inline-grid;
+  width: 34px;
+  height: 34px;
+  margin-right: 0;
+  place-items: center;
+  flex: 0 0 34px;
+  border: 1px solid rgba(202, 143, 97, 0.72);
+  border-radius: 50%;
+  color: #d89a68;
+  background: rgba(202, 143, 97, 0.06);
+  box-shadow: none;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.site-footer > div:nth-child(2) a:nth-of-type(1)::before {
+  content: "✉";
+}
+
+.site-footer > div:nth-child(2) a:nth-of-type(2)::before {
+  content: "☎";
+}
+
+/* Navigation and legal links injected by FooterLinksPortal. */
+.site-footer > .footer-links-block {
+  grid-column: 1 / -1;
+  order: 3;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 36px 64px;
+  padding: 34px 0 32px;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.site-footer .footer-link-group {
+  min-width: 0;
+}
+
+.site-footer .footer-link-group .footer-label {
+  margin-bottom: 18px;
+  color: #d8a176;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+}
+
+.site-footer .footer-link-list {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 7px;
+}
+
+.site-footer .footer-link-list a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 42px;
+  padding: 7px 6px 7px 36px;
+  border-radius: 10px;
+  color: #f4ece4;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-decoration: none;
+  transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.site-footer .footer-link-list a::before {
+  position: absolute;
+  left: 6px;
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  color: #cf8e5c;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.site-footer .footer-link-group:first-child .footer-link-list a::before {
+  content: "›";
+  font-weight: 700;
+}
+
+.site-footer .footer-link-group:last-child .footer-link-list a::before {
+  content: "✓";
+  width: 20px;
+  height: 20px;
+  border: 1px solid rgba(207, 142, 92, 0.75);
+  border-radius: 50%;
+  font-size: 11px;
+}
+
+.site-footer .footer-link-list a:hover,
+.site-footer .footer-link-list a:focus-visible {
+  color: #efb88e;
+  background: rgba(255, 255, 255, 0.045);
+  transform: translateX(2px);
+  outline: none;
+}
+
+/* Copyright should visually finish the footer, after navigation/legal links. */
+.site-footer > div:nth-child(3) {
+  grid-column: 1 / -1;
+  order: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: 0;
+}
+
+.site-footer > div:nth-child(3) .footer-label {
+  display: none;
+}
+
+.site-footer > div:nth-child(3) p {
+  max-width: none;
+  margin: 0;
+  color: #aaa097;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.site-footer > div:nth-child(3)::after {
+  flex: 0 0 48px;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .site-footer {
+    grid-template-columns: 1fr 1fr;
+    gap: 30px 34px;
+    padding: 38px 36px 28px;
+  }
+
+  .site-footer .footer-brand-block {
+    grid-column: 1 / -1;
+    max-width: 560px;
+    padding-bottom: 28px;
+  }
+
+  .site-footer > div:nth-child(2) {
+    grid-column: 1 / -1;
+    padding: 0;
+  }
+
+  .site-footer > .footer-links-block {
+    gap: 30px 42px;
+  }
+}
+
+@media (max-width: 620px) {
+  .site-footer {
+    grid-template-columns: 1fr;
+    gap: 0;
+    width: min(100% - 28px, 1240px);
+    margin-top: 42px;
+    margin-bottom: 14px;
+    padding: 30px 26px 24px;
+    border-radius: 24px;
+  }
+
+  .site-footer .footer-brand-block {
+    grid-column: auto;
+    max-width: none;
+    padding: 0 0 28px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  }
+
+  .site-footer .footer-wordmark {
+    margin-bottom: 20px;
+  }
+
+  .site-footer .footer-brand-block > p {
+    max-width: 100%;
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .site-footer > div:nth-child(2) {
+    grid-column: auto;
+    padding: 28px 0;
+    border-bottom: none;
+  }
+
+  .site-footer > div:nth-child(2) .footer-label {
+    margin-bottom: 16px;
+  }
+
+  .site-footer > div:nth-child(2) a {
+    min-height: 52px;
+    padding: 5px 0;
+    font-size: 15px;
+    overflow-wrap: anywhere;
+  }
+
+  .site-footer > div:nth-child(2) a + a {
+    margin-top: 4px;
+  }
+
+  .site-footer > .footer-links-block {
+    grid-column: auto;
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+    border-bottom: none;
+  }
+
+  .site-footer .footer-link-group {
+    padding: 28px 0;
+  }
+
+  .site-footer .footer-link-group + .footer-link-group {
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+  }
+
+  .site-footer .footer-link-group .footer-label {
+    margin-bottom: 14px;
+    font-size: 12px;
+  }
+
+  .site-footer .footer-link-list {
+    gap: 3px;
+  }
+
+  .site-footer .footer-link-list a {
+    min-height: 46px;
+    padding: 9px 8px 9px 38px;
+    font-size: 16px;
+    line-height: 1.35;
+    white-space: normal;
+  }
+
+  .site-footer > div:nth-child(3) {
+    grid-column: auto;
+    order: 4;
+    padding: 24px 0 2px;
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+  }
+
+  .site-footer > div:nth-child(3) p {
+    font-size: 13px;
+    line-height: 1.65;
+  }
+
+  .site-footer > div:nth-child(3)::after {
+    display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .site-footer {
+    width: min(100% - 20px, 1240px);
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .site-footer > div:nth-child(2) a,
+  .site-footer .footer-link-list a {
+    font-size: 14px;
+  }
+}
