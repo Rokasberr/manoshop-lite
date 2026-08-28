@@ -266,6 +266,104 @@
   font-size: 13px;
 }
 
+.proposal-bank-box {
+  margin-top: 22px;
+  border: 1px solid #ddcfbf;
+  border-radius: 22px;
+  background: linear-gradient(145deg, #fffdf9, #f5ede3);
+  padding: clamp(18px, 3vw, 26px);
+}
+
+.proposal-bank-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.proposal-bank-heading strong,
+.proposal-bank-heading span {
+  display: block;
+}
+
+.proposal-bank-heading span:not(.proposal-bank-icon) {
+  margin-top: 3px;
+  color: #74685d;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.proposal-bank-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border-radius: 14px;
+  background: #e9dac8;
+  color: #624a35;
+}
+
+.proposal-bank-amount {
+  margin-top: 20px;
+  border-radius: 16px;
+  background: #2c241d;
+  color: #fff;
+  padding: 16px 18px;
+}
+
+.proposal-bank-amount span,
+.proposal-bank-amount strong {
+  display: block;
+}
+
+.proposal-bank-amount span {
+  color: #d8c9bb;
+  font-size: 12px;
+}
+
+.proposal-bank-amount strong {
+  margin-top: 5px;
+  font-size: 24px;
+}
+
+.proposal-bank-details {
+  margin: 18px 0 0;
+}
+
+.proposal-bank-details > div {
+  display: grid;
+  grid-template-columns: minmax(120px, .65fr) minmax(0, 1.35fr);
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e6dbcf;
+}
+
+.proposal-bank-details dt {
+  color: #8b7d70;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.proposal-bank-details dd {
+  margin: 0;
+  color: #312920;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.proposal-copy-payment {
+  width: 100%;
+}
+
+.proposal-bank-note {
+  margin: 12px 0 0;
+  color: #766a5f;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
 .proposal-notice {
   margin-top: 18px;
   border: 1px solid #ddd3c7;
@@ -315,5 +413,6 @@
   .proposal-secure { max-width: 150px; text-align: right; justify-content: flex-end; }
   .proposal-metrics,
   .proposal-grid { grid-template-columns: 1fr; }
+  .proposal-bank-details > div { grid-template-columns: 1fr; gap: 5px; }
   .proposal-footer { flex-direction: column; }
 }
