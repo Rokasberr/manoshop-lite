@@ -74,3 +74,18 @@ test("Admin Web CRM stores proposals, follow-ups, deadlines and contact history"
   assert.match(adminSource, /Kontaktų istorija/);
   assert.match(adminSource, /Išsaugoti CRM/);
 });
+
+test("CRM V3 automatically schedules new leads and prioritizes the sales queue", () => {
+  const controllerSource = readRepoFile("server", "controllers", "webServiceRequestController.js");
+  const adminSource = readRepoFile("client", "src", "pages", "admin", "WebOrdersManagerPage.jsx");
+
+  assert.match(controllerSource, /INITIAL_FOLLOW_UP_HOURS/);
+  assert.match(controllerSource, /nextAction: "Susisiekti su klientu"/);
+  assert.match(controllerSource, /nextActionAt: getInitialNextActionAt\(plan\.id\)/);
+  assert.match(adminSource, /getLeadPriority/);
+  assert.match(adminSource, /Reikia dėmesio/);
+  assert.match(adminSource, /Pipeline vertė/);
+  assert.match(adminSource, /Prioritetas:/);
+  assert.match(adminSource, /Follow-up vėluoja/);
+  assert.match(adminSource, /setQuickFollowUp/);
+});
