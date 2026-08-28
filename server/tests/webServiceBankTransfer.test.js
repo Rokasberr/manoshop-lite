@@ -50,13 +50,27 @@ test("Bank transfer details stay server-configured and include request-specific 
   );
 });
 
-test("Stripe web deposits are opt-in instead of enabled by a live secret key", () => {
-  withEnv({ WEB_STRIPE_DEPOSITS_ENABLED: null }, () => {
-    assert.equal(areWebStripeDepositsEnabled(), false);
-  });
-  withEnv({ WEB_STRIPE_DEPOSITS_ENABLED: "true" }, () => {
-    assert.equal(areWebStripeDepositsEnabled(), true);
-  });
+test("Stripe web deposits are opt-in and test mode does not require the live unlock", () => {
+  withEnv(
+    {
+      STRIPE_SECRET_KEY: "sk_test_example",
+      WEB_STRIPE_DEPOSITS_ENABLED: null,
+      WEB_SERVICE_STRIPE_LIVE_ENABLED: null,
+    },
+    () => {
+      assert.equal(areWebStripeDepositsEnabled(), false);
+    }
+  );
+  withEnv(
+    {
+      STRIPE_SECRET_KEY: "sk_test_example",
+      WEB_STRIPE_DEPOSITS_ENABLED: "true",
+      WEB_SERVICE_STRIPE_LIVE_ENABLED: "false",
+    },
+    () => {
+      assert.equal(areWebStripeDepositsEnabled(), true);
+    }
+  );
 });
 
 test("Bank transfer routes, CRM confirmation and client instructions are wired", () => {
