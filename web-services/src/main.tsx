@@ -6,6 +6,7 @@ import ProposalPage from "./ProposalPage";
 import { initializeAnalytics } from "./lib/analytics";
 import { captureLeadAttribution } from "./lib/leadAttribution";
 import { installLeadTracking } from "./lib/leadTracking";
+import { installProposalTracking } from "./lib/proposalTracking";
 import "./styles/main.css";
 import "./styles/polish.css";
 import "./styles/cookies.css";
@@ -17,6 +18,7 @@ import "./styles/mobile-menu-fix.css";
 captureLeadAttribution();
 initializeAnalytics();
 installLeadTracking();
+installProposalTracking();
 
 const proposalMatch = window.location.pathname.match(/^\/pasiulymas\/([a-f0-9]{64})\/?$/i);
 
