@@ -8,6 +8,7 @@ const {
   markStripeWebhookEventProcessed,
 } = require("../services/webhookEventService");
 const { getWebServiceStripeClient } = require("../utils/stripeClient");
+const { sendWebServiceTestInvoiceEmail } = require("../services/webServiceTestInvoiceEmailService");
 
 const getStripeId = (value) => (typeof value === "string" ? value : value?.id || "");
 
@@ -45,7 +46,22 @@ const handleWebServiceStripeWebhook = async (req, res) => {
         const session = event.data.object;
 
         if (session.metadata?.checkoutType === "web_service_deposit") {
-          await syncWebServiceDepositFromSession(session);
+          const request = await syncWebServiceDepositFromSession(session);
+          if (request?.depositStatus === "paid" && request.depositTestInvoiceStatus !== "sent") {
+            request.depositTestInvoiceStatus = "processing";
+            await request.save();
+            try {
+              const delivery = await sendWebServiceTestInvoiceEmail({ request, paymentType: "deposit" });
+              request.depositTestInvoiceNumber = delivery.invoiceNumber;
+              request.depositTestInvoiceStatus = "sent";
+              request.depositTestInvoiceSentAt = new Date();
+              await request.save();
+            } catch (error) {
+              request.depositTestInvoiceStatus = "failed";
+              await request.save();
+              throw error;
+            }
+          }
         }
         break;
       }

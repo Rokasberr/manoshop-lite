@@ -118,6 +118,7 @@ const sendBrevoTransactionalEmail = async ({
   replyTo = null,
   tags = [],
   senderOverride = null,
+  attachments = [],
 }) => {
   const { apiKey, sender: configuredSender, timeoutMs } = getBrevoEmailConfig();
   const overrideSender = normalizeEmailIdentity(senderOverride);
@@ -158,6 +159,16 @@ const sendBrevoTransactionalEmail = async ({
       ...(text ? { textContent: text } : {}),
       ...(replyTo ? { replyTo } : {}),
       ...(tags.length ? { tags } : {}),
+      ...(attachments.length
+        ? {
+            attachment: attachments.map((attachment) => ({
+              name: String(attachment.filename || attachment.name || "attachment.bin"),
+              content: Buffer.isBuffer(attachment.content)
+                ? attachment.content.toString("base64")
+                : String(attachment.content || ""),
+            })),
+          }
+        : {}),
     };
 
     const response = await fetch(BREVO_TRANSACTIONAL_EMAIL_ENDPOINT, {

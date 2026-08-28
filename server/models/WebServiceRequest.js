@@ -17,6 +17,7 @@ const CONTACT_TYPE_OPTIONS = ["note", "email", "call", "meeting", "proposal"];
 const PROPOSAL_STATUS_OPTIONS = ["draft", "sent", "viewed", "accepted", "declined", "expired"];
 const DEPOSIT_STATUS_OPTIONS = ["not_requested", "pending", "paid", "failed", "refunded"];
 const DEPOSIT_PAYMENT_METHOD_OPTIONS = ["", "stripe", "bank_transfer"];
+const TEST_INVOICE_STATUS_OPTIONS = ["not_created", "processing", "sent", "failed"];
 
 const attributionSchema = new mongoose.Schema(
   {
@@ -87,6 +88,13 @@ const webServiceRequestSchema = new mongoose.Schema(
     stripeDepositCheckoutSessionId: { type: String, trim: true, maxlength: 255, default: "" },
     stripeDepositPaymentIntentId: { type: String, trim: true, maxlength: 255, default: "" },
     depositPaidAt: { type: Date, default: null },
+    depositTestInvoiceNumber: { type: String, trim: true, maxlength: 100, default: "" },
+    depositTestInvoiceStatus: {
+      type: String,
+      enum: TEST_INVOICE_STATUS_OPTIONS,
+      default: "not_created",
+    },
+    depositTestInvoiceSentAt: { type: Date, default: null },
     finalPrice: { type: Number, min: 0, default: null },
     nextAction: { type: String, trim: true, maxlength: 500, default: "" },
     nextActionAt: { type: Date, default: null, index: true },
@@ -110,3 +118,4 @@ module.exports.CONTACT_TYPE_OPTIONS = CONTACT_TYPE_OPTIONS;
 module.exports.PROPOSAL_STATUS_OPTIONS = PROPOSAL_STATUS_OPTIONS;
 module.exports.DEPOSIT_STATUS_OPTIONS = DEPOSIT_STATUS_OPTIONS;
 module.exports.DEPOSIT_PAYMENT_METHOD_OPTIONS = DEPOSIT_PAYMENT_METHOD_OPTIONS;
+module.exports.TEST_INVOICE_STATUS_OPTIONS = TEST_INVOICE_STATUS_OPTIONS;
