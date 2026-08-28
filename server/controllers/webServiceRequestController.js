@@ -2,7 +2,7 @@ const crypto = require("crypto");
 
 const { getWebServicePlan } = require("../config/webServicePlans");
 const WebServiceRequest = require("../models/WebServiceRequest");
-const { STATUS_OPTIONS } = require("../models/WebServiceRequest");
+const { STATUS_OPTIONS, CONTACT_TYPE_OPTIONS } = require("../models/WebServiceRequest");
 const { sendWebServiceRequestEmails } = require("../services/webServiceRequestEmailService");
 const { createHttpError } = require("../utils/httpError");
 
@@ -22,6 +22,24 @@ const cleanAttribution = (raw = {}) => ({
   gclid: cleanString(raw.gclid, 200),
   fbclid: cleanString(raw.fbclid, 200),
 });
+
+const parseNullablePrice = (rawPrice, errorMessage) => {
+  if (rawPrice === null || rawPrice === "") return null;
+  const price = Number(rawPrice);
+  if (!Number.isFinite(price) || price < 0 || price > 1_000_000) {
+    throw createHttpError(errorMessage, 400);
+  }
+  return Math.round(price * 100) / 100;
+};
+
+const parseNullableDate = (rawDate, errorMessage) => {
+  if (rawDate === null || rawDate === "") return null;
+  const date = new Date(rawDate);
+  if (Number.isNaN(date.getTime())) {
+    throw createHttpError(errorMessage, 400);
+  }
+  return date;
+};
 
 const buildRequestNumber = () => {
   const year = new Date().getFullYear();
@@ -124,21 +142,46 @@ const updateAdminWebServiceRequest = async (req, res) => {
     request.status = status;
   }
 
+  if (Object.prototype.hasOwnProperty.call(req.body || {}, "proposalPrice")) {
+    request.proposalPrice = parseNullablePrice(req.body.proposalPrice, "Netinkama pasiūlymo kaina.");
+  }
+
   if (Object.prototype.hasOwnProperty.call(req.body || {}, "finalPrice")) {
-    const rawPrice = req.body.finalPrice;
-    if (rawPrice === null || rawPrice === "") {
-      request.finalPrice = null;
-    } else {
-      const finalPrice = Number(rawPrice);
-      if (!Number.isFinite(finalPrice) || finalPrice < 0 || finalPrice > 1_000_000) {
-        throw createHttpError("Netinkama galutinė projekto kaina.", 400);
-      }
-      request.finalPrice = Math.round(finalPrice * 100) / 100;
-    }
+    request.finalPrice = parseNullablePrice(req.body.finalPrice, "Netinkama galutinė projekto kaina.");
+  }
+
+  if (Object.prototype.hasOwnProperty.call(req.body || {}, "nextAction")) {
+    request.nextAction = cleanString(req.body.nextAction, 500);
+  }
+
+  if (Object.prototype.hasOwnProperty.call(req.body || {}, "nextActionAt")) {
+    request.nextActionAt = parseNullableDate(req.body.nextActionAt, "Netinkama kito veiksmo data.");
+  }
+
+  if (Object.prototype.hasOwnProperty.call(req.body || {}, "dueDate")) {
+    request.dueDate = parseNullableDate(req.body.dueDate, "Netinkamas projekto terminas.");
   }
 
   if (Object.prototype.hasOwnProperty.call(req.body || {}, "internalNotes")) {
     request.internalNotes = cleanString(req.body.internalNotes, 5000);
+  }
+
+  if (req.body?.contactEntry) {
+    const type = cleanString(req.body.contactEntry.type, 40).toLowerCase() || "note";
+    const note = cleanString(req.body.contactEntry.note, 2000);
+    const happenedAt = parseNullableDate(
+      req.body.contactEntry.happenedAt,
+      "Netinkama kontakto data."
+    ) || new Date();
+
+    if (!CONTACT_TYPE_OPTIONS.includes(type)) {
+      throw createHttpError("Netinkamas kontakto tipas.", 400);
+    }
+    if (!note) {
+      throw createHttpError("Įrašykite kontakto pastabą.", 400);
+    }
+
+    request.contactHistory.push({ type, note, happenedAt });
   }
 
   await request.save();

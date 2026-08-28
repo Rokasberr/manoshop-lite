@@ -13,6 +13,8 @@ const STATUS_OPTIONS = [
   "lost",
 ];
 
+const CONTACT_TYPE_OPTIONS = ["note", "email", "call", "meeting", "proposal"];
+
 const attributionSchema = new mongoose.Schema(
   {
     source: { type: String, trim: true, maxlength: 100, default: "direct" },
@@ -26,6 +28,15 @@ const attributionSchema = new mongoose.Schema(
     fbclid: { type: String, trim: true, maxlength: 200, default: "" },
   },
   { _id: false }
+);
+
+const contactHistorySchema = new mongoose.Schema(
+  {
+    type: { type: String, enum: CONTACT_TYPE_OPTIONS, default: "note" },
+    note: { type: String, required: true, trim: true, maxlength: 2000 },
+    happenedAt: { type: Date, default: Date.now },
+  },
+  { timestamps: true }
 );
 
 const webServiceRequestSchema = new mongoose.Schema(
@@ -50,7 +61,12 @@ const webServiceRequestSchema = new mongoose.Schema(
     source: { type: String, trim: true, maxlength: 100, default: "direct" },
     attribution: { type: attributionSchema, default: () => ({}) },
     status: { type: String, enum: STATUS_OPTIONS, default: "new", index: true },
+    proposalPrice: { type: Number, min: 0, default: null },
     finalPrice: { type: Number, min: 0, default: null },
+    nextAction: { type: String, trim: true, maxlength: 500, default: "" },
+    nextActionAt: { type: Date, default: null, index: true },
+    dueDate: { type: Date, default: null },
+    contactHistory: { type: [contactHistorySchema], default: [] },
     internalNotes: { type: String, trim: true, maxlength: 5000, default: "" },
   },
   { timestamps: true }
@@ -59,6 +75,8 @@ const webServiceRequestSchema = new mongoose.Schema(
 webServiceRequestSchema.index({ status: 1, createdAt: -1 });
 webServiceRequestSchema.index({ email: 1, createdAt: -1 });
 webServiceRequestSchema.index({ source: 1, createdAt: -1 });
+webServiceRequestSchema.index({ nextActionAt: 1, status: 1 });
 
 module.exports = mongoose.model("WebServiceRequest", webServiceRequestSchema);
 module.exports.STATUS_OPTIONS = STATUS_OPTIONS;
+module.exports.CONTACT_TYPE_OPTIONS = CONTACT_TYPE_OPTIONS;

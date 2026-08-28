@@ -56,3 +56,21 @@ test("Stilloak Web and admin UI expose the new order flow", () => {
   assert.match(adminAppSource, /path="web-orders"/);
   assert.match(adminShellSource, /label: "Web užsakymai"/);
 });
+
+test("Admin Web CRM stores proposals, follow-ups, deadlines and contact history", () => {
+  const modelSource = readRepoFile("server", "models", "WebServiceRequest.js");
+  const controllerSource = readRepoFile("server", "controllers", "webServiceRequestController.js");
+  const adminSource = readRepoFile("client", "src", "pages", "admin", "WebOrdersManagerPage.jsx");
+
+  assert.match(modelSource, /proposalPrice:/);
+  assert.match(modelSource, /nextAction:/);
+  assert.match(modelSource, /nextActionAt:/);
+  assert.match(modelSource, /dueDate:/);
+  assert.match(modelSource, /contactHistory:/);
+  assert.match(controllerSource, /contactEntry/);
+  assert.match(controllerSource, /CONTACT_TYPE_OPTIONS/);
+  assert.match(adminSource, /Pasiūlymo kaina/);
+  assert.match(adminSource, /Follow-up data/);
+  assert.match(adminSource, /Kontaktų istorija/);
+  assert.match(adminSource, /Išsaugoti CRM/);
+});
