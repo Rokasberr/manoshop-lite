@@ -3,6 +3,7 @@ const {
   getPrimaryClientUrl,
   isAllowedOrigin,
 } = require("./originMatcher");
+const { getWebStripeSecretKey } = require("../config/webServicePayments");
 
 const createStripeClient = (secretKey, envName) => {
   let Stripe;
@@ -25,7 +26,7 @@ const createStripeClient = (secretKey, envName) => {
 const getStripeClient = () => createStripeClient(process.env.STRIPE_SECRET_KEY, "STRIPE_SECRET_KEY");
 
 const getWebServiceStripeClient = () => {
-  const secretKey = String(process.env.STRIPE_WEB_SERVICE_SECRET_KEY || "").trim();
+  const secretKey = getWebStripeSecretKey();
   const liveEnabled = String(process.env.WEB_SERVICE_STRIPE_LIVE_ENABLED || "").trim().toLowerCase() === "true";
 
   if (secretKey.startsWith("sk_live_") && !liveEnabled) {

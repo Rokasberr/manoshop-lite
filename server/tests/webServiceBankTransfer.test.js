@@ -73,7 +73,7 @@ test("Stripe web deposits are opt-in and test mode does not require the live unl
   );
 });
 
-test("Bank transfer routes, CRM confirmation and client instructions are wired", () => {
+test("Bank transfer admin fallback stays wired but is not exposed on the public proposal", () => {
   const routes = readRepoFile("server", "routes", "webServiceRequestRoutes.js");
   const controller = readRepoFile("server", "controllers", "webServiceBankTransferController.js");
   const model = readRepoFile("server", "models", "WebServiceRequest.js");
@@ -87,6 +87,6 @@ test("Bank transfer routes, CRM confirmation and client instructions are wired",
   assert.match(controller, /proposalStatus !== "accepted"/);
   assert.match(model, /depositPaymentMethod:/);
   assert.match(admin, /Pažymėti avansą gautu pavedimu/);
-  assert.match(proposal, /Avansas banko pavedimu/);
-  assert.match(proposal, /Nukopijuoti mokėjimo duomenis/);
+  assert.doesNotMatch(proposal, /Avansas banko pavedimu/);
+  assert.doesNotMatch(proposal, /Nukopijuoti mokėjimo duomenis/);
 });

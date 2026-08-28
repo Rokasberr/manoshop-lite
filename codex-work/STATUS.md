@@ -6,6 +6,10 @@ PROJECT_STATE: STILLOAK_WEB_SERVICES_LOCAL_VALIDATED
 
 Milestone 6 – Stilloak Web paslaugų svetainė. Tikslas: atskirame `web-services` kataloge paruošti savarankišką React + Vite + TypeScript svetainę, kuri vėliau bus diegiama kaip atskiras Vercel projektas su Root Directory `web-services`.
 
+## 2026-08-28 – Stripe testinio avanso checkout pataisa
+
+Rasta produkcinio 500 klaidos priežastis: Stilloak Web avansų kodas buvo pervestas į naują `STRIPE_WEB_SERVICE_SECRET_KEY`, tačiau Render Blueprint šį kintamąjį palieka rankiniam įvedimui (`sync: false`). Pridėtas laikinas, griežtai testinis migracijos kelias: jei dedikuotas raktas nenustatytas, galima paveldėti esamą `STRIPE_SECRET_KEY` tik su `sk_test_` prefiksu. Bendras `sk_live_` raktas niekada nepaveldimas, o dedikuotų live mokėjimų apsauga lieka nepakeista. Atnaujinti konfigūracijos ir regresijos testai; viešai pašalinto banko pavedimo UI testas suderintas su faktine būsena. Patikros: tiksliniai Stilloak Web mokėjimų testai PASS 20/20, pilni testai PASS 252/252, lint PASS (132 backend failai), typecheck/syntax PASS, client build PASS ir `git diff --check` PASS. Stripe Live, realūs mokėjimai, produkcinė DB, env reikšmės ir production deploy nevykdyti.
+
 ## 2026-08-26 – Stilloak Web paslaugų svetainė
 
 Darbas pradėtas pagal naują tikslą sukurti atskirą `web-services` aplikaciją būsimam domenui `https://web.stilloak-studio.com`.

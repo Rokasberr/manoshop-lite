@@ -5,10 +5,12 @@ const {
   areWebStripeDepositsEnabled,
   getWebStripeDepositStatus,
   getWebStripeKeyMode,
+  getWebStripeSecretKey,
 } = require("../config/webServicePayments");
 
 const ENV_KEYS = [
   "STRIPE_WEB_SERVICE_SECRET_KEY",
+  "STRIPE_SECRET_KEY",
   "WEB_STRIPE_DEPOSITS_ENABLED",
   "WEB_SERVICE_STRIPE_LIVE_ENABLED",
 ];
@@ -65,6 +67,36 @@ test("Stilloak Web can use Stripe test keys without unlocking live payments", ()
         liveEnabled: false,
         reason: "test_mode",
       });
+    }
+  );
+});
+
+test("Stilloak Web temporarily inherits only the shared Stripe test key", () => {
+  withPaymentEnv(
+    {
+      STRIPE_WEB_SERVICE_SECRET_KEY: undefined,
+      STRIPE_SECRET_KEY: "sk_test_shared_example",
+      WEB_STRIPE_DEPOSITS_ENABLED: "true",
+      WEB_SERVICE_STRIPE_LIVE_ENABLED: "false",
+    },
+    () => {
+      assert.equal(getWebStripeSecretKey(), "sk_test_shared_example");
+      assert.equal(getWebStripeKeyMode(), "test");
+      assert.equal(areWebStripeDepositsEnabled(), true);
+    }
+  );
+
+  withPaymentEnv(
+    {
+      STRIPE_WEB_SERVICE_SECRET_KEY: undefined,
+      STRIPE_SECRET_KEY: "sk_live_shared_example",
+      WEB_STRIPE_DEPOSITS_ENABLED: "true",
+      WEB_SERVICE_STRIPE_LIVE_ENABLED: "true",
+    },
+    () => {
+      assert.equal(getWebStripeSecretKey(), "");
+      assert.equal(getWebStripeKeyMode(), "unconfigured");
+      assert.equal(areWebStripeDepositsEnabled(), false);
     }
   );
 });
