@@ -29,7 +29,7 @@ test("Stilloak Web test invoice is a valid single-page PDF with an explicit inva
 
 test("remaining-payment test invoice calculates only the unpaid balance", () => {
   const pdf = createWebServiceTestInvoicePdfBuffer({
-    request: { ...request, finalPaidAt: new Date("2026-09-10T12:00:00.000Z") },
+    request: { ...request, finalPaymentAmount: 400, finalPaymentPaidAt: new Date("2026-09-10T12:00:00.000Z") },
     paymentType: "final",
   });
   const source = pdf.toString("latin1");

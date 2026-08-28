@@ -9,6 +9,27 @@ const {
 } = require("../services/webhookEventService");
 const { getWebServiceStripeClient } = require("../utils/stripeClient");
 const { sendWebServiceTestInvoiceEmail } = require("../services/webServiceTestInvoiceEmailService");
+const { syncWebServiceFinalPaymentFromSession } = require("../services/webServiceFinalPaymentService");
+
+const sendTestInvoiceOnce = async (request, paymentType) => {
+  const prefix = paymentType === "deposit" ? "deposit" : "final";
+  const statusField = `${prefix}TestInvoiceStatus`;
+  if (request?.[statusField] !== "sent") {
+    request[statusField] = "processing";
+    await request.save();
+    try {
+      const delivery = await sendWebServiceTestInvoiceEmail({ request, paymentType });
+      request[`${prefix}TestInvoiceNumber`] = delivery.invoiceNumber;
+      request[statusField] = "sent";
+      request[`${prefix}TestInvoiceSentAt`] = new Date();
+      await request.save();
+    } catch (error) {
+      request[statusField] = "failed";
+      await request.save();
+      throw error;
+    }
+  }
+};
 
 const getStripeId = (value) => (typeof value === "string" ? value : value?.id || "");
 
@@ -47,21 +68,10 @@ const handleWebServiceStripeWebhook = async (req, res) => {
 
         if (session.metadata?.checkoutType === "web_service_deposit") {
           const request = await syncWebServiceDepositFromSession(session);
-          if (request?.depositStatus === "paid" && request.depositTestInvoiceStatus !== "sent") {
-            request.depositTestInvoiceStatus = "processing";
-            await request.save();
-            try {
-              const delivery = await sendWebServiceTestInvoiceEmail({ request, paymentType: "deposit" });
-              request.depositTestInvoiceNumber = delivery.invoiceNumber;
-              request.depositTestInvoiceStatus = "sent";
-              request.depositTestInvoiceSentAt = new Date();
-              await request.save();
-            } catch (error) {
-              request.depositTestInvoiceStatus = "failed";
-              await request.save();
-              throw error;
-            }
-          }
+          if (request?.depositStatus === "paid") await sendTestInvoiceOnce(request, "deposit");
+        } else if (session.metadata?.checkoutType === "web_service_final_payment") {
+          const request = await syncWebServiceFinalPaymentFromSession(session);
+          if (request?.finalPaymentStatus === "paid") await sendTestInvoiceOnce(request, "final");
         }
         break;
       }
@@ -70,6 +80,8 @@ const handleWebServiceStripeWebhook = async (req, res) => {
 
         if (session.metadata?.checkoutType === "web_service_deposit") {
           await syncWebServiceDepositFromSession(session, { expired: true });
+        } else if (session.metadata?.checkoutType === "web_service_final_payment") {
+          await syncWebServiceFinalPaymentFromSession(session, { expired: true });
         }
         break;
       }

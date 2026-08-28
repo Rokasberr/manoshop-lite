@@ -26,6 +26,7 @@ const depositLabels = {
   failed: "Nepavyko",
   refunded: "Grąžintas",
 };
+const finalPaymentLabels = { not_requested: "Likutis neprašytas", requested: "Laukiama likučio", pending: "Mokėjimas pradėtas", paid: "Pilnai apmokėta", failed: "Nepavyko", refunded: "Grąžintas" };
 
 const paymentMethodLabels = {
   bank_transfer: "Banko pavedimas",
@@ -52,6 +53,7 @@ const WebProposalsPage = () => {
   const [sendingId, setSendingId] = useState("");
   const [syncingId, setSyncingId] = useState("");
   const [markingPaidId, setMarkingPaidId] = useState("");
+  const [requestingFinalId, setRequestingFinalId] = useState("");
   const [filter, setFilter] = useState("active");
 
   const loadRequests = async () => {
@@ -176,6 +178,20 @@ const WebProposalsPage = () => {
     }
   };
 
+  const handleRequestFinalPayment = async (request) => {
+    const amount = Math.round((Number(request.proposalPrice || 0) - Number(request.depositAmount || 0)) * 100) / 100;
+    if (!window.confirm(`Išsiųsti klientui prašymą apmokėti ${formatCurrency(amount)} projekto likutį?`)) return;
+    try {
+      setRequestingFinalId(request._id);
+      const result = await webServiceRequestService.requestFinalPayment(request._id);
+      setRequests((current) => current.map((item) => item._id === request._id ? result.request : item));
+      setProposalUrls((current) => ({ ...current, [request._id]: result.proposalUrl || "" }));
+      toast.success(result.email?.sent ? "Likučio mokėjimo kvietimas išsiųstas klientui." : "Mokėjimo nuoroda sukurta. Nukopijuok ją klientui.");
+    } catch (requestError) {
+      toast.error(requestError.response?.data?.message || "Nepavyko paruošti likusio mokėjimo.");
+    } finally { setRequestingFinalId(""); }
+  };
+
   const copyProposalUrl = async (requestId) => {
     const url = proposalUrls[requestId];
     if (!url) return;
@@ -248,6 +264,7 @@ const WebProposalsPage = () => {
               const draft = drafts[request._id] || buildDraft(request);
               const proposalStatus = request.proposalStatus || "draft";
               const depositStatus = request.depositStatus || "not_requested";
+              const finalPaymentStatus = request.finalPaymentStatus || "not_requested";
               const proposalUrl = proposalUrls[request._id] || "";
 
               return (
@@ -265,6 +282,7 @@ const WebProposalsPage = () => {
                         <span className={`rounded-full px-3 py-1 text-xs font-semibold ${depositStatus === "paid" ? "bg-emerald-50 text-emerald-700" : "bg-sky-50 text-sky-700"}`}>
                           {depositLabels[depositStatus] || depositStatus}
                         </span>
+                        {depositStatus === "paid" ? <span className={`rounded-full px-3 py-1 text-xs font-semibold ${finalPaymentStatus === "paid" ? "bg-emerald-50 text-emerald-700" : "bg-violet-50 text-violet-700"}`}>{finalPaymentLabels[finalPaymentStatus] || finalPaymentStatus}</span> : null}
                       </div>
 
                       <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -300,6 +318,7 @@ const WebProposalsPage = () => {
                         <div className="mt-5 rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4 text-sm text-emerald-900">
                           <strong>Klientas patvirtino:</strong> {request.proposalAcceptedName || request.name} · {new Date(request.proposalAcceptedAt).toLocaleString("lt-LT")}
                           {request.depositPaidAt ? ` · Avansas gautas ${new Date(request.depositPaidAt).toLocaleString("lt-LT")}` : ""}
+                          {request.finalPaymentPaidAt ? ` · Pilnai apmokėta ${new Date(request.finalPaymentPaidAt).toLocaleString("lt-LT")}` : ""}
                         </div>
                       ) : null}
 
@@ -407,6 +426,12 @@ const WebProposalsPage = () => {
                           onClick={() => handleSyncDeposit(request._id)}
                         >
                           {syncingId === request._id ? "Tikrinama..." : "Patikrinti ankstesnį Stripe mokėjimą"}
+                        </button>
+                      ) : null}
+
+                      {depositStatus === "paid" && finalPaymentStatus !== "paid" ? (
+                        <button type="button" className="dashboard-button-primary w-full justify-center" disabled={requestingFinalId === request._id} onClick={() => handleRequestFinalPayment(request)}>
+                          {requestingFinalId === request._id ? "Siunčiama..." : finalPaymentStatus === "not_requested" ? "Prašyti likusio mokėjimo" : "Siųsti naują likučio nuorodą"}
                         </button>
                       ) : null}
                     </div>

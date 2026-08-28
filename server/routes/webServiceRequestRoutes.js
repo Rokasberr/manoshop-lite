@@ -14,6 +14,9 @@ const {
   sendAdminWebServiceProposal,
   syncAdminWebServiceDeposit,
   updateAdminWebServiceRequest,
+  requestAdminWebServiceFinalPayment,
+  createPublicWebServiceFinalPaymentSession,
+  confirmPublicWebServiceFinalPayment,
 } = require("../controllers/webServiceRequestController");
 const {
   getPublicWebServiceBankTransfer,
@@ -67,6 +70,8 @@ router.post(
   publicProposalActionLimiter,
   asyncHandler(confirmPublicWebServiceDeposit)
 );
+router.post("/proposal/:token/final-payment", publicProposalActionLimiter, requireWebStripeDepositsEnabled, asyncHandler(createPublicWebServiceFinalPaymentSession));
+router.post("/proposal/:token/final-payment/confirm", publicProposalActionLimiter, asyncHandler(confirmPublicWebServiceFinalPayment));
 
 router.get("/", protect, adminOnly, asyncHandler(getAdminWebServiceRequests));
 router.post(
@@ -83,6 +88,7 @@ router.post(
   validateObjectId("id"),
   asyncHandler(syncAdminWebServiceDeposit)
 );
+router.post("/:id/proposal/final-payment/request", protect, adminOnly, validateObjectId("id"), asyncHandler(requestAdminWebServiceFinalPayment));
 router.post(
   "/:id/proposal/deposit/bank-transfer/paid",
   protect,
