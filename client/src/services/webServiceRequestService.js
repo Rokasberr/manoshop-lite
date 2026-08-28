@@ -32,10 +32,20 @@ const requestFinalPayment = async (requestId) => {
   const response = await api.post(`/web-service-requests/${requestId}/proposal/final-payment/request`);
   return response.data;
 };
+const markFinalBankTransferPaid = async (requestId) => {
+  const response = await api.post(`/web-service-requests/${requestId}/proposal/final-payment/bank-transfer/paid`);
+  return response.data;
+};
+const resendTestInvoice = async (requestId, paymentType) => {
+  const response = await api.post(`/web-service-requests/${requestId}/proposal/test-invoice/resend`, { paymentType });
+  return response.data;
+};
 
 export default {
   getAdminRequests,
   markBankTransferPaid,
+  markFinalBankTransferPaid,
+  resendTestInvoice,
   requestFinalPayment,
   sendProposal,
   syncDeposit,

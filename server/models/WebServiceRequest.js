@@ -100,6 +100,7 @@ const webServiceRequestSchema = new mongoose.Schema(
     finalPaymentStatus: { type: String, enum: FINAL_PAYMENT_STATUS_OPTIONS, default: "not_requested", index: true },
     finalPaymentRequestedAt: { type: Date, default: null },
     finalPaymentPaidAt: { type: Date, default: null },
+    finalPaymentMethod: { type: String, enum: DEPOSIT_PAYMENT_METHOD_OPTIONS, default: "" },
     stripeFinalCheckoutSessionId: { type: String, trim: true, maxlength: 255, default: "" },
     stripeFinalPaymentIntentId: { type: String, trim: true, maxlength: 255, default: "" },
     finalTestInvoiceNumber: { type: String, trim: true, maxlength: 100, default: "" },
