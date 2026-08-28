@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import CookieConsentBanner from "./components/CookieConsentBanner";
+import FooterLinksPortal from "./components/FooterLinksPortal";
 import ProposalPage from "./ProposalPage";
 import { initializeAnalytics } from "./lib/analytics";
 import { captureLeadAttribution } from "./lib/leadAttribution";
@@ -26,6 +27,7 @@ const proposalMatch = window.location.pathname.match(/^\/pasiulymas\/([a-f0-9]{6
 createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
     {proposalMatch ? <ProposalPage token={proposalMatch[1]} /> : <App />}
+    <FooterLinksPortal />
     <CookieConsentBanner />
   </StrictMode>
 );
