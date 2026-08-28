@@ -8,6 +8,7 @@ const {
 const { syncWebServiceDepositFromSession } = require("../services/webServiceDepositService");
 const { syncWebServiceFinalPaymentFromSession } = require("../services/webServiceFinalPaymentService");
 const { deliverWebServiceTestInvoice } = require("../services/webServiceTestInvoiceEmailService");
+const { deliverWebServiceHandoverEmail } = require("../services/webServiceLifecycleEmailService");
 const { createHttpError } = require("../utils/httpError");
 const { getWebServiceStripeClient } = require("../utils/stripeClient");
 
@@ -111,6 +112,7 @@ const markAdminWebServiceBankTransferPaid = async (req, res) => {
 
   const now = new Date();
   request.depositStatus = "paid";
+  request.projectStage = "in_progress";
   request.depositPaidAt = now;
   request.depositPaymentMethod = "bank_transfer";
   request.nextAction = "Suderinti projekto startą ir pradėti darbus";
@@ -167,6 +169,7 @@ const markAdminWebServiceFinalBankTransferPaid = async (req, res) => {
   request.finalPaymentMethod = "bank_transfer";
   request.finalPaymentPaidAt = now;
   request.status = "completed";
+  request.projectStage = "completed";
   request.nextAction = "Projektas apmokėtas pilnai";
   request.nextActionAt = null;
   request.contactHistory.push({ type: "note", note: `Patvirtinta likusi ${request.finalPaymentAmount} € projekto suma banko pavedimu.`, happenedAt: now });
@@ -175,6 +178,11 @@ const markAdminWebServiceFinalBankTransferPaid = async (req, res) => {
     await deliverWebServiceTestInvoice({ request, paymentType: "final" });
   } catch (error) {
     console.error(`[web-bank-transfer] ${request.requestNumber} likučio PDF laiško klaida: ${error.message}`);
+  }
+  try {
+    await deliverWebServiceHandoverEmail(request);
+  } catch (error) {
+    console.error(`[web-bank-transfer] ${request.requestNumber} perdavimo laiško klaida: ${error.message}`);
   }
   res.json(request);
 };

@@ -10,6 +10,7 @@ const {
 const { getWebServiceStripeClient } = require("../utils/stripeClient");
 const { deliverWebServiceTestInvoice } = require("../services/webServiceTestInvoiceEmailService");
 const { syncWebServiceFinalPaymentFromSession } = require("../services/webServiceFinalPaymentService");
+const { deliverWebServiceHandoverEmail } = require("../services/webServiceLifecycleEmailService");
 
 const sendTestInvoiceOnce = async (request, paymentType) => {
   const prefix = paymentType === "deposit" ? "deposit" : "final";
@@ -59,7 +60,10 @@ const handleWebServiceStripeWebhook = async (req, res) => {
           if (request?.depositStatus === "paid") await sendTestInvoiceOnce(request, "deposit");
         } else if (session.metadata?.checkoutType === "web_service_final_payment") {
           const request = await syncWebServiceFinalPaymentFromSession(session);
-          if (request?.finalPaymentStatus === "paid") await sendTestInvoiceOnce(request, "final");
+          if (request?.finalPaymentStatus === "paid") {
+            await sendTestInvoiceOnce(request, "final");
+            await deliverWebServiceHandoverEmail(request);
+          }
         }
         break;
       }
