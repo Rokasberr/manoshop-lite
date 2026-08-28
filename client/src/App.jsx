@@ -42,6 +42,7 @@ const AdminDashboardPreviewPage = lazy(() => import("./pages/admin/AdminDashboar
 const ProductManagerPage = lazy(() => import("./pages/admin/ProductManagerPage"));
 const OrdersManagerPage = lazy(() => import("./pages/admin/OrdersManagerPage"));
 const WebOrdersManagerPage = lazy(() => import("./pages/admin/WebOrdersManagerPage"));
+const WebProposalsPage = lazy(() => import("./pages/admin/WebProposalsPage"));
 const InstagramGeneratorPage = lazy(() => import("./pages/admin/InstagramGeneratorPage"));
 const AdminDigitalProductsPage = lazy(() => import("./pages/admin/AdminDigitalProductsPage"));
 const AdminDigitalProductGeneratorPage = lazy(() => import("./pages/admin/AdminDigitalProductGeneratorPage"));
@@ -124,6 +125,7 @@ const App = () => (
             <Route path="digital-products" element={<AdminDigitalProductsPage />} />
             <Route path="orders" element={<OrdersManagerPage />} />
             <Route path="web-orders" element={<WebOrdersManagerPage />} />
+            <Route path="web-proposals" element={<WebProposalsPage />} />
             <Route path="instagram-generator" element={<InstagramGeneratorPage />} />
             <Route path="digital-product-generator" element={<AdminDigitalProductGeneratorPage />} />
           </Route>

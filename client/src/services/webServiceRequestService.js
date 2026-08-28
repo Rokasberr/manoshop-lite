@@ -12,7 +12,19 @@ const updateRequest = async (requestId, payload) => {
   return response.data;
 };
 
+const sendProposal = async (requestId, payload) => {
+  const response = await api.post(`/web-service-requests/${requestId}/proposal/send`, payload);
+  return response.data;
+};
+
+const syncDeposit = async (requestId) => {
+  const response = await api.post(`/web-service-requests/${requestId}/proposal/deposit/sync`);
+  return response.data;
+};
+
 export default {
   getAdminRequests,
+  sendProposal,
+  syncDeposit,
   updateRequest,
 };

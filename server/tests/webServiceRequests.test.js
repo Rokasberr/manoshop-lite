@@ -89,3 +89,34 @@ test("CRM V3 automatically schedules new leads and prioritizes the sales queue",
   assert.match(adminSource, /Follow-up vėluoja/);
   assert.match(adminSource, /setQuickFollowUp/);
 });
+
+test("Web proposals use server-controlled pricing, tokenized acceptance and Stripe deposits", () => {
+  const modelSource = readRepoFile("server", "models", "WebServiceRequest.js");
+  const controllerSource = readRepoFile("server", "controllers", "webServiceRequestController.js");
+  const routesSource = readRepoFile("server", "routes", "webServiceRequestRoutes.js");
+  const proposalPageSource = readRepoFile("web-services", "src", "ProposalPage.tsx");
+  const webMainSource = readRepoFile("web-services", "src", "main.tsx");
+  const adminSource = readRepoFile("client", "src", "pages", "admin", "WebProposalsPage.jsx");
+  const adminAppSource = readRepoFile("client", "src", "App.jsx");
+  const adminShellSource = readRepoFile("client", "src", "components", "admin-dashboard", "AdminShell.jsx");
+
+  assert.match(modelSource, /proposalTokenHash:/);
+  assert.match(modelSource, /proposalAcceptedAt:/);
+  assert.match(modelSource, /depositPercent:/);
+  assert.match(modelSource, /depositStatus:/);
+  assert.match(controllerSource, /hashProposalToken/);
+  assert.match(controllerSource, /calculateDeposit\(proposalPrice, depositPercent\)/);
+  assert.match(controllerSource, /checkoutType: "web_service_deposit"/);
+  assert.match(controllerSource, /unit_amount: Math\.round\(request\.depositAmount \* 100\)/);
+  assert.match(controllerSource, /acceptedTerms !== true/);
+  assert.match(routesSource, /\/proposal\/:token\/accept/);
+  assert.match(routesSource, /\/proposal\/:token\/deposit/);
+  assert.match(routesSource, /\/:id\/proposal\/send/);
+  assert.match(proposalPageSource, /Patvirtinti pasiūlymą/);
+  assert.match(proposalPageSource, /Apmokėti .* avansą/);
+  assert.match(webMainSource, /pasiulymas/);
+  assert.match(adminSource, /Pasiūlymai ir avansai/);
+  assert.match(adminSource, /Paruošti ir išsiųsti/);
+  assert.match(adminAppSource, /path="web-proposals"/);
+  assert.match(adminShellSource, /label: "Web pasiūlymai"/);
+});
