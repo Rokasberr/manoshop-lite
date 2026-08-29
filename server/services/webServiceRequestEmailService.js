@@ -56,12 +56,12 @@ const getNotificationRecipient = () => {
 };
 
 const buildBrandHeader = (eyebrow) => `
-  <table role="presentation" style="width:100%;border-collapse:collapse;margin:0 0 28px;">
+  <table role="presentation" style="width:100%;border-collapse:collapse;margin:0 0 28px;text-align:left;">
     <tr>
       <td style="width:54px;vertical-align:middle;">
         <img src="${escapeHtml(WEB_LOGO_URL)}" width="44" height="44" alt="Stilloak Web" style="display:block;width:44px;height:44px;border:0;outline:none;text-decoration:none;" />
       </td>
-      <td style="vertical-align:middle;padding-left:12px;">
+      <td style="vertical-align:middle;padding-left:12px;text-align:left;">
         <div style="font-size:19px;line-height:1.1;font-weight:700;letter-spacing:-0.03em;color:#201d19;">Stilloak <span style="color:#8a5a39;font-weight:600;">Web</span></div>
         <div style="margin-top:5px;font-size:10px;line-height:1.3;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#8b7b6c;">${escapeHtml(eyebrow)}</div>
       </td>
@@ -100,16 +100,16 @@ const buildCustomerEmail = (request) => {
   const safeBudget = escapeHtml(request.budget || "");
 
   const html = `
-    <div style="margin:0;padding:28px 14px;background:#f5f0e9;font-family:Arial,Helvetica,sans-serif;color:#201d19;">
-      <div style="max-width:640px;margin:0 auto;overflow:hidden;background:#fffdf9;border:1px solid #e5dbcf;border-radius:22px;box-shadow:0 14px 40px rgba(74,51,33,.08);">
-        <div style="padding:30px 32px 10px;">
+    <div style="margin:0;padding:28px 14px;background:#f5f0e9;font-family:Arial,Helvetica,sans-serif;color:#201d19;text-align:left;">
+      <div style="max-width:640px;margin:0 auto;overflow:hidden;background:#fffdf9;border:1px solid #e5dbcf;border-radius:22px;box-shadow:0 14px 40px rgba(74,51,33,.08);text-align:left;">
+        <div style="padding:30px 32px 10px;text-align:left;">
           ${buildBrandHeader("Užklausa sėkmingai gauta")}
           <div style="display:inline-block;margin:0 0 14px;padding:7px 11px;border-radius:999px;background:#f0e4d7;color:#765039;font-size:11px;font-weight:700;letter-spacing:.04em;">${safeNumber}</div>
-          <h1 style="margin:0;font-size:30px;line-height:1.2;letter-spacing:-.035em;color:#201d19;">Ačiū, ${safeName}.</h1>
-          <p style="margin:14px 0 0;font-size:15px;line-height:1.75;color:#665e56;">Jūsų svetainės kūrimo užklausa jau mūsų sistemoje. Peržiūrėsime informaciją ir susisieksime dėl projekto apimties, termino bei kitų žingsnių.</p>
+          <h1 style="margin:0;font-size:30px;line-height:1.2;letter-spacing:-.035em;color:#201d19;text-align:left;">Ačiū, ${safeName}.</h1>
+          <p style="margin:14px 0 0;font-size:15px;line-height:1.75;color:#665e56;text-align:left;">Jūsų svetainės kūrimo užklausa jau mūsų sistemoje. Peržiūrėsime informaciją ir susisieksime dėl projekto apimties, termino bei kitų žingsnių.</p>
         </div>
 
-        <div style="padding:20px 32px 30px;">
+        <div style="padding:20px 32px 30px;text-align:left;">
           <table role="presentation" style="width:100%;border-collapse:collapse;background:#f7f2ec;border:1px solid #ebe1d6;border-radius:16px;">
             <tr>
               <td style="padding:18px 20px 9px;color:#82766b;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;">Pasirinktas paketas</td>
@@ -185,9 +185,9 @@ const buildAdminEmail = (request) => {
     .join("");
 
   const html = `
-    <div style="margin:0;padding:28px 14px;background:#f5f0e9;font-family:Arial,Helvetica,sans-serif;color:#201d19;">
-      <div style="max-width:680px;margin:0 auto;overflow:hidden;background:#fffdf9;border:1px solid #e5dbcf;border-radius:22px;box-shadow:0 14px 40px rgba(74,51,33,.08);">
-        <div style="padding:30px 32px;">
+    <div style="margin:0;padding:28px 14px;background:#f5f0e9;font-family:Arial,Helvetica,sans-serif;color:#201d19;text-align:left;">
+      <div style="max-width:680px;margin:0 auto;overflow:hidden;background:#fffdf9;border:1px solid #e5dbcf;border-radius:22px;box-shadow:0 14px 40px rgba(74,51,33,.08);text-align:left;">
+        <div style="padding:30px 32px;text-align:left;">
           ${buildBrandHeader("Naujas potencialus klientas")}
 
           <table role="presentation" style="width:100%;border-collapse:collapse;margin-bottom:20px;">
@@ -199,8 +199,8 @@ const buildAdminEmail = (request) => {
             </tr>
           </table>
 
-          <h1 style="margin:0;font-size:28px;line-height:1.2;letter-spacing:-.035em;color:#201d19;">${escapeHtml(customerName || "Naujas klientas")}</h1>
-          <p style="margin:10px 0 22px;font-size:14px;line-height:1.65;color:#6c6259;">Gauta nauja svetainės kūrimo užklausa. Žemiau — svarbiausia informacija vienoje vietoje.</p>
+          <h1 style="margin:0;font-size:28px;line-height:1.2;letter-spacing:-.035em;color:#201d19;text-align:left;">${escapeHtml(customerName || "Naujas klientas")}</h1>
+          <p style="margin:10px 0 22px;font-size:14px;line-height:1.65;color:#6c6259;text-align:left;">Gauta nauja svetainės kūrimo užklausa. Žemiau — svarbiausia informacija vienoje vietoje.</p>
 
           <div style="padding:4px 20px 8px;background:#f8f3ed;border:1px solid #e9dfd4;border-radius:16px;">
             <table role="presentation" style="width:100%;border-collapse:collapse;">${htmlRows}</table>
@@ -208,7 +208,7 @@ const buildAdminEmail = (request) => {
 
           <div style="margin-top:20px;padding:19px 20px;background:#211e1a;border-radius:16px;color:#fffaf5;">
             <div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#cbb9aa;">Projekto aprašymas</div>
-            <div style="margin-top:9px;white-space:pre-wrap;font-size:14px;line-height:1.7;color:#f0e7df;">${escapeHtml(request.message || "-")}</div>
+            <div style="margin-top:9px;white-space:pre-wrap;font-size:14px;line-height:1.7;color:#f0e7df;text-align:left;word-break:break-word;">${escapeHtml(request.message || "-")}</div>
           </div>
 
           <table role="presentation" style="width:100%;border-collapse:collapse;margin-top:22px;">

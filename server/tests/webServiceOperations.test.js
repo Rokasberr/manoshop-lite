@@ -14,6 +14,10 @@ test("Web service email template has branding, support contact and escaped custo
   assert.match(email.html, /hello@stilloak-studio\.com/);
   assert.match(email.html, /&lt;Testas&gt;/);
   assert.doesNotMatch(email.html, /Sveiki, <Testas>/);
+  assert.match(email.html, /text-align:left/);
+  assert.match(email.html, /vertical-align:top/);
+  assert.match(email.html, /word-break:break-word/);
+  assert.doesNotMatch(email.html, /text-align:justify/);
 });
 
 test("database backup fails closed without HTTPS destination and a 32-byte key", () => {
@@ -42,6 +46,8 @@ test("operations routes, encrypted backups, error alerts and legal pages stay wi
   const errors = readRepoFile("server", "middleware", "errorMiddleware.js");
   const legal = readRepoFile("client", "src", "content", "infoPages.js");
   const proposal = readRepoFile("web-services", "src", "ProposalPage.tsx");
+  const proposalEmail = readRepoFile("server", "services", "webServiceProposalEmailService.js");
+  const requestEmail = readRepoFile("server", "services", "webServiceRequestEmailService.js");
   assert.match(routes, /\/operations\/backup/);
   assert.match(backup, /aes-256-gcm/);
   assert.match(backup, /DATABASE_BACKUP_UPLOAD_URL/);
@@ -50,6 +56,8 @@ test("operations routes, encrypted backups, error alerts and legal pages stay wi
   assert.match(legal, /webServicesTerms/);
   assert.match(legal, /webServicesRefunds/);
   assert.match(proposal, /web-services-terms/);
+  assert.match(proposalEmail, /text-align:left/);
+  assert.match(requestEmail, /text-align:left/);
 });
 
 test("both public sites keep their section and contact navigation wired", () => {
