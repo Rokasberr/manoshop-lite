@@ -46,6 +46,8 @@ const WebProposalsPage = lazy(() => import("./pages/admin/WebProposalsPage"));
 const InstagramGeneratorPage = lazy(() => import("./pages/admin/InstagramGeneratorPage"));
 const AdminDigitalProductsPage = lazy(() => import("./pages/admin/AdminDigitalProductsPage"));
 const AdminDigitalProductGeneratorPage = lazy(() => import("./pages/admin/AdminDigitalProductGeneratorPage"));
+const EmailTestingPage = lazy(() => import("./pages/admin/EmailTestingPage"));
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 const App = () => (
   <Suspense fallback={<LoadingSpinner fullScreen />}>
     <Routes>
@@ -129,13 +131,14 @@ const App = () => (
             <Route path="orders" element={<OrdersManagerPage />} />
             <Route path="web-orders" element={<WebOrdersManagerPage />} />
             <Route path="web-proposals" element={<WebProposalsPage />} />
+            <Route path="email-testing" element={<EmailTestingPage />} />
             <Route path="instagram-generator" element={<InstagramGeneratorPage />} />
             <Route path="digital-product-generator" element={<AdminDigitalProductGeneratorPage />} />
           </Route>
           <Route path="/member/digital-product-generator" element={<Navigate to="/admin/digital-product-generator" replace />} />
         </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
   </Suspense>

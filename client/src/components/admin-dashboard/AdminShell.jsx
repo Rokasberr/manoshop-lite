@@ -4,6 +4,7 @@ import {
   Globe2,
   Instagram,
   Lightbulb,
+  MailCheck,
   LogOut,
   Menu,
   Package,
@@ -49,6 +50,11 @@ const adminNavigation = [
     label: "Web pasiūlymai",
     to: "/admin/web-proposals",
     icon: FileText,
+  },
+  {
+    label: "Laiškų testavimas",
+    to: "/admin/email-testing",
+    icon: MailCheck,
   },
   {
     label: "Instagram",

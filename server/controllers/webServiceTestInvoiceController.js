@@ -11,7 +11,7 @@ const resendAdminWebServiceTestInvoice = async (req, res) => {
   if (paymentType === "final" && request.finalPaymentStatus !== "paid") throw createHttpError("Likutis dar neapmokėtas.", 409);
 
   const delivery = await deliverWebServiceTestInvoice({ request, paymentType });
-  request.contactHistory.push({ type: "email", note: `Pakartotinai išsiųsta ${paymentType === "final" ? "likučio" : "avanso"} testinė PDF sąskaita.`, happenedAt: new Date() });
+  request.contactHistory.push({ type: "email", note: `Pakartotinai išsiųsta ${paymentType === "final" ? "likučio" : "avanso"} testinė PDF sąskaita.`, happenedAt: new Date(), actorName: req.user?.name || "Administratorius", actorEmail: req.user?.email || "" });
   await request.save();
   res.json({ request, delivery: { sent: delivery.sent, provider: delivery.provider, invoiceNumber: delivery.invoiceNumber } });
 };

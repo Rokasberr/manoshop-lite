@@ -189,6 +189,8 @@ const markDeliverySent = async ({ record, result }) => {
   record.provider = result?.provider || "";
   record.messageId = result?.messageId || "";
   record.sentAt = new Date();
+  record.deliveryStatus = "sent";
+  record.deliveryStatusAt = new Date();
   record.lastAttemptAt = new Date();
   record.error = "";
   await record.save();

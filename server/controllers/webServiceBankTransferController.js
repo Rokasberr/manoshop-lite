@@ -16,6 +16,7 @@ const PROPOSAL_TOKEN_PATTERN = /^[a-f0-9]{64}$/i;
 
 const cleanToken = (value) => String(value || "").trim();
 const hashProposalToken = (token) => crypto.createHash("sha256").update(token).digest("hex");
+const adminActor = (req) => ({ actorName: String(req.user?.name || "Administratorius").slice(0, 160), actorEmail: String(req.user?.email || "").toLowerCase().slice(0, 254) });
 
 const findProposalByToken = async (rawToken) => {
   const token = cleanToken(rawToken);
@@ -122,6 +123,7 @@ const markAdminWebServiceBankTransferPaid = async (req, res) => {
     type: "note",
     note: `Patvirtintas ${request.depositPercent}% projekto avansas banko pavedimu (${request.depositAmount} €).`,
     happenedAt: now,
+    ...adminActor(req),
   });
 
   await request.save();
@@ -172,7 +174,7 @@ const markAdminWebServiceFinalBankTransferPaid = async (req, res) => {
   request.projectStage = "completed";
   request.nextAction = "Projektas apmokėtas pilnai";
   request.nextActionAt = null;
-  request.contactHistory.push({ type: "note", note: `Patvirtinta likusi ${request.finalPaymentAmount} € projekto suma banko pavedimu.`, happenedAt: now });
+  request.contactHistory.push({ type: "note", note: `Patvirtinta likusi ${request.finalPaymentAmount} € projekto suma banko pavedimu.`, happenedAt: now, ...adminActor(req) });
   await request.save();
   try {
     await deliverWebServiceTestInvoice({ request, paymentType: "final" });

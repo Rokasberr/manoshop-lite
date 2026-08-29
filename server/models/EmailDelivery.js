@@ -33,6 +33,13 @@ const emailDeliverySchema = new mongoose.Schema(
       default: "processing",
       index: true,
     },
+    deliveryStatus: {
+      type: String,
+      enum: ["queued", "sent", "delivered", "bounced", "complained"],
+      default: "queued",
+      index: true,
+    },
+    deliveryStatusAt: { type: Date, default: null },
     attempts: {
       type: Number,
       default: 1,
@@ -70,5 +77,6 @@ const emailDeliverySchema = new mongoose.Schema(
 
 emailDeliverySchema.index({ type: 1, dedupeKey: 1 }, { unique: true });
 emailDeliverySchema.index({ status: 1, updatedAt: 1 });
+emailDeliverySchema.index({ deliveryStatus: 1, updatedAt: -1 });
 
 module.exports = mongoose.model("EmailDelivery", emailDeliverySchema);

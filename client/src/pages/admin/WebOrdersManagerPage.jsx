@@ -499,6 +499,7 @@ const WebOrdersManagerPage = () => {
                                   <span>{new Date(entry.happenedAt || entry.createdAt).toLocaleString("lt-LT")}</span>
                                 </div>
                                 <p className="mt-2 whitespace-pre-wrap text-sm text-slate-700">{entry.note}</p>
+                                {entry.actorName || entry.actorEmail ? <p className="mt-2 text-xs text-slate-500">Atliko: {entry.actorName || entry.actorEmail}</p> : null}
                               </div>
                             ))}
                           </div>

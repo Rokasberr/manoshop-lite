@@ -18,6 +18,7 @@ const businessRoutes = require("./routes/businessRoutes");
 const storeRoutes = require("./routes/storeRoutes");
 const memberResourceRoutes = require("./routes/memberResourceRoutes");
 const webServiceRequestRoutes = require("./routes/webServiceRequestRoutes");
+const emailEventRoutes = require("./routes/emailEventRoutes");
 const { validateEnvironment } = require("./config/env");
 const { startSavingsStudioSummaryScheduler } = require("./services/savingsStudioScheduler");
 const { startWebServicePaymentReminderScheduler } = require("./services/webServicePaymentReminderScheduler");
@@ -126,6 +127,7 @@ app.use("/api/business", businessRoutes);
 app.use("/api/stores", storeRoutes);
 app.use("/api/member-resources", memberResourceRoutes);
 app.use("/api/web-service-requests", webServiceRequestRoutes);
+app.use("/api/email-events", emailEventRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

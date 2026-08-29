@@ -12,6 +12,7 @@ const { sendWebServiceRequestEmails } = require("../services/webServiceRequestEm
 const { deliverWebServiceTestContract } = require("../services/webServiceTestContractEmailService");
 const { createHttpError } = require("../utils/httpError");
 const { getWebServiceStripeClient } = require("../utils/stripeClient");
+const { createWebServiceTestInvoicePdfBuffer } = require("../utils/webServiceTestInvoicePdf");
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PROPOSAL_TOKEN_PATTERN = /^[a-f0-9]{64}$/i;
@@ -26,6 +27,11 @@ const DEFAULT_PROPOSAL_TERMS =
 
 const cleanString = (value, maxLength = 5000) =>
   String(value || "").trim().slice(0, maxLength);
+
+const adminActor = (req) => ({
+  actorName: cleanString(req.user?.name || "Administratorius", 160),
+  actorEmail: cleanString(req.user?.email, 254).toLowerCase(),
+});
 
 const cleanAttribution = (raw = {}) => ({
   source: cleanString(raw.source, 100).toLowerCase() || "direct",
@@ -91,6 +97,17 @@ const getWebPublicUrl = () =>
 
 const calculateDeposit = (price, percent) => Math.round(Number(price) * Number(percent) * 100) / 10000;
 
+const parseHandoverItem = (value) => {
+  const raw = cleanString(value, 1000);
+  const separator = raw.indexOf("|");
+  const label = cleanString(separator >= 0 ? raw.slice(0, separator) : raw, 200);
+  const candidateUrl = cleanString(separator >= 0 ? raw.slice(separator + 1) : "", 500);
+  return {
+    label: label || "Projekto failas",
+    url: /^https:\/\//i.test(candidateUrl) ? candidateUrl : "",
+  };
+};
+
 const serializePublicProposal = (request) => ({
   requestNumber: request.requestNumber,
   customer: {
@@ -123,12 +140,38 @@ const serializePublicProposal = (request) => ({
     amount: request.depositAmount,
     status: request.depositStatus,
     paidAt: request.depositPaidAt,
+    paymentMethod: request.depositPaymentMethod || "",
+    invoice: request.depositStatus === "paid" ? {
+      number: request.depositTestInvoiceNumber || "",
+      status: request.depositTestInvoiceStatus,
+      sentAt: request.depositTestInvoiceSentAt,
+      downloadPath: "invoices/deposit",
+    } : null,
   },
   finalPayment: {
     amount: request.finalPaymentAmount,
     status: request.finalPaymentStatus,
     requestedAt: request.finalPaymentRequestedAt,
     paidAt: request.finalPaymentPaidAt,
+    paymentMethod: request.finalPaymentMethod || "",
+    invoice: request.finalPaymentStatus === "paid" ? {
+      number: request.finalTestInvoiceNumber || "",
+      status: request.finalTestInvoiceStatus,
+      sentAt: request.finalTestInvoiceSentAt,
+      downloadPath: "invoices/final",
+    } : null,
+  },
+  project: {
+    stage: request.projectStage,
+    dueDate: request.dueDate,
+    liveUrl: request.projectLiveUrl || "",
+    warrantyEndsAt: request.warrantyEndsAt,
+    carePlan: request.carePlan || "",
+    files: (request.handoverItems || []).map(parseHandoverItem).filter((item) => item.label),
+  },
+  contact: {
+    email: process.env.WEB_SERVICES_CONTACT_EMAIL?.trim() || "hello@stilloak-studio.com",
+    phone: process.env.WEB_SERVICES_CONTACT_PHONE?.trim() || "+370 638 43445",
   },
 });
 
@@ -324,7 +367,7 @@ const updateAdminWebServiceRequest = async (req, res) => {
       throw createHttpError("Įrašykite kontakto pastabą.", 400);
     }
 
-    request.contactHistory.push({ type, note, happenedAt });
+    request.contactHistory.push({ type, note, happenedAt, ...adminActor(req) });
   }
 
   await request.save();
@@ -386,6 +429,8 @@ const sendAdminWebServiceProposal = async (req, res) => {
   request.stripeDepositCheckoutSessionId = "";
   request.stripeDepositPaymentIntentId = "";
   request.depositPaidAt = null;
+  request.depositReminderSentAt = null;
+  request.depositReminderCount = 0;
   request.status = "proposal_sent";
   request.nextAction = "Laukti kliento pasiūlymo patvirtinimo";
   request.nextActionAt = new Date(now.getTime() + Math.min(3, expiryDays) * 24 * 60 * 60 * 1000);
@@ -393,6 +438,7 @@ const sendAdminWebServiceProposal = async (req, res) => {
     type: "proposal",
     note: `Išsiųstas ${proposalPrice} € pasiūlymas; avansas ${depositPercent}%.`,
     happenedAt: now,
+    ...adminActor(req),
   });
 
   await request.save();
@@ -418,6 +464,24 @@ const getPublicWebServiceProposal = async (req, res) => {
   }
 
   res.json(serializePublicProposal(request));
+};
+
+const getPublicWebServiceInvoicePdf = async (req, res) => {
+  const { request } = await findProposalByToken(req.params.token);
+  const paymentType = req.params.paymentType === "final" ? "final" : req.params.paymentType === "deposit" ? "deposit" : "";
+  if (!paymentType) throw createHttpError("Sąskaita nerasta.", 404);
+
+  const isFinal = paymentType === "final";
+  const isPaid = isFinal ? request.finalPaymentStatus === "paid" : request.depositStatus === "paid";
+  if (!isPaid) throw createHttpError("Sąskaita bus pasiekiama tik gavus mokėjimą.", 409);
+
+  const invoiceNumber = isFinal ? request.finalTestInvoiceNumber : request.depositTestInvoiceNumber;
+  const safeFileName = `${invoiceNumber || `TEST-${request.requestNumber}-${paymentType}`}.pdf`.replace(/[^\w.-]/g, "_");
+  const pdf = createWebServiceTestInvoicePdfBuffer({ request, paymentType });
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", `attachment; filename="${safeFileName}"`);
+  res.setHeader("Cache-Control", "private, no-store");
+  res.send(pdf);
 };
 
 const acceptPublicWebServiceProposal = async (req, res) => {
@@ -589,6 +653,8 @@ const requestAdminWebServiceFinalPayment = async (req, res) => {
   request.finalPaymentStatus = "requested";
   request.projectStage = "awaiting_final_payment";
   request.finalPaymentRequestedAt = now;
+  request.finalPaymentReminderSentAt = null;
+  request.finalPaymentReminderCount = 0;
   request.finalPaymentPaidAt = null;
   request.stripeFinalCheckoutSessionId = "";
   request.stripeFinalPaymentIntentId = "";
@@ -597,7 +663,7 @@ const requestAdminWebServiceFinalPayment = async (req, res) => {
   request.finalTestInvoiceSentAt = null;
   request.nextAction = "Laukti likusios projekto sumos apmokėjimo";
   request.nextActionAt = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
-  request.contactHistory.push({ type: "email", note: `Paprašyta apmokėti likusią ${amount} € projekto sumą.`, happenedAt: now });
+  request.contactHistory.push({ type: "email", note: `Paprašyta apmokėti likusią ${amount} € projekto sumą.`, happenedAt: now, ...adminActor(req) });
   await request.save();
 
   let emailResult;
@@ -652,6 +718,7 @@ module.exports = {
   createWebServiceRequest,
   getAdminWebServiceRequests,
   getPublicWebServiceProposal,
+  getPublicWebServiceInvoicePdf,
   sendAdminWebServiceProposal,
   syncAdminWebServiceDeposit,
   updateAdminWebServiceRequest,

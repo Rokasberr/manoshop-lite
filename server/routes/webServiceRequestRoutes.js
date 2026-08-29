@@ -11,6 +11,7 @@ const {
   createWebServiceRequest,
   getAdminWebServiceRequests,
   getPublicWebServiceProposal,
+  getPublicWebServiceInvoicePdf,
   sendAdminWebServiceProposal,
   syncAdminWebServiceDeposit,
   updateAdminWebServiceRequest,
@@ -52,6 +53,11 @@ const publicProposalActionLimiter = createWindowRateLimiter({
 
 router.post("/", publicRequestLimiter, asyncHandler(createWebServiceRequest));
 router.get("/proposal/:token", publicProposalLimiter, asyncHandler(getPublicWebServiceProposal));
+router.get(
+  "/proposal/:token/invoices/:paymentType",
+  publicProposalLimiter,
+  asyncHandler(getPublicWebServiceInvoicePdf)
+);
 router.get(
   "/proposal/:token/bank-transfer",
   publicProposalLimiter,
