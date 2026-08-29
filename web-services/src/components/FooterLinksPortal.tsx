@@ -9,9 +9,10 @@ const navigationLinks = [
 ] as const;
 
 const legalLinks = [
-  ["Privatumo politika", "https://stilloak-studio.com/privacy"],
+  ["Privatumo politika", "https://stilloak-studio.com/web-services-privacy"],
   ["Slapukų politika", "https://stilloak-studio.com/cookie-policy"],
-  ["Naudojimo sąlygos", "https://stilloak-studio.com/terms"]
+  ["Paslaugų sąlygos", "https://stilloak-studio.com/web-services-terms"],
+  ["Atsisakymas ir grąžinimai", "https://stilloak-studio.com/web-services-refunds"]
 ] as const;
 
 export default function FooterLinksPortal() {
