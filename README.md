@@ -108,6 +108,18 @@ Rekomenduojamas variantas:
 
 Backend health patikra: `/api/health`.
 
+### Šifruotos DB atsarginės kopijos
+
+Serveris gali kartą per parą sukurti pilną MongoDB kolekcijų kopiją, ją suspausti, užšifruoti AES-256-GCM ir `POST` užklausa perduoti į išorinę HTTPS saugyklą. Įjunkite tik prijungę atskirą privačią saugyklą:
+
+- `DATABASE_BACKUP_ENABLED=true`
+- `DATABASE_BACKUP_UPLOAD_URL=https://...` — saugyklos įkėlimo endpointas
+- `DATABASE_BACKUP_UPLOAD_TOKEN=...` — atskiras ribotų teisių įkėlimo tokenas
+- `DATABASE_BACKUP_ENCRYPTION_KEY=...` — 32 baitų base64 arba 64 simbolių hex raktas; laikomas tik secrets aplinkoje
+- `OPERATIONS_ALERT_EMAIL=projects@stilloak-studio.com`
+
+Saugykla turi priimti `application/octet-stream`, `Authorization: Bearer ...` ir `x-backup-filename`. Atkūrimo raktas negali būti laikomas kartu su kopijomis. Kol visi trys backup parametrai nesukonfigūruoti, administravimo skydas rodo perspėjimą ir kopijavimas lieka išjungtas.
+
 ## Stripe Webhook
 
 Stripe webhook turi likti pagrindinis narystės aktyvavimo šaltinis. Rekomenduojami eventai:
