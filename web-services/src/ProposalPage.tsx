@@ -9,7 +9,7 @@ import {
 
 type PublicProposal = {
   requestNumber: string;
-  customer: { name: string; company: string };
+  customer: { name: string; company: string; billingName: string; companyCode: string; vatCode: string; billingAddress: string };
   package: { id: string; name: string };
   proposal: {
     price: number | null;
@@ -53,6 +53,10 @@ function ProposalPage({ token }: ProposalPageProps) {
   const [error, setError] = useState("");
   const [acceptedName, setAcceptedName] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [billingName, setBillingName] = useState("");
+  const [companyCode, setCompanyCode] = useState("");
+  const [vatCode, setVatCode] = useState("");
+  const [billingAddress, setBillingAddress] = useState("");
   const [accepting, setAccepting] = useState(false);
   const [paying, setPaying] = useState(false);
   const [paymentMessage, setPaymentMessage] = useState("");
@@ -90,6 +94,10 @@ function ProposalPage({ token }: ProposalPageProps) {
             const confirmed = (await confirmResponse.json()) as PublicProposal;
             setProposal(confirmed);
             setAcceptedName(confirmed.proposal.acceptedName || confirmed.customer.name || "");
+            setBillingName(confirmed.customer.billingName || confirmed.customer.company || confirmed.customer.name || "");
+            setCompanyCode(confirmed.customer.companyCode || "");
+            setVatCode(confirmed.customer.vatCode || "");
+            setBillingAddress(confirmed.customer.billingAddress || "");
             setPaymentMessage(payment === "final-success"
               ? (confirmed.finalPayment.status === "paid" ? "Galutinis mokėjimas sėkmingai gautas. Ačiū!" : "Stripe mokėjimas dar tvirtinamas.")
               : (confirmed.deposit.status === "paid" ? "Avansas sėkmingai gautas. Susisieksime dėl projekto starto." : "Stripe mokėjimas dar tvirtinamas."));
@@ -107,6 +115,10 @@ function ProposalPage({ token }: ProposalPageProps) {
 
         setProposal(data);
         setAcceptedName(data.proposal.acceptedName || data.customer.name || "");
+        setBillingName(data.customer.billingName || data.customer.company || data.customer.name || "");
+        setCompanyCode(data.customer.companyCode || "");
+        setVatCode(data.customer.vatCode || "");
+        setBillingAddress(data.customer.billingAddress || "");
       } catch (loadError) {
         setError(loadError instanceof Error ? loadError.message : "Pasiūlymo nepavyko užkrauti.");
       } finally {
@@ -127,7 +139,14 @@ function ProposalPage({ token }: ProposalPageProps) {
       const response = await fetch(`${endpoint}/accept`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ acceptedName: acceptedName.trim(), acceptedTerms }),
+        body: JSON.stringify({
+          acceptedName: acceptedName.trim(),
+          acceptedTerms,
+          billingName: billingName.trim(),
+          companyCode: companyCode.trim(),
+          vatCode: vatCode.trim(),
+          billingAddress: billingAddress.trim(),
+        }),
       });
       const data = (await response.json().catch(() => ({}))) as PublicProposal & { message?: string };
       if (!response.ok) throw new Error(data.message || "Pasiūlymo patvirtinti nepavyko.");
@@ -293,11 +312,32 @@ function ProposalPage({ token }: ProposalPageProps) {
             Patvirtinančio asmens vardas ir pavardė
             <input value={acceptedName} onChange={(event) => setAcceptedName(event.target.value)} minLength={2} required />
           </label>
+          <label className="proposal-label">
+            Sąskaitos gavėjas / įmonės pavadinimas
+            <input value={billingName} onChange={(event) => setBillingName(event.target.value)} minLength={2} required />
+          </label>
+          <div className="proposal-grid">
+            <label className="proposal-label">
+              Įmonės kodas (jei taikoma)
+              <input value={companyCode} onChange={(event) => setCompanyCode(event.target.value)} />
+            </label>
+            <label className="proposal-label">
+              PVM kodas (jei taikoma)
+              <input value={vatCode} onChange={(event) => setVatCode(event.target.value)} />
+            </label>
+          </div>
+          <label className="proposal-label">
+            Sąskaitos adresas
+            <input value={billingAddress} onChange={(event) => setBillingAddress(event.target.value)} minLength={5} required />
+          </label>
+          <div className="proposal-notice">
+            Patvirtinus bus atsiųsta testinė sutarties PDF versija. Ji negalioja ir nėra teisinė sutartis.
+          </div>
           <label className="proposal-checkbox">
             <input type="checkbox" checked={acceptedTerms} onChange={(event) => setAcceptedTerms(event.target.checked)} required />
             <span>Sutinku su šio pasiūlymo apimtimi, kaina, sąlygomis ir nurodyta avanso suma.</span>
           </label>
-          <button className="proposal-primary-button" type="submit" disabled={accepting || !acceptedTerms || acceptedName.trim().length < 2}>
+          <button className="proposal-primary-button" type="submit" disabled={accepting || !acceptedTerms || acceptedName.trim().length < 2 || billingName.trim().length < 2 || billingAddress.trim().length < 5}>
             {accepting ? <Loader2 className="proposal-spinner" size={19} /> : <FileCheck2 size={19} />}
             {accepting ? "Patvirtinama..." : "Patvirtinti pasiūlymą"}
           </button>
