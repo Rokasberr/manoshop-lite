@@ -40,11 +40,21 @@ const resendTestInvoice = async (requestId, paymentType) => {
   const response = await api.post(`/web-service-requests/${requestId}/proposal/test-invoice/resend`, { paymentType });
   return response.data;
 };
+const resendTestContract = async (requestId) => {
+  const response = await api.post(`/web-service-requests/${requestId}/proposal/test-contract/resend`);
+  return response.data;
+};
+const resendHandover = async (requestId) => {
+  const response = await api.post(`/web-service-requests/${requestId}/proposal/handover/resend`);
+  return response.data;
+};
 
 export default {
   getAdminRequests,
   markBankTransferPaid,
   markFinalBankTransferPaid,
+  resendHandover,
+  resendTestContract,
   resendTestInvoice,
   requestFinalPayment,
   sendProposal,
