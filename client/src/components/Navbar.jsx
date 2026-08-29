@@ -24,6 +24,7 @@ const Navbar = () => {
     { label: copy.nav.digitalProducts, to: "/digital-products" },
     { label: copy.nav.savingStudio, to: "/savings-studio" },
     { label: copy.nav.membership, to: "/pricing" },
+    { label: copy.nav.contact, to: "/contact" },
   ];
 
   const handleLogout = async () => {
@@ -33,7 +34,7 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-30 px-3 pt-3 sm:px-6 lg:px-8">
-      <div className="header-shell mx-auto flex max-w-7xl items-center justify-between gap-3 px-3 py-2.5 backdrop-blur-xl sm:px-4">
+      <div className="header-shell mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-3 py-2.5 backdrop-blur-xl sm:px-4">
         <Link to="/" className="flex min-w-0 items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg shadow-[0_12px_28px_rgba(26,79,64,0.14)]">
             <img
@@ -183,6 +184,22 @@ const Navbar = () => {
             <ArrowRight size={16} />
           </Link>
         </div>
+
+        <nav className="order-3 flex w-full gap-1 overflow-x-auto border-t border-[rgb(var(--line)/0.65)] pt-2 xl:hidden" aria-label={copy.mobileNavigationLabel || "Pagrindinė navigacija"}>
+          {publicLinks.map((link) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              className={`nav-link-public shrink-0 ${
+                location.pathname === link.to || location.pathname.startsWith(`${link.to}/`)
+                  ? "nav-link-public-active"
+                  : ""
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
       </div>
     </header>
   );
