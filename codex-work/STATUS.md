@@ -2,6 +2,10 @@
 
 PROJECT_STATE: STILLOAK_WEB_SERVICES_LOCAL_VALIDATED
 
+## 2026-08-29 – Tvarkingas siunčiamų laiškų teksto lygiavimas
+
+Stilloak Web bendrame laiškų šablone, pirminės užklausos laiškuose ir komercinio pasiūlymo laiške aiškiai nustatytas kairinis teksto lygiavimas, vienodas eilučių aukštis ir stabilūs tarpai. Pasisveikinimas atskirtas nuo pagrindinės pastraipos, informacinės lentelės laukai lygiuojami nuo tos pačios kairės linijos, o ilgos reikšmės saugiai persikelia į kitą eilutę. Mygtuko tekstas išlieka centruotas. Šablonai naudoja el. pašto programoms patikimesnes prezentacines lenteles ir inline stilius; regresijos testas saugo nuo `text-align: justify` ir netvarkingo dinaminių reikšmių išsiliejimo.
+
 ## 2026-08-29 – Abiejų viešų svetainių navigacija
 
 Pagrindinėje Stilloak Studio svetainėje „Kontaktai“ prijungti prie realaus `/contact` puslapio desktop ir mobilioje navigacijoje. Mobiliajame ekrane pridėta horizontaliai slenkama viešų puslapių navigacijos juosta. Bendras `NavigationEffects` komponentas po React maršruto pakeitimo apdoroja URL sekcijos identifikatorių, todėl tokios nuorodos kaip `/pricing#funkcijos` nuslenka į teisingą vietą; keičiant puslapį be sekcijos vaizdas grąžinamas į viršų. Stilloak Web svetainėje navigacijos, hero, kontaktų, kainų ir logotipo nuorodos naudoja vieną patikimą sekcijų navigacijos funkciją, į navigaciją įtraukti „Pavyzdžiai“, o neveikiantis dekoratyvinis „Susisiekti“ elementas nebėra pateikiamas kaip tikras mygtukas. Pridėta statinė regresija `webServiceOperations.test.js`.
