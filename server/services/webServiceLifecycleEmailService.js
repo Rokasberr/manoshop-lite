@@ -17,13 +17,19 @@ const buildMessage = ({ request, type }) => {
   const subject = isHandover
     ? `Jūsų projektas užbaigtas — ${request.requestNumber}`
     : `Primename apie ${isFinal ? "likusios sumos" : "avanso"} apmokėjimą — ${request.requestNumber}`;
+  const handoverDetails = [
+    request.projectLiveUrl ? `Svetainė: ${request.projectLiveUrl}` : null,
+    request.warrantyEndsAt ? `Garantija iki: ${new Date(request.warrantyEndsAt).toLocaleDateString("lt-LT")}` : null,
+    request.carePlan ? `Priežiūra: ${request.carePlan}` : null,
+    request.handoverItems?.length ? `Perduota: ${request.handoverItems.join(", ")}` : null,
+  ].filter(Boolean);
   const action = isHandover
-    ? "Projektas apmokėtas pilnai ir pažymėtas užbaigtu. Susisieksime atskirai dėl galutinių failų, prieigų ir perdavimo."
+    ? ["Projektas apmokėtas pilnai ir pažymėtas užbaigtu.", ...handoverDetails].join("\n")
     : `Laukiame ${isFinal ? "likusios projekto sumos" : "projekto avanso"}: ${money(amount)}. Mokėjimo nuorodą rasite ankstesniame Stilloak Web laiške.`;
   return {
     subject,
     text: `Sveiki, ${request.name},\n\n${action}\n\nStilloak Web`,
-    html: `<div style="font-family:Arial,sans-serif;color:#201d19"><h1>${escapeHtml(subject)}</h1><p>Sveiki, ${escapeHtml(request.name)}.</p><p>${escapeHtml(action)}</p><p>Stilloak Web</p></div>`,
+    html: `<div style="font-family:Arial,sans-serif;color:#201d19"><h1>${escapeHtml(subject)}</h1><p>Sveiki, ${escapeHtml(request.name)}.</p>${action.split("\n").map((line) => `<p>${escapeHtml(line)}</p>`).join("")}<p>Stilloak Web</p></div>`,
   };
 };
 
