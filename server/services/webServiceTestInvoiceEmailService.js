@@ -9,6 +9,7 @@ const {
   buildTestInvoiceNumber,
   createWebServiceTestInvoicePdfBuffer,
 } = require("../utils/webServiceTestInvoicePdf");
+const { buildWebServiceEmail } = require("./webServiceEmailTemplate");
 
 const WEB_ORDERS_FROM_EMAIL =
   process.env.WEB_ORDERS_FROM_EMAIL?.trim() || "Stilloak Studio <hello@stilloak-studio.com>";
@@ -19,15 +20,7 @@ const sendWebServiceTestInvoiceEmail = async ({ request, paymentType = "deposit"
   const pdf = createWebServiceTestInvoicePdfBuffer({ request, paymentType });
   const paymentLabel = paymentType === "final" ? "likusios projekto sumos" : "projekto avanso";
   const subject = `TESTINĖ sąskaita po ${paymentLabel} — ${request.requestNumber}`;
-  const text = [
-    `Sveiki, ${request.name},`,
-    "",
-    `Gavome ${paymentLabel} testinį mokėjimą. Prisegame testinę PDF sąskaitą.`,
-    "Dokumentas pažymėtas kaip negaliojantis ir nėra apskaitos dokumentas.",
-    "",
-    "Stilloak Web",
-  ].join("\n");
-  const html = `<p>Sveiki, ${String(request.name || "").replace(/[<>&]/g, "")},</p><p>Gavome ${paymentLabel} testinį mokėjimą.</p><p><strong>Prisegtas PDF yra testinis ir nėra apskaitos dokumentas.</strong></p><p>Stilloak Web</p>`;
+  const { text, html } = buildWebServiceEmail({ subject, name: request.name, title: "Mokėjimas gautas", intro: `Gavome ${paymentLabel} testinį mokėjimą. PDF dokumentą rasite laiško priede.`, rows: [{ label: "Užsakymas", value: request.requestNumber }, { label: "Dokumento numeris", value: invoiceNumber }], notice: "Prisegtas PDF yra testinis, negalioja ir nėra apskaitos dokumentas." });
   const attachments = [{ filename, content: pdf }];
 
   if (isBrevoEmailConfigured()) {

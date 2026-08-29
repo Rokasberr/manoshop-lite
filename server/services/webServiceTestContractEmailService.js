@@ -1,6 +1,7 @@
 const { getEmailTransport, getTransportConfig, isEmailTransportConfigured, normalizeEmailTransportError } = require("../utils/emailTransport");
 const { isBrevoEmailConfigured, sendBrevoTransactionalEmail } = require("../utils/brevoEmail");
 const { buildTestContractNumber, createWebServiceTestContractPdfBuffer } = require("../utils/webServiceTestContractPdf");
+const { buildWebServiceEmail } = require("./webServiceEmailTemplate");
 
 const FROM = process.env.WEB_ORDERS_FROM_EMAIL?.trim() || "Stilloak Studio <hello@stilloak-studio.com>";
 
@@ -8,8 +9,7 @@ const sendWebServiceTestContractEmail = async (request) => {
   const contractNumber = buildTestContractNumber(request);
   const attachment = { filename: `${contractNumber}.pdf`, content: createWebServiceTestContractPdfBuffer({ request }) };
   const subject = `TESTINĖ projekto sutartis — ${request.requestNumber}`;
-  const text = `Sveiki, ${request.name},\n\nPrisegame pagal patvirtintą pasiūlymą sugeneruotą testinę projekto sutartį. Dokumentas negalioja ir nėra teisinė sutartis.\n\nStilloak Web`;
-  const html = `<p>Sveiki, ${String(request.name || "").replace(/[<>&]/g, "")},</p><p>Prisegame pagal patvirtintą pasiūlymą sugeneruotą testinę projekto sutartį.</p><p><strong>Dokumentas negalioja ir nėra teisinė sutartis.</strong></p><p>Stilloak Web</p>`;
+  const { text, html } = buildWebServiceEmail({ subject, name: request.name, title: "Pasiūlymas patvirtintas", intro: "Prisegame pagal patvirtintą pasiūlymą sugeneruotą testinę projekto sutartį.", rows: [{ label: "Užsakymas", value: request.requestNumber }, { label: "Sutarties numeris", value: contractNumber }], notice: "Dokumentas negalioja, nėra teisinė sutartis ir skirtas tik sistemos testavimui." });
 
   if (isBrevoEmailConfigured()) {
     const result = await sendBrevoTransactionalEmail({ to: request.email, subject, text, html, tags: ["web-orders", "test-contract"], senderOverride: FROM, attachments: [attachment] });

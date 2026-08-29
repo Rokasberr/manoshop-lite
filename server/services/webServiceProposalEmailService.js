@@ -11,6 +11,8 @@ const {
 
 const WEB_ORDERS_FROM_EMAIL =
   process.env.WEB_ORDERS_FROM_EMAIL?.trim() || "Stilloak Studio <hello@stilloak-studio.com>";
+const configuredLogoUrl = process.env.EMAIL_LOGO_URL?.trim() || "";
+const EMAIL_LOGO_URL = /^https:\/\//i.test(configuredLogoUrl) ? configuredLogoUrl : "https://web.stilloak-studio.com/stilloak-logo.svg";
 
 const escapeHtml = (value) =>
   String(value ?? "")
@@ -52,6 +54,7 @@ const buildProposalEmail = ({ request, proposalUrl }) => {
   const html = `
     <div style="margin:0;padding:24px;background:#f7f5f2;font-family:Arial,sans-serif;color:#201d19;">
       <div style="max-width:640px;margin:0 auto;background:#fff;border:1px solid #e8e2da;border-radius:18px;padding:32px;">
+        <img src="${escapeHtml(EMAIL_LOGO_URL)}" alt="Stilloak Web" width="46" height="46" style="display:block;margin:0 0 16px;border-radius:12px" />
         <p style="margin:0 0 12px;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#806b50;">Stilloak Web</p>
         <h1 style="margin:0 0 16px;font-size:28px;line-height:1.25;">Jūsų projekto pasiūlymas</h1>
         <p style="margin:0 0 22px;font-size:15px;line-height:1.7;color:#655b50;">Sveiki, ${escapeHtml(request.name)}. Paruošėme jūsų svetainės projekto komercinį pasiūlymą.</p>

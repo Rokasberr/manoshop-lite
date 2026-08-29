@@ -5,9 +5,9 @@ const {
   normalizeEmailTransportError,
 } = require("../utils/emailTransport");
 const { isBrevoEmailConfigured, sendBrevoTransactionalEmail } = require("../utils/brevoEmail");
+const { buildWebServiceEmail } = require("./webServiceEmailTemplate");
 
 const FROM = process.env.WEB_ORDERS_FROM_EMAIL?.trim() || "Stilloak Studio <hello@stilloak-studio.com>";
-const escapeHtml = (value) => String(value ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 const money = (value) => `${new Intl.NumberFormat("lt-LT", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value || 0))} €`;
 
 const buildMessage = ({ request, type }) => {
@@ -26,11 +26,7 @@ const buildMessage = ({ request, type }) => {
   const action = isHandover
     ? ["Projektas apmokėtas pilnai ir pažymėtas užbaigtu.", ...handoverDetails].join("\n")
     : `Laukiame ${isFinal ? "likusios projekto sumos" : "projekto avanso"}: ${money(amount)}. Mokėjimo nuorodą rasite ankstesniame Stilloak Web laiške.`;
-  return {
-    subject,
-    text: `Sveiki, ${request.name},\n\n${action}\n\nStilloak Web`,
-    html: `<div style="font-family:Arial,sans-serif;color:#201d19"><h1>${escapeHtml(subject)}</h1><p>Sveiki, ${escapeHtml(request.name)}.</p>${action.split("\n").map((line) => `<p>${escapeHtml(line)}</p>`).join("")}<p>Stilloak Web</p></div>`,
-  };
+  return buildWebServiceEmail({ subject, name: request.name, title: isHandover ? "Projektas užbaigtas" : "Mokėjimo priminimas", intro: action.split("\n")[0], rows: isHandover ? handoverDetails.map((line) => { const [label, ...value] = line.split(":"); return { label, value: value.join(":").trim() }; }) : [{ label: isFinal ? "Likutis" : "Avansas", value: money(amount) }], notice: isHandover ? "Prieigos duomenų el. paštu nesiunčiame. Juos perduokite tik sutartu saugiu kanalu." : "Mokėjimo nuorodą rasite ankstesniame Stilloak Web laiške." });
 };
 
 const send = async ({ request, type }) => {

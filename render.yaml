@@ -42,6 +42,16 @@ services:
         value: "true"
       - key: WEB_SERVICE_STRIPE_LIVE_ENABLED
         value: "false"
+      - key: DATABASE_BACKUP_ENABLED
+        value: "false"
+      - key: DATABASE_BACKUP_UPLOAD_URL
+        sync: false
+      - key: DATABASE_BACKUP_UPLOAD_TOKEN
+        sync: false
+      - key: DATABASE_BACKUP_ENCRYPTION_KEY
+        sync: false
+      - key: OPERATIONS_ALERT_EMAIL
+        value: projects@stilloak-studio.com
       - key: WEB_BANK_TRANSFER_BENEFICIARY
         sync: false
       - key: WEB_BANK_TRANSFER_IBAN

@@ -335,7 +335,7 @@ function ProposalPage({ token }: ProposalPageProps) {
           </div>
           <label className="proposal-checkbox">
             <input type="checkbox" checked={acceptedTerms} onChange={(event) => setAcceptedTerms(event.target.checked)} required />
-            <span>Sutinku su šio pasiūlymo apimtimi, kaina, sąlygomis ir nurodyta avanso suma.</span>
+            <span>Sutinku su šio pasiūlymo apimtimi, kaina, sąlygomis ir nurodyta avanso suma. Susipažinau su <a href="https://stilloak-studio.com/web-services-terms" target="_blank" rel="noreferrer">paslaugų sąlygomis</a> ir <a href="https://stilloak-studio.com/web-services-privacy" target="_blank" rel="noreferrer">privatumo informacija</a>.</span>
           </label>
           <button className="proposal-primary-button" type="submit" disabled={accepting || !acceptedTerms || acceptedName.trim().length < 2 || billingName.trim().length < 2 || billingAddress.trim().length < 5}>
             {accepting ? <Loader2 className="proposal-spinner" size={19} /> : <FileCheck2 size={19} />}

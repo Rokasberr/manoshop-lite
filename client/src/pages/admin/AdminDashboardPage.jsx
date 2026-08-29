@@ -5,6 +5,7 @@ import AdminDashboardOverview from "../../components/admin-dashboard/AdminDashbo
 import orderService from "../../services/orderService";
 import productService from "../../services/productService";
 import userService from "../../services/userService";
+import adminOperationsService from "../../services/adminOperationsService";
 
 const AdminDashboardPage = () => {
   const [loading, setLoading] = useState(true);
@@ -14,15 +15,17 @@ const AdminDashboardPage = () => {
     orders: [],
     users: [],
     productTotal: 0,
+    operations: { backup: {}, events: [], failedDeliveries: [] },
   });
 
   useEffect(() => {
     const loadDashboard = async () => {
       try {
-        const [productsResponse, ordersResponse, usersResponse] = await Promise.all([
+        const [productsResponse, ordersResponse, usersResponse, operations] = await Promise.all([
           productService.listProducts({ page: 1, limit: 100 }),
           orderService.getAdminOrders(),
           userService.listUsers(),
+          adminOperationsService.getOperations(),
         ]);
 
         setDashboardData({
@@ -30,6 +33,7 @@ const AdminDashboardPage = () => {
           orders: ordersResponse,
           users: usersResponse,
           productTotal: productsResponse.pagination.total,
+          operations,
         });
       } catch (loadError) {
         setError(loadError.response?.data?.message || "Nepavyko užkrauti admin duomenų.");
