@@ -2,6 +2,10 @@
 
 PROJECT_STATE: STILLOAK_WEB_SERVICES_LOCAL_VALIDATED
 
+## 2026-08-29 – Kliento rekvizitai, testinė sutartis ir pilnas perdavimas
+
+Pasiūlymo patvirtinime klientas dabar privalomai įveda sąskaitos gavėją ir adresą, o įmonės bei PVM kodus gali pridėti pasirinktinai. Patvirtinus automatiškai sugeneruojama ir el. paštu išsiunčiama A4 testinė paslaugų sutartis su projekto apimtimi, kaina, avansu, sąlygomis ir patvirtinimo duomenimis; dokumentas keliose vietose aiškiai pažymėtas `NEGALIOJA` ir `TIK TESTAVIMUI`. Administratorius mato sutarties būseną bei rekvizitus ir gali PDF išsiųsti pakartotinai. Projekto perdavimui pridėta vieša svetainės nuoroda, garantijos data, priežiūros planas ir perduodamų elementų sąrašas; po pilno apmokėjimo laišką galima pakartoti. Stripe integracija liko Checkout Sessions pagrindu, webhook parašas tikrinamas, mokėjimo metodai nekietinami, Live režimas lieka užrakintas. Patikros: visi testai PASS 260/260, papildomi tiksliniai testai PASS 12/12, backend lint ir sintaksė PASS, pagrindinės aplikacijos build PASS, `web-services` lint ir build PASS, `git diff --check` PASS. Testinės sutarties PDF papildomai patikrintas su Poppler ir vizualiai: A4, 1 puslapis, tekstas nenukirstas.
+
 ## 2026-08-28 – Projektų etapai, mokėjimų priminimai ir perdavimas
 
 Pridėti atskiri projekto etapai: laukia avanso, darbai vykdomi, kliento peržiūra, laukia likučio ir užbaigta. Administratorius etapą gali keisti pasiūlymų puslapyje, o mokėjimų srautai automatiškai perveda į vykdomą, laukiančio likučio arba užbaigtą etapą. Serverio scheduleris kas valandą tikrina neapmokėtus avansus ir likučius; pirmas priminimas siunčiamas po 3 dienų, kartojamas ne dažniau kaip kas 3 dienas, o DB claim apsaugo nuo dubliuoto siuntimo. Po pilno Stripe arba bankinio apmokėjimo siunčiamas projekto užbaigimo ir perdavimo laiškas, išsaugant jo būseną bei laiką. Laiške sąmoningai nesiunčiami slaptažodžiai ar prieigos raktai. Stripe Live ir tikros apskaitos sąskaitos neįjungtos.
