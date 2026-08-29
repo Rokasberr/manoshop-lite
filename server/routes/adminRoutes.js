@@ -24,6 +24,7 @@ const {
   generateAdminInstagramPost,
   getRecentAdminInstagramPosts,
 } = require("../controllers/instagramPostController");
+const { getAdminOperations, resolveAdminOperationalEvent, runAdminDatabaseBackup } = require("../controllers/adminOperationsController");
 
 const router = express.Router();
 const instagramGenerationRateLimiter = createWindowRateLimiter({
@@ -51,5 +52,8 @@ router.post(
 );
 router.get("/instagram-posts/recent", asyncHandler(getRecentAdminInstagramPosts));
 router.get("/instagram-posts/download/:filename", asyncHandler(downloadAdminInstagramPost));
+router.get("/operations", asyncHandler(getAdminOperations));
+router.post("/operations/backup", asyncHandler(runAdminDatabaseBackup));
+router.patch("/operations/:id/resolve", validateObjectId("id"), asyncHandler(resolveAdminOperationalEvent));
 
 module.exports = router;
