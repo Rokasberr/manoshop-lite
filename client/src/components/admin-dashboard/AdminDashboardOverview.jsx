@@ -1,4 +1,4 @@
-import { ArrowRight, DollarSign, Instagram, Lightbulb, Package, ShoppingCart, Users } from "lucide-react";
+import { AlertTriangle, ArrowRight, Database, DollarSign, Instagram, Lightbulb, Package, ShoppingCart, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
@@ -60,6 +60,8 @@ const AdminDashboardOverview = ({ dashboardData, previewMode = false }) => {
     total: order.totalPrice,
   }));
   const showInstagramGeneratorShortcut = !previewMode && isAdminUser(user);
+  const operations = dashboardData.operations || { backup: {}, events: [], failedDeliveries: [] };
+  const operationAlertCount = operations.events.length + operations.failedDeliveries.length + (operations.backup.configured ? 0 : 1);
 
   const statCards = [
     {
@@ -116,6 +118,18 @@ const AdminDashboardOverview = ({ dashboardData, previewMode = false }) => {
           />
         ))}
       </div>
+
+      {!previewMode ? (
+        <div className={`dashboard-panel border p-6 ${operationAlertCount ? "border-amber-200 bg-amber-50/70" : "border-emerald-200 bg-emerald-50/70"}`}>
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-start gap-4">
+              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${operationAlertCount ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>{operationAlertCount ? <AlertTriangle size={22} /> : <Database size={22} />}</div>
+              <div><p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Sistemos būklė</p><h2 className="mt-2 text-xl font-semibold text-slate-950">{operationAlertCount ? `${operationAlertCount} punktai reikalauja dėmesio` : "Klaidų ir pristatymo perspėjimų nėra"}</h2><p className="mt-2 text-sm text-slate-600">DB kopija: {operations.backup.configured && operations.backup.enabled ? `aktyvi${operations.backup.lastSuccessAt ? ` · paskutinė ${new Date(operations.backup.lastSuccessAt).toLocaleString("lt-LT")}` : ""}` : "dar neprijungta prie išorinės saugyklos"}. Nepavykę laiškai: {operations.failedDeliveries.length}. Neišspręstos klaidos: {operations.events.length}.</p></div>
+            </div>
+            <Link to="/admin/web-proposals" className="dashboard-button-secondary justify-center">Tikrinti Web projektus</Link>
+          </div>
+        </div>
+      ) : null}
 
       {showInstagramGeneratorShortcut ? (
         <div className="dashboard-panel overflow-hidden p-0">
