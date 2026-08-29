@@ -14,7 +14,7 @@ test("Web service email template has branding, support contact and escaped custo
   assert.match(email.html, /hello@stilloak-studio\.com/);
   assert.match(email.html, /&lt;Testas&gt;/);
   assert.doesNotMatch(email.html, /Sveiki, <Testas>/);
-  assert.match(email.html, /text-align:left/);
+  assert.match(email.html, /text-align:center/);
   assert.match(email.html, /word-break:break-word/);
   assert.match(email.html, /@media only screen and \(max-width:480px\)/);
   assert.match(email.html, /email-card/);
@@ -22,6 +22,7 @@ test("Web service email template has branding, support contact and escaped custo
   assert.match(email.html, /Kilo klausimų\?/);
   assert.match(email.html, /\[if mso\]/);
   assert.doesNotMatch(email.html, /text-align:justify/);
+  assert.doesNotMatch(email.html, /text-align:left/);
 });
 
 test("database backup fails closed without HTTPS destination and a 32-byte key", () => {
