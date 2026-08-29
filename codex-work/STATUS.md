@@ -2,6 +2,10 @@
 
 PROJECT_STATE: STILLOAK_WEB_SERVICES_LOCAL_VALIDATED
 
+## 2026-08-29 – Profesionalus Stilloak Web laiškų dizainas
+
+Bendras klientams siunčiamų Stilloak Web laiškų šablonas perkurtas kaip pilna profesionali transakcinio laiško sistema. Pridėta tamsi firminė antraštė su logotipu, aiški pranešimo žyma ir tipografinė hierarchija, atskiros mobiliam ekranui saugios užsakymo duomenų kortelės, viso pločio pagrindinis CTA, akcentuotas perspėjimo blokas, pagalbos kontaktas bei santūrus informacinis footeris. Pasisveikinimas, pagrindinis tekstas ir papildomas projekto aprašymas vizualiai atskirti. Ilgos dinaminės reikšmės persikelia neardydamos maketo. Pridėti `viewport`, Apple Mail ir Outlook/MSO suderinamumo elementai bei 480 px mobili adaptacija. Komercinio pasiūlymo laiškas pervestas į tą patį bendrą šabloną, todėl pasiūlymo, avanso, likučio, priminimo, perdavimo, sutarties ir testinės sąskaitos laiškai išlaiko vienodą firminę struktūrą.
+
 ## 2026-08-29 – Tvarkingas siunčiamų laiškų teksto lygiavimas
 
 Stilloak Web bendrame laiškų šablone, pirminės užklausos laiškuose ir komercinio pasiūlymo laiške aiškiai nustatytas kairinis teksto lygiavimas, vienodas eilučių aukštis ir stabilūs tarpai. Pasisveikinimas atskirtas nuo pagrindinės pastraipos, informacinės lentelės laukai lygiuojami nuo tos pačios kairės linijos, o ilgos reikšmės saugiai persikelia į kitą eilutę. Mygtuko tekstas išlieka centruotas. Šablonai naudoja el. pašto programoms patikimesnes prezentacines lenteles ir inline stilius; regresijos testas saugo nuo `text-align: justify` ir netvarkingo dinaminių reikšmių išsiliejimo.
