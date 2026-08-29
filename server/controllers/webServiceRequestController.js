@@ -9,6 +9,7 @@ const { syncWebServiceFinalPaymentFromSession } = require("../services/webServic
 const { sendWebServiceFinalPaymentEmail } = require("../services/webServiceFinalPaymentEmailService");
 const { sendWebServiceProposalEmail } = require("../services/webServiceProposalEmailService");
 const { sendWebServiceRequestEmails } = require("../services/webServiceRequestEmailService");
+const { deliverWebServiceTestContract } = require("../services/webServiceTestContractEmailService");
 const { createHttpError } = require("../utils/httpError");
 const { getWebServiceStripeClient } = require("../utils/stripeClient");
 
@@ -95,6 +96,10 @@ const serializePublicProposal = (request) => ({
   customer: {
     name: request.name,
     company: request.company || "",
+    billingName: request.billingName || "",
+    companyCode: request.companyCode || "",
+    vatCode: request.vatCode || "",
+    billingAddress: request.billingAddress || "",
   },
   package: {
     id: request.packageId,
@@ -281,6 +286,29 @@ const updateAdminWebServiceRequest = async (req, res) => {
     request.internalNotes = cleanString(req.body.internalNotes, 5000);
   }
 
+  if (Object.prototype.hasOwnProperty.call(req.body || {}, "projectLiveUrl")) {
+    const projectLiveUrl = cleanString(req.body.projectLiveUrl, 500);
+    if (projectLiveUrl && !/^https?:\/\//i.test(projectLiveUrl)) {
+      throw createHttpError("Svetainės adresas turi prasidėti http:// arba https://.", 400);
+    }
+    request.projectLiveUrl = projectLiveUrl;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(req.body || {}, "warrantyEndsAt")) {
+    request.warrantyEndsAt = parseNullableDate(req.body.warrantyEndsAt, "Netinkama garantijos pabaigos data.");
+  }
+
+  if (Object.prototype.hasOwnProperty.call(req.body || {}, "carePlan")) {
+    request.carePlan = cleanString(req.body.carePlan, 500);
+  }
+
+  if (Object.prototype.hasOwnProperty.call(req.body || {}, "handoverItems")) {
+    if (!Array.isArray(req.body.handoverItems) || req.body.handoverItems.length > 20) {
+      throw createHttpError("Perduodamų elementų sąrašas netinkamas.", 400);
+    }
+    request.handoverItems = req.body.handoverItems.map((item) => cleanString(item, 200)).filter(Boolean);
+  }
+
   if (req.body?.contactEntry) {
     const type = cleanString(req.body.contactEntry.type, 40).toLowerCase() || "note";
     const note = cleanString(req.body.contactEntry.note, 2000);
@@ -347,6 +375,10 @@ const sendAdminWebServiceProposal = async (req, res) => {
   request.proposalViewedAt = null;
   request.proposalAcceptedAt = null;
   request.proposalAcceptedName = "";
+  request.proposalAcceptedIp = "";
+  request.contractTestNumber = "";
+  request.contractTestStatus = "not_created";
+  request.contractTestSentAt = null;
   request.proposalExpiresAt = new Date(now.getTime() + expiryDays * 24 * 60 * 60 * 1000);
   request.depositPercent = depositPercent;
   request.depositAmount = calculateDeposit(proposalPrice, depositPercent);
@@ -400,14 +432,24 @@ const acceptPublicWebServiceProposal = async (req, res) => {
 
   if (request.proposalStatus !== "accepted") {
     const acceptedName = cleanString(req.body?.acceptedName, 160);
+    const billingName = cleanString(req.body?.billingName, 200);
+    const billingAddress = cleanString(req.body?.billingAddress, 300);
     if (acceptedName.length < 2 || req.body?.acceptedTerms !== true) {
       throw createHttpError("Patvirtinkite vardą ir sutikimą su pasiūlymo sąlygomis.", 400);
+    }
+    if (billingName.length < 2 || billingAddress.length < 5) {
+      throw createHttpError("Įrašykite sąskaitos gavėją ir adresą.", 400);
     }
 
     const now = new Date();
     request.proposalStatus = "accepted";
     request.proposalAcceptedAt = now;
     request.proposalAcceptedName = acceptedName;
+    request.proposalAcceptedIp = cleanString(req.ip, 100);
+    request.billingName = billingName;
+    request.companyCode = cleanString(req.body?.companyCode, 50);
+    request.vatCode = cleanString(req.body?.vatCode, 50);
+    request.billingAddress = billingAddress;
     request.status = "accepted";
     request.projectStage = "awaiting_deposit";
     request.nextAction = "Laukti projekto avanso apmokėjimo";
@@ -418,6 +460,11 @@ const acceptPublicWebServiceProposal = async (req, res) => {
       happenedAt: now,
     });
     await request.save();
+    try {
+      await deliverWebServiceTestContract(request);
+    } catch (error) {
+      console.error(`[web-contract] ${request.requestNumber} testinės sutarties laiško klaida: ${error.message}`);
+    }
   }
 
   res.json(serializePublicProposal(request));

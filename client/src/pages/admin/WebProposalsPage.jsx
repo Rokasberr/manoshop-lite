@@ -44,6 +44,10 @@ const buildDraft = (request) => ({
   proposalTerms: request.proposalTerms || DEFAULT_TERMS,
   depositPercent: request.depositPercent ?? 50,
   expiryDays: 14,
+  projectLiveUrl: request.projectLiveUrl || "",
+  warrantyEndsAt: request.warrantyEndsAt ? new Date(request.warrantyEndsAt).toISOString().slice(0, 10) : "",
+  carePlan: request.carePlan || "",
+  handoverItemsText: (request.handoverItems || []).join("\n"),
 });
 
 const WebProposalsPage = () => {
@@ -59,6 +63,9 @@ const WebProposalsPage = () => {
   const [finalBankPaidId, setFinalBankPaidId] = useState("");
   const [resendingInvoiceKey, setResendingInvoiceKey] = useState("");
   const [updatingStageId, setUpdatingStageId] = useState("");
+  const [savingHandoverId, setSavingHandoverId] = useState("");
+  const [resendingContractId, setResendingContractId] = useState("");
+  const [resendingHandoverId, setResendingHandoverId] = useState("");
   const [filter, setFilter] = useState("active");
 
   const loadRequests = async () => {
@@ -234,6 +241,46 @@ const WebProposalsPage = () => {
     }
   };
 
+  const handleSaveHandover = async (request) => {
+    const draft = drafts[request._id];
+    try {
+      setSavingHandoverId(request._id);
+      const updated = await webServiceRequestService.updateRequest(request._id, {
+        projectLiveUrl: draft.projectLiveUrl,
+        warrantyEndsAt: draft.warrantyEndsAt || null,
+        carePlan: draft.carePlan,
+        handoverItems: draft.handoverItemsText.split("\n").map((item) => item.trim()).filter(Boolean),
+      });
+      setRequests((current) => current.map((item) => item._id === request._id ? updated : item));
+      setDrafts((current) => ({ ...current, [request._id]: buildDraft(updated) }));
+      toast.success("Perdavimo informacija išsaugota.");
+    } catch (saveError) {
+      toast.error(saveError.response?.data?.message || "Nepavyko išsaugoti perdavimo informacijos.");
+    } finally { setSavingHandoverId(""); }
+  };
+
+  const handleResendContract = async (request) => {
+    try {
+      setResendingContractId(request._id);
+      const result = await webServiceRequestService.resendTestContract(request._id);
+      setRequests((current) => current.map((item) => item._id === request._id ? result.request : item));
+      toast.success("Testinė sutartis išsiųsta pakartotinai.");
+    } catch (sendError) {
+      toast.error(sendError.response?.data?.message || "Nepavyko išsiųsti testinės sutarties.");
+    } finally { setResendingContractId(""); }
+  };
+
+  const handleResendHandover = async (request) => {
+    try {
+      setResendingHandoverId(request._id);
+      const result = await webServiceRequestService.resendHandover(request._id);
+      setRequests((current) => current.map((item) => item._id === request._id ? result.request : item));
+      toast.success("Projekto perdavimo laiškas išsiųstas pakartotinai.");
+    } catch (sendError) {
+      toast.error(sendError.response?.data?.message || "Nepavyko išsiųsti perdavimo laiško.");
+    } finally { setResendingHandoverId(""); }
+  };
+
   const copyProposalUrl = async (requestId) => {
     const url = proposalUrls[requestId];
     if (!url) return;
@@ -366,6 +413,17 @@ const WebProposalsPage = () => {
                         </div>
                       ) : null}
 
+                      {proposalStatus === "accepted" ? (
+                        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-sm">
+                          <div>
+                            <strong>Testinė sutartis: {request.contractTestStatus === "sent" ? "išsiųsta" : request.contractTestStatus || "nesukurta"}</strong>
+                            <p className="text-xs text-slate-500">{request.contractTestNumber || "Numeris dar nesukurtas"}{request.contractTestSentAt ? ` · ${new Date(request.contractTestSentAt).toLocaleString("lt-LT")}` : ""}</p>
+                            <p className="mt-1 text-xs text-slate-500">Sąskaitos duomenys: {request.billingName || "—"}, {request.billingAddress || "—"}</p>
+                          </div>
+                          <button type="button" className="dashboard-button-secondary" disabled={resendingContractId === request._id} onClick={() => handleResendContract(request)}>{resendingContractId === request._id ? "Siunčiama..." : "Siųsti sutartį dar kartą"}</button>
+                        </div>
+                      ) : null}
+
                       {depositStatus === "paid" ? (
                         <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
                           <p className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">Mokėjimų istorija</p>
@@ -399,6 +457,18 @@ const WebProposalsPage = () => {
                           {Object.entries(projectStageLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                         </select>
                       </label>
+
+                      {depositStatus === "paid" ? (
+                        <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
+                          <p className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">Perdavimo informacija</p>
+                          <label className="block text-sm font-medium text-slate-700">Vieša svetainės nuoroda<input className="input-field mt-2 w-full" type="url" placeholder="https://..." value={draft.projectLiveUrl || ""} onChange={(event) => updateDraft(request._id, "projectLiveUrl", event.target.value)} /></label>
+                          <label className="block text-sm font-medium text-slate-700">Garantija iki<input className="input-field mt-2 w-full" type="date" value={draft.warrantyEndsAt || ""} onChange={(event) => updateDraft(request._id, "warrantyEndsAt", event.target.value)} /></label>
+                          <label className="block text-sm font-medium text-slate-700">Priežiūros planas<textarea className="input-field mt-2 min-h-20 w-full resize-y" value={draft.carePlan || ""} onChange={(event) => updateDraft(request._id, "carePlan", event.target.value)} /></label>
+                          <label className="block text-sm font-medium text-slate-700">Perduodami elementai (po vieną eilutėje)<textarea className="input-field mt-2 min-h-24 w-full resize-y" value={draft.handoverItemsText || ""} onChange={(event) => updateDraft(request._id, "handoverItemsText", event.target.value)} /></label>
+                          <button type="button" className="dashboard-button-secondary w-full justify-center" disabled={savingHandoverId === request._id} onClick={() => handleSaveHandover(request)}>{savingHandoverId === request._id ? "Saugoma..." : "Išsaugoti perdavimo informaciją"}</button>
+                          {finalPaymentStatus === "paid" ? <button type="button" className="dashboard-button-secondary w-full justify-center" disabled={resendingHandoverId === request._id} onClick={() => handleResendHandover(request)}>{resendingHandoverId === request._id ? "Siunčiama..." : "Siųsti perdavimo laišką dar kartą"}</button> : null}
+                        </div>
+                      ) : null}
                       <label className="block text-sm font-medium text-slate-700">
                         Projekto kaina, €
                         <input

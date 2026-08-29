@@ -160,3 +160,28 @@ test("Web projects expose stages, payment reminders and completion handover", ()
   assert.match(adminSource, /Projekto etapas/);
   assert.match(adminSource, /Kliento peržiūra/);
 });
+
+test("accepted Web proposals collect billing data and automate test contracts and handover details", () => {
+  const modelSource = readRepoFile("server", "models", "WebServiceRequest.js");
+  const controllerSource = readRepoFile("server", "controllers", "webServiceRequestController.js");
+  const lifecycleController = readRepoFile("server", "controllers", "webServiceLifecycleController.js");
+  const routesSource = readRepoFile("server", "routes", "webServiceRequestRoutes.js");
+  const proposalPageSource = readRepoFile("web-services", "src", "ProposalPage.tsx");
+  const adminSource = readRepoFile("client", "src", "pages", "admin", "WebProposalsPage.jsx");
+
+  assert.match(modelSource, /billingName:/);
+  assert.match(modelSource, /contractTestStatus:/);
+  assert.match(modelSource, /projectLiveUrl:/);
+  assert.match(modelSource, /handoverItems:/);
+  assert.match(controllerSource, /deliverWebServiceTestContract\(request\)/);
+  assert.match(controllerSource, /billingAddress\.length < 5/);
+  assert.match(lifecycleController, /resendAdminWebServiceTestContract/);
+  assert.match(lifecycleController, /resendAdminWebServiceHandover/);
+  assert.match(routesSource, /test-contract\/resend/);
+  assert.match(routesSource, /handover\/resend/);
+  assert.match(proposalPageSource, /Sąskaitos gavėjas \/ įmonės pavadinimas/);
+  assert.match(proposalPageSource, /billingAddress/);
+  assert.match(adminSource, /Perdavimo informacija/);
+  assert.match(adminSource, /Siųsti sutartį dar kartą/);
+  assert.match(adminSource, /Siųsti perdavimo laišką dar kartą/);
+});
