@@ -1,11 +1,12 @@
 const { normalizeError } = require("../utils/httpError");
+const { recordOperationalEvent } = require("../services/operationalAlertService");
 
 const notFound = (req, res, next) => {
   res.status(404);
   next(new Error(`Kelias nerastas: ${req.originalUrl}`));
 };
 
-const errorHandler = (err, _req, res, _next) => {
+const errorHandler = (err, req, res, _next) => {
   const normalizedError = normalizeError(err);
   const statusCode =
     res.statusCode && res.statusCode !== 200
@@ -16,6 +17,16 @@ const errorHandler = (err, _req, res, _next) => {
     statusCode >= 500 && isProduction
       ? "Serverio klaida. Bandyk dar kartą vėliau."
       : normalizedError.message || "Serverio klaida";
+
+  if (statusCode >= 500) {
+    void recordOperationalEvent({
+      type: "application_error",
+      severity: "critical",
+      message: normalizedError.message || "Nežinoma serverio klaida",
+      context: { method: req.method, path: req.originalUrl, statusCode },
+      notify: true,
+    }).catch((recordError) => console.error(JSON.stringify({ level: "error", event: "operational_event_write_failed", message: recordError.message })));
+  }
 
   res.status(statusCode).json({
     message,
