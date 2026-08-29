@@ -3,7 +3,7 @@
   "ignoreCommand": "git diff --quiet HEAD^ HEAD ./",
   "rewrites": [
     {
-      "source": "/pasiulymas/:path*",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
