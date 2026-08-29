@@ -105,6 +105,30 @@ Pastaba 2026-08-24: ankstesni Verslo etapo darbai lieka dokumentuoti. Nauji Priv
 
 ## Likę tolesni etapai
 
+## Milestone 8 – Privatus kliento projekto puslapis
+
+- [x] Esama saugi pasiūlymo nuoroda po patvirtinimo tampa kliento projekto puslapiu.
+- [x] Klientui rodomas projekto etapas, terminas, avanso ir likučio būsenos bei apmokėjimo datos.
+- [x] Apmokėtų dalių testinės PDF sąskaitos atsisiunčiamos tik per privatų projekto tokeną.
+- [x] Projekto perdavimo elementai rodomi kaip failai arba saugios HTTPS nuorodos.
+- [x] Pridėtas tiesioginis el. pašto ir telefono kontaktas, empty/error ir mobilios būsenos.
+- [x] Admin valdyme dokumentuotas failų formatas `Pavadinimas | https://...`.
+- [x] Pilna root testų, lint, typecheck ir build validacija; deployment paliktas neatliktas pagal repozitorijos produkcinio deploy draudimą.
+
+## Milestone 9 – El. laiškų, operacijų ir klaidų kontrolė
+
+- [x] Admin pridėtas testinio laiško ekranas su septyniais realių šablonų tipais.
+- [x] Nauji Web ir esami narystės/auth laiškai naudoja profesionalius, mobilius HTML šablonus; nereikalingas masinis perrašymas praleistas.
+- [x] Transakciniams laiškams pridėtos `sent`, `delivered`, `bounced`, `complained` pristatymo būsenos ir slaptu raktu apsaugotas webhook.
+- [x] Avanso ir likučio automatiniai priminimai pakeisti į ribotą 2, 5 ir 10 dienų seką, stabdomą po apmokėjimo.
+- [x] Esamas Web pasiūlymų administravimas patvirtintas kaip bendras mokėjimų testavimo ekranas: Stripe/pavedimas, avansas, likutis, PDF ir laiškai.
+- [x] Projekto kontaktų istorijoje išsaugomas ir rodomas veiksmą atlikęs administratorius.
+- [x] Kliento projekto puslapis jau įgyvendintas Milestone 8, todėl nedubliuotas.
+- [ ] Realus Gmail telefono, Gmail desktop ir Apple Mail vaizdo smoke — reikia žmogaus valdomų pašto klientų.
+- [x] Abiejose viešose svetainėse pridėti aiškūs 404 puslapiai su veikiančiais grįžimo ir kontakto veiksmais.
+- [x] Šifruotų DB kopijų kodas, scheduleris, rankinis admin veiksmas ir būsenos jau buvo paruošti; aktyvavimui vis dar būtinas realus privatus HTTPS upload endpointas, tokenas ir šifravimo raktas.
+- [x] Pilna lint/typecheck/test (270/270), abiejų svetainių build ir `git diff --check` validacija; deployment neatliktas dėl aktyvaus repozitorijos draudimo.
+
 - [x] El. pašto patvirtinimas.
 - [x] Payment failure el. laiškas.
 - [x] Prenumeratos atšaukimo el. laiškas.

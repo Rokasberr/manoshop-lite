@@ -153,7 +153,7 @@ test("Web projects expose stages, payment reminders and completion handover", ()
   assert.match(modelSource, /handoverEmailStatus:/);
   assert.match(controllerSource, /PROJECT_STAGE_OPTIONS\.includes\(projectStage\)/);
   assert.match(schedulerSource, /findOneAndUpdate/);
-  assert.match(schedulerSource, /REMINDER_AFTER_DAYS = 3/);
+  assert.match(schedulerSource, /REMINDER_DAYS = \[2, 5, 10\]/);
   assert.match(lifecycleEmailSource, /deliverWebServiceHandoverEmail/);
   assert.match(webhookSource, /deliverWebServiceHandoverEmail\(request\)/);
   assert.match(serverSource, /startWebServicePaymentReminderScheduler\(\)/);
@@ -184,4 +184,25 @@ test("accepted Web proposals collect billing data and automate test contracts an
   assert.match(adminSource, /Perdavimo informacija/);
   assert.match(adminSource, /Siųsti sutartį dar kartą/);
   assert.match(adminSource, /Siųsti perdavimo laišką dar kartą/);
+});
+
+test("accepted Web proposal becomes a private client project portal", () => {
+  const controllerSource = readRepoFile("server", "controllers", "webServiceRequestController.js");
+  const routesSource = readRepoFile("server", "routes", "webServiceRequestRoutes.js");
+  const proposalPageSource = readRepoFile("web-services", "src", "ProposalPage.tsx");
+  const proposalStyles = readRepoFile("web-services", "src", "styles", "proposal.css");
+  const adminSource = readRepoFile("client", "src", "pages", "admin", "WebProposalsPage.jsx");
+
+  assert.match(controllerSource, /project:\s*\{/);
+  assert.match(controllerSource, /files: \(request\.handoverItems/);
+  assert.match(controllerSource, /getPublicWebServiceInvoicePdf/);
+  assert.match(controllerSource, /Cache-Control", "private, no-store/);
+  assert.match(routesSource, /invoices\/:paymentType/);
+  assert.match(proposalPageSource, /Kliento projektas/);
+  assert.match(proposalPageSource, /Projekto būsena/);
+  assert.match(proposalPageSource, /Apmokėjimai/);
+  assert.match(proposalPageSource, /Perduoti failai/);
+  assert.match(proposalPageSource, /PDF sąskaita/);
+  assert.match(proposalStyles, /\.project-portal/);
+  assert.match(adminSource, /pavadinimas \| saugi https:\/\//);
 });

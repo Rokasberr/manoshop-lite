@@ -1,11 +1,19 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import {
   CheckCircle2,
+  CalendarDays,
   CreditCard,
+  Download,
+  ExternalLink,
   FileCheck2,
+  FolderOpen,
   Loader2,
+  Mail,
+  Phone,
   ShieldCheck,
 } from "lucide-react";
+
+type InvoiceInfo = { number: string; status: string; sentAt: string | null; downloadPath: string } | null;
 
 type PublicProposal = {
   requestNumber: string;
@@ -29,8 +37,19 @@ type PublicProposal = {
     amount: number | null;
     status: string;
     paidAt: string | null;
+    paymentMethod: string;
+    invoice: InvoiceInfo;
   };
-  finalPayment: { amount: number | null; status: string; requestedAt: string | null; paidAt: string | null };
+  finalPayment: { amount: number | null; status: string; requestedAt: string | null; paidAt: string | null; paymentMethod: string; invoice: InvoiceInfo };
+  project: {
+    stage: string;
+    dueDate: string | null;
+    liveUrl: string;
+    warrantyEndsAt: string | null;
+    carePlan: string;
+    files: Array<{ label: string; url: string }>;
+  };
+  contact: { email: string; phone: string };
 };
 
 type ProposalPageProps = {
@@ -46,6 +65,28 @@ const formatCurrency = (value: number | null) =>
 
 const formatDate = (value: string | null) =>
   value ? new Date(value).toLocaleDateString("lt-LT") : "—";
+
+const projectStageLabels: Record<string, string> = {
+  awaiting_deposit: "Laukiama avanso",
+  in_progress: "Darbai vykdomi",
+  client_review: "Laukiama jūsų peržiūros",
+  awaiting_final_payment: "Laukiama galutinio apmokėjimo",
+  completed: "Projektas užbaigtas",
+};
+
+const paymentStatusLabels: Record<string, string> = {
+  not_requested: "Dar neprašytas",
+  requested: "Laukiama apmokėjimo",
+  pending: "Tvirtinamas",
+  paid: "Apmokėta",
+  failed: "Nepavyko",
+  refunded: "Grąžinta",
+};
+
+const paymentMethodLabels: Record<string, string> = {
+  stripe: "Kortele per Stripe",
+  bank_transfer: "Banko pavedimu",
+};
 
 function ProposalPage({ token }: ProposalPageProps) {
   const [proposal, setProposal] = useState<PublicProposal | null>(null);
@@ -67,7 +108,7 @@ function ProposalPage({ token }: ProposalPageProps) {
   );
 
   useEffect(() => {
-    document.title = "Projekto pasiūlymas | Stilloak Web";
+    document.title = "Kliento projektas | Stilloak Web";
 
     const load = async () => {
       if (!endpoint) {
@@ -236,22 +277,62 @@ function ProposalPage({ token }: ProposalPageProps) {
         <a href="/" className="proposal-wordmark" aria-label="Stilloak Web pradžia">
           <strong>Stilloak</strong><span>Web</span>
         </a>
-        <span className="proposal-secure"><ShieldCheck size={16} /> Saugi pasiūlymo nuoroda</span>
+        <span className="proposal-secure"><ShieldCheck size={16} /> Privati kliento nuoroda</span>
       </header>
 
       <section className="proposal-hero proposal-card">
-        <p className="proposal-eyebrow">Komercinis pasiūlymas · {proposal.requestNumber}</p>
+        <p className="proposal-eyebrow">{isAccepted ? "Kliento projektas" : "Komercinis pasiūlymas"} · {proposal.requestNumber}</p>
         <h1>{proposal.package.name}</h1>
         <p className="proposal-lead">
-          {proposal.customer.company || proposal.customer.name}, paruošėme projekto apimtį, kainą ir starto sąlygas vienoje vietoje.
+          {isAccepted
+            ? `${proposal.customer.company || proposal.customer.name}, čia rasite visą aktualią projekto informaciją vienoje vietoje.`
+            : `${proposal.customer.company || proposal.customer.name}, paruošėme projekto apimtį, kainą ir starto sąlygas vienoje vietoje.`}
         </p>
 
         <div className="proposal-metrics">
           <div><span>Projekto kaina</span><strong>{formatCurrency(proposal.proposal.price)}</strong></div>
           <div><span>Pradinis avansas</span><strong>{proposal.deposit.percent}% · {formatCurrency(proposal.deposit.amount)}</strong></div>
-          <div><span>Galioja iki</span><strong>{formatDate(proposal.proposal.expiresAt)}</strong></div>
+          <div><span>{isAccepted ? "Projekto terminas" : "Galioja iki"}</span><strong>{formatDate(isAccepted ? proposal.project?.dueDate : proposal.proposal.expiresAt)}</strong></div>
         </div>
       </section>
+
+      {isAccepted ? (
+        <section className="project-portal" aria-label="Projekto informacija">
+          <div className="proposal-card project-status-card">
+            <div className="proposal-section-title"><CheckCircle2 size={22} /><h2>Projekto būsena</h2></div>
+            <div className="project-stage"><span className="project-stage-dot" />{projectStageLabels[proposal.project?.stage] || "Projektas vykdomas"}</div>
+            <div className="project-meta-row"><CalendarDays size={18} /><span>Numatytas terminas</span><strong>{formatDate(proposal.project?.dueDate)}</strong></div>
+            {proposal.project?.liveUrl ? <a className="proposal-secondary-button" href={proposal.project.liveUrl} target="_blank" rel="noreferrer"><ExternalLink size={18} /> Atidaryti svetainę</a> : null}
+          </div>
+
+          <div className="proposal-card project-section-wide">
+            <div className="proposal-section-title"><CreditCard size={22} /><h2>Apmokėjimai</h2></div>
+            <div className="project-payment-list">
+              {[
+                { key: "deposit", label: "Avansas", amount: proposal.deposit.amount, status: proposal.deposit.status, paidAt: proposal.deposit.paidAt, method: proposal.deposit.paymentMethod, invoice: proposal.deposit.invoice },
+                { key: "final", label: "Likusi dalis", amount: proposal.finalPayment.amount, status: proposal.finalPayment.status, paidAt: proposal.finalPayment.paidAt, method: proposal.finalPayment.paymentMethod, invoice: proposal.finalPayment.invoice },
+              ].map((payment) => (
+                <article className="project-payment" key={payment.key}>
+                  <div><span>{payment.label}</span><strong>{formatCurrency(payment.amount)}</strong></div>
+                  <div><span className={`project-payment-status ${payment.status === "paid" ? "is-paid" : ""}`}>{paymentStatusLabels[payment.status] || payment.status}</span><small>{payment.paidAt ? `${formatDate(payment.paidAt)} · ${paymentMethodLabels[payment.method] || payment.method}` : ""}</small></div>
+                  {payment.invoice ? <a className="project-download" href={`${endpoint}/${payment.invoice.downloadPath}`}><Download size={17} /> PDF sąskaita{payment.invoice.number ? ` · ${payment.invoice.number}` : ""}</a> : <span className="project-muted">Sąskaita atsiras gavus mokėjimą</span>}
+                </article>
+              ))}
+            </div>
+          </div>
+
+          <div className="proposal-card">
+            <div className="proposal-section-title"><FolderOpen size={22} /><h2>Perduoti failai</h2></div>
+            {proposal.project?.files?.length ? <div className="project-file-list">{proposal.project.files.map((file, index) => file.url ? <a key={`${file.label}-${index}`} href={file.url} target="_blank" rel="noreferrer"><FolderOpen size={18} /><span>{file.label}</span><Download size={16} /></a> : <div key={`${file.label}-${index}`}><FileCheck2 size={18} /><span>{file.label}</span></div>)}</div> : <p className="project-empty">Failai bus pateikti čia, kai tik bus paruošti perdavimui.</p>}
+          </div>
+
+          <div className="proposal-card">
+            <div className="proposal-section-title"><Mail size={22} /><h2>Kontaktas</h2></div>
+            <p className="project-empty">Turite klausimų ar norite pateikti pastabą? Susisiekite tiesiogiai.</p>
+            <div className="project-contact-list"><a href={`mailto:${proposal.contact?.email}`}><Mail size={18} />{proposal.contact?.email}</a><a href={`tel:${proposal.contact?.phone?.replace(/\s/g, "")}`}><Phone size={18} />{proposal.contact?.phone}</a></div>
+          </div>
+        </section>
+      ) : null}
 
       <section className="proposal-grid">
         <div className="proposal-card">

@@ -4,6 +4,7 @@ import App from "./App";
 import CookieConsentBanner from "./components/CookieConsentBanner";
 import FooterLinksPortal from "./components/FooterLinksPortal";
 import ProposalPage from "./ProposalPage";
+import NotFoundPage from "./NotFoundPage";
 import { initializeAnalytics } from "./lib/analytics";
 import { captureLeadAttribution } from "./lib/leadAttribution";
 import { installLeadTracking } from "./lib/leadTracking";
@@ -24,10 +25,11 @@ installLeadTracking();
 installProposalTracking();
 
 const proposalMatch = window.location.pathname.match(/^\/pasiulymas\/([a-f0-9]{64})\/?$/i);
+const isHomePage = /^\/?$/.test(window.location.pathname);
 
 createRoot(document.getElementById("root") as HTMLElement).render(
   <StrictMode>
-    {proposalMatch ? <ProposalPage token={proposalMatch[1]} /> : <App />}
+    {proposalMatch ? <ProposalPage token={proposalMatch[1]} /> : isHomePage ? <App /> : <NotFoundPage />}
     <FooterLinksPortal />
     <CookieConsentBanner />
   </StrictMode>

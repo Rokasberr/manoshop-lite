@@ -41,6 +41,8 @@ const contactHistorySchema = new mongoose.Schema(
     type: { type: String, enum: CONTACT_TYPE_OPTIONS, default: "note" },
     note: { type: String, required: true, trim: true, maxlength: 2000 },
     happenedAt: { type: Date, default: Date.now },
+    actorName: { type: String, trim: true, maxlength: 160, default: "" },
+    actorEmail: { type: String, trim: true, lowercase: true, maxlength: 254, default: "" },
   },
   { timestamps: true }
 );
@@ -117,7 +119,9 @@ const webServiceRequestSchema = new mongoose.Schema(
     finalTestInvoiceSentAt: { type: Date, default: null },
     projectStage: { type: String, enum: PROJECT_STAGE_OPTIONS, default: "awaiting_deposit", index: true },
     depositReminderSentAt: { type: Date, default: null },
+    depositReminderCount: { type: Number, min: 0, max: 3, default: 0 },
     finalPaymentReminderSentAt: { type: Date, default: null },
+    finalPaymentReminderCount: { type: Number, min: 0, max: 3, default: 0 },
     handoverEmailStatus: { type: String, enum: TEST_INVOICE_STATUS_OPTIONS, default: "not_created" },
     handoverEmailSentAt: { type: Date, default: null },
     projectLiveUrl: { type: String, trim: true, maxlength: 500, default: "" },
