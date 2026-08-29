@@ -56,12 +56,12 @@ const getNotificationRecipient = () => {
 };
 
 const buildBrandHeader = (eyebrow) => `
-  <table role="presentation" style="width:100%;border-collapse:collapse;margin:0 0 28px;text-align:left;">
+  <table role="presentation" align="center" style="width:100%;border-collapse:collapse;margin:0 0 28px;text-align:center;">
     <tr>
       <td style="width:54px;vertical-align:middle;">
         <img src="${escapeHtml(WEB_LOGO_URL)}" width="44" height="44" alt="Stilloak Web" style="display:block;width:44px;height:44px;border:0;outline:none;text-decoration:none;" />
       </td>
-      <td style="vertical-align:middle;padding-left:12px;text-align:left;">
+      <td style="vertical-align:middle;padding-left:12px;text-align:center;">
         <div style="font-size:19px;line-height:1.1;font-weight:700;letter-spacing:-0.03em;color:#201d19;">Stilloak <span style="color:#8a5a39;font-weight:600;">Web</span></div>
         <div style="margin-top:5px;font-size:10px;line-height:1.3;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#8b7b6c;">${escapeHtml(eyebrow)}</div>
       </td>
@@ -100,35 +100,35 @@ const buildCustomerEmail = (request) => {
   const safeBudget = escapeHtml(request.budget || "");
 
   const html = `
-    <div style="margin:0;padding:28px 14px;background:#f5f0e9;font-family:Arial,Helvetica,sans-serif;color:#201d19;text-align:left;">
-      <div style="max-width:640px;margin:0 auto;overflow:hidden;background:#fffdf9;border:1px solid #e5dbcf;border-radius:22px;box-shadow:0 14px 40px rgba(74,51,33,.08);text-align:left;">
-        <div style="padding:30px 32px 10px;text-align:left;">
+    <div style="margin:0;padding:28px 14px;background:#f5f0e9;font-family:Arial,Helvetica,sans-serif;color:#201d19;text-align:center;">
+      <div style="max-width:640px;margin:0 auto;overflow:hidden;background:#fffdf9;border:1px solid #e5dbcf;border-radius:22px;box-shadow:0 14px 40px rgba(74,51,33,.08);text-align:center;">
+        <div style="padding:30px 32px 10px;text-align:center;">
           ${buildBrandHeader("Užklausa sėkmingai gauta")}
           <div style="display:inline-block;margin:0 0 14px;padding:7px 11px;border-radius:999px;background:#f0e4d7;color:#765039;font-size:11px;font-weight:700;letter-spacing:.04em;">${safeNumber}</div>
-          <h1 style="margin:0;font-size:30px;line-height:1.2;letter-spacing:-.035em;color:#201d19;text-align:left;">Ačiū, ${safeName}.</h1>
-          <p style="margin:14px 0 0;font-size:15px;line-height:1.75;color:#665e56;text-align:left;">Jūsų svetainės kūrimo užklausa jau mūsų sistemoje. Peržiūrėsime informaciją ir susisieksime dėl projekto apimties, termino bei kitų žingsnių.</p>
+          <h1 style="margin:0;font-size:30px;line-height:1.2;letter-spacing:-.035em;color:#201d19;text-align:center;">Ačiū, ${safeName}.</h1>
+          <p style="margin:14px 0 0;font-size:15px;line-height:1.75;color:#665e56;text-align:center;">Jūsų svetainės kūrimo užklausa jau mūsų sistemoje. Peržiūrėsime informaciją ir susisieksime dėl projekto apimties, termino bei kitų žingsnių.</p>
         </div>
 
-        <div style="padding:20px 32px 30px;text-align:left;">
+        <div style="padding:20px 32px 30px;text-align:center;">
           <table role="presentation" style="width:100%;border-collapse:collapse;background:#f7f2ec;border:1px solid #ebe1d6;border-radius:16px;">
             <tr>
-              <td style="padding:18px 20px 9px;color:#82766b;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;">Pasirinktas paketas</td>
-              <td style="padding:18px 20px 9px;color:#82766b;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;text-align:right;">Kaina</td>
+              <td style="padding:18px 20px 9px;color:#82766b;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;text-align:center;">Pasirinktas paketas</td>
+              <td style="padding:18px 20px 9px;color:#82766b;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;text-align:center;">Kaina</td>
             </tr>
             <tr>
-              <td style="padding:0 20px 18px;font-size:16px;font-weight:700;color:#2c2723;">${safePackage}</td>
-              <td style="padding:0 20px 18px;font-size:16px;font-weight:700;color:#2c2723;text-align:right;">${safePrice}</td>
+              <td style="padding:0 20px 18px;font-size:16px;font-weight:700;color:#2c2723;text-align:center;">${safePackage}</td>
+              <td style="padding:0 20px 18px;font-size:16px;font-weight:700;color:#2c2723;text-align:center;">${safePrice}</td>
             </tr>
-            ${safeBudget ? `<tr><td colspan="2" style="padding:14px 20px;border-top:1px solid #e7dbcf;font-size:13px;color:#665e56;"><strong>Nurodytas biudžetas:</strong> ${safeBudget}</td></tr>` : ""}
+            ${safeBudget ? `<tr><td colspan="2" style="padding:14px 20px;border-top:1px solid #e7dbcf;font-size:13px;color:#665e56;text-align:center;"><strong>Nurodytas biudžetas:</strong> ${safeBudget}</td></tr>` : ""}
           </table>
 
-          <div style="margin-top:22px;padding:18px 20px;border-left:3px solid #9a6744;background:#fbf7f2;border-radius:0 13px 13px 0;">
+          <div style="margin-top:22px;padding:18px 20px;border-left:3px solid #9a6744;background:#fbf7f2;border-radius:0 13px 13px 0;text-align:center;">
             <div style="font-size:12px;font-weight:700;color:#4c4037;">Kas toliau?</div>
             <div style="margin-top:6px;font-size:13px;line-height:1.7;color:#74685e;">1. Peržiūrime užklausą · 2. Susisiekiame · 3. Paruošiame konkretų pasiūlymą.</div>
           </div>
         </div>
 
-        <div style="padding:18px 32px;background:#201d19;color:#d9cec2;font-size:11px;line-height:1.6;">
+        <div style="padding:18px 32px;background:#201d19;color:#d9cec2;font-size:11px;line-height:1.6;text-align:center;">
           Stilloak Web · ${escapeHtml(COMPANY_NAME)} · <a href="${escapeHtml(WEB_PUBLIC_URL)}" style="color:#f0d9c4;text-decoration:none;">web.stilloak-studio.com</a>
         </div>
       </div>

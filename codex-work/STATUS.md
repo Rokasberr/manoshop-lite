@@ -2,6 +2,10 @@
 
 PROJECT_STATE: STILLOAK_WEB_SERVICES_LOCAL_VALIDATED
 
+## 2026-08-29 – Centruotas Stilloak Web laiškų turinys
+
+Pagal realaus gauto laiško peržiūrą profesionalaus Stilloak Web šablono tekstinė kompozicija pakeista į centruotą. Centre dabar lygiuojami firminės antraštės ženklas, pranešimo žyma, pavadinimas, pasisveikinimas, pagrindinės pastraipos, papildomas projekto tekstas, informacinių kortelių etiketės ir reikšmės, perspėjimas, pagalbos kontaktas bei footerio tekstas. CTA išliko centruotas ir viso pločio. Ilgų reikšmių saugus persikėlimas, mobili 480 px adaptacija ir Outlook/MSO suderinamumas išsaugoti.
+
 ## 2026-08-29 – Profesionalus Stilloak Web laiškų dizainas
 
 Bendras klientams siunčiamų Stilloak Web laiškų šablonas perkurtas kaip pilna profesionali transakcinio laiško sistema. Pridėta tamsi firminė antraštė su logotipu, aiški pranešimo žyma ir tipografinė hierarchija, atskiros mobiliam ekranui saugios užsakymo duomenų kortelės, viso pločio pagrindinis CTA, akcentuotas perspėjimo blokas, pagalbos kontaktas bei santūrus informacinis footeris. Pasisveikinimas, pagrindinis tekstas ir papildomas projekto aprašymas vizualiai atskirti. Ilgos dinaminės reikšmės persikelia neardydamos maketo. Pridėti `viewport`, Apple Mail ir Outlook/MSO suderinamumo elementai bei 480 px mobili adaptacija. Komercinio pasiūlymo laiškas pervestas į tą patį bendrą šabloną, todėl pasiūlymo, avanso, likučio, priminimo, perdavimo, sutarties ir testinės sąskaitos laiškai išlaiko vienodą firminę struktūrą.
