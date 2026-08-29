@@ -15,8 +15,12 @@ test("Web service email template has branding, support contact and escaped custo
   assert.match(email.html, /&lt;Testas&gt;/);
   assert.doesNotMatch(email.html, /Sveiki, <Testas>/);
   assert.match(email.html, /text-align:left/);
-  assert.match(email.html, /vertical-align:top/);
   assert.match(email.html, /word-break:break-word/);
+  assert.match(email.html, /@media only screen and \(max-width:480px\)/);
+  assert.match(email.html, /email-card/);
+  assert.match(email.html, /Stilloak Web pranešimas/);
+  assert.match(email.html, /Kilo klausimų\?/);
+  assert.match(email.html, /\[if mso\]/);
   assert.doesNotMatch(email.html, /text-align:justify/);
 });
 
@@ -56,7 +60,8 @@ test("operations routes, encrypted backups, error alerts and legal pages stay wi
   assert.match(legal, /webServicesTerms/);
   assert.match(legal, /webServicesRefunds/);
   assert.match(proposal, /web-services-terms/);
-  assert.match(proposalEmail, /text-align:left/);
+  assert.match(proposalEmail, /buildWebServiceEmail/);
+  assert.match(proposalEmail, /Peržiūrėti ir patvirtinti pasiūlymą/);
   assert.match(requestEmail, /text-align:left/);
 });
 
