@@ -95,6 +95,14 @@ Pastaba 2026-08-24: ankstesni Verslo etapo darbai lieka dokumentuoti. Nauji Priv
 
 ## Stop-and-fix taisyklė
 
+## Milestone 7 – Viešų svetainių navigacija
+
+- [x] Pagrindinėje Stilloak Studio svetainėje pridėta matoma kontaktų nuoroda desktop ir mobilioje navigacijoje.
+- [x] Nuorodos su sekcijų identifikatoriais patikimai nuslenka iki sekcijos ir po maršruto pakeitimo.
+- [x] Stilloak Web navigacija, hero CTA, kainų pasirinkimas ir logotipai nukreipia į teisingas sekcijas.
+- [x] Neveikiantis dekoratyvinis „Susisiekti“ mygtukas pavyzdžio makete nebepateikiamas kaip interaktyvus valdiklis.
+- [x] Navigacijos regresija padengta testu ir abi aplikacijos validuotos lint, typecheck bei build patikromis.
+
 ## Likę tolesni etapai
 
 - [x] El. pašto patvirtinimas.

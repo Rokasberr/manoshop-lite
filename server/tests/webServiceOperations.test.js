@@ -51,3 +51,18 @@ test("operations routes, encrypted backups, error alerts and legal pages stay wi
   assert.match(legal, /webServicesRefunds/);
   assert.match(proposal, /web-services-terms/);
 });
+
+test("both public sites keep their section and contact navigation wired", () => {
+  const navbar = readRepoFile("client", "src", "components", "Navbar.jsx");
+  const layout = readRepoFile("client", "src", "components", "Layout.jsx");
+  const navigationEffects = readRepoFile("client", "src", "components", "NavigationEffects.jsx");
+  const webApp = readRepoFile("web-services", "src", "App.tsx");
+
+  assert.match(navbar, /copy\.nav\.contact, to: "\/contact"/);
+  assert.match(navbar, /aria-label=\{copy\.mobileNavigationLabel/);
+  assert.match(layout, /<NavigationEffects \/>/);
+  assert.match(navigationEffects, /scrollIntoView/);
+  assert.match(webApp, /\["Kontaktai", "#kontaktai"\]/);
+  assert.match(webApp, /navigateToSection\(event, "#kontaktai"\)/);
+  assert.doesNotMatch(webApp, /<button type="button">Susisiekti<\/button>/);
+});

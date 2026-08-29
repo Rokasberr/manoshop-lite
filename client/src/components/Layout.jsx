@@ -3,6 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import CookieConsentBanner from "./CookieConsentBanner";
+import NavigationEffects from "./NavigationEffects";
 
 const Layout = () => {
   const { pathname } = useLocation();
@@ -15,6 +16,7 @@ const Layout = () => {
 
   return (
     <div className="app-surface relative min-h-screen overflow-x-hidden">
+      <NavigationEffects />
       <div className="site-backdrop pointer-events-none absolute inset-0 -z-10" />
       <a
         href="#main-content"

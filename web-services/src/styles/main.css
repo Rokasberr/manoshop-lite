@@ -183,6 +183,7 @@ main {
 }
 
 .section {
+  scroll-margin-top: 116px;
   width: min(100% - 48px, 1240px);
   margin: 0 auto;
 }
@@ -415,7 +416,9 @@ main {
   gap: 18px;
 }
 
-.preview-nav button {
+.preview-nav .preview-cta {
+  display: inline-flex;
+  align-items: center;
   min-height: 26px;
   padding: 0 11px;
   border: 0;

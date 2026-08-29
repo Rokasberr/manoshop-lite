@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, MouseEvent, useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   Check,
@@ -296,6 +296,21 @@ function App() {
     }, 0);
   };
 
+  const navigateToSection = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
+    event.preventDefault();
+    setMenuOpen(false);
+
+    const targetId = href.replace(/^#/, "");
+    const target = document.getElementById(targetId);
+    if (!target) return;
+
+    window.history.replaceState(null, "", href);
+    target.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+      block: "start"
+    });
+  };
+
   const submitLead = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const nextErrors = validateForm(form);
@@ -348,13 +363,14 @@ function App() {
     ["Paslaugos", "#paslaugos"],
     ["Kainos", "#kainos"],
     ["Procesas", "#procesas"],
+    ["Pavyzdžiai", "#portfolio"],
     ["Kontaktai", "#kontaktai"]
   ];
 
   return (
     <div className="site-shell">
       <header className="site-header">
-        <a className="wordmark" href="#top" aria-label="Stilloak Web pradžia">
+        <a className="wordmark" href="#top" aria-label="Stilloak Web pradžia" onClick={(event) => navigateToSection(event, "#top")}>
           <strong>Stilloak</strong>
           <span>Web</span>
         </a>
@@ -372,11 +388,11 @@ function App() {
 
         <nav id="primary-navigation" className={menuOpen ? "nav nav-open" : "nav"} aria-label="Pagrindinė navigacija">
           {navLinks.map(([label, href]) => (
-            <a key={href} href={href} onClick={() => setMenuOpen(false)}>
+            <a key={href} href={href} onClick={(event) => navigateToSection(event, href)}>
               {label}
             </a>
           ))}
-          <a className="nav-cta" href="#kontaktai" onClick={() => setMenuOpen(false)}>
+          <a className="nav-cta" href="#kontaktai" onClick={(event) => navigateToSection(event, "#kontaktai")}>
             Gauti pasiūlymą <ArrowRight size={17} aria-hidden="true" />
           </a>
         </nav>
@@ -396,10 +412,10 @@ function App() {
               paleidimo pasirūpiname visu procesu, kad galėtumėte susitelkti į savo veiklą.
             </p>
             <div className="hero-actions">
-              <a className="button button-primary" href="#kontaktai">
+              <a className="button button-primary" href="#kontaktai" onClick={(event) => navigateToSection(event, "#kontaktai")}>
                 Užsakyti svetainę <ArrowRight size={18} aria-hidden="true" />
               </a>
-              <a className="button button-secondary" href="#kainos">
+              <a className="button button-secondary" href="#kainos" onClick={(event) => navigateToSection(event, "#kainos")}>
                 Peržiūrėti kainas <ArrowRight size={18} aria-hidden="true" />
               </a>
             </div>
@@ -436,7 +452,7 @@ function App() {
                     <span>Paslaugos</span>
                     <span>Kontaktai</span>
                   </div>
-                  <button type="button">Susisiekti</button>
+                  <span className="preview-cta">Susisiekti</span>
                 </div>
 
                 <div className="preview-hero">
@@ -833,7 +849,7 @@ function App() {
 
       <footer className="site-footer">
         <div className="footer-brand-block">
-          <a className="wordmark footer-wordmark" href="#top">
+          <a className="wordmark footer-wordmark" href="#top" onClick={(event) => navigateToSection(event, "#top")}>
             <strong>Stilloak</strong>
             <span>Web</span>
           </a>
