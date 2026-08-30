@@ -385,5 +385,6 @@ module.exports = {
   buildCustomerEmail,
   formatPrice,
   getNotificationRecipient,
+  sendAdminNotification,
   sendWebServiceRequestEmails,
 };
