@@ -162,20 +162,20 @@ const heroSlides = [
   {
     image: "/stilloak-premium-hero.webp",
     alt: "Premium svetainės dizaino pristatymas nešiojamame kompiuteryje",
-    title: "Strategija · Dizainas · Technologija",
-    text: "Vieninga jūsų verslo skaitmeninė kryptis."
+    title: "Individuali skaitmeninė patirtis",
+    text: "Svetainė, sukurta jūsų verslo pozicijai ir charakteriui."
   },
   {
-    image: "/stilloak-direction-editorial.webp",
-    alt: "Šviesi redakcinė premium dizaino kryptis",
-    title: "Redakcinė estetika · Aiški hierarchija",
-    text: "Dizainas, kuris leidžia turiniui kalbėti užtikrintai."
+    image: "/stilloak-direction-architecture-v2.webp",
+    alt: "Šviesi premium architektūros studijos scena su maketu",
+    title: "Šviesi architektūrinė kryptis",
+    text: "Rami estetika, tiksli hierarchija ir erdvė jūsų idėjai."
   },
   {
-    image: "/stilloak-direction-dark.webp",
-    alt: "Tamsi išskirtinio premium dizaino kryptis",
-    title: "Charakteris · Atmosfera · Išskirtinumas",
-    text: "Vizualinė patirtis, kurią klientas prisimena."
+    image: "/stilloak-direction-technology-v2.webp",
+    alt: "Tamsi premium technologijų scena su skulptūriniu metalo objektu",
+    title: "Tamsi technologinė kryptis",
+    text: "Ryškus charakteris, preciziškos detalės ir išskirtinis įvaizdis."
   }
 ];
 
@@ -537,7 +537,6 @@ function App() {
                 <article className="hero-slide" key={slide.image} aria-hidden={activeHeroSlide !== index}>
                   <img src={slide.image} alt={slide.alt} fetchPriority={index === 0 ? "high" : "auto"} />
                   <div className="hero-media-caption">
-                    <span>{String(index + 1).padStart(2, "0")} / {String(heroSlides.length).padStart(2, "0")}</span>
                     <p><strong>{slide.title}</strong><small>{slide.text}</small></p>
                   </div>
                 </article>
