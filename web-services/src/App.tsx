@@ -108,11 +108,12 @@ const conceptProjects = [
     kicker: "ARCHITEKTŪRA",
     brand: "NORTH / FORM",
     domain: "northform.lt",
+    direction: "Editorial minimal",
     title: "Architektūros studija",
     headline: "Erdvės, kurios tarnauja žmogui.",
     description: "Moderni architektūros studijos svetainė su stipria darbų prezentacija ir aiškiu kontaktiniu keliu.",
     cta: "Peržiūrėti projektus",
-    meta: "Koncepcinis pavyzdys · Dizainas, Svetainė",
+    meta: "Šviesi redakcinė kryptis · Daug erdvės · Portfolio centre",
     features: [
       ["Projektai", "Atrinkti darbai"],
       ["Studija", "Požiūris ir komanda"],
@@ -124,11 +125,12 @@ const conceptProjects = [
     kicker: "INDUSTRIJA",
     brand: "FERRO / LT",
     domain: "ferro-industries.lt",
+    direction: "Dark industrial",
     title: "Pramonės įmonė",
     headline: "Tikslumas, kuriuo galima pasitikėti.",
     description: "Techninis, solidus įvaizdis su paslaugų struktūra, sertifikatų erdve ir užklausos keliu B2B klientui.",
     cta: "Gauti pasiūlymą",
-    meta: "Koncepcinis pavyzdys · Dizainas, Svetainė",
+    meta: "Tamsi industrinė kryptis · Techninis tikslumas · B2B autoritetas",
     features: [
       ["Gamyba", "Aiškios kompetencijos"],
       ["Kokybė", "Sertifikatai"],
@@ -140,11 +142,12 @@ const conceptProjects = [
     kicker: "GROŽIS",
     brand: "ÉLAN / STUDIO",
     domain: "elan-studio.lt",
+    direction: "Soft luxury",
     title: "Grožio salonas",
     headline: "Ramybė, estetika ir laikas sau.",
     description: "Premium grožio paslaugų svetainė su lengvu vizualu, paslaugų pristatymu ir rezervacijos akcentu.",
     cta: "Rezervuoti vizitą",
-    meta: "Koncepcinis pavyzdys · Dizainas, Svetainė",
+    meta: "Švelni premium kryptis · Emocija · Rezervacijos patirtis",
     features: [
       ["Paslaugos", "Aiškios kategorijos"],
       ["Kainos", "Lengva peržiūra"],
@@ -642,6 +645,7 @@ function App() {
                   </div>
                 </div>
                 <div className="concept-meta">
+                  <span>{project.direction}</span>
                   <h3>{project.title}</h3>
                   <p>{project.meta}</p>
                 </div>
