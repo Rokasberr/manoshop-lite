@@ -479,9 +479,33 @@ body {
 .contact-panel .contact-copy h2 { color: #fffaf6; }
 .contact-panel .contact-copy > p { color: #d2c9c1; }
 .contact-panel .response-time,
-.contact-panel .contact-email { color: #eee5dc; }
+.contact-panel .contact-email {
+  width: fit-content;
+  max-width: 100%;
+  padding: 11px 15px;
+  color: #fffaf6;
+  border: 1px solid rgba(239, 190, 151, .34);
+  background: rgba(10, 10, 9, .34);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
+  font-size: .86rem;
+  font-weight: 700;
+  opacity: 1;
+}
 .contact-panel .response-time svg,
-.contact-panel .contact-email svg { color: #e2bc9c; }
+.contact-panel .contact-email svg {
+  flex: 0 0 auto;
+  color: #efbd92;
+  stroke-width: 2.2;
+}
+
+@media (hover: hover) {
+  .contact-panel .response-time:hover,
+  .contact-panel .contact-email:hover {
+    color: #ffffff;
+    border-color: rgba(239, 190, 151, .62);
+    background: rgba(168, 117, 80, .24);
+  }
+}
 
 .contact-form {
   gap: 16px;
@@ -649,6 +673,13 @@ body {
   .price-card { padding: 48px 24px 25px; }
   .contact-panel { gap: 26px; }
   .contact-form { padding: 20px 16px; }
+  .contact-panel .response-time,
+  .contact-panel .contact-email {
+    width: 100%;
+    min-height: 50px;
+    justify-content: flex-start;
+    overflow-wrap: anywhere;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
