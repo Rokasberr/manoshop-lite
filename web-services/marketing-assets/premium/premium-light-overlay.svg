@@ -1,0 +1,32 @@
+<svg width="1080" height="1080" viewBox="0 0 1080 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="wash" x1="1080" y1="0" x2="510" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFDF9" stop-opacity="0.93"/><stop offset="1" stop-color="#FFFDF9" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="bottom" x1="0" y1="1080" x2="0" y2="840" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F5EDE3" stop-opacity="0.95"/><stop offset="1" stop-color="#F5EDE3" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect x="390" width="690" height="1080" fill="url(#wash)"/>
+  <rect y="820" width="1080" height="260" fill="url(#bottom)"/>
+  <rect x="48" y="45" width="245" height="74" rx="22" fill="#FFFDF9" fill-opacity="0.74"/>
+  <g transform="translate(66 62)">
+    <rect width="46" height="46" rx="13" fill="#8A5A39"/>
+    <text x="23" y="33" text-anchor="middle" fill="#FFF8EE" font-family="Arial, sans-serif" font-size="23" font-weight="700">S</text>
+    <text x="63" y="22" fill="#171512" font-family="Arial, sans-serif" font-size="21" font-weight="700" letter-spacing="1.6">STILLOAK</text>
+    <text x="63" y="44" fill="#8A5A39" font-family="Arial, sans-serif" font-size="16" letter-spacing="2.7">WEB STUDIO</text>
+  </g>
+  <text x="603" y="238" fill="#8A5A39" font-family="Arial, sans-serif" font-size="17" font-weight="700" letter-spacing="3.4">SVETAINĖ JŪSŲ VERSLUI</text>
+  <text x="603" y="320" fill="#171512" font-family="Georgia, serif" font-size="62">
+    <tspan x="603" dy="0">Ne tik</tspan>
+    <tspan x="603" dy="69">graži.</tspan>
+    <tspan x="603" dy="82" font-style="italic" fill="#8A5A39">Sukurta</tspan>
+    <tspan x="603" dy="69" font-style="italic" fill="#8A5A39">veikti.</tspan>
+  </text>
+  <text x="603" y="678" fill="#615A53" font-family="Arial, sans-serif" font-size="22">
+    <tspan x="603" dy="0">Aiški struktūra.</tspan><tspan x="603" dy="34">Patogu telefone.</tspan><tspan x="603" dy="34">Paprasta susisiekti.</tspan>
+  </text>
+  <line x1="66" y1="940" x2="1014" y2="940" stroke="#8A5A39" stroke-opacity="0.34"/>
+  <text x="66" y="998" fill="#171512" font-family="Arial, sans-serif" font-size="23" font-weight="700">Projektai nuo 299 €</text>
+  <text x="1014" y="998" text-anchor="end" fill="#8A5A39" font-family="Arial, sans-serif" font-size="19" font-weight="700" letter-spacing="0.8">GAUTI PASIŪLYMĄ  →</text>
+</svg>

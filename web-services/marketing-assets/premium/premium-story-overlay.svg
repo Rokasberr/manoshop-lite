@@ -1,0 +1,27 @@
+<svg width="1080" height="1920" viewBox="0 0 1080 1920" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="top" x1="0" y1="0" x2="760" y2="920" gradientUnits="userSpaceOnUse"><stop stop-color="#100F0E" stop-opacity="0.78"/><stop offset="1" stop-color="#100F0E" stop-opacity="0"/></linearGradient>
+    <linearGradient id="bottom" x1="0" y1="1920" x2="0" y2="1580" gradientUnits="userSpaceOnUse"><stop stop-color="#0E0D0C" stop-opacity="0.86"/><stop offset="1" stop-color="#0E0D0C" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="1080" height="1100" fill="url(#top)"/>
+  <rect y="1510" width="1080" height="410" fill="url(#bottom)"/>
+  <g transform="translate(76 96)">
+    <rect width="50" height="50" rx="14" fill="#A87550"/>
+    <text x="25" y="36" text-anchor="middle" fill="#FFF8EE" font-family="Arial, sans-serif" font-size="25" font-weight="700">S</text>
+    <text x="69" y="23" fill="#FFFDF9" font-family="Arial, sans-serif" font-size="22" font-weight="700" letter-spacing="1.8">STILLOAK</text>
+    <text x="69" y="47" fill="#D9B98B" font-family="Arial, sans-serif" font-size="17" letter-spacing="3">WEB STUDIO</text>
+  </g>
+  <text x="76" y="315" fill="#D9B98B" font-family="Arial, sans-serif" font-size="19" font-weight="700" letter-spacing="4">NUO IDĖJOS IKI PALEIDIMO</text>
+  <text x="76" y="414" fill="#FFFDF9" font-family="Georgia, serif" font-size="78">
+    <tspan x="76" dy="0">Svetainė, kuri</tspan>
+    <tspan x="76" dy="90">pakelia jūsų</tspan>
+    <tspan x="76" dy="90" font-style="italic" fill="#E4C5A7">verslo įvaizdį.</tspan>
+  </text>
+  <text x="76" y="770" fill="#D1CBC5" font-family="Arial, sans-serif" font-size="25">
+    <tspan x="76" dy="0">Individualus dizainas.</tspan><tspan x="76" dy="42">Aiškus procesas.</tspan><tspan x="76" dy="42">Matoma projekto eiga.</tspan>
+  </text>
+  <text x="76" y="1690" fill="#FFFDF9" font-family="Arial, sans-serif" font-size="34" font-weight="700">Papasakokite apie savo projektą</text>
+  <text x="76" y="1750" fill="#C9C1BA" font-family="Arial, sans-serif" font-size="23">Atsakysime per 24 valandas.</text>
+  <rect x="76" y="1800" width="430" height="64" rx="32" fill="#A87550"/>
+  <text x="291" y="1841" text-anchor="middle" fill="#FFFDF9" font-family="Arial, sans-serif" font-size="21" font-weight="700" letter-spacing="0.8">GAUTI PASIŪLYMĄ  →</text>
+</svg>

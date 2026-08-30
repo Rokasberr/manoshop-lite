@@ -1,11 +1,14 @@
-import { FormEvent, MouseEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
   Check,
+  ChevronLeft,
+  ChevronRight,
   Clock3,
   Code2,
   Globe2,
   Headphones,
+  LayoutDashboard,
   Mail,
   Menu,
   MonitorSmartphone,
@@ -14,9 +17,11 @@ import {
   Send,
   ShieldCheck,
   Sparkles,
+  WalletCards,
   X
 } from "lucide-react";
 import { pricePlans } from "./data/pricing";
+import { trackAnalyticsEvent } from "./lib/analytics";
 import { getLeadAttribution } from "./lib/leadAttribution";
 
 type FormState = {
@@ -83,7 +88,7 @@ const benefits = [
 const processSteps = [
   {
     title: "Užklausa",
-    text: "Pasirenkate paketą ir trumpai papasakojate, ko reikia jūsų verslui."
+    text: "Pasirenkate projekto kryptį ir trumpai papasakojate, ko reikia jūsų verslui."
   },
   {
     title: "Aptarimas",
@@ -105,11 +110,12 @@ const conceptProjects = [
     kicker: "ARCHITEKTŪRA",
     brand: "NORTH / FORM",
     domain: "northform.lt",
+    direction: "Editorial minimal",
     title: "Architektūros studija",
     headline: "Erdvės, kurios tarnauja žmogui.",
     description: "Moderni architektūros studijos svetainė su stipria darbų prezentacija ir aiškiu kontaktiniu keliu.",
     cta: "Peržiūrėti projektus",
-    meta: "Koncepcinis pavyzdys · Dizainas, Svetainė",
+    meta: "Šviesi redakcinė kryptis · Daug erdvės · Portfolio centre",
     features: [
       ["Projektai", "Atrinkti darbai"],
       ["Studija", "Požiūris ir komanda"],
@@ -121,11 +127,12 @@ const conceptProjects = [
     kicker: "INDUSTRIJA",
     brand: "FERRO / LT",
     domain: "ferro-industries.lt",
+    direction: "Dark industrial",
     title: "Pramonės įmonė",
     headline: "Tikslumas, kuriuo galima pasitikėti.",
     description: "Techninis, solidus įvaizdis su paslaugų struktūra, sertifikatų erdve ir užklausos keliu B2B klientui.",
     cta: "Gauti pasiūlymą",
-    meta: "Koncepcinis pavyzdys · Dizainas, Svetainė",
+    meta: "Tamsi industrinė kryptis · Techninis tikslumas · B2B autoritetas",
     features: [
       ["Gamyba", "Aiškios kompetencijos"],
       ["Kokybė", "Sertifikatai"],
@@ -137,16 +144,38 @@ const conceptProjects = [
     kicker: "GROŽIS",
     brand: "ÉLAN / STUDIO",
     domain: "elan-studio.lt",
+    direction: "Soft luxury",
     title: "Grožio salonas",
     headline: "Ramybė, estetika ir laikas sau.",
     description: "Premium grožio paslaugų svetainė su lengvu vizualu, paslaugų pristatymu ir rezervacijos akcentu.",
     cta: "Rezervuoti vizitą",
-    meta: "Koncepcinis pavyzdys · Dizainas, Svetainė",
+    meta: "Švelni premium kryptis · Emocija · Rezervacijos patirtis",
     features: [
       ["Paslaugos", "Aiškios kategorijos"],
       ["Kainos", "Lengva peržiūra"],
       ["Vizitas", "Rezervacijos CTA"]
     ]
+  }
+];
+
+const heroSlides = [
+  {
+    image: "/stilloak-premium-hero.webp",
+    alt: "Premium svetainės dizaino pristatymas nešiojamame kompiuteryje",
+    title: "Individuali skaitmeninė patirtis",
+    text: "Svetainė, sukurta jūsų verslo pozicijai ir charakteriui."
+  },
+  {
+    image: "/stilloak-direction-architecture-v2.webp",
+    alt: "Šviesi premium architektūros studijos scena su maketu",
+    title: "Šviesi architektūrinė kryptis",
+    text: "Rami estetika, tiksli hierarchija ir erdvė jūsų idėjai."
+  },
+  {
+    image: "/stilloak-direction-technology-v2.webp",
+    alt: "Tamsi premium technologijų scena su skulptūriniu metalo objektu",
+    title: "Tamsi technologinė kryptis",
+    text: "Ryškus charakteris, preciziškos detalės ir išskirtinis įvaizdis."
   }
 ];
 
@@ -178,6 +207,43 @@ const trustSignals = [
   }
 ];
 
+const clientExperience = [
+  {
+    icon: LayoutDashboard,
+    title: "Visa eiga vienoje vietoje",
+    text: "Per privačią nuorodą matysite projekto būseną, terminą ir darbų planą."
+  },
+  {
+    icon: WalletCards,
+    title: "Aiškūs mokėjimai",
+    text: "Avansas, likutis ir sąskaitos pateikiami aiškiai, be informacijos paieškų laiškuose."
+  },
+  {
+    icon: ShieldCheck,
+    title: "Patvirtinimai ir pastabos",
+    text: "Prie kiekvieno darbo galėsite pateikti pastabą, prašyti pakeitimo arba patvirtinti rezultatą."
+  }
+];
+
+const commonQuestions = [
+  {
+    question: "Ar užklausa mane įpareigoja pirkti?",
+    answer: "Ne. Pirmiausia peržiūrime poreikį ir pateikiame aiškų pasiūlymą su darbų apimtimi, terminu ir kaina."
+  },
+  {
+    question: "Kada pradedami darbai?",
+    answer: "Darbai pradedami patvirtinus pasiūlymą ir gavus jame numatytą avansą. Tiksli pradžia ir terminas nurodomi pasiūlyme."
+  },
+  {
+    question: "Ar matysiu, kas jau atlikta?",
+    answer: "Taip. Po pasiūlymo patvirtinimo privati nuoroda tampa projekto puslapiu, kuriame matoma darbų eiga, mokėjimai ir dokumentai."
+  },
+  {
+    question: "Ar svetainė veiks telefone?",
+    answer: "Taip. Mobilus vaizdas, aiški navigacija ir patogūs kontaktų veiksmai yra bazinė kiekvieno projekto dalis."
+  }
+];
+
 function validateForm(form: FormState): FormErrors {
   const errors: FormErrors = {};
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -196,7 +262,7 @@ function validateForm(form: FormState): FormErrors {
   }
 
   if (!selectedPlan) {
-    errors.packageId = "Pasirinkite svetainės kūrimo paketą.";
+    errors.packageId = "Pasirinkite svetainės kūrimo sprendimą.";
   }
 
   if (form.packageId === "custom" && !form.budget) {
@@ -220,6 +286,8 @@ function App() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "fallback" | "error">("idle");
   const [requestNumber, setRequestNumber] = useState("");
+  const [activeHeroSlide, setActiveHeroSlide] = useState(0);
+  const heroCarouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -259,7 +327,7 @@ function App() {
   const mailtoHref = useMemo(() => {
     const subject = encodeURIComponent("Svetainės kūrimo užklausa");
     const body = encodeURIComponent(
-      `Sveiki,\n\nNoriu užsakyti svetainės kūrimą.\n\nPaketas: ${selectedPlan?.name || "-"}\nKaina: ${selectedPlan?.priceLabel || "-"}\nBiudžetas: ${form.budget || "-"}\nĮmonė: ${form.company || "-"}\nTelefonas: ${form.phone || "-"}\n\nProjekto aprašymas:\n${form.message || "-"}`
+      `Sveiki,\n\nNoriu užsakyti svetainės kūrimą.\n\nProjekto kryptis: ${selectedPlan?.name || "-"}\nKaina: ${selectedPlan?.priceLabel || "-"}\nBiudžetas: ${form.budget || "-"}\nĮmonė: ${form.company || "-"}\nTelefonas: ${form.phone || "-"}\n\nProjekto aprašymas:\n${form.message || "-"}`
     );
     return `mailto:${contactEmail}?subject=${subject}&body=${body}`;
   }, [form.budget, form.company, form.message, form.phone, selectedPlan]);
@@ -291,9 +359,25 @@ function App() {
     }
 
     updateForm("packageId", packageId);
+    trackAnalyticsEvent("select_package", { package_id: packageId });
     window.setTimeout(() => {
       document.getElementById("kontaktai")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 0);
+  };
+
+  const trackCta = (location: string, action: string) => {
+    trackAnalyticsEvent("cta_click", { location, action });
+  };
+
+  const showHeroSlide = (index: number) => {
+    const nextIndex = (index + heroSlides.length) % heroSlides.length;
+    const carousel = heroCarouselRef.current;
+    if (!carousel) return;
+    carousel.scrollTo({
+      left: carousel.clientWidth * nextIndex,
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
+    });
+    setActiveHeroSlide(nextIndex);
   };
 
   const navigateToSection = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -372,7 +456,7 @@ function App() {
       <header className="site-header">
         <a className="wordmark" href="#top" aria-label="Stilloak Web pradžia" onClick={(event) => navigateToSection(event, "#top")}>
           <strong>Stilloak</strong>
-          <span>Web</span>
+          <span>Web Studio</span>
         </a>
 
         <button
@@ -392,7 +476,10 @@ function App() {
               {label}
             </a>
           ))}
-          <a className="nav-cta" href="#kontaktai" onClick={(event) => navigateToSection(event, "#kontaktai")}>
+          <a className="nav-cta" href="#kontaktai" onClick={(event) => {
+            trackCta("navigation", "get_offer");
+            navigateToSection(event, "#kontaktai");
+          }}>
             Gauti pasiūlymą <ArrowRight size={17} aria-hidden="true" />
           </a>
         </nav>
@@ -401,22 +488,25 @@ function App() {
       <main id="top">
         <section className="hero section">
           <div className="hero-copy-block">
-            <span className="hero-pill">
-              <span className="hero-pill-dot" /> Svetainės, kurios kuria vertę
-            </span>
             <h1>
-              Svetainės verslui, kurios atrodo profesionaliai ir <em>padeda gauti klientų.</em>
+              Svetainė, kuri kuria jūsų verslo <em>vertę.</em>
             </h1>
             <p>
-              Kuriame modernias, greitas ir patikimas svetaines, pritaikytas jūsų verslui. Nuo idėjos iki
-              paleidimo pasirūpiname visu procesu, kad galėtumėte susitelkti į savo veiklą.
+              Kuriame individualias verslo svetaines, kuriose strategija, dizainas ir technologija veikia kaip
+              viena sistema. Jokių atsitiktinių šablonų – tik jūsų verslui sukurta kryptis.
             </p>
             <div className="hero-actions">
-              <a className="button button-primary" href="#kontaktai" onClick={(event) => navigateToSection(event, "#kontaktai")}>
-                Užsakyti svetainę <ArrowRight size={18} aria-hidden="true" />
+              <a className="button button-primary" href="#kontaktai" onClick={(event) => {
+                trackCta("hero", "order_website");
+                navigateToSection(event, "#kontaktai");
+              }}>
+                Aptarti projektą <ArrowRight size={18} aria-hidden="true" />
               </a>
-              <a className="button button-secondary" href="#kainos" onClick={(event) => navigateToSection(event, "#kainos")}>
-                Peržiūrėti kainas <ArrowRight size={18} aria-hidden="true" />
+              <a className="button button-secondary" href="#portfolio" onClick={(event) => {
+                trackCta("hero", "view_work");
+                navigateToSection(event, "#portfolio");
+              }}>
+                Atrasti mūsų kryptį <ArrowRight size={18} aria-hidden="true" />
               </a>
             </div>
 
@@ -427,67 +517,41 @@ function App() {
                 <span><MonitorSmartphone size={18} /></span>
               </div>
               <div>
-                <strong>Aiški kaina ir procesas</strong>
-                <small>Responsive dizainas · SEO pagrindai · Domeno prijungimas</small>
+                <strong>Individualus dizainas ir aiškus procesas</strong>
+                <small>Privati projekto erdvė · Matoma eiga · Pagalba po paleidimo</small>
               </div>
             </div>
           </div>
 
-          <div className="hero-visual" aria-label="Pavyzdinės verslo svetainės vizualas">
-            <div className="browser-frame">
-              <div className="browser-toolbar">
-                <div className="browser-dots" aria-hidden="true">
-                  <span />
-                  <span />
-                  <span />
-                </div>
-                <div className="browser-address">yourbusiness.lt</div>
-              </div>
-
-              <div className="preview-site">
-                <div className="preview-nav">
-                  <strong>NATŪRALI</strong>
-                  <div>
-                    <span>Apie mus</span>
-                    <span>Paslaugos</span>
-                    <span>Kontaktai</span>
+          <div className="hero-premium-media" aria-label="Stilloak Web Studio premium svetainės kūrimo kryptys">
+            <div
+              className="hero-carousel"
+              ref={heroCarouselRef}
+              onScroll={(event) => {
+                const element = event.currentTarget;
+                if (!element.clientWidth) return;
+                setActiveHeroSlide(Math.round(element.scrollLeft / element.clientWidth));
+              }}
+            >
+              {heroSlides.map((slide, index) => (
+                <article className="hero-slide" key={slide.image} aria-hidden={activeHeroSlide !== index}>
+                  <img src={slide.image} alt={slide.alt} fetchPriority={index === 0 ? "high" : "auto"} />
+                  <div className="hero-media-caption">
+                    <p><strong>{slide.title}</strong><small>{slide.text}</small></p>
                   </div>
-                  <span className="preview-cta">Susisiekti</span>
-                </div>
-
-                <div className="preview-hero">
-                  <div className="preview-copy">
-                    <small>NATŪRALŪS SPRENDIMAI</small>
-                    <strong>Jūsų geresnei kasdienai</strong>
-                    <p>Aiški žinutė, kokybiškas dizainas ir patogi vartotojo patirtis.</p>
-                    <span>Sužinoti daugiau</span>
-                  </div>
-                  <div className="still-life" aria-hidden="true">
-                    <div className="plant-stem stem-one" />
-                    <div className="plant-stem stem-two" />
-                    <div className="leaf leaf-one" />
-                    <div className="leaf leaf-two" />
-                    <div className="leaf leaf-three" />
-                    <div className="bottle" />
-                    <div className="vase" />
-                  </div>
-                </div>
+                </article>
+              ))}
+            </div>
+            <div className="hero-carousel-controls" aria-label="Keisti dizaino kryptį">
+              <button type="button" onClick={() => showHeroSlide(activeHeroSlide - 1)} aria-label="Ankstesnė kryptis">
+                <ChevronLeft size={19} aria-hidden="true" />
+              </button>
+              <div className="hero-carousel-dots" aria-hidden="true">
+                {heroSlides.map((slide, index) => <i className={index === activeHeroSlide ? "is-active" : ""} key={slide.image} />)}
               </div>
-
-              <div className="mini-preview-row" aria-hidden="true">
-                <div className="mini-preview mini-build">
-                  <small>STATYBOS</small>
-                  <strong>Aiški struktūra nuo pirmo ekrano</strong>
-                </div>
-                <div className="mini-preview mini-legal">
-                  <small>PASLAUGOS</small>
-                  <strong>Tvirtas įvaizdis ir pasitikėjimas</strong>
-                </div>
-                <div className="mini-preview mini-interior">
-                  <small>INTERJERAS</small>
-                  <strong>Vizualas, kuris kalba už verslą</strong>
-                </div>
-              </div>
+              <button type="button" onClick={() => showHeroSlide(activeHeroSlide + 1)} aria-label="Kita kryptis">
+                <ChevronRight size={19} aria-hidden="true" />
+              </button>
             </div>
           </div>
         </section>
@@ -508,9 +572,9 @@ function App() {
 
         <section id="kainos" className="section pricing-section" aria-labelledby="pricing-title">
           <div className="section-intro compact-intro" data-reveal>
-            <span>Kainos</span>
-            <h2 id="pricing-title">Pasirinkite tinkamiausią paketą.</h2>
-            <p>Aiški bazinė kaina paprastiems projektams ir individualus pasiūlymas sudėtingesniems poreikiams.</p>
+            <span>Studijos pasiūlymai</span>
+            <h2 id="pricing-title">Aiški investicija į jūsų įvaizdį.</h2>
+            <p>Pasirinkite projekto apimtį. Kiekvieną kryptį pritaikome jūsų verslui, turiniui ir auditorijai.</p>
           </div>
 
           <div className="pricing-grid">
@@ -532,7 +596,7 @@ function App() {
                   type="button"
                   onClick={() => choosePlan(plan.id)}
                 >
-                  {plan.id === "custom" ? "Susisiekti" : "Pasirinkti paketą"}
+                  {plan.id === "custom" ? "Susisiekti" : "Pasirinkti sprendimą"}
                 </button>
               </article>
             ))}
@@ -558,11 +622,38 @@ function App() {
           </div>
         </section>
 
+        <section id="kliento-zona" className="section client-experience-section" aria-labelledby="client-experience-title">
+          <div className="client-experience-panel" data-reveal>
+            <div className="client-experience-copy">
+              <span className="section-eyebrow">Skaidrus bendradarbiavimas</span>
+              <h2 id="client-experience-title">Projektą valdysite ne per padrikus laiškus.</h2>
+              <p>
+                Gavę privatų projekto puslapį visada žinosite, kas vyksta dabar, ką reikia patvirtinti ir kokie
+                mokėjimai ar dokumentai jau paruošti.
+              </p>
+              <a className="button button-primary" href="#kontaktai" onClick={(event) => {
+                trackCta("client_portal", "start_project");
+                navigateToSection(event, "#kontaktai");
+              }}>
+                Aptarti projektą <ArrowRight size={18} aria-hidden="true" />
+              </a>
+            </div>
+            <div className="client-experience-grid">
+              {clientExperience.map((item) => (
+                <article className="client-experience-card" key={item.title}>
+                  <span><item.icon size={21} aria-hidden="true" /></span>
+                  <div><h3>{item.title}</h3><p>{item.text}</p></div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section id="portfolio" className="section concepts-section" aria-labelledby="concepts-title">
           <div className="section-intro compact-intro process-intro" data-reveal>
             <span>Vizualinės kryptys</span>
-            <h2 id="concepts-title">Pavyzdiniai projektai</h2>
-            <p>Šie maketai rodo galimas dizaino kryptis. Tai koncepciniai pavyzdžiai, ne klientų projektai.</p>
+            <h2 id="concepts-title">Viena studija. Skirtingas charakteris.</h2>
+            <p>Kiekvieną svetainę kuriame pagal verslo poziciją ir auditoriją. Žemiau – trys skirtingos koncepcinės kryptys.</p>
           </div>
 
           <div className="concept-grid">
@@ -611,6 +702,7 @@ function App() {
                   </div>
                 </div>
                 <div className="concept-meta">
+                  <span>{project.direction}</span>
                   <h3>{project.title}</h3>
                   <p>{project.meta}</p>
                 </div>
@@ -642,22 +734,38 @@ function App() {
           </div>
         </section>
 
+        <section className="section faq-section" aria-labelledby="faq-title">
+          <div className="section-intro compact-intro" data-reveal>
+            <span>Dažniausi klausimai</span>
+            <h2 id="faq-title">Aiškūs atsakymai prieš pradedant.</h2>
+            <p>Trumpai apie pasiūlymą, darbų pradžią ir projekto valdymą.</p>
+          </div>
+          <div className="faq-list" data-reveal>
+            {commonQuestions.map((item) => (
+              <details className="faq-item" key={item.question}>
+                <summary>{item.question}<span aria-hidden="true">+</span></summary>
+                <p>{item.answer}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+
         <section id="kontaktai" className="section contact-panel" aria-labelledby="contact-title">
           <div className="contact-copy" data-reveal>
             <span className="contact-kicker">Pradėkime bendradarbiauti</span>
-            <h2 id="contact-title">Užsakykite svetainę</h2>
+            <h2 id="contact-title">Papasakokite, ką norite sukurti.</h2>
             <p>
-              Papasakokite apie savo projektą. Peržiūrėsime poreikį, atsakysime į klausimus ir padėsime pasirinkti
-              tinkamiausią sprendimą.
+              Peržiūrėsime jūsų situaciją, patikslinsime tikslus ir pasiūlysime tinkamiausią projekto kryptį.
+              Pirmoji konsultacija nieko neįpareigoja.
             </p>
             <div className="response-time">
               <Clock3 size={21} aria-hidden="true" />
               <span>Atsakome per 24 val.</span>
             </div>
-            <a className="contact-email" href={`mailto:${contactEmail}`}>
+            <a className="contact-email" href={`mailto:${contactEmail}`} onClick={() => trackCta("contact", "email")}>
               <Mail size={18} aria-hidden="true" /> {contactEmail}
             </a>
-            <a className="contact-email" href={contactPhoneHref}>
+            <a className="contact-email" href={contactPhoneHref} onClick={() => trackCta("contact", "phone")}>
               <Phone size={18} aria-hidden="true" /> {contactPhone}
             </a>
           </div>
@@ -666,7 +774,7 @@ function App() {
             {selectedPlan ? (
               <div className="selected-plan-summary">
                 <div>
-                  <span>Pasirinktas paketas</span>
+                  <span>Pasirinkta projekto kryptis</span>
                   <strong>{selectedPlan.name}</strong>
                 </div>
                 <b>{selectedPlan.priceLabel}</b>
@@ -729,14 +837,14 @@ function App() {
 
             <div className="field-grid">
               <label>
-                <span>Pasirinktas paketas</span>
+                <span>Projekto kryptis</span>
                 <select
                   name="packageId"
                   value={form.packageId}
                   onChange={(event) => updateForm("packageId", event.target.value)}
                   aria-invalid={Boolean(errors.packageId)}
                 >
-                  <option value="">Pasirinkite paketą</option>
+                  <option value="">Pasirinkite sprendimą</option>
                   {pricePlans.map((plan) => (
                     <option key={plan.id} value={plan.id}>
                       {plan.name} — {plan.priceLabel}
@@ -766,7 +874,7 @@ function App() {
               ) : (
                 <label>
                   <span>Bazinė kaina</span>
-                  <input type="text" value={selectedPlan?.priceLabel || "Pasirinkite paketą"} readOnly />
+                  <input type="text" value={selectedPlan?.priceLabel || "Pasirinkite sprendimą"} readOnly />
                 </label>
               )}
             </div>
@@ -840,6 +948,8 @@ function App() {
               <Send size={18} aria-hidden="true" />
             </button>
 
+            <p className="form-reassurance">Užklausa nieko nekainuoja ir neįpareigoja pirkti.</p>
+
             <p className="privacy-note">
               <ShieldCheck size={15} aria-hidden="true" /> Užsakymo informacija siunčiama saugiai ir patenka į Stilloak administravimo sistemą.
             </p>
@@ -851,7 +961,7 @@ function App() {
         <div className="footer-brand-block">
           <a className="wordmark footer-wordmark" href="#top" onClick={(event) => navigateToSection(event, "#top")}>
             <strong>Stilloak</strong>
-            <span>Web</span>
+            <span>Web Studio</span>
           </a>
           <p>Svetainės, kurios padeda verslui atrodyti profesionaliai ir augti.</p>
         </div>

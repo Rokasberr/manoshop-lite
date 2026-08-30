@@ -46,11 +46,15 @@ Kopijuokite `.env.example` į lokalią `.env.local` tik jei reikia lokalaus test
 VITE_API_URL=
 VITE_WEB_LEAD_ENDPOINT=
 VITE_WEB_CONTACT_EMAIL=hello@stilloak-studio.com
+VITE_GA_MEASUREMENT_ID=
+VITE_META_PIXEL_ID=
 ```
 
 Rekomenduojama cloud aplinkoje nustatyti `VITE_API_URL` į pagrindinio Stilloak backend `/api` adresą. `VITE_WEB_LEAD_ENDPOINT` naudojamas tik kaip tiesioginis override.
 
 Jei nei vienas API adresas nenustatytas, forma nerodo netikro sėkmingo išsiuntimo ir pasiūlo susisiekti el. paštu.
+
+`VITE_META_PIXEL_ID` paliekamas tuščias iki reklamos paskyros paruošimo. Meta Pixel įkeliamas tik lankytojui sutikus su rinkodaros slapukais. Kampanijų tekstai, UTM schema, vizualai ir paleidimo vartai aprašyti faile `MARKETING_LAUNCH.md`.
 
 ## Vercel
 
@@ -73,6 +77,8 @@ Vercel environment variables:
 
 - `VITE_API_URL` — pagrindinio Stilloak backend `/api` URL
 - `VITE_WEB_CONTACT_EMAIL` — viešas Stilloak Web kontaktinis el. paštas
+- `VITE_GA_MEASUREMENT_ID` — GA4 matavimo identifikatorius
+- `VITE_META_PIXEL_ID` — Meta Pixel identifikatorius, nustatomas tik paruošus reklamos paskyrą
 
 Backend CORS `CLIENT_URL` sąraše turi būti leidžiamas ir `https://web.stilloak-studio.com`.
 
