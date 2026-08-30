@@ -66,6 +66,16 @@ const projectTaskSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+const revisionRoundSchema = new mongoose.Schema(
+  {
+    number: { type: Number, required: true, min: 1, max: 50 },
+    startedAt: { type: Date, default: Date.now },
+    actorName: { type: String, trim: true, maxlength: 160, default: "" },
+    note: { type: String, trim: true, maxlength: 500, default: "" },
+  },
+  { _id: false }
+);
+
 const webServiceRequestSchema = new mongoose.Schema(
   {
     requestNumber: {
@@ -139,6 +149,8 @@ const webServiceRequestSchema = new mongoose.Schema(
     finalTestInvoiceSentAt: { type: Date, default: null },
     projectStage: { type: String, enum: PROJECT_STAGE_OPTIONS, default: "awaiting_deposit", index: true },
     projectTasks: { type: [projectTaskSchema], default: [] },
+    revisionLimit: { type: Number, min: 0, max: 10, default: 2 },
+    revisionRounds: { type: [revisionRoundSchema], default: [] },
     depositReminderSentAt: { type: Date, default: null },
     depositReminderCount: { type: Number, min: 0, max: 3, default: 0 },
     finalPaymentReminderSentAt: { type: Date, default: null },
