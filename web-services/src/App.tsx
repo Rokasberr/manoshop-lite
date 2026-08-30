@@ -88,7 +88,7 @@ const benefits = [
 const processSteps = [
   {
     title: "Užklausa",
-    text: "Pasirenkate paketą ir trumpai papasakojate, ko reikia jūsų verslui."
+    text: "Pasirenkate projekto kryptį ir trumpai papasakojate, ko reikia jūsų verslui."
   },
   {
     title: "Aptarimas",
@@ -262,7 +262,7 @@ function validateForm(form: FormState): FormErrors {
   }
 
   if (!selectedPlan) {
-    errors.packageId = "Pasirinkite svetainės kūrimo paketą.";
+    errors.packageId = "Pasirinkite svetainės kūrimo sprendimą.";
   }
 
   if (form.packageId === "custom" && !form.budget) {
@@ -327,7 +327,7 @@ function App() {
   const mailtoHref = useMemo(() => {
     const subject = encodeURIComponent("Svetainės kūrimo užklausa");
     const body = encodeURIComponent(
-      `Sveiki,\n\nNoriu užsakyti svetainės kūrimą.\n\nPaketas: ${selectedPlan?.name || "-"}\nKaina: ${selectedPlan?.priceLabel || "-"}\nBiudžetas: ${form.budget || "-"}\nĮmonė: ${form.company || "-"}\nTelefonas: ${form.phone || "-"}\n\nProjekto aprašymas:\n${form.message || "-"}`
+      `Sveiki,\n\nNoriu užsakyti svetainės kūrimą.\n\nProjekto kryptis: ${selectedPlan?.name || "-"}\nKaina: ${selectedPlan?.priceLabel || "-"}\nBiudžetas: ${form.budget || "-"}\nĮmonė: ${form.company || "-"}\nTelefonas: ${form.phone || "-"}\n\nProjekto aprašymas:\n${form.message || "-"}`
     );
     return `mailto:${contactEmail}?subject=${subject}&body=${body}`;
   }, [form.budget, form.company, form.message, form.phone, selectedPlan]);
@@ -596,7 +596,7 @@ function App() {
                   type="button"
                   onClick={() => choosePlan(plan.id)}
                 >
-                  {plan.id === "custom" ? "Susisiekti" : "Pasirinkti paketą"}
+                  {plan.id === "custom" ? "Susisiekti" : "Pasirinkti sprendimą"}
                 </button>
               </article>
             ))}
@@ -774,7 +774,7 @@ function App() {
             {selectedPlan ? (
               <div className="selected-plan-summary">
                 <div>
-                  <span>Pasirinktas paketas</span>
+                  <span>Pasirinkta projekto kryptis</span>
                   <strong>{selectedPlan.name}</strong>
                 </div>
                 <b>{selectedPlan.priceLabel}</b>
@@ -837,14 +837,14 @@ function App() {
 
             <div className="field-grid">
               <label>
-                <span>Pasirinktas paketas</span>
+                <span>Projekto kryptis</span>
                 <select
                   name="packageId"
                   value={form.packageId}
                   onChange={(event) => updateForm("packageId", event.target.value)}
                   aria-invalid={Boolean(errors.packageId)}
                 >
-                  <option value="">Pasirinkite paketą</option>
+                  <option value="">Pasirinkite sprendimą</option>
                   {pricePlans.map((plan) => (
                     <option key={plan.id} value={plan.id}>
                       {plan.name} — {plan.priceLabel}
@@ -874,7 +874,7 @@ function App() {
               ) : (
                 <label>
                   <span>Bazinė kaina</span>
-                  <input type="text" value={selectedPlan?.priceLabel || "Pasirinkite paketą"} readOnly />
+                  <input type="text" value={selectedPlan?.priceLabel || "Pasirinkite sprendimą"} readOnly />
                 </label>
               )}
             </div>
