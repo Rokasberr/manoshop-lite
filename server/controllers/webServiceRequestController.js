@@ -10,6 +10,7 @@ const { sendWebServiceFinalPaymentEmail } = require("../services/webServiceFinal
 const { sendWebServiceProposalEmail } = require("../services/webServiceProposalEmailService");
 const { sendWebServiceRequestEmails } = require("../services/webServiceRequestEmailService");
 const { sendWebServiceProjectUpdateEmail } = require("../services/webServiceProjectUpdateEmailService");
+const { sendWebServiceProjectFeedbackEmail } = require("../services/webServiceProjectFeedbackEmailService");
 const { decryptProjectToken, encryptProjectToken } = require("../services/webServiceProjectTokenService");
 const { deliverWebServiceTestContract } = require("../services/webServiceTestContractEmailService");
 const { createHttpError } = require("../utils/httpError");
@@ -579,6 +580,23 @@ const submitPublicWebServiceTaskFeedback = async (req, res) => {
     actorEmail: request.email,
   });
   await request.save();
+
+  try {
+    const delivery = await sendWebServiceProjectFeedbackEmail({ request, task, action, message });
+    if (delivery.sent) {
+      request.contactHistory.push({
+        type: "email",
+        note: `Administratoriui išsiųstas pranešimas apie kliento veiksmą darbui „${task.title}“.`,
+        happenedAt: new Date(),
+        actorName: "Sistema",
+        actorEmail: "",
+      });
+      await request.save();
+    }
+  } catch (error) {
+    console.error(`[web-project-feedback] ${request.requestNumber} laiško klaida: ${error.message}`);
+  }
+
   res.json(serializePublicProposal(request));
 };
 

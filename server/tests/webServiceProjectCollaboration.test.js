@@ -4,6 +4,7 @@ const path = require("node:path");
 const test = require("node:test");
 
 const { buildProjectUpdateEmail } = require("../services/webServiceProjectUpdateEmailService");
+const { buildProjectFeedbackEmail } = require("../services/webServiceProjectFeedbackEmailService");
 const { decryptProjectToken, encryptProjectToken } = require("../services/webServiceProjectTokenService");
 
 const readRepoFile = (...parts) => fs.readFileSync(path.resolve(__dirname, "..", "..", ...parts), "utf8");
@@ -39,6 +40,21 @@ test("project update email groups changed tasks and links to the private portal"
   assert.match(email.html, /Peržiūrėti projekto eigą/);
 });
 
+test("project feedback email tells the owner what the client changed", () => {
+  const email = buildProjectFeedbackEmail({
+    request: { name: "Emilija", email: "emilija@example.com", requestNumber: "WEB-2026-TEST" },
+    task: { title: "Pagrindinio puslapio dizainas" },
+    action: "changes_requested",
+    message: "Pakeiskime pagrindinę nuotrauką.",
+  });
+
+  assert.match(email.subject, /Paprašė pataisymų/);
+  assert.match(email.text, /Emilija/);
+  assert.match(email.text, /Pagrindinio puslapio dizainas/);
+  assert.match(email.text, /Pakeiskime pagrindinę nuotrauką/);
+  assert.match(email.html, /Atidaryti projektų valdymą/);
+});
+
 test("private portal supports dated tasks, comments, approval and revision requests", () => {
   const model = readRepoFile("server", "models", "WebServiceRequest.js");
   const controller = readRepoFile("server", "controllers", "webServiceRequestController.js");
@@ -57,4 +73,5 @@ test("private portal supports dated tasks, comments, approval and revision reque
   assert.match(portal, /Reikia pataisymų/);
   assert.match(portal, /Patvirtinti/);
   assert.match(portal, /Jūsų pastaba/);
+  assert.match(admin, /web-project-search/);
 });

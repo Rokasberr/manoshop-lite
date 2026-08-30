@@ -79,6 +79,7 @@ const WebProposalsPage = () => {
   const [resendingContractId, setResendingContractId] = useState("");
   const [resendingHandoverId, setResendingHandoverId] = useState("");
   const [filter, setFilter] = useState("active");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const loadRequests = async () => {
     try {
@@ -109,15 +110,26 @@ const WebProposalsPage = () => {
   }, [requests]);
 
   const visibleRequests = useMemo(() => {
-    if (filter === "all") return requests;
+    let filteredRequests = requests;
     if (filter === "needs_payment") {
-      return requests.filter(
+      filteredRequests = requests.filter(
         (request) => request.proposalStatus === "accepted" && request.depositStatus !== "paid"
       );
+    } else if (filter === "paid") {
+      filteredRequests = requests.filter((request) => request.depositStatus === "paid");
+    } else if (filter !== "all") {
+      filteredRequests = requests.filter((request) => !["completed", "lost"].includes(request.status));
     }
-    if (filter === "paid") return requests.filter((request) => request.depositStatus === "paid");
-    return requests.filter((request) => !["completed", "lost"].includes(request.status));
-  }, [filter, requests]);
+
+    const query = searchQuery.trim().toLocaleLowerCase("lt-LT");
+    if (!query) return filteredRequests;
+
+    return filteredRequests.filter((request) =>
+      [request.requestNumber, request.name, request.email, request.phone, request.company]
+        .filter(Boolean)
+        .some((value) => String(value).toLocaleLowerCase("lt-LT").includes(query))
+    );
+  }, [filter, requests, searchQuery]);
 
   const updateDraft = (requestId, key, value) => {
     setDrafts((current) => ({
@@ -371,16 +383,28 @@ const WebProposalsPage = () => {
               Klientų pasiūlymai
             </h2>
           </div>
-          <select
-            className="select-field min-w-56"
-            value={filter}
-            onChange={(event) => setFilter(event.target.value)}
-          >
-            <option value="active">Aktyvūs</option>
-            <option value="needs_payment">Patvirtinti, laukia avanso</option>
-            <option value="paid">Avansas apmokėtas</option>
-            <option value="all">Visi</option>
-          </select>
+          <div className="grid w-full gap-3 sm:w-auto sm:grid-cols-2">
+            <label className="sr-only" htmlFor="web-project-search">Ieškoti projekto</label>
+            <input
+              id="web-project-search"
+              className="input-field min-w-0 sm:min-w-64"
+              type="search"
+              placeholder="Klientas, el. paštas, numeris..."
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+            />
+            <select
+              className="select-field min-w-0 sm:min-w-56"
+              aria-label="Filtruoti projektus"
+              value={filter}
+              onChange={(event) => setFilter(event.target.value)}
+            >
+              <option value="active">Aktyvūs</option>
+              <option value="needs_payment">Patvirtinti, laukia avanso</option>
+              <option value="paid">Avansas apmokėtas</option>
+              <option value="all">Visi</option>
+            </select>
+          </div>
         </div>
 
         {loading ? (
