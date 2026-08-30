@@ -1,7 +1,9 @@
-import { FormEvent, MouseEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
   Check,
+  ChevronLeft,
+  ChevronRight,
   Clock3,
   Code2,
   Globe2,
@@ -156,6 +158,27 @@ const conceptProjects = [
   }
 ];
 
+const heroSlides = [
+  {
+    image: "/stilloak-premium-hero.webp",
+    alt: "Premium svetainės dizaino pristatymas nešiojamame kompiuteryje",
+    title: "Strategija · Dizainas · Technologija",
+    text: "Vieninga jūsų verslo skaitmeninė kryptis."
+  },
+  {
+    image: "/stilloak-direction-editorial.webp",
+    alt: "Šviesi redakcinė premium dizaino kryptis",
+    title: "Redakcinė estetika · Aiški hierarchija",
+    text: "Dizainas, kuris leidžia turiniui kalbėti užtikrintai."
+  },
+  {
+    image: "/stilloak-direction-dark.webp",
+    alt: "Tamsi išskirtinio premium dizaino kryptis",
+    title: "Charakteris · Atmosfera · Išskirtinumas",
+    text: "Vizualinė patirtis, kurią klientas prisimena."
+  }
+];
+
 const trustSignals = [
   {
     icon: ShieldCheck,
@@ -263,6 +286,8 @@ function App() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "fallback" | "error">("idle");
   const [requestNumber, setRequestNumber] = useState("");
+  const [activeHeroSlide, setActiveHeroSlide] = useState(0);
+  const heroCarouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -342,6 +367,17 @@ function App() {
 
   const trackCta = (location: string, action: string) => {
     trackAnalyticsEvent("cta_click", { location, action });
+  };
+
+  const showHeroSlide = (index: number) => {
+    const nextIndex = (index + heroSlides.length) % heroSlides.length;
+    const carousel = heroCarouselRef.current;
+    if (!carousel) return;
+    carousel.scrollTo({
+      left: carousel.clientWidth * nextIndex,
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
+    });
+    setActiveHeroSlide(nextIndex);
   };
 
   const navigateToSection = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -487,11 +523,36 @@ function App() {
             </div>
           </div>
 
-          <div className="hero-premium-media" aria-label="Stilloak Web Studio premium svetainės kūrimo kryptis">
-            <img src="/stilloak-premium-hero.webp" alt="Premium svetainės dizaino pristatymas nešiojamame kompiuteryje" fetchPriority="high" />
-            <div className="hero-media-caption">
-              <span>01</span>
-              <p><strong>Strategija · Dizainas · Technologija</strong><small>Vieninga jūsų verslo skaitmeninė kryptis.</small></p>
+          <div className="hero-premium-media" aria-label="Stilloak Web Studio premium svetainės kūrimo kryptys">
+            <div
+              className="hero-carousel"
+              ref={heroCarouselRef}
+              onScroll={(event) => {
+                const element = event.currentTarget;
+                if (!element.clientWidth) return;
+                setActiveHeroSlide(Math.round(element.scrollLeft / element.clientWidth));
+              }}
+            >
+              {heroSlides.map((slide, index) => (
+                <article className="hero-slide" key={slide.image} aria-hidden={activeHeroSlide !== index}>
+                  <img src={slide.image} alt={slide.alt} fetchPriority={index === 0 ? "high" : "auto"} />
+                  <div className="hero-media-caption">
+                    <span>{String(index + 1).padStart(2, "0")} / {String(heroSlides.length).padStart(2, "0")}</span>
+                    <p><strong>{slide.title}</strong><small>{slide.text}</small></p>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <div className="hero-carousel-controls" aria-label="Keisti dizaino kryptį">
+              <button type="button" onClick={() => showHeroSlide(activeHeroSlide - 1)} aria-label="Ankstesnė kryptis">
+                <ChevronLeft size={19} aria-hidden="true" />
+              </button>
+              <div className="hero-carousel-dots" aria-hidden="true">
+                {heroSlides.map((slide, index) => <i className={index === activeHeroSlide ? "is-active" : ""} key={slide.image} />)}
+              </div>
+              <button type="button" onClick={() => showHeroSlide(activeHeroSlide + 1)} aria-label="Kita kryptis">
+                <ChevronRight size={19} aria-hidden="true" />
+              </button>
             </div>
           </div>
         </section>
