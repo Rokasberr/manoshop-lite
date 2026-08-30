@@ -176,6 +176,7 @@ const serializePublicProposal = (request) => ({
       title: task.title,
       status: task.status,
       plannedDate: task.plannedDate,
+      reviewUrl: task.reviewUrl || "",
       completedAt: task.completedAt,
       clientDecision: task.clientDecision || "none",
       clientDecisionAt: task.clientDecisionAt,
@@ -314,6 +315,7 @@ const updateAdminWebServiceRequest = async (req, res) => {
     title: task.title,
     status: task.status,
     plannedDate: task.plannedDate?.toISOString() || "",
+    reviewUrl: task.reviewUrl || "",
   }));
 
   if (Object.prototype.hasOwnProperty.call(req.body || {}, "status")) {
@@ -390,9 +392,13 @@ const updateAdminWebServiceRequest = async (req, res) => {
       const title = cleanString(task?.title, 200);
       const status = cleanString(task?.status, 40).toLowerCase() || "pending";
       const plannedDate = parseNullableDate(task?.plannedDate || null, "Netinkama projekto darbo data.");
+      const reviewUrl = cleanString(task?.reviewUrl, 500);
       if (!title) throw createHttpError("Kiekvienas projekto darbas turi turėti pavadinimą.", 400);
       if (!PROJECT_TASK_STATUS_OPTIONS.includes(status)) {
         throw createHttpError("Netinkama projekto darbo būsena.", 400);
+      }
+      if (reviewUrl && !/^https:\/\//i.test(reviewUrl)) {
+        throw createHttpError("Darbo peržiūros nuoroda turi prasidėti https://.", 400);
       }
       const existing = existingTasks.get(cleanString(task?.id, 100));
       return {
@@ -400,6 +406,7 @@ const updateAdminWebServiceRequest = async (req, res) => {
         title,
         status,
         plannedDate,
+        reviewUrl,
         completedAt: status === "completed" ? (existing?.completedAt || new Date()) : null,
       };
     });
@@ -429,7 +436,7 @@ const updateAdminWebServiceRequest = async (req, res) => {
     const previous = new Map(projectTasksBeforeUpdate.map((task) => [task.id, task]));
     const changedTasks = request.projectTasks.filter((task) => {
       const old = previous.get(task._id.toString());
-      return !old || old.title !== task.title || old.status !== task.status || old.plannedDate !== (task.plannedDate?.toISOString() || "");
+      return !old || old.title !== task.title || old.status !== task.status || old.plannedDate !== (task.plannedDate?.toISOString() || "") || old.reviewUrl !== (task.reviewUrl || "");
     });
     if (changedTasks.length) {
       const rawToken = decryptProjectToken(request.proposalTokenEncrypted);
