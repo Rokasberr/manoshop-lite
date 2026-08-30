@@ -18,6 +18,7 @@ const {
   requestAdminWebServiceFinalPayment,
   createPublicWebServiceFinalPaymentSession,
   confirmPublicWebServiceFinalPayment,
+  submitPublicWebServiceTaskFeedback,
 } = require("../controllers/webServiceRequestController");
 const {
   getPublicWebServiceBankTransfer,
@@ -81,6 +82,7 @@ router.post(
 );
 router.post("/proposal/:token/final-payment", publicProposalActionLimiter, requireWebStripeDepositsEnabled, asyncHandler(createPublicWebServiceFinalPaymentSession));
 router.post("/proposal/:token/final-payment/confirm", publicProposalActionLimiter, asyncHandler(confirmPublicWebServiceFinalPayment));
+router.post("/proposal/:token/tasks/:taskId/feedback", publicProposalActionLimiter, asyncHandler(submitPublicWebServiceTaskFeedback));
 
 router.get("/", protect, adminOnly, asyncHandler(getAdminWebServiceRequests));
 router.post(

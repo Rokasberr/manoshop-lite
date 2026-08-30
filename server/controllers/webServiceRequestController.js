@@ -9,6 +9,8 @@ const { syncWebServiceFinalPaymentFromSession } = require("../services/webServic
 const { sendWebServiceFinalPaymentEmail } = require("../services/webServiceFinalPaymentEmailService");
 const { sendWebServiceProposalEmail } = require("../services/webServiceProposalEmailService");
 const { sendWebServiceRequestEmails } = require("../services/webServiceRequestEmailService");
+const { sendWebServiceProjectUpdateEmail } = require("../services/webServiceProjectUpdateEmailService");
+const { decryptProjectToken, encryptProjectToken } = require("../services/webServiceProjectTokenService");
 const { deliverWebServiceTestContract } = require("../services/webServiceTestContractEmailService");
 const { createHttpError } = require("../utils/httpError");
 const { getWebServiceStripeClient } = require("../utils/stripeClient");
@@ -172,6 +174,14 @@ const serializePublicProposal = (request) => ({
       id: task._id?.toString() || "",
       title: task.title,
       status: task.status,
+      plannedDate: task.plannedDate,
+      completedAt: task.completedAt,
+      clientDecision: task.clientDecision || "none",
+      clientDecisionAt: task.clientDecisionAt,
+      clientComments: (task.clientComments || []).map((comment) => ({
+        message: comment.message,
+        createdAt: comment.createdAt,
+      })),
     })),
   },
   contact: {
@@ -179,6 +189,12 @@ const serializePublicProposal = (request) => ({
     phone: process.env.WEB_SERVICES_CONTACT_PHONE?.trim() || "+370 638 43445",
   },
 });
+
+const serializeAdminRequest = (request) => {
+  const response = request.toObject();
+  delete response.proposalTokenEncrypted;
+  return response;
+};
 
 const findProposalByToken = async (rawToken) => {
   const token = cleanString(rawToken, 80);
@@ -286,11 +302,18 @@ const getAdminWebServiceRequests = async (req, res) => {
 };
 
 const updateAdminWebServiceRequest = async (req, res) => {
-  const request = await WebServiceRequest.findById(req.params.id);
+  const request = await WebServiceRequest.findById(req.params.id).select("+proposalTokenEncrypted");
 
   if (!request) {
     throw createHttpError("Web užsakymas nerastas.", 404);
   }
+
+  const projectTasksBeforeUpdate = (request.projectTasks || []).map((task) => ({
+    id: task._id.toString(),
+    title: task.title,
+    status: task.status,
+    plannedDate: task.plannedDate?.toISOString() || "",
+  }));
 
   if (Object.prototype.hasOwnProperty.call(req.body || {}, "status")) {
     const status = cleanString(req.body.status, 40).toLowerCase();
@@ -361,14 +384,23 @@ const updateAdminWebServiceRequest = async (req, res) => {
     if (!Array.isArray(req.body.projectTasks) || req.body.projectTasks.length > 30) {
       throw createHttpError("Projekto darbų sąrašas netinkamas.", 400);
     }
+    const existingTasks = new Map((request.projectTasks || []).map((task) => [task._id.toString(), task]));
     request.projectTasks = req.body.projectTasks.map((task) => {
       const title = cleanString(task?.title, 200);
       const status = cleanString(task?.status, 40).toLowerCase() || "pending";
+      const plannedDate = parseNullableDate(task?.plannedDate || null, "Netinkama projekto darbo data.");
       if (!title) throw createHttpError("Kiekvienas projekto darbas turi turėti pavadinimą.", 400);
       if (!PROJECT_TASK_STATUS_OPTIONS.includes(status)) {
         throw createHttpError("Netinkama projekto darbo būsena.", 400);
       }
-      return { title, status };
+      const existing = existingTasks.get(cleanString(task?.id, 100));
+      return {
+        ...(existing ? existing.toObject() : {}),
+        title,
+        status,
+        plannedDate,
+        completedAt: status === "completed" ? (existing?.completedAt || new Date()) : null,
+      };
     });
   }
 
@@ -391,7 +423,29 @@ const updateAdminWebServiceRequest = async (req, res) => {
   }
 
   await request.save();
-  res.json(request);
+
+  if (Object.prototype.hasOwnProperty.call(req.body || {}, "projectTasks") && request.proposalStatus === "accepted") {
+    const previous = new Map(projectTasksBeforeUpdate.map((task) => [task.id, task]));
+    const changedTasks = request.projectTasks.filter((task) => {
+      const old = previous.get(task._id.toString());
+      return !old || old.title !== task.title || old.status !== task.status || old.plannedDate !== (task.plannedDate?.toISOString() || "");
+    });
+    if (changedTasks.length) {
+      const rawToken = decryptProjectToken(request.proposalTokenEncrypted);
+      const projectUrl = rawToken ? `${getWebPublicUrl()}/pasiulymas/${rawToken}` : "";
+      try {
+        const delivery = await sendWebServiceProjectUpdateEmail({ request, changedTasks, projectUrl });
+        if (delivery.sent) {
+          request.contactHistory.push({ type: "email", note: `Klientui išsiųstas vienas ${changedTasks.length} darbų atnaujinimo laiškas.`, happenedAt: new Date(), ...adminActor(req) });
+          await request.save();
+        }
+      } catch (error) {
+        console.error(`[web-project-update] ${request.requestNumber} laiško klaida: ${error.message}`);
+      }
+    }
+  }
+
+  res.json(serializeAdminRequest(request));
 };
 
 const sendAdminWebServiceProposal = async (req, res) => {
@@ -434,6 +488,7 @@ const sendAdminWebServiceProposal = async (req, res) => {
   request.proposalTerms = terms;
   request.proposalStatus = "sent";
   request.proposalTokenHash = hashProposalToken(token);
+  request.proposalTokenEncrypted = encryptProjectToken(token);
   request.proposalSentAt = now;
   request.proposalViewedAt = null;
   request.proposalAcceptedAt = null;
@@ -471,7 +526,7 @@ const sendAdminWebServiceProposal = async (req, res) => {
     emailResult = { sent: false, error: error.message };
   }
 
-  res.status(201).json({ request, proposalUrl, email: emailResult });
+  res.status(201).json({ request: serializeAdminRequest(request), proposalUrl, email: emailResult });
 };
 
 const getPublicWebServiceProposal = async (req, res) => {
@@ -483,6 +538,47 @@ const getPublicWebServiceProposal = async (req, res) => {
     await request.save();
   }
 
+  res.json(serializePublicProposal(request));
+};
+
+const submitPublicWebServiceTaskFeedback = async (req, res) => {
+  const { request } = await findProposalByToken(req.params.token);
+  if (request.proposalStatus !== "accepted") {
+    throw createHttpError("Projekto pastabas galima teikti tik patvirtinus pasiūlymą.", 409);
+  }
+
+  const task = request.projectTasks.id(cleanString(req.params.taskId, 100));
+  if (!task) throw createHttpError("Projekto darbas nerastas.", 404);
+
+  const action = cleanString(req.body?.action, 40).toLowerCase();
+  const message = cleanString(req.body?.message, 1000);
+  if (!["comment", "approved", "changes_requested"].includes(action)) {
+    throw createHttpError("Netinkamas projekto darbo veiksmas.", 400);
+  }
+  if ((action === "comment" || action === "changes_requested") && message.length < 2) {
+    throw createHttpError("Įrašykite pastabą.", 400);
+  }
+  if (message && task.clientComments.length >= 20) {
+    throw createHttpError("Pasiektas šio darbo pastabų limitas.", 409);
+  }
+
+  const now = new Date();
+  if (message) task.clientComments.push({ message, createdAt: now });
+  if (action === "approved") {
+    task.clientDecision = "approved";
+    task.clientDecisionAt = now;
+  } else if (action === "changes_requested") {
+    task.clientDecision = "changes_requested";
+    task.clientDecisionAt = now;
+  }
+  request.contactHistory.push({
+    type: "note",
+    note: action === "approved" ? `Klientas patvirtino darbą „${task.title}“.` : action === "changes_requested" ? `Klientas paprašė pataisymų darbui „${task.title}“: ${message}` : `Klientas parašė pastabą darbui „${task.title}“: ${message}`,
+    happenedAt: now,
+    actorName: request.name,
+    actorEmail: request.email,
+  });
+  await request.save();
   res.json(serializePublicProposal(request));
 };
 
@@ -669,6 +765,7 @@ const requestAdminWebServiceFinalPayment = async (req, res) => {
   const now = new Date();
   const proposalUrl = `${getWebPublicUrl()}/pasiulymas/${token}`;
   request.proposalTokenHash = hashProposalToken(token);
+  request.proposalTokenEncrypted = encryptProjectToken(token);
   request.finalPaymentAmount = amount;
   request.finalPaymentStatus = "requested";
   request.projectStage = "awaiting_final_payment";
@@ -693,7 +790,7 @@ const requestAdminWebServiceFinalPayment = async (req, res) => {
     console.error(`[web-final-payment] ${request.requestNumber} laiško klaida: ${error.message}`);
     emailResult = { sent: false, error: error.message };
   }
-  res.status(201).json({ request, proposalUrl, email: emailResult });
+  res.status(201).json({ request: serializeAdminRequest(request), proposalUrl, email: emailResult });
 };
 
 const createPublicWebServiceFinalPaymentSession = async (req, res) => {
@@ -738,6 +835,7 @@ module.exports = {
   createWebServiceRequest,
   getAdminWebServiceRequests,
   getPublicWebServiceProposal,
+  submitPublicWebServiceTaskFeedback,
   getPublicWebServiceInvoicePdf,
   sendAdminWebServiceProposal,
   syncAdminWebServiceDeposit,

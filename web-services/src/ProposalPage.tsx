@@ -13,6 +13,9 @@ import {
   ShieldCheck,
   Circle,
   Clock3,
+  MessageSquare,
+  ThumbsUp,
+  RotateCcw,
 } from "lucide-react";
 
 type InvoiceInfo = { number: string; status: string; sentAt: string | null; downloadPath: string } | null;
@@ -50,7 +53,16 @@ type PublicProposal = {
     warrantyEndsAt: string | null;
     carePlan: string;
     files: Array<{ label: string; url: string }>;
-    tasks: Array<{ id: string; title: string; status: "pending" | "in_progress" | "completed" }>;
+    tasks: Array<{
+      id: string;
+      title: string;
+      status: "pending" | "in_progress" | "completed";
+      plannedDate: string | null;
+      completedAt: string | null;
+      clientDecision: "none" | "approved" | "changes_requested";
+      clientDecisionAt: string | null;
+      clientComments: Array<{ message: string; createdAt: string }>;
+    }>;
   };
   contact: { email: string; phone: string };
 };
@@ -110,11 +122,40 @@ function ProposalPage({ token }: ProposalPageProps) {
   const [accepting, setAccepting] = useState(false);
   const [paying, setPaying] = useState(false);
   const [paymentMessage, setPaymentMessage] = useState("");
+  const [taskMessages, setTaskMessages] = useState<Record<string, string>>({});
+  const [submittingTaskId, setSubmittingTaskId] = useState("");
 
   const endpoint = useMemo(
     () => (apiBaseUrl ? `${apiBaseUrl}/web-service-requests/proposal/${token}` : ""),
     [token]
   );
+
+  const submitTaskFeedback = async (taskId: string, action: "comment" | "approved" | "changes_requested") => {
+    if (!endpoint || submittingTaskId) return;
+    const message = (taskMessages[taskId] || "").trim();
+    if ((action === "comment" || action === "changes_requested") && message.length < 2) {
+      setError("Prieš siunčiant įrašykite pastabą.");
+      return;
+    }
+    try {
+      setSubmittingTaskId(taskId);
+      setError("");
+      const response = await fetch(`${endpoint}/tasks/${taskId}/feedback`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, message }),
+      });
+      const data = await response.json().catch(() => ({})) as PublicProposal & { message?: string };
+      if (!response.ok) throw new Error(data.message || "Nepavyko išsaugoti pastabos.");
+      setProposal(data);
+      setTaskMessages((current) => ({ ...current, [taskId]: "" }));
+      setPaymentMessage(action === "approved" ? "Darbas patvirtintas. Ačiū!" : action === "changes_requested" ? "Pataisymų prašymas išsiųstas." : "Pastaba išsiųsta.");
+    } catch (feedbackError) {
+      setError(feedbackError instanceof Error ? feedbackError.message : "Nepavyko išsaugoti pastabos.");
+    } finally {
+      setSubmittingTaskId("");
+    }
+  };
 
   useEffect(() => {
     document.title = "Kliento projektas | Stilloak Web";
@@ -333,6 +374,21 @@ function ProposalPage({ token }: ProposalPageProps) {
                     {task.status === "completed" ? <CheckCircle2 size={20} /> : task.status === "in_progress" ? <Clock3 size={20} /> : <Circle size={20} />}
                     <span>{task.title}</span>
                     <small>{projectTaskStatusLabels[task.status]}</small>
+                    <div className="project-task-meta">
+                      {task.plannedDate ? <span><CalendarDays size={15} /> Planuojama {formatDate(task.plannedDate)}</span> : null}
+                      {task.completedAt ? <span><CheckCircle2 size={15} /> Atlikta {formatDate(task.completedAt)}</span> : null}
+                    </div>
+                    {task.clientDecision !== "none" ? <div className={`project-client-decision is-${task.clientDecision}`}>{task.clientDecision === "approved" ? <><ThumbsUp size={16} /> Jūs patvirtinote</> : <><RotateCcw size={16} /> Paprašėte pataisymų</>}</div> : null}
+                    {task.clientComments?.length ? <div className="project-client-comments">{task.clientComments.map((comment, commentIndex) => <p key={`${task.id}-comment-${commentIndex}`}><MessageSquare size={15} /><span>{comment.message}<small>{formatDate(comment.createdAt)}</small></span></p>)}</div> : null}
+                    <div className="project-task-feedback">
+                      <label htmlFor={`task-comment-${task.id}`}>Jūsų pastaba</label>
+                      <textarea id={`task-comment-${task.id}`} maxLength={1000} placeholder="Parašykite pastabą arba norimą pataisymą..." value={taskMessages[task.id] || ""} onChange={(event) => setTaskMessages((current) => ({ ...current, [task.id]: event.target.value }))} />
+                      <div>
+                        <button type="button" disabled={submittingTaskId === task.id} onClick={() => submitTaskFeedback(task.id, "comment")}><MessageSquare size={16} /> Siųsti pastabą</button>
+                        <button type="button" disabled={submittingTaskId === task.id} onClick={() => submitTaskFeedback(task.id, "changes_requested")}><RotateCcw size={16} /> Reikia pataisymų</button>
+                        <button type="button" className="is-approve" disabled={submittingTaskId === task.id} onClick={() => submitTaskFeedback(task.id, "approved")}><ThumbsUp size={16} /> Patvirtinti</button>
+                      </div>
+                    </div>
                   </article>
                 ))}
               </div>
