@@ -6,6 +6,7 @@ import {
   Code2,
   Globe2,
   Headphones,
+  LayoutDashboard,
   Mail,
   Menu,
   MonitorSmartphone,
@@ -14,9 +15,11 @@ import {
   Send,
   ShieldCheck,
   Sparkles,
+  WalletCards,
   X
 } from "lucide-react";
 import { pricePlans } from "./data/pricing";
+import { trackAnalyticsEvent } from "./lib/analytics";
 import { getLeadAttribution } from "./lib/leadAttribution";
 
 type FormState = {
@@ -178,6 +181,43 @@ const trustSignals = [
   }
 ];
 
+const clientExperience = [
+  {
+    icon: LayoutDashboard,
+    title: "Visa eiga vienoje vietoje",
+    text: "Per privačią nuorodą matysite projekto būseną, terminą ir darbų planą."
+  },
+  {
+    icon: WalletCards,
+    title: "Aiškūs mokėjimai",
+    text: "Avansas, likutis ir sąskaitos pateikiami aiškiai, be informacijos paieškų laiškuose."
+  },
+  {
+    icon: ShieldCheck,
+    title: "Patvirtinimai ir pastabos",
+    text: "Prie kiekvieno darbo galėsite pateikti pastabą, prašyti pakeitimo arba patvirtinti rezultatą."
+  }
+];
+
+const commonQuestions = [
+  {
+    question: "Ar užklausa mane įpareigoja pirkti?",
+    answer: "Ne. Pirmiausia peržiūrime poreikį ir pateikiame aiškų pasiūlymą su darbų apimtimi, terminu ir kaina."
+  },
+  {
+    question: "Kada pradedami darbai?",
+    answer: "Darbai pradedami patvirtinus pasiūlymą ir gavus jame numatytą avansą. Tiksli pradžia ir terminas nurodomi pasiūlyme."
+  },
+  {
+    question: "Ar matysiu, kas jau atlikta?",
+    answer: "Taip. Po pasiūlymo patvirtinimo privati nuoroda tampa projekto puslapiu, kuriame matoma darbų eiga, mokėjimai ir dokumentai."
+  },
+  {
+    question: "Ar svetainė veiks telefone?",
+    answer: "Taip. Mobilus vaizdas, aiški navigacija ir patogūs kontaktų veiksmai yra bazinė kiekvieno projekto dalis."
+  }
+];
+
 function validateForm(form: FormState): FormErrors {
   const errors: FormErrors = {};
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -291,9 +331,14 @@ function App() {
     }
 
     updateForm("packageId", packageId);
+    trackAnalyticsEvent("select_package", { package_id: packageId });
     window.setTimeout(() => {
       document.getElementById("kontaktai")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 0);
+  };
+
+  const trackCta = (location: string, action: string) => {
+    trackAnalyticsEvent("cta_click", { location, action });
   };
 
   const navigateToSection = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -372,7 +417,7 @@ function App() {
       <header className="site-header">
         <a className="wordmark" href="#top" aria-label="Stilloak Web pradžia" onClick={(event) => navigateToSection(event, "#top")}>
           <strong>Stilloak</strong>
-          <span>Web</span>
+          <span>Web Studio</span>
         </a>
 
         <button
@@ -392,7 +437,10 @@ function App() {
               {label}
             </a>
           ))}
-          <a className="nav-cta" href="#kontaktai" onClick={(event) => navigateToSection(event, "#kontaktai")}>
+          <a className="nav-cta" href="#kontaktai" onClick={(event) => {
+            trackCta("navigation", "get_offer");
+            navigateToSection(event, "#kontaktai");
+          }}>
             Gauti pasiūlymą <ArrowRight size={17} aria-hidden="true" />
           </a>
         </nav>
@@ -402,21 +450,27 @@ function App() {
         <section className="hero section">
           <div className="hero-copy-block">
             <span className="hero-pill">
-              <span className="hero-pill-dot" /> Svetainės, kurios kuria vertę
+              <span className="hero-pill-dot" /> Boutique web studio
             </span>
             <h1>
-              Svetainės verslui, kurios atrodo profesionaliai ir <em>padeda gauti klientų.</em>
+              Jūsų verslas vertas daugiau <em>nei šablono.</em>
             </h1>
             <p>
-              Kuriame modernias, greitas ir patikimas svetaines, pritaikytas jūsų verslui. Nuo idėjos iki
-              paleidimo pasirūpiname visu procesu, kad galėtumėte susitelkti į savo veiklą.
+              Individualiai kuriame svetaines, kurios išgrynina jūsų vertę ir profesionaliai pristato verslą.
+              Nuo pirmos krypties iki paleidimo visas procesas lieka aiškus ir matomas.
             </p>
             <div className="hero-actions">
-              <a className="button button-primary" href="#kontaktai" onClick={(event) => navigateToSection(event, "#kontaktai")}>
-                Užsakyti svetainę <ArrowRight size={18} aria-hidden="true" />
+              <a className="button button-primary" href="#kontaktai" onClick={(event) => {
+                trackCta("hero", "order_website");
+                navigateToSection(event, "#kontaktai");
+              }}>
+                Aptarti projektą <ArrowRight size={18} aria-hidden="true" />
               </a>
-              <a className="button button-secondary" href="#kainos" onClick={(event) => navigateToSection(event, "#kainos")}>
-                Peržiūrėti kainas <ArrowRight size={18} aria-hidden="true" />
+              <a className="button button-secondary" href="#portfolio" onClick={(event) => {
+                trackCta("hero", "view_work");
+                navigateToSection(event, "#portfolio");
+              }}>
+                Atrasti mūsų kryptį <ArrowRight size={18} aria-hidden="true" />
               </a>
             </div>
 
@@ -427,67 +481,17 @@ function App() {
                 <span><MonitorSmartphone size={18} /></span>
               </div>
               <div>
-                <strong>Aiški kaina ir procesas</strong>
-                <small>Responsive dizainas · SEO pagrindai · Domeno prijungimas</small>
+                <strong>Individualus dizainas ir aiškus procesas</strong>
+                <small>Privati projekto erdvė · Matoma eiga · Pagalba po paleidimo</small>
               </div>
             </div>
           </div>
 
-          <div className="hero-visual" aria-label="Pavyzdinės verslo svetainės vizualas">
-            <div className="browser-frame">
-              <div className="browser-toolbar">
-                <div className="browser-dots" aria-hidden="true">
-                  <span />
-                  <span />
-                  <span />
-                </div>
-                <div className="browser-address">yourbusiness.lt</div>
-              </div>
-
-              <div className="preview-site">
-                <div className="preview-nav">
-                  <strong>NATŪRALI</strong>
-                  <div>
-                    <span>Apie mus</span>
-                    <span>Paslaugos</span>
-                    <span>Kontaktai</span>
-                  </div>
-                  <span className="preview-cta">Susisiekti</span>
-                </div>
-
-                <div className="preview-hero">
-                  <div className="preview-copy">
-                    <small>NATŪRALŪS SPRENDIMAI</small>
-                    <strong>Jūsų geresnei kasdienai</strong>
-                    <p>Aiški žinutė, kokybiškas dizainas ir patogi vartotojo patirtis.</p>
-                    <span>Sužinoti daugiau</span>
-                  </div>
-                  <div className="still-life" aria-hidden="true">
-                    <div className="plant-stem stem-one" />
-                    <div className="plant-stem stem-two" />
-                    <div className="leaf leaf-one" />
-                    <div className="leaf leaf-two" />
-                    <div className="leaf leaf-three" />
-                    <div className="bottle" />
-                    <div className="vase" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="mini-preview-row" aria-hidden="true">
-                <div className="mini-preview mini-build">
-                  <small>STATYBOS</small>
-                  <strong>Aiški struktūra nuo pirmo ekrano</strong>
-                </div>
-                <div className="mini-preview mini-legal">
-                  <small>PASLAUGOS</small>
-                  <strong>Tvirtas įvaizdis ir pasitikėjimas</strong>
-                </div>
-                <div className="mini-preview mini-interior">
-                  <small>INTERJERAS</small>
-                  <strong>Vizualas, kuris kalba už verslą</strong>
-                </div>
-              </div>
+          <div className="hero-premium-media" aria-label="Stilloak Web Studio premium svetainės kūrimo kryptis">
+            <img src="/stilloak-premium-hero.webp" alt="Premium svetainės dizaino pristatymas nešiojamame kompiuteryje" fetchPriority="high" />
+            <div className="hero-media-caption">
+              <span>01</span>
+              <p><strong>Strategija · Dizainas · Technologija</strong><small>Vieninga jūsų verslo skaitmeninė kryptis.</small></p>
             </div>
           </div>
         </section>
@@ -555,6 +559,33 @@ function App() {
                 </div>
               </article>
             ))}
+          </div>
+        </section>
+
+        <section id="kliento-zona" className="section client-experience-section" aria-labelledby="client-experience-title">
+          <div className="client-experience-panel" data-reveal>
+            <div className="client-experience-copy">
+              <span className="section-eyebrow">Skaidrus bendradarbiavimas</span>
+              <h2 id="client-experience-title">Projektą valdysite ne per padrikus laiškus.</h2>
+              <p>
+                Gavę privatų projekto puslapį visada žinosite, kas vyksta dabar, ką reikia patvirtinti ir kokie
+                mokėjimai ar dokumentai jau paruošti.
+              </p>
+              <a className="button button-primary" href="#kontaktai" onClick={(event) => {
+                trackCta("client_portal", "start_project");
+                navigateToSection(event, "#kontaktai");
+              }}>
+                Aptarti projektą <ArrowRight size={18} aria-hidden="true" />
+              </a>
+            </div>
+            <div className="client-experience-grid">
+              {clientExperience.map((item) => (
+                <article className="client-experience-card" key={item.title}>
+                  <span><item.icon size={21} aria-hidden="true" /></span>
+                  <div><h3>{item.title}</h3><p>{item.text}</p></div>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -642,6 +673,22 @@ function App() {
           </div>
         </section>
 
+        <section className="section faq-section" aria-labelledby="faq-title">
+          <div className="section-intro compact-intro" data-reveal>
+            <span>Dažniausi klausimai</span>
+            <h2 id="faq-title">Aiškūs atsakymai prieš pradedant.</h2>
+            <p>Trumpai apie pasiūlymą, darbų pradžią ir projekto valdymą.</p>
+          </div>
+          <div className="faq-list" data-reveal>
+            {commonQuestions.map((item) => (
+              <details className="faq-item" key={item.question}>
+                <summary>{item.question}<span aria-hidden="true">+</span></summary>
+                <p>{item.answer}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+
         <section id="kontaktai" className="section contact-panel" aria-labelledby="contact-title">
           <div className="contact-copy" data-reveal>
             <span className="contact-kicker">Pradėkime bendradarbiauti</span>
@@ -654,10 +701,10 @@ function App() {
               <Clock3 size={21} aria-hidden="true" />
               <span>Atsakome per 24 val.</span>
             </div>
-            <a className="contact-email" href={`mailto:${contactEmail}`}>
+            <a className="contact-email" href={`mailto:${contactEmail}`} onClick={() => trackCta("contact", "email")}>
               <Mail size={18} aria-hidden="true" /> {contactEmail}
             </a>
-            <a className="contact-email" href={contactPhoneHref}>
+            <a className="contact-email" href={contactPhoneHref} onClick={() => trackCta("contact", "phone")}>
               <Phone size={18} aria-hidden="true" /> {contactPhone}
             </a>
           </div>
@@ -840,6 +887,8 @@ function App() {
               <Send size={18} aria-hidden="true" />
             </button>
 
+            <p className="form-reassurance">Užklausa nieko nekainuoja ir neįpareigoja pirkti.</p>
+
             <p className="privacy-note">
               <ShieldCheck size={15} aria-hidden="true" /> Užsakymo informacija siunčiama saugiai ir patenka į Stilloak administravimo sistemą.
             </p>
@@ -851,7 +900,7 @@ function App() {
         <div className="footer-brand-block">
           <a className="wordmark footer-wordmark" href="#top" onClick={(event) => navigateToSection(event, "#top")}>
             <strong>Stilloak</strong>
-            <span>Web</span>
+            <span>Web Studio</span>
           </a>
           <p>Svetainės, kurios padeda verslui atrodyti profesionaliai ir augti.</p>
         </div>

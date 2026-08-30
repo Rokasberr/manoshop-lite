@@ -1,0 +1,29 @@
+<svg width="1080" height="1350" viewBox="0 0 1080 1350" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="shade" x1="0" y1="0" x2="760" y2="610" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#11100F" stop-opacity="0.72"/><stop offset="1" stop-color="#11100F" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="foot" x1="0" y1="1350" x2="0" y2="1020" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#110F0D" stop-opacity="0.9"/><stop offset="1" stop-color="#110F0D" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="760" fill="url(#shade)"/>
+  <rect y="980" width="1080" height="370" fill="url(#foot)"/>
+  <g transform="translate(74 72)">
+    <rect width="48" height="48" rx="14" fill="#A87550"/>
+    <text x="24" y="34" text-anchor="middle" fill="#FFF8EE" font-family="Arial, sans-serif" font-size="24" font-weight="700">S</text>
+    <text x="66" y="22" fill="#FFFDF9" font-family="Arial, sans-serif" font-size="22" font-weight="700" letter-spacing="1.8">STILLOAK</text>
+    <text x="66" y="45" fill="#D9B98B" font-family="Arial, sans-serif" font-size="17" letter-spacing="3">WEB STUDIO</text>
+  </g>
+  <text x="74" y="260" fill="#D9B98B" font-family="Arial, sans-serif" font-size="19" font-weight="700" letter-spacing="4">INDIVIDUALUS SVETAINIŲ KŪRIMAS</text>
+  <text x="74" y="352" fill="#FFFDF9" font-family="Georgia, serif" font-size="72">
+    <tspan x="74" dy="0">Jūsų verslas</tspan>
+    <tspan x="74" dy="82">vertas daugiau</tspan>
+    <tspan x="74" dy="82" font-style="italic" fill="#E4C5A7">nei šablono.</tspan>
+  </text>
+  <line x1="74" y1="615" x2="142" y2="615" stroke="#B98962" stroke-width="3"/>
+  <text x="166" y="623" fill="#D5CEC7" font-family="Arial, sans-serif" font-size="23">Strategija · Dizainas · Technologija</text>
+  <text x="74" y="1182" fill="#FFFDF9" font-family="Arial, sans-serif" font-size="31" font-weight="700">Pradėkime nuo jūsų idėjos</text>
+  <text x="74" y="1231" fill="#C9C1BA" font-family="Arial, sans-serif" font-size="22">Aiškus pasiūlymas. Matoma projekto eiga.</text>
+  <text x="74" y="1291" fill="#E4C5A7" font-family="Arial, sans-serif" font-size="20" font-weight="700" letter-spacing="1">WEB.STILLOAK-STUDIO.COM  →</text>
+</svg>
