@@ -452,9 +452,6 @@ function App() {
       <main id="top">
         <section className="hero section">
           <div className="hero-copy-block">
-            <span className="hero-pill">
-              <span className="hero-pill-dot" /> Boutique web studio
-            </span>
             <h1>
               Jūsų verslas vertas daugiau <em>nei šablono.</em>
             </h1>
