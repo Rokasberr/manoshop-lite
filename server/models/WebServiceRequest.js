@@ -21,6 +21,7 @@ const TEST_INVOICE_STATUS_OPTIONS = ["not_created", "processing", "sent", "faile
 const FINAL_PAYMENT_STATUS_OPTIONS = ["not_requested", "requested", "pending", "paid", "failed", "refunded"];
 const PROJECT_STAGE_OPTIONS = ["awaiting_deposit", "in_progress", "client_review", "awaiting_final_payment", "completed"];
 const PROJECT_TASK_STATUS_OPTIONS = ["pending", "in_progress", "completed"];
+const PROJECT_TASK_DECISION_OPTIONS = ["none", "approved", "changes_requested"];
 
 const attributionSchema = new mongoose.Schema(
   {
@@ -52,6 +53,14 @@ const projectTaskSchema = new mongoose.Schema(
   {
     title: { type: String, required: true, trim: true, maxlength: 200 },
     status: { type: String, enum: PROJECT_TASK_STATUS_OPTIONS, default: "pending" },
+    plannedDate: { type: Date, default: null },
+    completedAt: { type: Date, default: null },
+    clientDecision: { type: String, enum: PROJECT_TASK_DECISION_OPTIONS, default: "none" },
+    clientDecisionAt: { type: Date, default: null },
+    clientComments: {
+      type: [{ message: { type: String, required: true, trim: true, maxlength: 1000 }, createdAt: { type: Date, default: Date.now } }],
+      default: [],
+    },
   },
   { timestamps: true }
 );
@@ -88,6 +97,7 @@ const webServiceRequestSchema = new mongoose.Schema(
     proposalTerms: { type: String, trim: true, maxlength: 5000, default: "" },
     proposalStatus: { type: String, enum: PROPOSAL_STATUS_OPTIONS, default: "draft", index: true },
     proposalTokenHash: { type: String, trim: true, maxlength: 128, default: "", index: true },
+    proposalTokenEncrypted: { type: String, trim: true, maxlength: 500, default: "", select: false },
     proposalSentAt: { type: Date, default: null },
     proposalViewedAt: { type: Date, default: null },
     proposalAcceptedAt: { type: Date, default: null },
@@ -166,3 +176,4 @@ module.exports.FINAL_PAYMENT_STATUS_OPTIONS = FINAL_PAYMENT_STATUS_OPTIONS;
 
 module.exports.PROJECT_STAGE_OPTIONS = PROJECT_STAGE_OPTIONS;
 module.exports.PROJECT_TASK_STATUS_OPTIONS = PROJECT_TASK_STATUS_OPTIONS;
+module.exports.PROJECT_TASK_DECISION_OPTIONS = PROJECT_TASK_DECISION_OPTIONS;

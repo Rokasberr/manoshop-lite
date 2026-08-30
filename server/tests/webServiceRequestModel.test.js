@@ -42,12 +42,13 @@ test("WebServiceRequest validates structured client project tasks", () => {
   const valid = new WebServiceRequest({
     ...validRequest(),
     projectTasks: [
-      { title: "Paruošti dizainą", status: "completed" },
+      { title: "Paruošti dizainą", status: "completed", plannedDate: new Date("2026-09-05"), clientDecision: "approved", clientComments: [{ message: "Tinka" }] },
       { title: "Sukurti mobilią versiją", status: "in_progress" },
     ],
   });
   assert.equal(valid.validateSync(), undefined);
   assert.equal(valid.projectTasks.length, 2);
+  assert.equal(valid.projectTasks[0].clientDecision, "approved");
 
   const invalid = new WebServiceRequest({
     ...validRequest(),

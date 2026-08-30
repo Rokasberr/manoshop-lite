@@ -49,7 +49,16 @@ const buildDraft = (request) => ({
   warrantyEndsAt: request.warrantyEndsAt ? new Date(request.warrantyEndsAt).toISOString().slice(0, 10) : "",
   carePlan: request.carePlan || "",
   handoverItemsText: (request.handoverItems || []).join("\n"),
-  projectTasks: (request.projectTasks || []).map((task) => ({ title: task.title || "", status: task.status || "pending" })),
+  projectTasks: (request.projectTasks || []).map((task) => ({
+    id: task._id || task.id || "",
+    title: task.title || "",
+    status: task.status || "pending",
+    plannedDate: task.plannedDate ? new Date(task.plannedDate).toISOString().slice(0, 10) : "",
+    completedAt: task.completedAt || null,
+    clientDecision: task.clientDecision || "none",
+    clientDecisionAt: task.clientDecisionAt || null,
+    clientComments: task.clientComments || [],
+  })),
 });
 
 const WebProposalsPage = () => {
@@ -127,7 +136,7 @@ const WebProposalsPage = () => {
   };
 
   const addProjectTask = (requestId) => {
-    updateDraft(requestId, "projectTasks", [...(drafts[requestId]?.projectTasks || []), { title: "", status: "pending" }]);
+    updateDraft(requestId, "projectTasks", [...(drafts[requestId]?.projectTasks || []), { id: "", title: "", status: "pending", plannedDate: "", clientDecision: "none", clientComments: [] }]);
   };
 
   const removeProjectTask = (requestId, index) => {
@@ -143,7 +152,7 @@ const WebProposalsPage = () => {
   };
 
   const handleSaveProjectTasks = async (request) => {
-    const tasks = (drafts[request._id]?.projectTasks || []).map((task) => ({ title: task.title.trim(), status: task.status })).filter((task) => task.title);
+    const tasks = (drafts[request._id]?.projectTasks || []).map((task) => ({ id: task.id, title: task.title.trim(), status: task.status, plannedDate: task.plannedDate || null })).filter((task) => task.title);
     try {
       setSavingTasksId(request._id);
       const updated = await webServiceRequestService.updateRequest(request._id, { projectTasks: tasks });
@@ -516,6 +525,10 @@ const WebProposalsPage = () => {
                                     <button type="button" className="dashboard-button-secondary px-3 text-rose-700" aria-label="Pašalinti darbą" onClick={() => removeProjectTask(request._id, index)}>×</button>
                                   </div>
                                 </div>
+                                <label className="mt-2 block text-xs font-medium text-slate-600">Planuojama data<input className="input-field mt-1 w-full" type="date" value={task.plannedDate || ""} onChange={(event) => updateProjectTask(request._id, index, "plannedDate", event.target.value)} /></label>
+                                {task.completedAt ? <p className="mt-2 text-xs text-emerald-700">Atlikta: {new Date(task.completedAt).toLocaleString("lt-LT")}</p> : null}
+                                {task.clientDecision !== "none" ? <p className={`mt-2 rounded-lg px-3 py-2 text-xs font-semibold ${task.clientDecision === "approved" ? "bg-emerald-50 text-emerald-800" : "bg-amber-50 text-amber-800"}`}>Kliento sprendimas: {task.clientDecision === "approved" ? "Patvirtinta" : "Reikia pataisymų"}{task.clientDecisionAt ? ` · ${new Date(task.clientDecisionAt).toLocaleString("lt-LT")}` : ""}</p> : null}
+                                {task.clientComments?.length ? <div className="mt-2 space-y-2">{task.clientComments.map((comment, commentIndex) => <div className="rounded-lg bg-white px-3 py-2 text-xs text-slate-700" key={`${task.id}-comment-${commentIndex}`}><strong>Kliento pastaba:</strong> {comment.message}<span className="mt-1 block text-slate-400">{comment.createdAt ? new Date(comment.createdAt).toLocaleString("lt-LT") : ""}</span></div>)}</div> : null}
                               </div>
                             ))}
                           </div> : <p className="rounded-xl bg-slate-50 p-3 text-sm text-slate-500">Darbų dar nėra. Paspausk „+ Darbas“ ir sudaryk kliento projekto planą.</p>}
