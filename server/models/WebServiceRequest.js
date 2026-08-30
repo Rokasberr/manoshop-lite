@@ -54,6 +54,7 @@ const projectTaskSchema = new mongoose.Schema(
     title: { type: String, required: true, trim: true, maxlength: 200 },
     status: { type: String, enum: PROJECT_TASK_STATUS_OPTIONS, default: "pending" },
     plannedDate: { type: Date, default: null },
+    reviewUrl: { type: String, trim: true, maxlength: 500, default: "" },
     completedAt: { type: Date, default: null },
     clientDecision: { type: String, enum: PROJECT_TASK_DECISION_OPTIONS, default: "none" },
     clientDecisionAt: { type: Date, default: null },
