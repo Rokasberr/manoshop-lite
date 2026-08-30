@@ -332,6 +332,18 @@ body {
   padding: 20px 23px 24px;
 }
 
+.concept-meta > span {
+  display: inline-flex;
+  margin-bottom: 10px;
+  color: #8d6043;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.concept-meta h3 { margin-top: 0; }
+
 .trust-panel,
 .client-experience-panel {
   border-radius: 34px;
@@ -339,6 +351,39 @@ body {
     radial-gradient(circle at 86% 8%, rgba(168, 117, 80, 0.3), transparent 32%),
     linear-gradient(145deg, #141514, #292622 72%, #3a2a20);
   box-shadow: 0 34px 90px rgba(35, 27, 22, 0.18);
+}
+
+.trust-panel,
+.trust-panel .trust-heading h2,
+.trust-panel .trust-item strong,
+.client-experience-panel,
+.client-experience-panel h2,
+.client-experience-panel h3 {
+  color: #fffaf6;
+}
+
+.trust-panel .trust-heading p,
+.trust-panel .trust-item small,
+.client-experience-panel .client-experience-copy > p,
+.client-experience-panel .client-experience-card p {
+  color: #d3cbc4;
+}
+
+.trust-panel .trust-heading > span {
+  color: #f1d3b9;
+  border-color: rgba(241, 211, 185, .28);
+  background: rgba(168, 117, 80, .18);
+}
+
+.trust-panel .trust-item,
+.client-experience-panel .client-experience-card {
+  border-color: rgba(255, 250, 246, .13);
+  background: rgba(255, 255, 255, .065);
+}
+
+.trust-panel .trust-item-icon {
+  color: #f1d3b9;
+  background: rgba(168, 117, 80, .24);
 }
 
 .faq-item summary {
