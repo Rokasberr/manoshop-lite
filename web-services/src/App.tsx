@@ -453,11 +453,11 @@ function App() {
         <section className="hero section">
           <div className="hero-copy-block">
             <h1>
-              Jūsų verslas vertas daugiau <em>nei šablono.</em>
+              Svetainė, kuri kuria jūsų verslo <em>vertę.</em>
             </h1>
             <p>
-              Individualiai kuriame svetaines, kurios išgrynina jūsų vertę ir profesionaliai pristato verslą.
-              Nuo pirmos krypties iki paleidimo visas procesas lieka aiškus ir matomas.
+              Kuriame individualias verslo svetaines, kuriose strategija, dizainas ir technologija veikia kaip
+              viena sistema. Jokių atsitiktinių šablonų – tik jūsų verslui sukurta kryptis.
             </p>
             <div className="hero-actions">
               <a className="button button-primary" href="#kontaktai" onClick={(event) => {
@@ -512,9 +512,9 @@ function App() {
 
         <section id="kainos" className="section pricing-section" aria-labelledby="pricing-title">
           <div className="section-intro compact-intro" data-reveal>
-            <span>Kainos</span>
-            <h2 id="pricing-title">Pasirinkite tinkamiausią paketą.</h2>
-            <p>Aiški bazinė kaina paprastiems projektams ir individualus pasiūlymas sudėtingesniems poreikiams.</p>
+            <span>Studijos pasiūlymai</span>
+            <h2 id="pricing-title">Aiški investicija į jūsų įvaizdį.</h2>
+            <p>Pasirinkite projekto apimtį. Kiekvieną kryptį pritaikome jūsų verslui, turiniui ir auditorijai.</p>
           </div>
 
           <div className="pricing-grid">
@@ -592,8 +592,8 @@ function App() {
         <section id="portfolio" className="section concepts-section" aria-labelledby="concepts-title">
           <div className="section-intro compact-intro process-intro" data-reveal>
             <span>Vizualinės kryptys</span>
-            <h2 id="concepts-title">Pavyzdiniai projektai</h2>
-            <p>Šie maketai rodo galimas dizaino kryptis. Tai koncepciniai pavyzdžiai, ne klientų projektai.</p>
+            <h2 id="concepts-title">Viena studija. Skirtingas charakteris.</h2>
+            <p>Kiekvieną svetainę kuriame pagal verslo poziciją ir auditoriją. Žemiau – trys skirtingos koncepcinės kryptys.</p>
           </div>
 
           <div className="concept-grid">
@@ -693,10 +693,10 @@ function App() {
         <section id="kontaktai" className="section contact-panel" aria-labelledby="contact-title">
           <div className="contact-copy" data-reveal>
             <span className="contact-kicker">Pradėkime bendradarbiauti</span>
-            <h2 id="contact-title">Užsakykite svetainę</h2>
+            <h2 id="contact-title">Papasakokite, ką norite sukurti.</h2>
             <p>
-              Papasakokite apie savo projektą. Peržiūrėsime poreikį, atsakysime į klausimus ir padėsime pasirinkti
-              tinkamiausią sprendimą.
+              Peržiūrėsime jūsų situaciją, patikslinsime tikslus ir pasiūlysime tinkamiausią projekto kryptį.
+              Pirmoji konsultacija nieko neįpareigoja.
             </p>
             <div className="response-time">
               <Clock3 size={21} aria-hidden="true" />
