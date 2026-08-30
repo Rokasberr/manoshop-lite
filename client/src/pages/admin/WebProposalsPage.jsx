@@ -48,6 +48,8 @@ const buildDraft = (request) => ({
   projectLiveUrl: request.projectLiveUrl || "",
   warrantyEndsAt: request.warrantyEndsAt ? new Date(request.warrantyEndsAt).toISOString().slice(0, 10) : "",
   carePlan: request.carePlan || "",
+  revisionLimit: request.revisionLimit ?? 2,
+  revisionRoundNote: "",
   handoverItemsText: (request.handoverItems || []).join("\n"),
   projectTasks: (request.projectTasks || []).map((task) => ({
     id: task._id || task.id || "",
@@ -77,6 +79,7 @@ const WebProposalsPage = () => {
   const [updatingStageId, setUpdatingStageId] = useState("");
   const [savingHandoverId, setSavingHandoverId] = useState("");
   const [savingTasksId, setSavingTasksId] = useState("");
+  const [savingRevisionsId, setSavingRevisionsId] = useState("");
   const [resendingContractId, setResendingContractId] = useState("");
   const [resendingHandoverId, setResendingHandoverId] = useState("");
   const [filter, setFilter] = useState("active");
@@ -176,6 +179,39 @@ const WebProposalsPage = () => {
       toast.error(saveError.response?.data?.message || "Nepavyko išsaugoti darbų plano.");
     } finally {
       setSavingTasksId("");
+    }
+  };
+
+  const handleSaveRevisionLimit = async (request) => {
+    const draft = drafts[request._id];
+    try {
+      setSavingRevisionsId(request._id);
+      const updated = await webServiceRequestService.updateRequest(request._id, { revisionLimit: Number(draft.revisionLimit) });
+      setRequests((current) => current.map((item) => item._id === request._id ? updated : item));
+      setDrafts((current) => ({ ...current, [request._id]: buildDraft(updated) }));
+      toast.success("Korekcijų limitas išsaugotas.");
+    } catch (saveError) {
+      toast.error(saveError.response?.data?.message || "Nepavyko išsaugoti korekcijų limito.");
+    } finally {
+      setSavingRevisionsId("");
+    }
+  };
+
+  const handleStartRevisionRound = async (request) => {
+    const draft = drafts[request._id];
+    try {
+      setSavingRevisionsId(request._id);
+      const updated = await webServiceRequestService.updateRequest(request._id, {
+        startRevisionRound: true,
+        revisionRoundNote: draft.revisionRoundNote.trim(),
+      });
+      setRequests((current) => current.map((item) => item._id === request._id ? updated : item));
+      setDrafts((current) => ({ ...current, [request._id]: buildDraft(updated) }));
+      toast.success("Korekcijų etapas užregistruotas.");
+    } catch (saveError) {
+      toast.error(saveError.response?.data?.message || "Nepavyko užregistruoti korekcijų etapo.");
+    } finally {
+      setSavingRevisionsId("");
     }
   };
 
@@ -559,6 +595,26 @@ const WebProposalsPage = () => {
                             ))}
                           </div> : <p className="rounded-xl bg-slate-50 p-3 text-sm text-slate-500">Darbų dar nėra. Paspausk „+ Darbas“ ir sudaryk kliento projekto planą.</p>}
                           <button type="button" className="dashboard-button-primary w-full justify-center" disabled={savingTasksId === request._id} onClick={() => handleSaveProjectTasks(request)}>{savingTasksId === request._id ? "Saugoma..." : "Išsaugoti darbų planą"}</button>
+                        </div>
+                      ) : null}
+
+                      {proposalStatus === "accepted" ? (
+                        <div className="space-y-3 rounded-2xl border border-amber-200 bg-amber-50/60 p-4">
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-amber-800">Korekcijų etapai</p>
+                            <p className="mt-1 text-sm text-slate-700"><strong>{request.revisionRounds?.length || 0}</strong> iš <strong>{draft.revisionLimit}</strong> panaudota</p>
+                          </div>
+                          <label className="block text-sm font-medium text-slate-700">Į kainą įskaičiuotų etapų limitas
+                            <input className="input-field mt-2 w-full" type="number" min="0" max="10" step="1" value={draft.revisionLimit} onChange={(event) => updateDraft(request._id, "revisionLimit", event.target.value)} />
+                          </label>
+                          <button type="button" className="dashboard-button-secondary w-full justify-center" disabled={savingRevisionsId === request._id} onClick={() => handleSaveRevisionLimit(request)}>Išsaugoti limitą</button>
+                          <label className="block text-sm font-medium text-slate-700">Etapo pastaba (nebūtina)
+                            <textarea className="input-field mt-2 min-h-20 w-full resize-y" maxLength={500} placeholder="Pvz. Pagrindinio puslapio dizaino korekcijos" value={draft.revisionRoundNote} onChange={(event) => updateDraft(request._id, "revisionRoundNote", event.target.value)} />
+                            <span className="mt-1 block text-xs font-normal text-slate-500">Klientas matys šią pastabą korekcijų istorijoje.</span>
+                          </label>
+                          <button type="button" className="dashboard-button-primary w-full justify-center" disabled={savingRevisionsId === request._id} onClick={() => handleStartRevisionRound(request)}>{savingRevisionsId === request._id ? "Saugoma..." : "Registruoti korekcijų etapą"}</button>
+                          {request.revisionRounds?.length ? <div className="space-y-2 border-t border-amber-200 pt-3">{request.revisionRounds.map((round) => <div className="rounded-lg bg-white px-3 py-2 text-xs text-slate-700" key={`${request._id}-revision-${round.number}`}><strong>{round.number} korekcijų etapas</strong><span className="mt-1 block text-slate-500">{round.startedAt ? new Date(round.startedAt).toLocaleString("lt-LT") : ""}{round.note ? ` · ${round.note}` : ""}</span></div>)}</div> : null}
+                          {(request.revisionRounds?.length || 0) >= Number(draft.revisionLimit) ? <p className="rounded-lg bg-amber-100 px-3 py-2 text-xs font-semibold text-amber-900">Į kainą įskaičiuotas limitas pasiektas. Kitas etapas bus pažymėtas kaip papildomas.</p> : null}
                         </div>
                       ) : null}
 
