@@ -198,6 +198,9 @@ Milestone 2 – Asmeninio plano Stripe prenumeratos savitarnos etapas lokaliai b
 
 ## Vykdoma
 
+- 2026-08-30 Stilloak Web korekcijų etapų apskaita: projekte saugomas administratoriaus nustatomas 0–10 įskaičiuotų etapų limitas (numatyta 2), atskiras sąmoningas korekcijų etapo registravimo veiksmas, datos ir pastabų istorija. Kliento pataisymų komentarai skaitiklio automatiškai nedidina. Privataus projekto puslapyje rodomas panaudotas kiekis, likutis ir perspėjimas pasiekus limitą; papildomi etapai registruojami istorijoje kaip viršijantys įskaičiuotą limitą.
+- Korekcijų etapų validacija: tiksliniai testai 9/9, pilni serverio testai 278/278, root lint/typecheck/build, `web-services` lint/typecheck/build ir `git diff --check` praėjo.
+
 - 2026-08-30 Stilloak Web „Client Flow V2“ užbaigimas: esamos laiškų, mokėjimų, PDF, priminimų, etapų, kontaktų istorijos ir privataus portalo funkcijos audituotos ir nedubliuotos. Pridėtas struktūruotas projekto darbų planas su datomis ir progresu, kliento pastabomis, darbo patvirtinimu bei pataisymų prašymu, vienas grupuotas laiškas klientui apie administratoriaus pakeistus darbus ir momentinis laiškas administratoriui apie kliento veiksmą. Admin pasiūlymų ekrane pridėta paieška pagal numerį, klientą, el. paštą, telefoną ar įmonę. Tiksliniai testai 19/19, pilni serverio testai 275/275, root lint/typecheck ir `web-services` lint/typecheck/build praėjo; pagrindinio kliento build ir preview smoke dar vykdomi.
 
 - P1 blocker: tikrame telefone Asmeninio nario zona nukerpa dešinę puslapio pusę, platūs elementai/lentelės gali daryti visą puslapį platesnį už viewport ir dalis turinio tampa nepasiekiama. Lokalus 320-768 px hardening įgyvendintas, bet Asmeninis nebus uždarytas kaip 10/10 iki prisijungusio realaus telefono arba browser `scrollWidth/clientWidth` smoke patvirtinimo. Production veiksmai nevykdyti.
