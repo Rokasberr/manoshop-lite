@@ -2,7 +2,7 @@ const crypto = require("crypto");
 
 const { getWebServicePlan } = require("../config/webServicePlans");
 const WebServiceRequest = require("../models/WebServiceRequest");
-const { STATUS_OPTIONS, CONTACT_TYPE_OPTIONS, PROJECT_STAGE_OPTIONS } = require("../models/WebServiceRequest");
+const { STATUS_OPTIONS, CONTACT_TYPE_OPTIONS, PROJECT_STAGE_OPTIONS, PROJECT_TASK_STATUS_OPTIONS } = require("../models/WebServiceRequest");
 const { buildIdempotencyKey } = require("../services/stripeCheckoutService");
 const { syncWebServiceDepositFromSession } = require("../services/webServiceDepositService");
 const { syncWebServiceFinalPaymentFromSession } = require("../services/webServiceFinalPaymentService");
@@ -168,6 +168,11 @@ const serializePublicProposal = (request) => ({
     warrantyEndsAt: request.warrantyEndsAt,
     carePlan: request.carePlan || "",
     files: (request.handoverItems || []).map(parseHandoverItem).filter((item) => item.label),
+    tasks: (request.projectTasks || []).map((task) => ({
+      id: task._id?.toString() || "",
+      title: task.title,
+      status: task.status,
+    })),
   },
   contact: {
     email: process.env.WEB_SERVICES_CONTACT_EMAIL?.trim() || "hello@stilloak-studio.com",
@@ -350,6 +355,21 @@ const updateAdminWebServiceRequest = async (req, res) => {
       throw createHttpError("Perduodamų elementų sąrašas netinkamas.", 400);
     }
     request.handoverItems = req.body.handoverItems.map((item) => cleanString(item, 200)).filter(Boolean);
+  }
+
+  if (Object.prototype.hasOwnProperty.call(req.body || {}, "projectTasks")) {
+    if (!Array.isArray(req.body.projectTasks) || req.body.projectTasks.length > 30) {
+      throw createHttpError("Projekto darbų sąrašas netinkamas.", 400);
+    }
+    request.projectTasks = req.body.projectTasks.map((task) => {
+      const title = cleanString(task?.title, 200);
+      const status = cleanString(task?.status, 40).toLowerCase() || "pending";
+      if (!title) throw createHttpError("Kiekvienas projekto darbas turi turėti pavadinimą.", 400);
+      if (!PROJECT_TASK_STATUS_OPTIONS.includes(status)) {
+        throw createHttpError("Netinkama projekto darbo būsena.", 400);
+      }
+      return { title, status };
+    });
   }
 
   if (req.body?.contactEntry) {

@@ -20,6 +20,7 @@ const DEPOSIT_PAYMENT_METHOD_OPTIONS = ["", "stripe", "bank_transfer"];
 const TEST_INVOICE_STATUS_OPTIONS = ["not_created", "processing", "sent", "failed"];
 const FINAL_PAYMENT_STATUS_OPTIONS = ["not_requested", "requested", "pending", "paid", "failed", "refunded"];
 const PROJECT_STAGE_OPTIONS = ["awaiting_deposit", "in_progress", "client_review", "awaiting_final_payment", "completed"];
+const PROJECT_TASK_STATUS_OPTIONS = ["pending", "in_progress", "completed"];
 
 const attributionSchema = new mongoose.Schema(
   {
@@ -43,6 +44,14 @@ const contactHistorySchema = new mongoose.Schema(
     happenedAt: { type: Date, default: Date.now },
     actorName: { type: String, trim: true, maxlength: 160, default: "" },
     actorEmail: { type: String, trim: true, lowercase: true, maxlength: 254, default: "" },
+  },
+  { timestamps: true }
+);
+
+const projectTaskSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true, trim: true, maxlength: 200 },
+    status: { type: String, enum: PROJECT_TASK_STATUS_OPTIONS, default: "pending" },
   },
   { timestamps: true }
 );
@@ -118,6 +127,7 @@ const webServiceRequestSchema = new mongoose.Schema(
     finalTestInvoiceStatus: { type: String, enum: TEST_INVOICE_STATUS_OPTIONS, default: "not_created" },
     finalTestInvoiceSentAt: { type: Date, default: null },
     projectStage: { type: String, enum: PROJECT_STAGE_OPTIONS, default: "awaiting_deposit", index: true },
+    projectTasks: { type: [projectTaskSchema], default: [] },
     depositReminderSentAt: { type: Date, default: null },
     depositReminderCount: { type: Number, min: 0, max: 3, default: 0 },
     finalPaymentReminderSentAt: { type: Date, default: null },
@@ -155,3 +165,4 @@ module.exports.TEST_INVOICE_STATUS_OPTIONS = TEST_INVOICE_STATUS_OPTIONS;
 module.exports.FINAL_PAYMENT_STATUS_OPTIONS = FINAL_PAYMENT_STATUS_OPTIONS;
 
 module.exports.PROJECT_STAGE_OPTIONS = PROJECT_STAGE_OPTIONS;
+module.exports.PROJECT_TASK_STATUS_OPTIONS = PROJECT_TASK_STATUS_OPTIONS;

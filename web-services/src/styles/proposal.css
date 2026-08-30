@@ -181,6 +181,54 @@
   margin-top: 22px;
 }
 
+.project-tasks-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.project-tasks-heading .proposal-section-title { margin: 0; }
+.project-tasks-heading > strong { color: #22673f; font-size: 20px; }
+
+.project-progress {
+  height: 10px;
+  margin-top: 22px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #eee8e0;
+}
+
+.project-progress > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #2d8a58;
+  transition: width .25s ease;
+}
+
+.project-progress-copy { margin: 9px 0 0; color: #8b8176; font-size: 13px; }
+.project-task-list { display: grid; gap: 10px; margin-top: 18px; }
+
+.project-task {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 11px;
+  border: 1px solid #e7e0d7;
+  border-radius: 14px;
+  padding: 13px 14px;
+  color: #6b5e51;
+}
+
+.project-task span { overflow-wrap: anywhere; color: #3f3933; font-weight: 700; }
+.project-task small { border-radius: 999px; background: #f3eee7; padding: 5px 9px; font-weight: 800; }
+.project-task.is-in_progress { border-color: #ead9af; background: #fffaf0; color: #9a681d; }
+.project-task.is-in_progress small { background: #f7e9c8; }
+.project-task.is-completed { border-color: #d8eadf; background: #f7fbf8; color: #2d8a58; }
+.project-task.is-completed span { text-decoration: line-through; text-decoration-color: #9fc8ae; }
+.project-task.is-completed small { background: #eaf6ee; color: #22673f; }
+
 .project-payment {
   display: grid;
   grid-template-columns: minmax(145px, .8fr) minmax(170px, 1fr) minmax(210px, 1.2fr);
@@ -537,4 +585,6 @@
   .project-meta-row strong { grid-column: 2; }
   .proposal-bank-details > div { grid-template-columns: 1fr; gap: 5px; }
   .proposal-footer { flex-direction: column; }
+  .project-task { grid-template-columns: auto minmax(0, 1fr); }
+  .project-task small { grid-column: 2; width: fit-content; }
 }

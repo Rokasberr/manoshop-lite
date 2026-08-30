@@ -29,6 +29,7 @@ const depositLabels = {
 const finalPaymentLabels = { not_requested: "Likutis neprašytas", requested: "Laukiama likučio", pending: "Mokėjimas pradėtas", paid: "Pilnai apmokėta", failed: "Nepavyko", refunded: "Grąžintas" };
 
 const projectStageLabels = { awaiting_deposit: "Laukia avanso", in_progress: "Darbai vykdomi", client_review: "Kliento peržiūra", awaiting_final_payment: "Laukia likučio", completed: "Užbaigta" };
+const projectTaskStatusLabels = { pending: "Laukia", in_progress: "Vykdoma", completed: "Atlikta" };
 
 const paymentMethodLabels = {
   bank_transfer: "Banko pavedimas",
@@ -48,6 +49,7 @@ const buildDraft = (request) => ({
   warrantyEndsAt: request.warrantyEndsAt ? new Date(request.warrantyEndsAt).toISOString().slice(0, 10) : "",
   carePlan: request.carePlan || "",
   handoverItemsText: (request.handoverItems || []).join("\n"),
+  projectTasks: (request.projectTasks || []).map((task) => ({ title: task.title || "", status: task.status || "pending" })),
 });
 
 const WebProposalsPage = () => {
@@ -64,6 +66,7 @@ const WebProposalsPage = () => {
   const [resendingInvoiceKey, setResendingInvoiceKey] = useState("");
   const [updatingStageId, setUpdatingStageId] = useState("");
   const [savingHandoverId, setSavingHandoverId] = useState("");
+  const [savingTasksId, setSavingTasksId] = useState("");
   const [resendingContractId, setResendingContractId] = useState("");
   const [resendingHandoverId, setResendingHandoverId] = useState("");
   const [filter, setFilter] = useState("active");
@@ -115,6 +118,43 @@ const WebProposalsPage = () => {
         [key]: value,
       },
     }));
+  };
+
+  const updateProjectTask = (requestId, index, key, value) => {
+    const tasks = [...(drafts[requestId]?.projectTasks || [])];
+    tasks[index] = { ...tasks[index], [key]: value };
+    updateDraft(requestId, "projectTasks", tasks);
+  };
+
+  const addProjectTask = (requestId) => {
+    updateDraft(requestId, "projectTasks", [...(drafts[requestId]?.projectTasks || []), { title: "", status: "pending" }]);
+  };
+
+  const removeProjectTask = (requestId, index) => {
+    updateDraft(requestId, "projectTasks", (drafts[requestId]?.projectTasks || []).filter((_, taskIndex) => taskIndex !== index));
+  };
+
+  const moveProjectTask = (requestId, index, direction) => {
+    const tasks = [...(drafts[requestId]?.projectTasks || [])];
+    const nextIndex = index + direction;
+    if (nextIndex < 0 || nextIndex >= tasks.length) return;
+    [tasks[index], tasks[nextIndex]] = [tasks[nextIndex], tasks[index]];
+    updateDraft(requestId, "projectTasks", tasks);
+  };
+
+  const handleSaveProjectTasks = async (request) => {
+    const tasks = (drafts[request._id]?.projectTasks || []).map((task) => ({ title: task.title.trim(), status: task.status })).filter((task) => task.title);
+    try {
+      setSavingTasksId(request._id);
+      const updated = await webServiceRequestService.updateRequest(request._id, { projectTasks: tasks });
+      setRequests((current) => current.map((item) => item._id === request._id ? updated : item));
+      setDrafts((current) => ({ ...current, [request._id]: buildDraft(updated) }));
+      toast.success("Kliento darbų planas išsaugotas.");
+    } catch (saveError) {
+      toast.error(saveError.response?.data?.message || "Nepavyko išsaugoti darbų plano.");
+    } finally {
+      setSavingTasksId("");
+    }
   };
 
   const handleSend = async (request) => {
@@ -457,6 +497,31 @@ const WebProposalsPage = () => {
                           {Object.entries(projectStageLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                         </select>
                       </label>
+
+                      {proposalStatus === "accepted" ? (
+                        <div className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4">
+                          <div className="flex items-center justify-between gap-3">
+                            <div><p className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">Kliento darbų planas</p><p className="mt-1 text-xs text-slate-500">Eiliškumas ir būsenos matomi privačiame projekto puslapyje.</p></div>
+                            <button type="button" className="dashboard-button-secondary shrink-0" disabled={(draft.projectTasks || []).length >= 30} onClick={() => addProjectTask(request._id)}>+ Darbas</button>
+                          </div>
+                          {(draft.projectTasks || []).length ? <div className="space-y-3">
+                            {draft.projectTasks.map((task, index) => (
+                              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3" key={`${request._id}-task-${index}`}>
+                                <input className="input-field w-full" type="text" maxLength={200} placeholder="Pvz. Mobilios versijos paruošimas" value={task.title} onChange={(event) => updateProjectTask(request._id, index, "title", event.target.value)} />
+                                <div className="mt-2 grid grid-cols-2 gap-2">
+                                  <select className="select-field w-full" aria-label={`Darbo ${index + 1} būsena`} value={task.status} onChange={(event) => updateProjectTask(request._id, index, "status", event.target.value)}>{Object.entries(projectTaskStatusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select>
+                                  <div className="flex justify-end gap-1">
+                                    <button type="button" className="dashboard-button-secondary px-3" disabled={index === 0} aria-label="Perkelti darbą aukštyn" onClick={() => moveProjectTask(request._id, index, -1)}>↑</button>
+                                    <button type="button" className="dashboard-button-secondary px-3" disabled={index === draft.projectTasks.length - 1} aria-label="Perkelti darbą žemyn" onClick={() => moveProjectTask(request._id, index, 1)}>↓</button>
+                                    <button type="button" className="dashboard-button-secondary px-3 text-rose-700" aria-label="Pašalinti darbą" onClick={() => removeProjectTask(request._id, index)}>×</button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div> : <p className="rounded-xl bg-slate-50 p-3 text-sm text-slate-500">Darbų dar nėra. Paspausk „+ Darbas“ ir sudaryk kliento projekto planą.</p>}
+                          <button type="button" className="dashboard-button-primary w-full justify-center" disabled={savingTasksId === request._id} onClick={() => handleSaveProjectTasks(request)}>{savingTasksId === request._id ? "Saugoma..." : "Išsaugoti darbų planą"}</button>
+                        </div>
+                      ) : null}
 
                       {depositStatus === "paid" ? (
                         <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
