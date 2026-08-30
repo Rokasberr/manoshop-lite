@@ -58,6 +58,7 @@ type PublicProposal = {
       title: string;
       status: "pending" | "in_progress" | "completed";
       plannedDate: string | null;
+      reviewUrl: string;
       completedAt: string | null;
       clientDecision: "none" | "approved" | "changes_requested";
       clientDecisionAt: string | null;
@@ -378,6 +379,7 @@ function ProposalPage({ token }: ProposalPageProps) {
                       {task.plannedDate ? <span><CalendarDays size={15} /> Planuojama {formatDate(task.plannedDate)}</span> : null}
                       {task.completedAt ? <span><CheckCircle2 size={15} /> Atlikta {formatDate(task.completedAt)}</span> : null}
                     </div>
+                    {task.reviewUrl ? <a className="project-task-review-link" href={task.reviewUrl} target="_blank" rel="noreferrer"><ExternalLink size={16} /> Peržiūrėti rezultatą</a> : null}
                     {task.clientDecision !== "none" ? <div className={`project-client-decision is-${task.clientDecision}`}>{task.clientDecision === "approved" ? <><ThumbsUp size={16} /> Jūs patvirtinote</> : <><RotateCcw size={16} /> Paprašėte pataisymų</>}</div> : null}
                     {task.clientComments?.length ? <div className="project-client-comments">{task.clientComments.map((comment, commentIndex) => <p key={`${task.id}-comment-${commentIndex}`}><MessageSquare size={15} /><span>{comment.message}<small>{formatDate(comment.createdAt)}</small></span></p>)}</div> : null}
                     <div className="project-task-feedback">

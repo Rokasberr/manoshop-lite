@@ -63,15 +63,19 @@ test("private portal supports dated tasks, comments, approval and revision reque
   const portal = readRepoFile("web-services", "src", "ProposalPage.tsx");
 
   assert.match(model, /plannedDate:/);
+  assert.match(model, /reviewUrl:/);
   assert.match(model, /clientDecision:/);
   assert.match(model, /clientComments:/);
   assert.match(controller, /submitPublicWebServiceTaskFeedback/);
   assert.match(controller, /proposalStatus !== "accepted"/);
+  assert.match(controller, /Darbo peržiūros nuoroda turi prasidėti https:\/\//);
   assert.match(routes, /tasks\/:taskId\/feedback/);
   assert.match(admin, /Kliento sprendimas/);
   assert.match(admin, /Kliento pastaba/);
+  assert.match(admin, /Peržiūros nuoroda/);
   assert.match(portal, /Reikia pataisymų/);
   assert.match(portal, /Patvirtinti/);
   assert.match(portal, /Jūsų pastaba/);
+  assert.match(portal, /Peržiūrėti rezultatą/);
   assert.match(admin, /web-project-search/);
 });
