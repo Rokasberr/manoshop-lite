@@ -187,6 +187,7 @@ test("accepted Web proposals collect billing data and automate test contracts an
 });
 
 test("accepted Web proposal becomes a private client project portal", () => {
+  const modelSource = readRepoFile("server", "models", "WebServiceRequest.js");
   const controllerSource = readRepoFile("server", "controllers", "webServiceRequestController.js");
   const routesSource = readRepoFile("server", "routes", "webServiceRequestRoutes.js");
   const proposalPageSource = readRepoFile("web-services", "src", "ProposalPage.tsx");
@@ -194,15 +195,25 @@ test("accepted Web proposal becomes a private client project portal", () => {
   const adminSource = readRepoFile("client", "src", "pages", "admin", "WebProposalsPage.jsx");
 
   assert.match(controllerSource, /project:\s*\{/);
+  assert.match(modelSource, /projectTasks:/);
+  assert.match(modelSource, /PROJECT_TASK_STATUS_OPTIONS/);
+  assert.match(controllerSource, /PROJECT_TASK_STATUS_OPTIONS\.includes\(status\)/);
+  assert.match(controllerSource, /tasks: \(request\.projectTasks/);
   assert.match(controllerSource, /files: \(request\.handoverItems/);
   assert.match(controllerSource, /getPublicWebServiceInvoicePdf/);
   assert.match(controllerSource, /Cache-Control", "private, no-store/);
   assert.match(routesSource, /invoices\/:paymentType/);
   assert.match(proposalPageSource, /Kliento projektas/);
   assert.match(proposalPageSource, /Projekto būsena/);
+  assert.match(proposalPageSource, /Darbų eiga/);
+  assert.match(proposalPageSource, /projectProgress/);
   assert.match(proposalPageSource, /Apmokėjimai/);
   assert.match(proposalPageSource, /Perduoti failai/);
   assert.match(proposalPageSource, /PDF sąskaita/);
   assert.match(proposalStyles, /\.project-portal/);
+  assert.match(proposalStyles, /\.project-task-list/);
   assert.match(adminSource, /pavadinimas \| saugi https:\/\//);
+  assert.match(adminSource, /Kliento darbų planas/);
+  assert.match(adminSource, /moveProjectTask/);
+  assert.match(adminSource, /Išsaugoti darbų planą/);
 });

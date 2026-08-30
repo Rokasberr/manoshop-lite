@@ -11,6 +11,8 @@ import {
   Mail,
   Phone,
   ShieldCheck,
+  Circle,
+  Clock3,
 } from "lucide-react";
 
 type InvoiceInfo = { number: string; status: string; sentAt: string | null; downloadPath: string } | null;
@@ -48,6 +50,7 @@ type PublicProposal = {
     warrantyEndsAt: string | null;
     carePlan: string;
     files: Array<{ label: string; url: string }>;
+    tasks: Array<{ id: string; title: string; status: "pending" | "in_progress" | "completed" }>;
   };
   contact: { email: string; phone: string };
 };
@@ -86,6 +89,12 @@ const paymentStatusLabels: Record<string, string> = {
 const paymentMethodLabels: Record<string, string> = {
   stripe: "Kortele per Stripe",
   bank_transfer: "Banko pavedimu",
+};
+
+const projectTaskStatusLabels = {
+  pending: "Laukia",
+  in_progress: "Vykdoma",
+  completed: "Atlikta",
 };
 
 function ProposalPage({ token }: ProposalPageProps) {
@@ -270,6 +279,9 @@ function ProposalPage({ token }: ProposalPageProps) {
   const isPaid = proposal.deposit.status === "paid";
   const finalRequested = ["requested", "pending", "paid"].includes(proposal.finalPayment?.status);
   const finalPaid = proposal.finalPayment?.status === "paid";
+  const projectTasks = proposal.project?.tasks || [];
+  const completedTaskCount = projectTasks.filter((task) => task.status === "completed").length;
+  const projectProgress = projectTasks.length ? Math.round((completedTaskCount / projectTasks.length) * 100) : 0;
 
   return (
     <main className="proposal-shell">
@@ -303,6 +315,28 @@ function ProposalPage({ token }: ProposalPageProps) {
             <div className="project-stage"><span className="project-stage-dot" />{projectStageLabels[proposal.project?.stage] || "Projektas vykdomas"}</div>
             <div className="project-meta-row"><CalendarDays size={18} /><span>Numatytas terminas</span><strong>{formatDate(proposal.project?.dueDate)}</strong></div>
             {proposal.project?.liveUrl ? <a className="proposal-secondary-button" href={proposal.project.liveUrl} target="_blank" rel="noreferrer"><ExternalLink size={18} /> Atidaryti svetainę</a> : null}
+          </div>
+
+          <div className="proposal-card project-section-wide">
+            <div className="project-tasks-heading">
+              <div className="proposal-section-title"><Clock3 size={22} /><h2>Darbų eiga</h2></div>
+              {projectTasks.length ? <strong>{projectProgress}%</strong> : null}
+            </div>
+            {projectTasks.length ? <>
+              <div className="project-progress" role="progressbar" aria-label="Atliktų projekto darbų progresas" aria-valuemin={0} aria-valuemax={100} aria-valuenow={projectProgress}>
+                <span style={{ width: `${projectProgress}%` }} />
+              </div>
+              <p className="project-progress-copy">Atlikta {completedTaskCount} iš {projectTasks.length} darbų</p>
+              <div className="project-task-list">
+                {projectTasks.map((task, index) => (
+                  <article className={`project-task is-${task.status}`} key={task.id || `${task.title}-${index}`}>
+                    {task.status === "completed" ? <CheckCircle2 size={20} /> : task.status === "in_progress" ? <Clock3 size={20} /> : <Circle size={20} />}
+                    <span>{task.title}</span>
+                    <small>{projectTaskStatusLabels[task.status]}</small>
+                  </article>
+                ))}
+              </div>
+            </> : <p className="project-empty">Darbų planas bus parodytas čia, kai tik projektas bus pradėtas.</p>}
           </div>
 
           <div className="proposal-card project-section-wide">

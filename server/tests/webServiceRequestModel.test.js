@@ -37,3 +37,23 @@ test("WebServiceRequest rejects a negative final price", () => {
   assert.ok(error);
   assert.ok(error.errors.finalPrice);
 });
+
+test("WebServiceRequest validates structured client project tasks", () => {
+  const valid = new WebServiceRequest({
+    ...validRequest(),
+    projectTasks: [
+      { title: "Paruošti dizainą", status: "completed" },
+      { title: "Sukurti mobilią versiją", status: "in_progress" },
+    ],
+  });
+  assert.equal(valid.validateSync(), undefined);
+  assert.equal(valid.projectTasks.length, 2);
+
+  const invalid = new WebServiceRequest({
+    ...validRequest(),
+    projectTasks: [{ title: "Netinkama būsena", status: "blocked" }],
+  });
+  const error = invalid.validateSync();
+  assert.ok(error);
+  assert.ok(error.errors["projectTasks.0.status"]);
+});
