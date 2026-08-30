@@ -170,6 +170,15 @@ const serializePublicProposal = (request) => ({
     liveUrl: request.projectLiveUrl || "",
     warrantyEndsAt: request.warrantyEndsAt,
     carePlan: request.carePlan || "",
+    revisions: {
+      limit: request.revisionLimit ?? 2,
+      used: (request.revisionRounds || []).length,
+      rounds: (request.revisionRounds || []).map((round) => ({
+        number: round.number,
+        startedAt: round.startedAt,
+        note: round.note || "",
+      })),
+    },
     files: (request.handoverItems || []).map(parseHandoverItem).filter((item) => item.label),
     tasks: (request.projectTasks || []).map((task) => ({
       id: task._id?.toString() || "",
@@ -374,6 +383,33 @@ const updateAdminWebServiceRequest = async (req, res) => {
 
   if (Object.prototype.hasOwnProperty.call(req.body || {}, "carePlan")) {
     request.carePlan = cleanString(req.body.carePlan, 500);
+  }
+
+  if (Object.prototype.hasOwnProperty.call(req.body || {}, "revisionLimit")) {
+    const revisionLimit = Number(req.body.revisionLimit);
+    if (!Number.isInteger(revisionLimit) || revisionLimit < 0 || revisionLimit > 10) {
+      throw createHttpError("Korekcijų etapų limitas turi būti sveikasis skaičius nuo 0 iki 10.", 400);
+    }
+    request.revisionLimit = revisionLimit;
+  }
+
+  if (req.body?.startRevisionRound === true) {
+    if (request.proposalStatus !== "accepted") {
+      throw createHttpError("Korekcijų etapą galima registruoti tik patvirtintam projektui.", 409);
+    }
+    const nextNumber = (request.revisionRounds || []).length + 1;
+    request.revisionRounds.push({
+      number: nextNumber,
+      startedAt: new Date(),
+      actorName: adminActor(req).actorName,
+      note: cleanString(req.body.revisionRoundNote, 500),
+    });
+    request.contactHistory.push({
+      type: "note",
+      note: `Užregistruotas ${nextNumber}-as korekcijų etapas${nextNumber > request.revisionLimit ? " (papildomas, virš įskaičiuoto limito)" : ""}.`,
+      happenedAt: new Date(),
+      ...adminActor(req),
+    });
   }
 
   if (Object.prototype.hasOwnProperty.call(req.body || {}, "handoverItems")) {
