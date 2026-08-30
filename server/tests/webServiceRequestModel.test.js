@@ -59,3 +59,17 @@ test("WebServiceRequest validates structured client project tasks", () => {
   assert.ok(error);
   assert.ok(error.errors["projectTasks.0.status"]);
 });
+
+test("WebServiceRequest tracks limited correction rounds", () => {
+  const request = new WebServiceRequest({
+    ...validRequest(),
+    revisionLimit: 3,
+    revisionRounds: [{ number: 1, note: "Pagrindinio puslapio korekcijos" }],
+  });
+  assert.equal(request.validateSync(), undefined);
+  assert.equal(request.revisionLimit, 3);
+  assert.equal(request.revisionRounds.length, 1);
+
+  const invalid = new WebServiceRequest({ ...validRequest(), revisionLimit: 11 });
+  assert.ok(invalid.validateSync()?.errors.revisionLimit);
+});
