@@ -258,6 +258,15 @@
 .project-task-feedback button:hover:not(:disabled) { background: #f8f3ee; }
 .project-task-feedback button.is-approve { border-color: #b8dbc5; background: #eaf6ee; color: #22673f; }
 .project-task-feedback button:disabled { cursor: wait; opacity: .55; }
+.project-revisions-card { background: linear-gradient(135deg, #fffdf9, #f8f1e8); }
+.project-revisions-summary { display: grid; grid-template-columns: minmax(150px, .35fr) 1fr; gap: 18px; align-items: center; margin-top: 16px; border: 1px solid #e5d6c4; border-radius: 16px; background: rgba(255,255,255,.75); padding: 18px; }
+.project-revisions-summary div { display: grid; gap: 4px; }
+.project-revisions-summary span { color: #76685b; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.project-revisions-summary strong { color: #2f251d; font-size: 24px; }
+.project-revisions-summary p { margin: 0; color: #65584c; line-height: 1.6; }
+.project-revision-list { display: grid; gap: 9px; margin: 14px 0 0; padding: 0; list-style: none; }
+.project-revision-list li { display: flex; justify-content: space-between; gap: 16px; border-bottom: 1px solid #eadfd3; padding: 10px 2px; color: #67584a; }
+.project-revision-list li strong { color: #372b22; }
 
 .project-payment {
   display: grid;
@@ -603,6 +612,8 @@
 }
 
 @media (max-width: 720px) {
+  .project-revisions-summary { grid-template-columns: 1fr; }
+  .project-revision-list li { flex-direction: column; gap: 4px; }
   .proposal-shell { padding: 16px; }
   .proposal-header { align-items: flex-start; }
   .proposal-secure { max-width: 150px; text-align: right; justify-content: flex-end; }
