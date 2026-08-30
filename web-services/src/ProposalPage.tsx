@@ -52,6 +52,11 @@ type PublicProposal = {
     liveUrl: string;
     warrantyEndsAt: string | null;
     carePlan: string;
+    revisions: {
+      limit: number;
+      used: number;
+      rounds: Array<{ number: number; startedAt: string | null; note: string }>;
+    };
     files: Array<{ label: string; url: string }>;
     tasks: Array<{
       id: string;
@@ -324,6 +329,9 @@ function ProposalPage({ token }: ProposalPageProps) {
   const projectTasks = proposal.project?.tasks || [];
   const completedTaskCount = projectTasks.filter((task) => task.status === "completed").length;
   const projectProgress = projectTasks.length ? Math.round((completedTaskCount / projectTasks.length) * 100) : 0;
+  const revisionLimit = proposal.project?.revisions?.limit ?? 2;
+  const revisionsUsed = proposal.project?.revisions?.used || 0;
+  const revisionsRemaining = Math.max(revisionLimit - revisionsUsed, 0);
 
   return (
     <main className="proposal-shell">
@@ -411,6 +419,15 @@ function ProposalPage({ token }: ProposalPageProps) {
                 </article>
               ))}
             </div>
+          </div>
+
+          <div className="proposal-card project-section-wide project-revisions-card">
+            <div className="proposal-section-title"><RotateCcw size={22} /><h2>Korekcijų etapai</h2></div>
+            <div className="project-revisions-summary">
+              <div><span>Panaudota</span><strong>{revisionsUsed} iš {revisionLimit}</strong></div>
+              <p>{revisionsRemaining > 0 ? `Liko ${revisionsRemaining} į kainą ${revisionsRemaining === 1 ? "įskaičiuotas etapas" : "įskaičiuoti etapai"}.` : "Į kainą įskaičiuotų korekcijų etapų limitas pasiektas. Papildomi pakeitimai derinami atskirai."}</p>
+            </div>
+            {proposal.project?.revisions?.rounds?.length ? <ol className="project-revision-list">{proposal.project.revisions.rounds.map((round) => <li key={`revision-${round.number}`}><strong>{round.number} etapas</strong><span>{formatDate(round.startedAt)}{round.note ? ` · ${round.note}` : ""}</span></li>)}</ol> : <p className="project-empty">Korekcijų etapų dar nepanaudota.</p>}
           </div>
 
           <div className="proposal-card">
