@@ -230,6 +230,7 @@
 .project-task.is-completed > small { background: #eaf6ee; color: #22673f; }
 
 .project-task-meta,
+.project-task-review-link,
 .project-client-decision,
 .project-client-comments,
 .project-task-feedback {
@@ -239,6 +240,9 @@
 .project-task-meta { display: flex; flex-wrap: wrap; gap: 8px 16px; color: #8b8176; font-size: 12px; }
 .project-task-meta span,
 .project-client-decision { display: inline-flex; align-items: center; gap: 6px; }
+.project-task-review-link { display: inline-flex; width: fit-content; align-items: center; gap: 7px; border-radius: 10px; background: #6f4a32; padding: 9px 12px; color: #fffaf5; font-size: 13px; font-weight: 800; text-decoration: none; }
+.project-task-review-link:hover { background: #4f3425; }
+.project-task-review-link:focus-visible { outline: 3px solid rgba(123, 83, 56, .24); outline-offset: 3px; }
 .project-client-decision { width: fit-content; border-radius: 999px; padding: 6px 10px; background: #fff1d7; color: #845c1f; font-size: 12px; font-weight: 800; }
 .project-client-decision.is-approved { background: #eaf6ee; color: #22673f; }
 .project-client-comments { display: grid; gap: 7px; }
