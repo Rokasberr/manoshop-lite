@@ -1,5 +1,17 @@
 const normalizeOrigin = (origin = "") => origin.trim().replace(/\/+$/, "");
 
+const TRUSTED_VERCEL_PREVIEW_HOST_PATTERN =
+  /^manoshop-lite-client-[a-z0-9-]+-rokasberrs-projects\.vercel\.app$/;
+
+const isTrustedVercelPreviewOrigin = (origin = "") => {
+  try {
+    const url = new URL(normalizeOrigin(origin));
+    return url.protocol === "https:" && TRUSTED_VERCEL_PREVIEW_HOST_PATTERN.test(url.hostname);
+  } catch {
+    return false;
+  }
+};
+
 const getConfiguredOrigins = () =>
   (process.env.CLIENT_URL || "")
     .split(",")
@@ -32,6 +44,10 @@ const isAllowedOrigin = (origin, configuredOrigins = getConfiguredOrigins()) => 
     return true;
   }
 
+  if (isTrustedVercelPreviewOrigin(origin)) {
+    return true;
+  }
+
   if (!configuredOrigins.length) {
     return true;
   }
@@ -46,5 +62,6 @@ module.exports = {
   getConfiguredOrigins,
   getPrimaryClientUrl,
   isAllowedOrigin,
+  isTrustedVercelPreviewOrigin,
   normalizeOrigin,
 };
