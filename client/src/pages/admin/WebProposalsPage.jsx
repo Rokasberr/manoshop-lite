@@ -54,6 +54,7 @@ const buildDraft = (request) => ({
     title: task.title || "",
     status: task.status || "pending",
     plannedDate: task.plannedDate ? new Date(task.plannedDate).toISOString().slice(0, 10) : "",
+    reviewUrl: task.reviewUrl || "",
     completedAt: task.completedAt || null,
     clientDecision: task.clientDecision || "none",
     clientDecisionAt: task.clientDecisionAt || null,
@@ -148,7 +149,7 @@ const WebProposalsPage = () => {
   };
 
   const addProjectTask = (requestId) => {
-    updateDraft(requestId, "projectTasks", [...(drafts[requestId]?.projectTasks || []), { id: "", title: "", status: "pending", plannedDate: "", clientDecision: "none", clientComments: [] }]);
+    updateDraft(requestId, "projectTasks", [...(drafts[requestId]?.projectTasks || []), { id: "", title: "", status: "pending", plannedDate: "", reviewUrl: "", clientDecision: "none", clientComments: [] }]);
   };
 
   const removeProjectTask = (requestId, index) => {
@@ -164,7 +165,7 @@ const WebProposalsPage = () => {
   };
 
   const handleSaveProjectTasks = async (request) => {
-    const tasks = (drafts[request._id]?.projectTasks || []).map((task) => ({ id: task.id, title: task.title.trim(), status: task.status, plannedDate: task.plannedDate || null })).filter((task) => task.title);
+    const tasks = (drafts[request._id]?.projectTasks || []).map((task) => ({ id: task.id, title: task.title.trim(), status: task.status, plannedDate: task.plannedDate || null, reviewUrl: task.reviewUrl.trim() })).filter((task) => task.title);
     try {
       setSavingTasksId(request._id);
       const updated = await webServiceRequestService.updateRequest(request._id, { projectTasks: tasks });
@@ -550,6 +551,7 @@ const WebProposalsPage = () => {
                                   </div>
                                 </div>
                                 <label className="mt-2 block text-xs font-medium text-slate-600">Planuojama data<input className="input-field mt-1 w-full" type="date" value={task.plannedDate || ""} onChange={(event) => updateProjectTask(request._id, index, "plannedDate", event.target.value)} /></label>
+                                <label className="mt-2 block text-xs font-medium text-slate-600">Peržiūros nuoroda<input className="input-field mt-1 w-full" type="url" inputMode="url" maxLength={500} placeholder="https://projekto-preview.vercel.app" value={task.reviewUrl || ""} onChange={(event) => updateProjectTask(request._id, index, "reviewUrl", event.target.value)} /><span className="mt-1 block font-normal text-slate-500">Klientas šią nuorodą matys prie konkretaus darbo.</span></label>
                                 {task.completedAt ? <p className="mt-2 text-xs text-emerald-700">Atlikta: {new Date(task.completedAt).toLocaleString("lt-LT")}</p> : null}
                                 {task.clientDecision !== "none" ? <p className={`mt-2 rounded-lg px-3 py-2 text-xs font-semibold ${task.clientDecision === "approved" ? "bg-emerald-50 text-emerald-800" : "bg-amber-50 text-amber-800"}`}>Kliento sprendimas: {task.clientDecision === "approved" ? "Patvirtinta" : "Reikia pataisymų"}{task.clientDecisionAt ? ` · ${new Date(task.clientDecisionAt).toLocaleString("lt-LT")}` : ""}</p> : null}
                                 {task.clientComments?.length ? <div className="mt-2 space-y-2">{task.clientComments.map((comment, commentIndex) => <div className="rounded-lg bg-white px-3 py-2 text-xs text-slate-700" key={`${task.id}-comment-${commentIndex}`}><strong>Kliento pastaba:</strong> {comment.message}<span className="mt-1 block text-slate-400">{comment.createdAt ? new Date(comment.createdAt).toLocaleString("lt-LT") : ""}</span></div>)}</div> : null}
