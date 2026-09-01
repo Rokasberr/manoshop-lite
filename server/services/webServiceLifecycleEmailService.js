@@ -13,10 +13,11 @@ const money = (value) => `${new Intl.NumberFormat("lt-LT", { minimumFractionDigi
 const buildMessage = ({ request, type }) => {
   const isHandover = type === "handover";
   const isFinal = type === "final";
+  const isFull = !isFinal && request.paymentPlan === "full";
   const amount = isFinal ? request.finalPaymentAmount : request.depositAmount;
   const subject = isHandover
     ? `Jūsų projektas užbaigtas — ${request.requestNumber}`
-    : `Primename apie ${isFinal ? "likusios sumos" : "avanso"} apmokėjimą — ${request.requestNumber}`;
+    : `Primename apie ${isFinal ? "likusios sumos" : isFull ? "visos projekto sumos" : "avanso"} apmokėjimą — ${request.requestNumber}`;
   const handoverDetails = [
     request.projectLiveUrl ? `Svetainė: ${request.projectLiveUrl}` : null,
     request.warrantyEndsAt ? `Garantija iki: ${new Date(request.warrantyEndsAt).toLocaleDateString("lt-LT")}` : null,
@@ -25,8 +26,8 @@ const buildMessage = ({ request, type }) => {
   ].filter(Boolean);
   const action = isHandover
     ? ["Projektas apmokėtas pilnai ir pažymėtas užbaigtu.", ...handoverDetails].join("\n")
-    : `Laukiame ${isFinal ? "likusios projekto sumos" : "projekto avanso"}: ${money(amount)}. Mokėjimo nuorodą rasite ankstesniame Stilloak Web laiške.`;
-  return buildWebServiceEmail({ subject, name: request.name, title: isHandover ? "Projektas užbaigtas" : "Mokėjimo priminimas", intro: action.split("\n")[0], rows: isHandover ? handoverDetails.map((line) => { const [label, ...value] = line.split(":"); return { label, value: value.join(":").trim() }; }) : [{ label: isFinal ? "Likutis" : "Avansas", value: money(amount) }], notice: isHandover ? "Prieigos duomenų el. paštu nesiunčiame. Juos perduokite tik sutartu saugiu kanalu." : "Mokėjimo nuorodą rasite ankstesniame Stilloak Web laiške." });
+    : `Laukiame ${isFinal ? "likusios projekto sumos" : isFull ? "visos projekto sumos" : "projekto avanso"}: ${money(amount)}. Mokėjimo nuorodą rasite ankstesniame Stilloak Web laiške.`;
+  return buildWebServiceEmail({ subject, name: request.name, title: isHandover ? "Projektas užbaigtas" : "Mokėjimo priminimas", intro: action.split("\n")[0], rows: isHandover ? handoverDetails.map((line) => { const [label, ...value] = line.split(":"); return { label, value: value.join(":").trim() }; }) : [{ label: isFinal ? "Likutis" : isFull ? "Visa suma" : "Avansas", value: money(amount) }], notice: isHandover ? "Prieigos duomenų el. paštu nesiunčiame. Juos perduokite tik sutartu saugiu kanalu." : "Mokėjimo nuorodą rasite ankstesniame Stilloak Web laiške." });
 };
 
 const send = async ({ request, type }) => {

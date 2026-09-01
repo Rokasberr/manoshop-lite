@@ -19,7 +19,7 @@ const formatPrice = (value) =>
 const buildProposalEmail = ({ request, proposalUrl }) => {
   const subject = `Stilloak Web pasiūlymas — ${request.requestNumber}`;
   const price = formatPrice(request.proposalPrice);
-  const deposit = formatPrice(request.depositAmount);
+  const splitDeposit = formatPrice(Number(request.proposalPrice || 0) * Number(request.splitPaymentPercent || 50) / 100);
   const expiresAt = request.proposalExpiresAt
     ? new Date(request.proposalExpiresAt).toLocaleDateString("lt-LT")
     : "";
@@ -30,7 +30,8 @@ const buildProposalEmail = ({ request, proposalUrl }) => {
     "Paruošėme jūsų svetainės projekto komercinį pasiūlymą.",
     `Projektas: ${request.packageName}`,
     `Kaina: ${price}`,
-    `Pradinis avansas (${request.depositPercent}%): ${deposit}`,
+    `Pagrindinis variantas: visa suma iškart – ${price}`,
+    `Alternatyva: ${request.splitPaymentPercent || 50}% avansas – ${splitDeposit}, likutis užbaigus projektą`,
     expiresAt ? `Pasiūlymas galioja iki: ${expiresAt}` : null,
     "",
     request.proposalSummary || null,
@@ -53,7 +54,8 @@ const buildProposalEmail = ({ request, proposalUrl }) => {
       { label: "Užklausa", value: request.requestNumber },
       { label: "Projektas", value: request.packageName },
       { label: "Bendra kaina", value: price },
-      { label: `Pradinis avansas (${request.depositPercent}%)`, value: deposit },
+      { label: "Pagrindinis mokėjimas", value: `Visa suma iškart – ${price}` },
+      { label: "Alternatyva dviem dalimis", value: `${request.splitPaymentPercent || 50}% avansas – ${splitDeposit}` },
       ...(expiresAt ? [{ label: "Pasiūlymas galioja iki", value: expiresAt }] : []),
     ],
     cta: { label: "Peržiūrėti ir patvirtinti pasiūlymą", url: proposalUrl },

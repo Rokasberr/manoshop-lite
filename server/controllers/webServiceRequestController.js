@@ -2,7 +2,7 @@ const crypto = require("crypto");
 
 const { getWebServicePlan } = require("../config/webServicePlans");
 const WebServiceRequest = require("../models/WebServiceRequest");
-const { STATUS_OPTIONS, CONTACT_TYPE_OPTIONS, PROJECT_STAGE_OPTIONS, PROJECT_TASK_STATUS_OPTIONS } = require("../models/WebServiceRequest");
+const { STATUS_OPTIONS, CONTACT_TYPE_OPTIONS, PAYMENT_PLAN_OPTIONS, PROJECT_STAGE_OPTIONS, PROJECT_TASK_STATUS_OPTIONS } = require("../models/WebServiceRequest");
 const { buildIdempotencyKey } = require("../services/stripeCheckoutService");
 const { syncWebServiceDepositFromSession } = require("../services/webServiceDepositService");
 const { syncWebServiceFinalPaymentFromSession } = require("../services/webServiceFinalPaymentService");
@@ -16,6 +16,7 @@ const { deliverWebServiceTestContract } = require("../services/webServiceTestCon
 const { createHttpError } = require("../utils/httpError");
 const { getWebServiceStripeClient } = require("../utils/stripeClient");
 const { createWebServiceTestInvoicePdfBuffer } = require("../utils/webServiceTestInvoicePdf");
+const { createWebServiceOfficialInvoicePdfBuffer } = require("../utils/webServiceOfficialInvoicePdf");
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PROPOSAL_TOKEN_PATTERN = /^[a-f0-9]{64}$/i;
@@ -26,7 +27,7 @@ const INITIAL_FOLLOW_UP_HOURS = {
   custom: 2,
 };
 const DEFAULT_PROPOSAL_TERMS =
-  "Darbų apimtis, terminas ir kaina galioja pagal šį pasiūlymą. Darbai pradedami gavus sutartą avansą. Papildomi darbai ar apimties pakeitimai derinami atskirai.";
+  "Darbų apimtis, terminas ir kaina galioja pagal šį pasiūlymą. Pagrindinis mokėjimo variantas – visa suma iškart; klientas taip pat gali pasirinkti du mokėjimus – avansą ir likutį. Darbai pradedami gavus sutartą pirmą mokėjimą. Papildomi darbai ar apimties pakeitimai derinami atskirai.";
 
 const cleanString = (value, maxLength = 5000) =>
   String(value || "").trim().slice(0, maxLength);
@@ -68,8 +69,8 @@ const parseNullableDate = (rawDate, errorMessage) => {
 
 const parseDepositPercent = (rawValue) => {
   const value = Number(rawValue ?? 50);
-  if (!Number.isFinite(value) || value < 10 || value > 100) {
-    throw createHttpError("Avanso procentas turi būti nuo 10 iki 100.", 400);
+  if (!Number.isFinite(value) || value < 10 || value > 90) {
+    throw createHttpError("Dviejų mokėjimų avanso procentas turi būti nuo 10 iki 90.", 400);
   }
   return Math.round(value);
 };
@@ -125,6 +126,11 @@ const serializePublicProposal = (request) => ({
     id: request.packageId,
     name: request.packageName,
   },
+  paymentPlan: request.paymentPlan || "split",
+  paymentOptions: {
+    default: "full",
+    splitPercent: request.splitPaymentPercent ?? (request.paymentPlan === "split" ? request.depositPercent : 50),
+  },
   proposal: {
     price: request.proposalPrice,
     summary: request.proposalSummary,
@@ -145,9 +151,10 @@ const serializePublicProposal = (request) => ({
     paidAt: request.depositPaidAt,
     paymentMethod: request.depositPaymentMethod || "",
     invoice: request.depositStatus === "paid" ? {
-      number: request.depositTestInvoiceNumber || "",
-      status: request.depositTestInvoiceStatus,
-      sentAt: request.depositTestInvoiceSentAt,
+      number: request.depositInvoiceNumber || request.depositTestInvoiceNumber || "",
+      status: request.depositInvoiceNumber ? request.depositInvoiceStatus : request.depositTestInvoiceStatus,
+      sentAt: request.depositInvoiceNumber ? request.depositInvoiceSentAt : request.depositTestInvoiceSentAt,
+      official: Boolean(request.depositInvoiceNumber),
       downloadPath: "invoices/deposit",
     } : null,
   },
@@ -158,18 +165,31 @@ const serializePublicProposal = (request) => ({
     paidAt: request.finalPaymentPaidAt,
     paymentMethod: request.finalPaymentMethod || "",
     invoice: request.finalPaymentStatus === "paid" ? {
-      number: request.finalTestInvoiceNumber || "",
-      status: request.finalTestInvoiceStatus,
-      sentAt: request.finalTestInvoiceSentAt,
+      number: request.finalInvoiceNumber || request.finalTestInvoiceNumber || "",
+      status: request.finalInvoiceNumber ? request.finalInvoiceStatus : request.finalTestInvoiceStatus,
+      sentAt: request.finalInvoiceNumber ? request.finalInvoiceSentAt : request.finalTestInvoiceSentAt,
+      official: Boolean(request.finalInvoiceNumber),
       downloadPath: "invoices/final",
     } : null,
   },
+  paymentsFullyPaid: request.paymentPlan === "full"
+    ? request.depositStatus === "paid"
+    : request.finalPaymentStatus === "paid",
   project: {
     stage: request.projectStage,
     dueDate: request.dueDate,
     liveUrl: request.projectLiveUrl || "",
     warrantyEndsAt: request.warrantyEndsAt,
     carePlan: request.carePlan || "",
+    revisions: {
+      limit: request.revisionLimit ?? 2,
+      used: (request.revisionRounds || []).length,
+      rounds: (request.revisionRounds || []).map((round) => ({
+        number: round.number,
+        startedAt: round.startedAt,
+        note: round.note || "",
+      })),
+    },
     files: (request.handoverItems || []).map(parseHandoverItem).filter((item) => item.label),
     tasks: (request.projectTasks || []).map((task) => ({
       id: task._id?.toString() || "",
@@ -376,6 +396,33 @@ const updateAdminWebServiceRequest = async (req, res) => {
     request.carePlan = cleanString(req.body.carePlan, 500);
   }
 
+  if (Object.prototype.hasOwnProperty.call(req.body || {}, "revisionLimit")) {
+    const revisionLimit = Number(req.body.revisionLimit);
+    if (!Number.isInteger(revisionLimit) || revisionLimit < 0 || revisionLimit > 10) {
+      throw createHttpError("Korekcijų etapų limitas turi būti sveikasis skaičius nuo 0 iki 10.", 400);
+    }
+    request.revisionLimit = revisionLimit;
+  }
+
+  if (req.body?.startRevisionRound === true) {
+    if (request.proposalStatus !== "accepted") {
+      throw createHttpError("Korekcijų etapą galima registruoti tik patvirtintam projektui.", 409);
+    }
+    const nextNumber = (request.revisionRounds || []).length + 1;
+    request.revisionRounds.push({
+      number: nextNumber,
+      startedAt: new Date(),
+      actorName: adminActor(req).actorName,
+      note: cleanString(req.body.revisionRoundNote, 500),
+    });
+    request.contactHistory.push({
+      type: "note",
+      note: `Užregistruotas ${nextNumber}-as korekcijų etapas${nextNumber > request.revisionLimit ? " (papildomas, virš įskaičiuoto limito)" : ""}.`,
+      happenedAt: new Date(),
+      ...adminActor(req),
+    });
+  }
+
   if (Object.prototype.hasOwnProperty.call(req.body || {}, "handoverItems")) {
     if (!Array.isArray(req.body.handoverItems) || req.body.handoverItems.length > 20) {
       throw createHttpError("Perduodamų elementų sąrašas netinkamas.", 400);
@@ -460,7 +507,7 @@ const sendAdminWebServiceProposal = async (req, res) => {
   const request = await WebServiceRequest.findById(req.params.id);
   if (!request) throw createHttpError("Web užsakymas nerastas.", 404);
   if (request.depositStatus === "paid") {
-    throw createHttpError("Avansas jau apmokėtas. Naujo pasiūlymo siųsti nebegalima.", 409);
+    throw createHttpError("Pirmas mokėjimas jau gautas. Naujo pasiūlymo siųsti nebegalima.", 409);
   }
 
   const fallbackPrice = request.proposalPrice ?? request.finalPrice ?? request.basePrice;
@@ -506,8 +553,10 @@ const sendAdminWebServiceProposal = async (req, res) => {
   request.contractTestStatus = "not_created";
   request.contractTestSentAt = null;
   request.proposalExpiresAt = new Date(now.getTime() + expiryDays * 24 * 60 * 60 * 1000);
-  request.depositPercent = depositPercent;
-  request.depositAmount = calculateDeposit(proposalPrice, depositPercent);
+  request.paymentPlan = "full";
+  request.splitPaymentPercent = depositPercent;
+  request.depositPercent = 100;
+  request.depositAmount = proposalPrice;
   request.depositStatus = "not_requested";
   request.stripeDepositCheckoutSessionId = "";
   request.stripeDepositPaymentIntentId = "";
@@ -519,7 +568,7 @@ const sendAdminWebServiceProposal = async (req, res) => {
   request.nextActionAt = new Date(now.getTime() + Math.min(3, expiryDays) * 24 * 60 * 60 * 1000);
   request.contactHistory.push({
     type: "proposal",
-    note: `Išsiųstas ${proposalPrice} € pasiūlymas; avansas ${depositPercent}%.`,
+    note: `Išsiųstas ${proposalPrice} € pasiūlymas; pagrindinis pasirinkimas – pilnas apmokėjimas, alternatyva – ${request.splitPaymentPercent}% avansas ir likutis.`,
     happenedAt: now,
     ...adminActor(req),
   });
@@ -616,9 +665,14 @@ const getPublicWebServiceInvoicePdf = async (req, res) => {
   const isPaid = isFinal ? request.finalPaymentStatus === "paid" : request.depositStatus === "paid";
   if (!isPaid) throw createHttpError("Sąskaita bus pasiekiama tik gavus mokėjimą.", 409);
 
-  const invoiceNumber = isFinal ? request.finalTestInvoiceNumber : request.depositTestInvoiceNumber;
+  const officialInvoiceNumber = isFinal ? request.finalInvoiceNumber : request.depositInvoiceNumber;
+  const testInvoiceNumber = isFinal ? request.finalTestInvoiceNumber : request.depositTestInvoiceNumber;
+  const invoiceNumber = officialInvoiceNumber || testInvoiceNumber;
   const safeFileName = `${invoiceNumber || `TEST-${request.requestNumber}-${paymentType}`}.pdf`.replace(/[^\w.-]/g, "_");
-  const pdf = createWebServiceTestInvoicePdfBuffer({ request, paymentType });
+  const issuedAt = isFinal ? request.finalInvoiceIssuedAt : request.depositInvoiceIssuedAt;
+  const pdf = officialInvoiceNumber
+    ? createWebServiceOfficialInvoicePdfBuffer({ request, paymentType, invoiceNumber: officialInvoiceNumber, issuedAt })
+    : createWebServiceTestInvoicePdfBuffer({ request, paymentType });
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader("Content-Disposition", `attachment; filename="${safeFileName}"`);
   res.setHeader("Cache-Control", "private, no-store");
@@ -639,11 +693,15 @@ const acceptPublicWebServiceProposal = async (req, res) => {
     const acceptedName = cleanString(req.body?.acceptedName, 160);
     const billingName = cleanString(req.body?.billingName, 200);
     const billingAddress = cleanString(req.body?.billingAddress, 300);
+    const paymentPlan = cleanString(req.body?.paymentPlan, 20) || "full";
     if (acceptedName.length < 2 || req.body?.acceptedTerms !== true) {
       throw createHttpError("Patvirtinkite vardą ir sutikimą su pasiūlymo sąlygomis.", 400);
     }
     if (billingName.length < 2 || billingAddress.length < 5) {
       throw createHttpError("Įrašykite sąskaitos gavėją ir adresą.", 400);
+    }
+    if (!PAYMENT_PLAN_OPTIONS.includes(paymentPlan)) {
+      throw createHttpError("Pasirinkite pilną mokėjimą arba mokėjimą dviem dalimis.", 400);
     }
 
     const now = new Date();
@@ -655,13 +713,16 @@ const acceptPublicWebServiceProposal = async (req, res) => {
     request.companyCode = cleanString(req.body?.companyCode, 50);
     request.vatCode = cleanString(req.body?.vatCode, 50);
     request.billingAddress = billingAddress;
+    request.paymentPlan = paymentPlan;
+    request.depositPercent = paymentPlan === "full" ? 100 : request.splitPaymentPercent;
+    request.depositAmount = calculateDeposit(request.proposalPrice, request.depositPercent);
     request.status = "accepted";
     request.projectStage = "awaiting_deposit";
-    request.nextAction = "Laukti projekto avanso apmokėjimo";
+    request.nextAction = paymentPlan === "full" ? "Laukti pilno projekto apmokėjimo" : "Laukti projekto avanso apmokėjimo";
     request.nextActionAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
     request.contactHistory.push({
       type: "proposal",
-      note: `Klientas ${acceptedName} patvirtino pasiūlymą ir jo sąlygas.`,
+      note: `Klientas ${acceptedName} patvirtino pasiūlymą ir pasirinko ${paymentPlan === "full" ? "pilną apmokėjimą" : "mokėjimą dviem dalimis"}.`,
       happenedAt: now,
     });
     await request.save();
@@ -685,7 +746,7 @@ const createPublicWebServiceDepositSession = async (req, res) => {
     return res.json({ alreadyPaid: true, proposal: serializePublicProposal(request) });
   }
   if (!request.depositAmount || request.depositAmount <= 0) {
-    throw createHttpError("Avanso suma nenustatyta.", 409);
+    throw createHttpError("Mokėjimo suma nenustatyta.", 409);
   }
 
   const stripe = getWebServiceStripeClient();
@@ -715,8 +776,8 @@ const createPublicWebServiceDepositSession = async (req, res) => {
             currency: "eur",
             unit_amount: Math.round(request.depositAmount * 100),
             product_data: {
-              name: `Stilloak Web projekto avansas — ${request.requestNumber}`,
-              description: `${request.depositPercent}% avansas už ${request.packageName}`,
+              name: request.paymentPlan === "full" ? `Stilloak Web projektas — ${request.requestNumber}` : `Stilloak Web projekto avansas — ${request.requestNumber}`,
+              description: request.paymentPlan === "full" ? `Pilnas apmokėjimas už ${request.packageName}` : `${request.depositPercent}% avansas už ${request.packageName}`,
             },
           },
         },
@@ -766,7 +827,7 @@ const syncAdminWebServiceDeposit = async (req, res) => {
   const request = await WebServiceRequest.findById(req.params.id);
   if (!request) throw createHttpError("Web užsakymas nerastas.", 404);
   if (!request.stripeDepositCheckoutSessionId) {
-    throw createHttpError("Šiam pasiūlymui Stripe avanso sesija dar nesukurta.", 409);
+    throw createHttpError("Šiam pasiūlymui Stripe pirmo mokėjimo sesija dar nesukurta.", 409);
   }
 
   const stripe = getWebServiceStripeClient();
@@ -781,6 +842,7 @@ const requestAdminWebServiceFinalPayment = async (req, res) => {
   if (request.proposalStatus !== "accepted" || request.depositStatus !== "paid") {
     throw createHttpError("Likusios sumos galima prašyti tik po patvirtinto pasiūlymo ir gauto avanso.", 409);
   }
+  if (request.paymentPlan === "full") throw createHttpError("Klientas pasirinko pilną mokėjimą; likučio nėra.", 409);
   if (request.finalPaymentStatus === "paid") throw createHttpError("Projektas jau apmokėtas pilnai.", 409);
 
   const amount = Math.round((Number(request.proposalPrice || 0) - Number(request.depositAmount || 0)) * 100) / 100;

@@ -18,7 +18,7 @@ const sendWebServiceTestInvoiceEmail = async ({ request, paymentType = "deposit"
   const invoiceNumber = buildTestInvoiceNumber(request, paymentType);
   const filename = `${invoiceNumber}.pdf`.replace(/[^\w.-]/g, "_");
   const pdf = createWebServiceTestInvoicePdfBuffer({ request, paymentType });
-  const paymentLabel = paymentType === "final" ? "likusios projekto sumos" : "projekto avanso";
+  const paymentLabel = paymentType === "final" ? "likusios projekto sumos" : request.paymentPlan === "full" ? "visos projekto sumos" : "projekto avanso";
   const subject = `TESTINĖ sąskaita po ${paymentLabel} — ${request.requestNumber}`;
   const { text, html } = buildWebServiceEmail({ subject, name: request.name, title: "Mokėjimas gautas", intro: `Gavome ${paymentLabel} testinį mokėjimą. PDF dokumentą rasite laiško priede.`, rows: [{ label: "Užsakymas", value: request.requestNumber }, { label: "Dokumento numeris", value: invoiceNumber }], notice: "Prisegtas PDF yra testinis, negalioja ir nėra apskaitos dokumentas." });
   const attachments = [{ filename, content: pdf }];

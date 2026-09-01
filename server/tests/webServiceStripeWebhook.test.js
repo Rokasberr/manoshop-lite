@@ -43,9 +43,10 @@ test("Stilloak Web Stripe webhook keeps event processing idempotent", () => {
   assert.match(controllerSource, /markStripeWebhookEventFailed\(webhookRecord, error\)/);
 });
 
-test("Stilloak Web Stripe webhook syncs the final payment and sends its test invoice", () => {
+test("Stilloak Web Stripe webhook syncs the final payment and sends the configured invoice", () => {
   assert.match(controllerSource, /checkoutType === "web_service_final_payment"/);
   assert.match(controllerSource, /syncWebServiceFinalPaymentFromSession\(session\)/);
-  assert.match(controllerSource, /sendTestInvoiceOnce\(request, "final"\)/);
+  assert.match(controllerSource, /sendInvoiceOnce\(request, "final"\)/);
+  assert.match(controllerSource, /areOfficialWebServiceDocumentsEnabled/);
   assert.match(controllerSource, /syncWebServiceFinalPaymentFromSession\(session, \{ expired: true \}\)/);
 });

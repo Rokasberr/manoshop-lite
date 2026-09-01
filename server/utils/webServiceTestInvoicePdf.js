@@ -11,7 +11,7 @@ const formatMoney = (value) => `${Number(value || 0).toFixed(2)} EUR`;
 const formatDate = (value) => new Date(value || Date.now()).toISOString().slice(0, 10);
 
 const buildTestInvoiceNumber = (request, paymentType = "deposit") => {
-  const suffix = paymentType === "final" ? "FINAL" : "AVANSAS";
+  const suffix = paymentType === "final" ? "FINAL" : request.paymentPlan === "full" ? "PILNAS" : "AVANSAS";
   return `TEST-${request.requestNumber}-${suffix}`;
 };
 
@@ -44,7 +44,7 @@ const createWebServiceTestInvoicePdfBuffer = ({ request, paymentType = "deposit"
   addText(48, 525, "Paslauga", 12, "F2");
   addText(330, 525, "Suma", 12, "F2");
   addLine(48, 514, 547, 514);
-  addText(48, 490, isFinal ? `Likusi suma uz ${request.packageName}` : `Avansas uz ${request.packageName}`);
+  addText(48, 490, isFinal ? `Likusi suma uz ${request.packageName}` : request.paymentPlan === "full" ? `Pilnas apmokejimas uz ${request.packageName}` : `Avansas uz ${request.packageName}`);
   addText(330, 490, formatMoney(amount), 11, "F2");
   addLine(300, 460, 547, 460);
   addText(330, 435, "Is viso sumoketa", 12, "F2");

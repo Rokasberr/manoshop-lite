@@ -28,7 +28,7 @@ const syncWebServiceDepositFromSession = async (session, { expired = false } = {
       request.stripeDepositCheckoutSessionId = "";
       request.contactHistory.push({
         type: "note",
-        note: "Stripe avanso apmokėjimo sesija baigė galioti neapmokėta.",
+        note: request.paymentPlan === "full" ? "Stripe pilno mokėjimo sesija baigė galioti neapmokėta." : "Stripe avanso apmokėjimo sesija baigė galioti neapmokėta.",
         happenedAt: new Date(),
       });
       await request.save();
@@ -48,15 +48,18 @@ const syncWebServiceDepositFromSession = async (session, { expired = false } = {
     getStripeId(session.payment_intent) || request.stripeDepositPaymentIntentId;
   request.nextAction = "Suderinti projekto startą ir pradėti darbus";
   request.nextActionAt = null;
+  const paymentLabel = request.paymentPlan === "full"
+    ? "Gautas pilnas projekto apmokėjimas per Stripe."
+    : `Gautas ${request.depositPercent}% projekto avansas per Stripe.`;
 
   const alreadyLogged = request.contactHistory.some(
-    (entry) => entry.note === `Gautas ${request.depositPercent}% projekto avansas per Stripe.`
+    (entry) => entry.note === paymentLabel
   );
 
   if (!alreadyLogged) {
     request.contactHistory.push({
       type: "note",
-      note: `Gautas ${request.depositPercent}% projekto avansas per Stripe.`,
+      note: paymentLabel,
       happenedAt: new Date(),
     });
   }
@@ -78,7 +81,7 @@ const syncWebServiceDepositRefund = async ({ paymentIntentId }) => {
   request.depositStatus = "refunded";
   request.contactHistory.push({
     type: "note",
-    note: "Stripe projekto avansas pažymėtas kaip grąžintas.",
+    note: request.paymentPlan === "full" ? "Stripe pilnas projekto mokėjimas pažymėtas kaip grąžintas." : "Stripe projekto avansas pažymėtas kaip grąžintas.",
     happenedAt: new Date(),
   });
   await request.save();

@@ -216,7 +216,7 @@ const clientExperience = [
   {
     icon: WalletCards,
     title: "Aiškūs mokėjimai",
-    text: "Avansas, likutis ir sąskaitos pateikiami aiškiai, be informacijos paieškų laiškuose."
+    text: "Galite mokėti visą sumą iškart arba pasirinkti avansą ir likutį. Sąskaitos pateikiamos vienoje vietoje."
   },
   {
     icon: ShieldCheck,
@@ -232,7 +232,7 @@ const commonQuestions = [
   },
   {
     question: "Kada pradedami darbai?",
-    answer: "Darbai pradedami patvirtinus pasiūlymą ir gavus jame numatytą avansą. Tiksli pradžia ir terminas nurodomi pasiūlyme."
+    answer: "Darbai pradedami patvirtinus pasiūlymą ir gavus pasirinktą pirmą mokėjimą – visą sumą arba avansą. Tiksli pradžia ir terminas nurodomi pasiūlyme."
   },
   {
     question: "Ar matysiu, kas jau atlikta?",

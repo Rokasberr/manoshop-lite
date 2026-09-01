@@ -54,7 +54,8 @@ const runPendingWebServicePaymentReminders = async (now = new Date()) => {
         continue;
       }
       sent += 1;
-      claim.contactHistory.push({ type: "email", note: `Automatiškai išsiųstas ${REMINDER_DAYS[expectedCount]} dienos ${paymentType === "final" ? "likučio" : "avanso"} mokėjimo priminimas.`, happenedAt: now });
+      const paymentLabel = paymentType === "final" ? "likučio" : claim.paymentPlan === "full" ? "pilno mokėjimo" : "avanso";
+      claim.contactHistory.push({ type: "email", note: `Automatiškai išsiųstas ${REMINDER_DAYS[expectedCount]} dienos ${paymentLabel} priminimas.`, happenedAt: now });
       await claim.save();
     } catch (error) {
       await WebServiceRequest.updateOne({ _id: claim._id, [field]: now }, { $set: { [field]: request[field] || null }, $inc: { [countField]: -1 } });

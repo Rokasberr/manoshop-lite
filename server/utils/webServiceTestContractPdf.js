@@ -54,7 +54,7 @@ const createWebServiceTestContractPdfBuffer = ({ request }) => {
     ["F2", 13, "2. Projektas ir kaina"],
     ["F1", 10, `Paslauga: ${request.packageName || "-"}`],
     ["F1", 10, `Bendra kaina: ${money(request.proposalPrice)}`],
-    ["F1", 10, `Avansas (${request.depositPercent || 0}%): ${money(request.depositAmount)}`],
+    ["F1", 10, request.paymentPlan === "full" ? `Mokejimas: visa suma iskart (${money(request.depositAmount)})` : `Avansas (${request.depositPercent || 0}%): ${money(request.depositAmount)}`],
     ["F1", 10, ""],
     ["F2", 13, "3. Darbu apimtis"],
     ...wrapText(request.proposalScope || "-", 88).map((line) => ["F1", 10, line]),

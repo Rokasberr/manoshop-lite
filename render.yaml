@@ -42,6 +42,18 @@ services:
         value: "true"
       - key: WEB_SERVICE_STRIPE_LIVE_ENABLED
         value: "false"
+      - key: WEB_SERVICE_ACTIVITY_CERTIFICATE_NUMBER
+        sync: false
+      - key: WEB_SERVICE_ACTIVITY_CODE
+        sync: false
+      - key: WEB_SERVICE_BUSINESS_ADDRESS
+        sync: false
+      - key: WEB_SERVICE_VAT_CODE
+        sync: false
+      - key: WEB_SERVICE_VAT_SCHEME
+        value: svs_pending
+      - key: WEB_SERVICE_OFFICIAL_DOCUMENTS_ENABLED
+        value: "false"
       - key: DATABASE_BACKUP_ENABLED
         value: "false"
       - key: DATABASE_BACKUP_UPLOAD_URL

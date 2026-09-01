@@ -27,7 +27,7 @@ const getWebBankTransferDetails = (requestNumber = "") => {
     bic,
     bankName,
     currency: "EUR",
-    reference: `Stilloak Web avansas – ${normalize(requestNumber)}`,
+    reference: `Stilloak Web mokėjimas – ${normalize(requestNumber)}`,
   };
 };
 
