@@ -16,7 +16,8 @@ const resendAdminWebServiceTestContract = async (req, res) => {
 const resendAdminWebServiceHandover = async (req, res) => {
   const request = await WebServiceRequest.findById(req.params.id);
   if (!request) throw createHttpError("Web užsakymas nerastas.", 404);
-  if (request.finalPaymentStatus !== "paid") throw createHttpError("Projektas dar neapmokėtas pilnai.", 409);
+  const fullyPaid = request.paymentPlan === "full" ? request.depositStatus === "paid" : request.finalPaymentStatus === "paid";
+  if (!fullyPaid) throw createHttpError("Projektas dar neapmokėtas pilnai.", 409);
   request.handoverEmailStatus = "not_created";
   request.contactHistory.push({ type: "email", note: "Pakartotinai inicijuotas projekto perdavimo laiškas.", happenedAt: new Date(), actorName: req.user?.name || "Administratorius", actorEmail: req.user?.email || "" });
   await request.save();

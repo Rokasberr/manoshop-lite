@@ -8,15 +8,16 @@ const {
   markStripeWebhookEventProcessed,
 } = require("../services/webhookEventService");
 const { getWebServiceStripeClient } = require("../utils/stripeClient");
-const { deliverWebServiceTestInvoice } = require("../services/webServiceTestInvoiceEmailService");
+const { deliverWebServiceInvoice } = require("../services/webServiceInvoiceDeliveryService");
 const { syncWebServiceFinalPaymentFromSession } = require("../services/webServiceFinalPaymentService");
 const { deliverWebServiceHandoverEmail } = require("../services/webServiceLifecycleEmailService");
+const { areOfficialWebServiceDocumentsEnabled } = require("../config/webServiceBusiness");
 
-const sendTestInvoiceOnce = async (request, paymentType) => {
+const sendInvoiceOnce = async (request, paymentType) => {
   const prefix = paymentType === "deposit" ? "deposit" : "final";
-  const statusField = `${prefix}TestInvoiceStatus`;
+  const statusField = `${prefix}${areOfficialWebServiceDocumentsEnabled() ? "InvoiceStatus" : "TestInvoiceStatus"}`;
   if (request?.[statusField] !== "sent") {
-    await deliverWebServiceTestInvoice({ request, paymentType });
+    await deliverWebServiceInvoice({ request, paymentType });
   }
 };
 
@@ -57,11 +58,11 @@ const handleWebServiceStripeWebhook = async (req, res) => {
 
         if (session.metadata?.checkoutType === "web_service_deposit") {
           const request = await syncWebServiceDepositFromSession(session);
-          if (request?.depositStatus === "paid") await sendTestInvoiceOnce(request, "deposit");
+          if (request?.depositStatus === "paid") await sendInvoiceOnce(request, "deposit");
         } else if (session.metadata?.checkoutType === "web_service_final_payment") {
           const request = await syncWebServiceFinalPaymentFromSession(session);
           if (request?.finalPaymentStatus === "paid") {
-            await sendTestInvoiceOnce(request, "final");
+            await sendInvoiceOnce(request, "final");
             await deliverWebServiceHandoverEmail(request);
           }
         }

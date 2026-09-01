@@ -7,7 +7,7 @@ const {
 } = require("../config/webServicePayments");
 const { syncWebServiceDepositFromSession } = require("../services/webServiceDepositService");
 const { syncWebServiceFinalPaymentFromSession } = require("../services/webServiceFinalPaymentService");
-const { deliverWebServiceTestInvoice } = require("../services/webServiceTestInvoiceEmailService");
+const { deliverWebServiceInvoice } = require("../services/webServiceInvoiceDeliveryService");
 const { deliverWebServiceHandoverEmail } = require("../services/webServiceLifecycleEmailService");
 const { createHttpError } = require("../utils/httpError");
 const { getWebServiceStripeClient } = require("../utils/stripeClient");
@@ -54,7 +54,7 @@ const retireExistingStripeDepositSession = async (request) => {
     request.stripeDepositCheckoutSessionId = "";
     request.contactHistory.push({
       type: "note",
-      note: "Ankstesnė neapmokėta Stripe avanso sesija uždaryta pereinant prie banko pavedimo.",
+      note: "Ankstesnė neapmokėta Stripe pirmo mokėjimo sesija uždaryta pereinant prie banko pavedimo.",
       happenedAt: new Date(),
     });
     await request.save();
@@ -102,7 +102,7 @@ const markAdminWebServiceBankTransferPaid = async (req, res) => {
     throw createHttpError("Pirmiausia klientas turi patvirtinti pasiūlymą.", 409);
   }
   if (!request.depositAmount || request.depositAmount <= 0) {
-    throw createHttpError("Avanso suma nenustatyta.", 409);
+    throw createHttpError("Mokėjimo suma nenustatyta.", 409);
   }
   if (request.depositStatus === "paid") {
     return res.json(request);
@@ -121,16 +121,18 @@ const markAdminWebServiceBankTransferPaid = async (req, res) => {
 
   request.contactHistory.push({
     type: "note",
-    note: `Patvirtintas ${request.depositPercent}% projekto avansas banko pavedimu (${request.depositAmount} €).`,
+    note: request.paymentPlan === "full"
+      ? `Patvirtintas pilnas projekto mokėjimas banko pavedimu (${request.depositAmount} €).`
+      : `Patvirtintas ${request.depositPercent}% projekto avansas banko pavedimu (${request.depositAmount} €).`,
     happenedAt: now,
     ...adminActor(req),
   });
 
   await request.save();
   try {
-    await deliverWebServiceTestInvoice({ request, paymentType: "deposit" });
+    await deliverWebServiceInvoice({ request, paymentType: "deposit" });
   } catch (error) {
-    console.error(`[web-bank-transfer] ${request.requestNumber} avanso PDF laiško klaida: ${error.message}`);
+    console.error(`[web-bank-transfer] ${request.requestNumber} pirmo mokėjimo PDF laiško klaida: ${error.message}`);
   }
   res.json(request);
 };
@@ -177,7 +179,7 @@ const markAdminWebServiceFinalBankTransferPaid = async (req, res) => {
   request.contactHistory.push({ type: "note", note: `Patvirtinta likusi ${request.finalPaymentAmount} € projekto suma banko pavedimu.`, happenedAt: now, ...adminActor(req) });
   await request.save();
   try {
-    await deliverWebServiceTestInvoice({ request, paymentType: "final" });
+    await deliverWebServiceInvoice({ request, paymentType: "final" });
   } catch (error) {
     console.error(`[web-bank-transfer] ${request.requestNumber} likučio PDF laiško klaida: ${error.message}`);
   }
@@ -192,7 +194,7 @@ const markAdminWebServiceFinalBankTransferPaid = async (req, res) => {
 const requireWebStripeDepositsEnabled = (req, _res, next) => {
   if (!areWebStripeDepositsEnabled()) {
     throw createHttpError(
-      "Kortelės mokėjimas šiuo metu išjungtas. Avansą atlikite banko pavedimu.",
+      "Kortelės mokėjimas šiuo metu išjungtas. Mokėjimą atlikite banko pavedimu.",
       409
     );
   }

@@ -78,4 +78,10 @@ test("private portal supports dated tasks, comments, approval and revision reque
   assert.match(portal, /Jūsų pastaba/);
   assert.match(portal, /Peržiūrėti rezultatą/);
   assert.match(admin, /web-project-search/);
+  assert.match(model, /revisionLimit:/);
+  assert.match(model, /revisionRounds:/);
+  assert.match(controller, /startRevisionRound/);
+  assert.match(admin, /Registruoti korekcijų etapą/);
+  assert.match(portal, /Korekcijų etapai/);
+  assert.match(portal, /Papildomi pakeitimai derinami atskirai/);
 });

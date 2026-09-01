@@ -59,3 +59,38 @@ test("WebServiceRequest validates structured client project tasks", () => {
   assert.ok(error);
   assert.ok(error.errors["projectTasks.0.status"]);
 });
+
+test("WebServiceRequest tracks limited correction rounds", () => {
+  const request = new WebServiceRequest({
+    ...validRequest(),
+    revisionLimit: 3,
+    revisionRounds: [{ number: 1, note: "Pagrindinio puslapio korekcijos" }],
+  });
+  assert.equal(request.validateSync(), undefined);
+  assert.equal(request.revisionLimit, 3);
+  assert.equal(request.revisionRounds.length, 1);
+
+  const invalid = new WebServiceRequest({ ...validRequest(), revisionLimit: 11 });
+  assert.ok(invalid.validateSync()?.errors.revisionLimit);
+});
+
+test("WebServiceRequest validates full and split payment plans", () => {
+  const full = new WebServiceRequest({ ...validRequest(), paymentPlan: "full" });
+  assert.equal(full.validateSync(), undefined);
+
+  const split = new WebServiceRequest({
+    ...validRequest(),
+    paymentPlan: "split",
+    splitPaymentPercent: 40,
+  });
+  assert.equal(split.validateSync(), undefined);
+
+  const unknown = new WebServiceRequest({ ...validRequest(), paymentPlan: "monthly" });
+  assert.ok(unknown.validateSync()?.errors.paymentPlan);
+
+  const invalidPercent = new WebServiceRequest({
+    ...validRequest(),
+    splitPaymentPercent: 100,
+  });
+  assert.ok(invalidPercent.validateSync()?.errors.splitPaymentPercent);
+});

@@ -37,7 +37,7 @@ const markFinalBankTransferPaid = async (requestId) => {
   return response.data;
 };
 const resendTestInvoice = async (requestId, paymentType) => {
-  const response = await api.post(`/web-service-requests/${requestId}/proposal/test-invoice/resend`, { paymentType });
+  const response = await api.post(`/web-service-requests/${requestId}/proposal/invoice/resend`, { paymentType });
   return response.data;
 };
 const resendTestContract = async (requestId) => {

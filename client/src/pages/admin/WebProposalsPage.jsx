@@ -8,7 +8,7 @@ import webServiceRequestService from "../../services/webServiceRequestService";
 import { formatCurrency } from "../../utils/currency";
 
 const DEFAULT_TERMS =
-  "Darbų apimtis, terminas ir kaina galioja pagal šį pasiūlymą. Darbai pradedami gavus sutartą avansą. Papildomi darbai ar apimties pakeitimai derinami atskirai.";
+  "Darbų apimtis, terminas ir kaina galioja pagal šį pasiūlymą. Pagrindinis mokėjimo variantas – visa suma iškart; klientas taip pat gali pasirinkti du mokėjimus – avansą ir likutį. Darbai pradedami gavus sutartą pirmą mokėjimą. Papildomi darbai ar apimties pakeitimai derinami atskirai.";
 
 const proposalLabels = {
   draft: "Juodraštis",
@@ -28,7 +28,7 @@ const depositLabels = {
 };
 const finalPaymentLabels = { not_requested: "Likutis neprašytas", requested: "Laukiama likučio", pending: "Mokėjimas pradėtas", paid: "Pilnai apmokėta", failed: "Nepavyko", refunded: "Grąžintas" };
 
-const projectStageLabels = { awaiting_deposit: "Laukia avanso", in_progress: "Darbai vykdomi", client_review: "Kliento peržiūra", awaiting_final_payment: "Laukia likučio", completed: "Užbaigta" };
+const projectStageLabels = { awaiting_deposit: "Laukia pirmo mokėjimo", in_progress: "Darbai vykdomi", client_review: "Kliento peržiūra", awaiting_final_payment: "Laukia likučio", completed: "Užbaigta" };
 const projectTaskStatusLabels = { pending: "Laukia", in_progress: "Vykdoma", completed: "Atlikta" };
 
 const paymentMethodLabels = {
@@ -43,11 +43,13 @@ const buildDraft = (request) => ({
     `Paruošime ${request.packageName} svetainės projektą pagal aptartus verslo tikslus, turinį ir funkcionalumą.`,
   proposalScope: request.proposalScope || request.message || "",
   proposalTerms: request.proposalTerms || DEFAULT_TERMS,
-  depositPercent: request.depositPercent ?? 50,
+  depositPercent: request.splitPaymentPercent ?? (request.paymentPlan === "split" ? request.depositPercent : 50),
   expiryDays: 14,
   projectLiveUrl: request.projectLiveUrl || "",
   warrantyEndsAt: request.warrantyEndsAt ? new Date(request.warrantyEndsAt).toISOString().slice(0, 10) : "",
   carePlan: request.carePlan || "",
+  revisionLimit: request.revisionLimit ?? 2,
+  revisionRoundNote: "",
   handoverItemsText: (request.handoverItems || []).join("\n"),
   projectTasks: (request.projectTasks || []).map((task) => ({
     id: task._id || task.id || "",
@@ -77,6 +79,7 @@ const WebProposalsPage = () => {
   const [updatingStageId, setUpdatingStageId] = useState("");
   const [savingHandoverId, setSavingHandoverId] = useState("");
   const [savingTasksId, setSavingTasksId] = useState("");
+  const [savingRevisionsId, setSavingRevisionsId] = useState("");
   const [resendingContractId, setResendingContractId] = useState("");
   const [resendingHandoverId, setResendingHandoverId] = useState("");
   const [filter, setFilter] = useState("active");
@@ -179,6 +182,39 @@ const WebProposalsPage = () => {
     }
   };
 
+  const handleSaveRevisionLimit = async (request) => {
+    const draft = drafts[request._id];
+    try {
+      setSavingRevisionsId(request._id);
+      const updated = await webServiceRequestService.updateRequest(request._id, { revisionLimit: Number(draft.revisionLimit) });
+      setRequests((current) => current.map((item) => item._id === request._id ? updated : item));
+      setDrafts((current) => ({ ...current, [request._id]: buildDraft(updated) }));
+      toast.success("Korekcijų limitas išsaugotas.");
+    } catch (saveError) {
+      toast.error(saveError.response?.data?.message || "Nepavyko išsaugoti korekcijų limito.");
+    } finally {
+      setSavingRevisionsId("");
+    }
+  };
+
+  const handleStartRevisionRound = async (request) => {
+    const draft = drafts[request._id];
+    try {
+      setSavingRevisionsId(request._id);
+      const updated = await webServiceRequestService.updateRequest(request._id, {
+        startRevisionRound: true,
+        revisionRoundNote: draft.revisionRoundNote.trim(),
+      });
+      setRequests((current) => current.map((item) => item._id === request._id ? updated : item));
+      setDrafts((current) => ({ ...current, [request._id]: buildDraft(updated) }));
+      toast.success("Korekcijų etapas užregistruotas.");
+    } catch (saveError) {
+      toast.error(saveError.response?.data?.message || "Nepavyko užregistruoti korekcijų etapo.");
+    } finally {
+      setSavingRevisionsId("");
+    }
+  };
+
   const handleSend = async (request) => {
     const draft = drafts[request._id];
     if (!draft) return;
@@ -223,10 +259,10 @@ const WebProposalsPage = () => {
         current.map((request) => (request._id === requestId ? updated : request))
       );
       toast.success(
-        updated.depositStatus === "paid" ? "Avansas patvirtintas." : "Stripe būsena atnaujinta."
+        updated.depositStatus === "paid" ? (updated.paymentPlan === "full" ? "Pilnas mokėjimas patvirtintas." : "Avansas patvirtintas.") : "Stripe būsena atnaujinta."
       );
     } catch (syncError) {
-      toast.error(syncError.response?.data?.message || "Nepavyko patikrinti avanso.");
+      toast.error(syncError.response?.data?.message || "Nepavyko patikrinti pirmo mokėjimo.");
     } finally {
       setSyncingId("");
     }
@@ -234,7 +270,7 @@ const WebProposalsPage = () => {
 
   const handleMarkBankTransferPaid = async (request) => {
     const confirmed = window.confirm(
-      `Patvirtinti, kad gautas ${formatCurrency(request.depositAmount)} avansas pavedimu už ${request.requestNumber}?`
+      `Patvirtinti, kad gautas ${formatCurrency(request.depositAmount)} ${request.paymentPlan === "full" ? "pilnas mokėjimas" : "avansas"} pavedimu už ${request.requestNumber}?`
     );
     if (!confirmed) return;
 
@@ -244,9 +280,9 @@ const WebProposalsPage = () => {
       setRequests((current) =>
         current.map((item) => (item._id === request._id ? updated : item))
       );
-      toast.success("Avansas pažymėtas gautu banko pavedimu.");
+      toast.success(request.paymentPlan === "full" ? "Pilnas mokėjimas pažymėtas gautu banko pavedimu." : "Avansas pažymėtas gautu banko pavedimu.");
     } catch (markError) {
-      toast.error(markError.response?.data?.message || "Nepavyko pažymėti avanso gautu.");
+      toast.error(markError.response?.data?.message || "Nepavyko pažymėti mokėjimo gautu.");
     } finally {
       setMarkingPaidId("");
     }
@@ -358,8 +394,8 @@ const WebProposalsPage = () => {
     <div className="space-y-8 font-admin">
       <AdminPageHeader
         eyebrow="Stilloak Web"
-        title="Pasiūlymai ir avansai"
-        description="Paruošk pasiūlymą, gauk kliento patvirtinimą ir avansą banko pavedimu. Kortelės avansai lieka išjungti, kol juos sąmoningai aktyvuosime."
+        title="Pasiūlymai ir mokėjimai"
+        description="Paruošk pasiūlymą su pagrindiniu pilno apmokėjimo variantu ir pasirenkamu mokėjimu dviem dalimis. Kortelės mokėjimai lieka išjungti, kol juos sąmoningai aktyvuosime."
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -367,7 +403,7 @@ const WebProposalsPage = () => {
           ["Aktyvūs projektai", stats.active],
           ["Laukia sprendimo", stats.sent],
           ["Patvirtinti", stats.accepted],
-          ["Avansas gautas", stats.paid],
+          ["Pirmas mokėjimas gautas", stats.paid],
         ].map(([label, value]) => (
           <div key={label} className="dashboard-panel p-5">
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{label}</p>
@@ -401,8 +437,8 @@ const WebProposalsPage = () => {
               onChange={(event) => setFilter(event.target.value)}
             >
               <option value="active">Aktyvūs</option>
-              <option value="needs_payment">Patvirtinti, laukia avanso</option>
-              <option value="paid">Avansas apmokėtas</option>
+              <option value="needs_payment">Patvirtinti, laukia mokėjimo</option>
+              <option value="paid">Pirmas mokėjimas gautas</option>
               <option value="all">Visi</option>
             </select>
           </div>
@@ -428,6 +464,8 @@ const WebProposalsPage = () => {
               const proposalStatus = request.proposalStatus || "draft";
               const depositStatus = request.depositStatus || "not_requested";
               const finalPaymentStatus = request.finalPaymentStatus || "not_requested";
+              const paymentPlan = request.paymentPlan || "split";
+              const paymentsFullyPaid = paymentPlan === "full" ? depositStatus === "paid" : finalPaymentStatus === "paid";
               const proposalUrl = proposalUrls[request._id] || "";
               const projectStage = request.projectStage || "awaiting_deposit";
 
@@ -446,7 +484,7 @@ const WebProposalsPage = () => {
                         <span className={`rounded-full px-3 py-1 text-xs font-semibold ${depositStatus === "paid" ? "bg-emerald-50 text-emerald-700" : "bg-sky-50 text-sky-700"}`}>
                           {depositLabels[depositStatus] || depositStatus}
                         </span>
-                        {depositStatus === "paid" ? <span className={`rounded-full px-3 py-1 text-xs font-semibold ${finalPaymentStatus === "paid" ? "bg-emerald-50 text-emerald-700" : "bg-violet-50 text-violet-700"}`}>{finalPaymentLabels[finalPaymentStatus] || finalPaymentStatus}</span> : null}
+                        {depositStatus === "paid" ? <span className={`rounded-full px-3 py-1 text-xs font-semibold ${paymentsFullyPaid ? "bg-emerald-50 text-emerald-700" : "bg-violet-50 text-violet-700"}`}>{paymentsFullyPaid ? "Pilnai apmokėta" : finalPaymentLabels[finalPaymentStatus] || finalPaymentStatus}</span> : null}
                         <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">{projectStageLabels[projectStage] || projectStage}</span>
                       </div>
 
@@ -467,9 +505,9 @@ const WebProposalsPage = () => {
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs uppercase tracking-[0.15em] text-slate-400">Avansas</p>
+                          <p className="text-xs uppercase tracking-[0.15em] text-slate-400">Mokėjimo planas</p>
                           <p className="mt-1 font-semibold text-slate-950">
-                            {request.depositAmount ? `${request.depositPercent}% · ${formatCurrency(request.depositAmount)}` : "—"}
+                            {request.depositAmount ? (paymentPlan === "full" ? `Visa suma · ${formatCurrency(request.depositAmount)}` : `${request.depositPercent}% · ${formatCurrency(request.depositAmount)}`) : "—"}
                           </p>
                           {request.depositPaymentMethod ? (
                             <p className="mt-1 text-xs text-slate-500">
@@ -482,8 +520,8 @@ const WebProposalsPage = () => {
                       {request.proposalAcceptedAt ? (
                         <div className="mt-5 rounded-2xl border border-emerald-100 bg-emerald-50/60 p-4 text-sm text-emerald-900">
                           <strong>Klientas patvirtino:</strong> {request.proposalAcceptedName || request.name} · {new Date(request.proposalAcceptedAt).toLocaleString("lt-LT")}
-                          {request.depositPaidAt ? ` · Avansas gautas ${new Date(request.depositPaidAt).toLocaleString("lt-LT")}` : ""}
-                          {request.finalPaymentPaidAt ? ` · Pilnai apmokėta ${new Date(request.finalPaymentPaidAt).toLocaleString("lt-LT")}` : ""}
+                          {request.depositPaidAt ? ` · ${paymentPlan === "full" ? "Visa suma" : "Avansas"} gauta ${new Date(request.depositPaidAt).toLocaleString("lt-LT")}` : ""}
+                          {paymentsFullyPaid ? ` · Pilnai apmokėta ${new Date(request.finalPaymentPaidAt || request.depositPaidAt).toLocaleString("lt-LT")}` : ""}
                         </div>
                       ) : null}
 
@@ -503,11 +541,11 @@ const WebProposalsPage = () => {
                           <p className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">Mokėjimų istorija</p>
                           <div className="mt-3 space-y-3 text-sm">
                             <div className="flex flex-wrap items-center justify-between gap-3">
-                              <div><strong>Avansas · {formatCurrency(request.depositAmount)}</strong><p className="text-xs text-slate-500">{paymentMethodLabels[request.depositPaymentMethod] || request.depositPaymentMethod || "—"} · {request.depositPaidAt ? new Date(request.depositPaidAt).toLocaleString("lt-LT") : "—"}</p><p className="text-xs text-slate-500">PDF: {request.depositTestInvoiceStatus === "sent" ? `išsiųstas ${request.depositTestInvoiceSentAt ? new Date(request.depositTestInvoiceSentAt).toLocaleString("lt-LT") : ""}` : request.depositTestInvoiceStatus || "nesukurtas"}</p></div>
+                              <div><strong>{paymentPlan === "full" ? "Pilnas mokėjimas" : "Avansas"} · {formatCurrency(request.depositAmount)}</strong><p className="text-xs text-slate-500">{paymentMethodLabels[request.depositPaymentMethod] || request.depositPaymentMethod || "—"} · {request.depositPaidAt ? new Date(request.depositPaidAt).toLocaleString("lt-LT") : "—"}</p><p className="text-xs text-slate-500">{request.depositInvoiceNumber ? `Oficiali sąskaita ${request.depositInvoiceNumber}` : "Testinis PDF"}: {(request.depositInvoiceNumber ? request.depositInvoiceStatus : request.depositTestInvoiceStatus) === "sent" ? `išsiųstas ${(request.depositInvoiceSentAt || request.depositTestInvoiceSentAt) ? new Date(request.depositInvoiceSentAt || request.depositTestInvoiceSentAt).toLocaleString("lt-LT") : ""}` : (request.depositInvoiceNumber ? request.depositInvoiceStatus : request.depositTestInvoiceStatus) || "nesukurtas"}</p></div>
                               <button type="button" className="dashboard-button-secondary" disabled={resendingInvoiceKey === `${request._id}-deposit`} onClick={() => handleResendInvoice(request, "deposit")}>{resendingInvoiceKey === `${request._id}-deposit` ? "Siunčiama..." : "Siųsti PDF dar kartą"}</button>
                             </div>
                             {finalPaymentStatus !== "not_requested" ? <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-3">
-                              <div><strong>Likutis · {formatCurrency(request.finalPaymentAmount)}</strong><p className="text-xs text-slate-500">{finalPaymentStatus === "paid" ? (paymentMethodLabels[request.finalPaymentMethod] || request.finalPaymentMethod || "—") : finalPaymentLabels[finalPaymentStatus]}{request.finalPaymentPaidAt ? ` · ${new Date(request.finalPaymentPaidAt).toLocaleString("lt-LT")}` : ""}</p><p className="text-xs text-slate-500">PDF: {request.finalTestInvoiceStatus === "sent" ? `išsiųstas ${request.finalTestInvoiceSentAt ? new Date(request.finalTestInvoiceSentAt).toLocaleString("lt-LT") : ""}` : request.finalTestInvoiceStatus || "nesukurtas"}</p></div>
+                              <div><strong>Likutis · {formatCurrency(request.finalPaymentAmount)}</strong><p className="text-xs text-slate-500">{finalPaymentStatus === "paid" ? (paymentMethodLabels[request.finalPaymentMethod] || request.finalPaymentMethod || "—") : finalPaymentLabels[finalPaymentStatus]}{request.finalPaymentPaidAt ? ` · ${new Date(request.finalPaymentPaidAt).toLocaleString("lt-LT")}` : ""}</p><p className="text-xs text-slate-500">{request.finalInvoiceNumber ? `Oficiali sąskaita ${request.finalInvoiceNumber}` : "Testinis PDF"}: {(request.finalInvoiceNumber ? request.finalInvoiceStatus : request.finalTestInvoiceStatus) === "sent" ? `išsiųstas ${(request.finalInvoiceSentAt || request.finalTestInvoiceSentAt) ? new Date(request.finalInvoiceSentAt || request.finalTestInvoiceSentAt).toLocaleString("lt-LT") : ""}` : (request.finalInvoiceNumber ? request.finalInvoiceStatus : request.finalTestInvoiceStatus) || "nesukurtas"}</p></div>
                               {finalPaymentStatus === "paid" ? <button type="button" className="dashboard-button-secondary" disabled={resendingInvoiceKey === `${request._id}-final`} onClick={() => handleResendInvoice(request, "final")}>{resendingInvoiceKey === `${request._id}-final` ? "Siunčiama..." : "Siųsti PDF dar kartą"}</button> : null}
                             </div> : null}
                           </div>
@@ -562,6 +600,26 @@ const WebProposalsPage = () => {
                         </div>
                       ) : null}
 
+                      {proposalStatus === "accepted" ? (
+                        <div className="space-y-3 rounded-2xl border border-amber-200 bg-amber-50/60 p-4">
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.15em] text-amber-800">Korekcijų etapai</p>
+                            <p className="mt-1 text-sm text-slate-700"><strong>{request.revisionRounds?.length || 0}</strong> iš <strong>{draft.revisionLimit}</strong> panaudota</p>
+                          </div>
+                          <label className="block text-sm font-medium text-slate-700">Į kainą įskaičiuotų etapų limitas
+                            <input className="input-field mt-2 w-full" type="number" min="0" max="10" step="1" value={draft.revisionLimit} onChange={(event) => updateDraft(request._id, "revisionLimit", event.target.value)} />
+                          </label>
+                          <button type="button" className="dashboard-button-secondary w-full justify-center" disabled={savingRevisionsId === request._id} onClick={() => handleSaveRevisionLimit(request)}>Išsaugoti limitą</button>
+                          <label className="block text-sm font-medium text-slate-700">Etapo pastaba (nebūtina)
+                            <textarea className="input-field mt-2 min-h-20 w-full resize-y" maxLength={500} placeholder="Pvz. Pagrindinio puslapio dizaino korekcijos" value={draft.revisionRoundNote} onChange={(event) => updateDraft(request._id, "revisionRoundNote", event.target.value)} />
+                            <span className="mt-1 block text-xs font-normal text-slate-500">Klientas matys šią pastabą korekcijų istorijoje.</span>
+                          </label>
+                          <button type="button" className="dashboard-button-primary w-full justify-center" disabled={savingRevisionsId === request._id} onClick={() => handleStartRevisionRound(request)}>{savingRevisionsId === request._id ? "Saugoma..." : "Registruoti korekcijų etapą"}</button>
+                          {request.revisionRounds?.length ? <div className="space-y-2 border-t border-amber-200 pt-3">{request.revisionRounds.map((round) => <div className="rounded-lg bg-white px-3 py-2 text-xs text-slate-700" key={`${request._id}-revision-${round.number}`}><strong>{round.number} korekcijų etapas</strong><span className="mt-1 block text-slate-500">{round.startedAt ? new Date(round.startedAt).toLocaleString("lt-LT") : ""}{round.note ? ` · ${round.note}` : ""}</span></div>)}</div> : null}
+                          {(request.revisionRounds?.length || 0) >= Number(draft.revisionLimit) ? <p className="rounded-lg bg-amber-100 px-3 py-2 text-xs font-semibold text-amber-900">Į kainą įskaičiuotas limitas pasiektas. Kitas etapas bus pažymėtas kaip papildomas.</p> : null}
+                        </div>
+                      ) : null}
+
                       {depositStatus === "paid" ? (
                         <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
                           <p className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-500">Perdavimo informacija</p>
@@ -570,7 +628,7 @@ const WebProposalsPage = () => {
                           <label className="block text-sm font-medium text-slate-700">Priežiūros planas<textarea className="input-field mt-2 min-h-20 w-full resize-y" value={draft.carePlan || ""} onChange={(event) => updateDraft(request._id, "carePlan", event.target.value)} /></label>
                           <label className="block text-sm font-medium text-slate-700">Klientui perduodami failai ir nuorodos<textarea className="input-field mt-2 min-h-24 w-full resize-y" placeholder={"Svetainės instrukcija | https://...\nLogotipo failai | https://..."} value={draft.handoverItemsText || ""} onChange={(event) => updateDraft(request._id, "handoverItemsText", event.target.value)} /><span className="mt-1 block text-xs font-normal text-slate-500">Po vieną eilutėje: pavadinimas | saugi https:// nuoroda</span></label>
                           <button type="button" className="dashboard-button-secondary w-full justify-center" disabled={savingHandoverId === request._id} onClick={() => handleSaveHandover(request)}>{savingHandoverId === request._id ? "Saugoma..." : "Išsaugoti perdavimo informaciją"}</button>
-                          {finalPaymentStatus === "paid" ? <button type="button" className="dashboard-button-secondary w-full justify-center" disabled={resendingHandoverId === request._id} onClick={() => handleResendHandover(request)}>{resendingHandoverId === request._id ? "Siunčiama..." : "Siųsti perdavimo laišką dar kartą"}</button> : null}
+                          {paymentsFullyPaid ? <button type="button" className="dashboard-button-secondary w-full justify-center" disabled={resendingHandoverId === request._id} onClick={() => handleResendHandover(request)}>{resendingHandoverId === request._id ? "Siunčiama..." : "Siųsti perdavimo laišką dar kartą"}</button> : null}
                         </div>
                       ) : null}
                       <label className="block text-sm font-medium text-slate-700">
@@ -614,12 +672,12 @@ const WebProposalsPage = () => {
 
                       <div className="grid gap-3 sm:grid-cols-2">
                         <label className="block text-sm font-medium text-slate-700">
-                          Avansas, %
+                          Dviejų mokėjimų avansas, %
                           <input
                             className="input-field mt-2 w-full"
                             type="number"
                             min="10"
-                            max="100"
+                            max="90"
                             value={draft.depositPercent ?? 50}
                             onChange={(event) => updateDraft(request._id, "depositPercent", event.target.value)}
                           />
@@ -653,7 +711,7 @@ const WebProposalsPage = () => {
                           disabled={markingPaidId === request._id}
                           onClick={() => handleMarkBankTransferPaid(request)}
                         >
-                          {markingPaidId === request._id ? "Žymima..." : "Pažymėti avansą gautu pavedimu"}
+                          {markingPaidId === request._id ? "Žymima..." : paymentPlan === "full" ? "Pažymėti pilną mokėjimą gautu" : "Pažymėti avansą gautu pavedimu"}
                         </button>
                       ) : null}
 
@@ -668,7 +726,7 @@ const WebProposalsPage = () => {
                         </button>
                       ) : null}
 
-                      {depositStatus === "paid" && finalPaymentStatus !== "paid" ? (
+                      {paymentPlan === "split" && depositStatus === "paid" && finalPaymentStatus !== "paid" ? (
                         <button type="button" className="dashboard-button-primary w-full justify-center" disabled={requestingFinalId === request._id} onClick={() => handleRequestFinalPayment(request)}>
                           {requestingFinalId === request._id ? "Siunčiama..." : finalPaymentStatus === "not_requested" ? "Prašyti likusio mokėjimo" : "Siųsti naują likučio nuorodą"}
                         </button>

@@ -19,6 +19,7 @@ const DEPOSIT_STATUS_OPTIONS = ["not_requested", "pending", "paid", "failed", "r
 const DEPOSIT_PAYMENT_METHOD_OPTIONS = ["", "stripe", "bank_transfer"];
 const TEST_INVOICE_STATUS_OPTIONS = ["not_created", "processing", "sent", "failed"];
 const FINAL_PAYMENT_STATUS_OPTIONS = ["not_requested", "requested", "pending", "paid", "failed", "refunded"];
+const PAYMENT_PLAN_OPTIONS = ["full", "split"];
 const PROJECT_STAGE_OPTIONS = ["awaiting_deposit", "in_progress", "client_review", "awaiting_final_payment", "completed"];
 const PROJECT_TASK_STATUS_OPTIONS = ["pending", "in_progress", "completed"];
 const PROJECT_TASK_DECISION_OPTIONS = ["none", "approved", "changes_requested"];
@@ -66,6 +67,43 @@ const projectTaskSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+const revisionRoundSchema = new mongoose.Schema(
+  {
+    number: { type: Number, required: true, min: 1, max: 50 },
+    startedAt: { type: Date, default: Date.now },
+    actorName: { type: String, trim: true, maxlength: 160, default: "" },
+    note: { type: String, trim: true, maxlength: 500, default: "" },
+  },
+  { _id: false }
+);
+
+const invoiceSnapshotSchema = new mongoose.Schema(
+  {
+    seller: {
+      legalName: { type: String, required: true, trim: true, maxlength: 160 },
+      tradingName: { type: String, trim: true, maxlength: 160, default: "" },
+      certificateNumber: { type: String, required: true, trim: true, maxlength: 50 },
+      activityCode: { type: String, required: true, trim: true, maxlength: 30 },
+      vatCode: { type: String, required: true, trim: true, maxlength: 50 },
+      address: { type: String, required: true, trim: true, maxlength: 300 },
+      email: { type: String, required: true, trim: true, lowercase: true, maxlength: 254 },
+      vatScheme: { type: String, required: true, enum: ["svs"] },
+    },
+    buyer: {
+      name: { type: String, required: true, trim: true, maxlength: 200 },
+      companyCode: { type: String, trim: true, maxlength: 50, default: "" },
+      vatCode: { type: String, trim: true, maxlength: 50, default: "" },
+      address: { type: String, required: true, trim: true, maxlength: 300 },
+      email: { type: String, required: true, trim: true, lowercase: true, maxlength: 254 },
+    },
+    description: { type: String, required: true, trim: true, maxlength: 300 },
+    amount: { type: Number, required: true, min: 0 },
+    paymentMethod: { type: String, required: true, enum: ["stripe", "bank_transfer"] },
+    requestNumber: { type: String, required: true, trim: true, maxlength: 100 },
+  },
+  { _id: false }
+);
+
 const webServiceRequestSchema = new mongoose.Schema(
   {
     requestNumber: {
@@ -109,6 +147,8 @@ const webServiceRequestSchema = new mongoose.Schema(
     contractTestNumber: { type: String, trim: true, maxlength: 100, default: "" },
     contractTestStatus: { type: String, enum: TEST_INVOICE_STATUS_OPTIONS, default: "not_created" },
     contractTestSentAt: { type: Date, default: null },
+    paymentPlan: { type: String, enum: PAYMENT_PLAN_OPTIONS, default: "split", index: true },
+    splitPaymentPercent: { type: Number, min: 10, max: 90, default: 50 },
     depositPercent: { type: Number, min: 10, max: 100, default: 50 },
     depositAmount: { type: Number, min: 0, default: null },
     depositStatus: { type: String, enum: DEPOSIT_STATUS_OPTIONS, default: "not_requested", index: true },
@@ -127,6 +167,11 @@ const webServiceRequestSchema = new mongoose.Schema(
       default: "not_created",
     },
     depositTestInvoiceSentAt: { type: Date, default: null },
+    depositInvoiceNumber: { type: String, trim: true, maxlength: 100, default: undefined },
+    depositInvoiceStatus: { type: String, enum: TEST_INVOICE_STATUS_OPTIONS, default: "not_created" },
+    depositInvoiceIssuedAt: { type: Date, default: null },
+    depositInvoiceSentAt: { type: Date, default: null },
+    depositInvoiceSnapshot: { type: invoiceSnapshotSchema, default: undefined },
     finalPaymentAmount: { type: Number, min: 0, default: null },
     finalPaymentStatus: { type: String, enum: FINAL_PAYMENT_STATUS_OPTIONS, default: "not_requested", index: true },
     finalPaymentRequestedAt: { type: Date, default: null },
@@ -137,8 +182,15 @@ const webServiceRequestSchema = new mongoose.Schema(
     finalTestInvoiceNumber: { type: String, trim: true, maxlength: 100, default: "" },
     finalTestInvoiceStatus: { type: String, enum: TEST_INVOICE_STATUS_OPTIONS, default: "not_created" },
     finalTestInvoiceSentAt: { type: Date, default: null },
+    finalInvoiceNumber: { type: String, trim: true, maxlength: 100, default: undefined },
+    finalInvoiceStatus: { type: String, enum: TEST_INVOICE_STATUS_OPTIONS, default: "not_created" },
+    finalInvoiceIssuedAt: { type: Date, default: null },
+    finalInvoiceSentAt: { type: Date, default: null },
+    finalInvoiceSnapshot: { type: invoiceSnapshotSchema, default: undefined },
     projectStage: { type: String, enum: PROJECT_STAGE_OPTIONS, default: "awaiting_deposit", index: true },
     projectTasks: { type: [projectTaskSchema], default: [] },
+    revisionLimit: { type: Number, min: 0, max: 10, default: 2 },
+    revisionRounds: { type: [revisionRoundSchema], default: [] },
     depositReminderSentAt: { type: Date, default: null },
     depositReminderCount: { type: Number, min: 0, max: 3, default: 0 },
     finalPaymentReminderSentAt: { type: Date, default: null },
@@ -165,6 +217,8 @@ webServiceRequestSchema.index({ source: 1, createdAt: -1 });
 webServiceRequestSchema.index({ nextActionAt: 1, status: 1 });
 webServiceRequestSchema.index({ proposalStatus: 1, proposalSentAt: -1 });
 webServiceRequestSchema.index({ depositStatus: 1, proposalAcceptedAt: -1 });
+webServiceRequestSchema.index({ depositInvoiceNumber: 1 }, { unique: true, sparse: true });
+webServiceRequestSchema.index({ finalInvoiceNumber: 1 }, { unique: true, sparse: true });
 
 module.exports = mongoose.model("WebServiceRequest", webServiceRequestSchema);
 module.exports.STATUS_OPTIONS = STATUS_OPTIONS;
@@ -174,6 +228,7 @@ module.exports.DEPOSIT_STATUS_OPTIONS = DEPOSIT_STATUS_OPTIONS;
 module.exports.DEPOSIT_PAYMENT_METHOD_OPTIONS = DEPOSIT_PAYMENT_METHOD_OPTIONS;
 module.exports.TEST_INVOICE_STATUS_OPTIONS = TEST_INVOICE_STATUS_OPTIONS;
 module.exports.FINAL_PAYMENT_STATUS_OPTIONS = FINAL_PAYMENT_STATUS_OPTIONS;
+module.exports.PAYMENT_PLAN_OPTIONS = PAYMENT_PLAN_OPTIONS;
 
 module.exports.PROJECT_STAGE_OPTIONS = PROJECT_STAGE_OPTIONS;
 module.exports.PROJECT_TASK_STATUS_OPTIONS = PROJECT_TASK_STATUS_OPTIONS;

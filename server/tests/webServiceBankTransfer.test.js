@@ -44,7 +44,7 @@ test("Bank transfer details stay server-configured and include request-specific 
         bic: "TESTLT21",
         bankName: "Test Bank",
         currency: "EUR",
-        reference: "Stilloak Web avansas – WEB-2026-ABC123",
+        reference: "Stilloak Web mokėjimas – WEB-2026-ABC123",
       });
     }
   );
@@ -87,6 +87,7 @@ test("Bank transfer admin fallback stays wired but is not exposed on the public 
   assert.match(controller, /proposalStatus !== "accepted"/);
   assert.match(model, /depositPaymentMethod:/);
   assert.match(admin, /Pažymėti avansą gautu pavedimu/);
+  assert.match(admin, /Pažymėti pilną mokėjimą gautu/);
   assert.doesNotMatch(proposal, /Avansas banko pavedimu/);
   assert.doesNotMatch(proposal, /Nukopijuoti mokėjimo duomenis/);
 });

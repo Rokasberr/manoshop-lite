@@ -24,6 +24,8 @@ type PublicProposal = {
   requestNumber: string;
   customer: { name: string; company: string; billingName: string; companyCode: string; vatCode: string; billingAddress: string };
   package: { id: string; name: string };
+  paymentPlan: "full" | "split";
+  paymentOptions: { default: "full"; splitPercent: number };
   proposal: {
     price: number | null;
     summary: string;
@@ -46,12 +48,18 @@ type PublicProposal = {
     invoice: InvoiceInfo;
   };
   finalPayment: { amount: number | null; status: string; requestedAt: string | null; paidAt: string | null; paymentMethod: string; invoice: InvoiceInfo };
+  paymentsFullyPaid: boolean;
   project: {
     stage: string;
     dueDate: string | null;
     liveUrl: string;
     warrantyEndsAt: string | null;
     carePlan: string;
+    revisions: {
+      limit: number;
+      used: number;
+      rounds: Array<{ number: number; startedAt: string | null; note: string }>;
+    };
     files: Array<{ label: string; url: string }>;
     tasks: Array<{
       id: string;
@@ -83,7 +91,7 @@ const formatDate = (value: string | null) =>
   value ? new Date(value).toLocaleDateString("lt-LT") : "—";
 
 const projectStageLabels: Record<string, string> = {
-  awaiting_deposit: "Laukiama avanso",
+  awaiting_deposit: "Laukiama pirmo mokėjimo",
   in_progress: "Darbai vykdomi",
   client_review: "Laukiama jūsų peržiūros",
   awaiting_final_payment: "Laukiama galutinio apmokėjimo",
@@ -120,6 +128,7 @@ function ProposalPage({ token }: ProposalPageProps) {
   const [companyCode, setCompanyCode] = useState("");
   const [vatCode, setVatCode] = useState("");
   const [billingAddress, setBillingAddress] = useState("");
+  const [paymentPlan, setPaymentPlan] = useState<"full" | "split">("full");
   const [accepting, setAccepting] = useState(false);
   const [paying, setPaying] = useState(false);
   const [paymentMessage, setPaymentMessage] = useState("");
@@ -190,9 +199,10 @@ function ProposalPage({ token }: ProposalPageProps) {
             setCompanyCode(confirmed.customer.companyCode || "");
             setVatCode(confirmed.customer.vatCode || "");
             setBillingAddress(confirmed.customer.billingAddress || "");
+            setPaymentPlan(confirmed.paymentPlan || "full");
             setPaymentMessage(payment === "final-success"
               ? (confirmed.finalPayment.status === "paid" ? "Galutinis mokėjimas sėkmingai gautas. Ačiū!" : "Stripe mokėjimas dar tvirtinamas.")
-              : (confirmed.deposit.status === "paid" ? "Avansas sėkmingai gautas. Susisieksime dėl projekto starto." : "Stripe mokėjimas dar tvirtinamas."));
+              : (confirmed.deposit.status === "paid" ? (confirmed.paymentPlan === "full" ? "Visa projekto suma sėkmingai gauta. Ačiū!" : "Avansas sėkmingai gautas. Susisieksime dėl projekto starto.") : "Stripe mokėjimas dar tvirtinamas."));
             return;
           }
         }
@@ -211,6 +221,7 @@ function ProposalPage({ token }: ProposalPageProps) {
         setCompanyCode(data.customer.companyCode || "");
         setVatCode(data.customer.vatCode || "");
         setBillingAddress(data.customer.billingAddress || "");
+        setPaymentPlan(data.paymentPlan || "full");
       } catch (loadError) {
         setError(loadError instanceof Error ? loadError.message : "Pasiūlymo nepavyko užkrauti.");
       } finally {
@@ -238,6 +249,7 @@ function ProposalPage({ token }: ProposalPageProps) {
           companyCode: companyCode.trim(),
           vatCode: vatCode.trim(),
           billingAddress: billingAddress.trim(),
+          paymentPlan,
         }),
       });
       const data = (await response.json().catch(() => ({}))) as PublicProposal & { message?: string };
@@ -263,10 +275,10 @@ function ProposalPage({ token }: ProposalPageProps) {
         proposal?: PublicProposal;
         message?: string;
       };
-      if (!response.ok) throw new Error(data.message || "Nepavyko atidaryti avanso apmokėjimo.");
+      if (!response.ok) throw new Error(data.message || "Nepavyko atidaryti mokėjimo.");
       if (data.alreadyPaid && data.proposal) {
         setProposal(data.proposal);
-        setPaymentMessage("Avansas jau apmokėtas.");
+        setPaymentMessage(proposal.paymentPlan === "full" ? "Visa projekto suma jau apmokėta." : "Avansas jau apmokėtas.");
         return;
       }
       if (!data.url) throw new Error("Stripe apmokėjimo nuoroda negauta.");
@@ -319,11 +331,15 @@ function ProposalPage({ token }: ProposalPageProps) {
   const isExpired = proposal.proposal.status === "expired";
   const isAccepted = proposal.proposal.status === "accepted";
   const isPaid = proposal.deposit.status === "paid";
+  const isFullPayment = proposal.paymentPlan === "full";
   const finalRequested = ["requested", "pending", "paid"].includes(proposal.finalPayment?.status);
   const finalPaid = proposal.finalPayment?.status === "paid";
   const projectTasks = proposal.project?.tasks || [];
   const completedTaskCount = projectTasks.filter((task) => task.status === "completed").length;
   const projectProgress = projectTasks.length ? Math.round((completedTaskCount / projectTasks.length) * 100) : 0;
+  const revisionLimit = proposal.project?.revisions?.limit ?? 2;
+  const revisionsUsed = proposal.project?.revisions?.used || 0;
+  const revisionsRemaining = Math.max(revisionLimit - revisionsUsed, 0);
 
   return (
     <main className="proposal-shell">
@@ -345,7 +361,7 @@ function ProposalPage({ token }: ProposalPageProps) {
 
         <div className="proposal-metrics">
           <div><span>Projekto kaina</span><strong>{formatCurrency(proposal.proposal.price)}</strong></div>
-          <div><span>Pradinis avansas</span><strong>{proposal.deposit.percent}% · {formatCurrency(proposal.deposit.amount)}</strong></div>
+          <div><span>Mokėjimas</span><strong>{isFullPayment ? `Visa suma · ${formatCurrency(proposal.deposit.amount)}` : `${proposal.deposit.percent}% avansas · ${formatCurrency(proposal.deposit.amount)}`}</strong></div>
           <div><span>{isAccepted ? "Projekto terminas" : "Galioja iki"}</span><strong>{formatDate(isAccepted ? proposal.project?.dueDate : proposal.proposal.expiresAt)}</strong></div>
         </div>
       </section>
@@ -401,8 +417,8 @@ function ProposalPage({ token }: ProposalPageProps) {
             <div className="proposal-section-title"><CreditCard size={22} /><h2>Apmokėjimai</h2></div>
             <div className="project-payment-list">
               {[
-                { key: "deposit", label: "Avansas", amount: proposal.deposit.amount, status: proposal.deposit.status, paidAt: proposal.deposit.paidAt, method: proposal.deposit.paymentMethod, invoice: proposal.deposit.invoice },
-                { key: "final", label: "Likusi dalis", amount: proposal.finalPayment.amount, status: proposal.finalPayment.status, paidAt: proposal.finalPayment.paidAt, method: proposal.finalPayment.paymentMethod, invoice: proposal.finalPayment.invoice },
+                { key: "deposit", label: isFullPayment ? "Pilnas mokėjimas" : "Avansas", amount: proposal.deposit.amount, status: proposal.deposit.status, paidAt: proposal.deposit.paidAt, method: proposal.deposit.paymentMethod, invoice: proposal.deposit.invoice },
+                ...(isFullPayment ? [] : [{ key: "final", label: "Likusi dalis", amount: proposal.finalPayment.amount, status: proposal.finalPayment.status, paidAt: proposal.finalPayment.paidAt, method: proposal.finalPayment.paymentMethod, invoice: proposal.finalPayment.invoice }]),
               ].map((payment) => (
                 <article className="project-payment" key={payment.key}>
                   <div><span>{payment.label}</span><strong>{formatCurrency(payment.amount)}</strong></div>
@@ -411,6 +427,15 @@ function ProposalPage({ token }: ProposalPageProps) {
                 </article>
               ))}
             </div>
+          </div>
+
+          <div className="proposal-card project-section-wide project-revisions-card">
+            <div className="proposal-section-title"><RotateCcw size={22} /><h2>Korekcijų etapai</h2></div>
+            <div className="project-revisions-summary">
+              <div><span>Panaudota</span><strong>{revisionsUsed} iš {revisionLimit}</strong></div>
+              <p>{revisionsRemaining > 0 ? `Liko ${revisionsRemaining} į kainą ${revisionsRemaining === 1 ? "įskaičiuotas etapas" : "įskaičiuoti etapai"}.` : "Į kainą įskaičiuotų korekcijų etapų limitas pasiektas. Papildomi pakeitimai derinami atskirai."}</p>
+            </div>
+            {proposal.project?.revisions?.rounds?.length ? <ol className="project-revision-list">{proposal.project.revisions.rounds.map((round) => <li key={`revision-${round.number}`}><strong>{round.number} etapas</strong><span>{formatDate(round.startedAt)}{round.note ? ` · ${round.note}` : ""}</span></li>)}</ol> : <p className="project-empty">Korekcijų etapų dar nepanaudota.</p>}
           </div>
 
           <div className="proposal-card">
@@ -463,8 +488,8 @@ function ProposalPage({ token }: ProposalPageProps) {
 
           {isPaid ? (
             <>
-              <div className="proposal-paid-box"><CheckCircle2 size={22} /><div><strong>Avansas apmokėtas</strong><span>{formatCurrency(proposal.deposit.amount)}</span></div></div>
-              {finalRequested ? (finalPaid ?
+              <div className="proposal-paid-box"><CheckCircle2 size={22} /><div><strong>{isFullPayment ? "Projektas apmokėtas pilnai" : "Avansas apmokėtas"}</strong><span>{formatCurrency(proposal.deposit.amount)}</span></div></div>
+              {!isFullPayment && finalRequested ? (finalPaid ?
                 <div className="proposal-paid-box"><CheckCircle2 size={22} /><div><strong>Projektas apmokėtas pilnai</strong><span>{formatCurrency(proposal.finalPayment.amount)}</span></div></div>
                 : <button className="proposal-primary-button" type="button" disabled={paying} onClick={startFinalPayment}>{paying ? <Loader2 className="proposal-spinner" size={19} /> : <CreditCard size={19} />}{paying ? "Atidaromas Stripe..." : `Apmokėti likutį · ${formatCurrency(proposal.finalPayment.amount)}`}</button>) : null}
             </>
@@ -473,7 +498,7 @@ function ProposalPage({ token }: ProposalPageProps) {
               {paying ? <Loader2 className="proposal-spinner" size={19} /> : <CreditCard size={19} />}
               {paying
                 ? "Atidaromas Stripe..."
-                : `Apmokėti ${proposal.deposit.percent}% avansą · ${formatCurrency(proposal.deposit.amount)}`}
+                : isFullPayment ? `Apmokėti visą sumą · ${formatCurrency(proposal.deposit.amount)}` : `Apmokėti ${proposal.deposit.percent}% avansą · ${formatCurrency(proposal.deposit.amount)}`}
             </button>
           )}
         </section>
@@ -481,6 +506,17 @@ function ProposalPage({ token }: ProposalPageProps) {
         <form className="proposal-card proposal-action-card" onSubmit={acceptProposal}>
           <h2>Patvirtinti pasiūlymą</h2>
           <p>Patvirtinimas užfiksuoja, kad sutinkate su aukščiau pateikta projekto apimtimi, kaina ir sąlygomis.</p>
+          <fieldset className="proposal-payment-choice">
+            <legend>Mokėjimo būdas</legend>
+            <label className={`proposal-payment-option ${paymentPlan === "full" ? "is-selected" : ""}`}>
+              <input type="radio" name="paymentPlan" value="full" checked={paymentPlan === "full"} onChange={() => setPaymentPlan("full")} />
+              <span><strong>Visa suma iškart</strong><small>{formatCurrency(proposal.proposal.price)} · rekomenduojamas variantas</small></span>
+            </label>
+            <label className={`proposal-payment-option ${paymentPlan === "split" ? "is-selected" : ""}`}>
+              <input type="radio" name="paymentPlan" value="split" checked={paymentPlan === "split"} onChange={() => setPaymentPlan("split")} />
+              <span><strong>Du mokėjimai</strong><small>{proposal.paymentOptions.splitPercent}% avansas dabar, likutis užbaigus projektą</small></span>
+            </label>
+          </fieldset>
           <label className="proposal-label">
             Patvirtinančio asmens vardas ir pavardė
             <input value={acceptedName} onChange={(event) => setAcceptedName(event.target.value)} minLength={2} required />
@@ -508,7 +544,7 @@ function ProposalPage({ token }: ProposalPageProps) {
           </div>
           <label className="proposal-checkbox">
             <input type="checkbox" checked={acceptedTerms} onChange={(event) => setAcceptedTerms(event.target.checked)} required />
-            <span>Sutinku su šio pasiūlymo apimtimi, kaina, sąlygomis ir nurodyta avanso suma. Susipažinau su <a href="https://stilloak-studio.com/web-services-terms" target="_blank" rel="noreferrer">paslaugų sąlygomis</a> ir <a href="https://stilloak-studio.com/web-services-privacy" target="_blank" rel="noreferrer">privatumo informacija</a>.</span>
+            <span>Sutinku su šio pasiūlymo apimtimi, kaina, sąlygomis ir pasirinktu mokėjimo planu. Susipažinau su <a href="https://stilloak-studio.com/web-services-terms" target="_blank" rel="noreferrer">paslaugų sąlygomis</a> ir <a href="https://stilloak-studio.com/web-services-privacy" target="_blank" rel="noreferrer">privatumo informacija</a>.</span>
           </label>
           <button className="proposal-primary-button" type="submit" disabled={accepting || !acceptedTerms || acceptedName.trim().length < 2 || billingName.trim().length < 2 || billingAddress.trim().length < 5}>
             {accepting ? <Loader2 className="proposal-spinner" size={19} /> : <FileCheck2 size={19} />}

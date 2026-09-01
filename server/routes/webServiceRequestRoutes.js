@@ -109,6 +109,7 @@ router.post(
 );
 router.post("/:id/proposal/final-payment/bank-transfer/paid", protect, adminOnly, validateObjectId("id"), asyncHandler(markAdminWebServiceFinalBankTransferPaid));
 router.post("/:id/proposal/test-invoice/resend", protect, adminOnly, validateObjectId("id"), asyncHandler(resendAdminWebServiceTestInvoice));
+router.post("/:id/proposal/invoice/resend", protect, adminOnly, validateObjectId("id"), asyncHandler(resendAdminWebServiceTestInvoice));
 router.post("/:id/proposal/test-contract/resend", protect, adminOnly, validateObjectId("id"), asyncHandler(resendAdminWebServiceTestContract));
 router.post("/:id/proposal/handover/resend", protect, adminOnly, validateObjectId("id"), asyncHandler(resendAdminWebServiceHandover));
 router.patch(
