@@ -2,7 +2,7 @@ const webServiceContactEmail = "rokas@stilloak-studio.com";
 const webServiceContactPhone = "+370 638 43445";
 const webServiceVatCode = "LT100020711618";
 const webServiceProvider = `Paslaugos teikiamos su „Stilloak Studio“ prekės ženklu. Kontaktai: ${webServiceContactEmail}, tel. ${webServiceContactPhone}.`;
-const webServiceVatStatus = `PVM mokėtojo kodas ${webServiceVatCode}; Lietuvoje taikoma smulkiojo verslo schema (SVS).`;
+const webServiceVatStatus = `PVM mokėtojo kodas ${webServiceVatCode}.`;
 
 export const serviceLinks = [
   { label: "Saugus apmokėjimas", to: "/secure-checkout" },
@@ -459,7 +459,7 @@ export const infoPages = {
     eyebrow: "Stilloak Web · rekvizitai",
     summary: "Vieši Stilloak Web paslaugų kontaktiniai ir PVM rekvizitai.",
     lastUpdated: "2026 m. rugsėjo 2 d.",
-    highlights: ["Stilloak Studio", `PVM kodas ${webServiceVatCode}`, "Smulkiojo verslo schema (SVS)"],
+    highlights: ["Stilloak Studio", `PVM kodas ${webServiceVatCode}`, webServiceContactEmail],
     sections: [
       {
         heading: "Rekvizitai",
