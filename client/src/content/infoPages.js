@@ -1,4 +1,4 @@
-const webServiceContactEmail = "rokas@stilloak-studio.com";
+const webServiceContactEmail = "hello@stilloak-studio.com";
 const webServiceContactPhone = "+370 638 43445";
 const webServiceVatCode = "LT100020711618";
 const webServiceProvider = `Paslaugos teikiamos su „Stilloak Studio“ prekės ženklu. Kontaktai: ${webServiceContactEmail}, tel. ${webServiceContactPhone}.`;
@@ -450,7 +450,7 @@ export const infoPages = {
     sections: [
       { heading: "Duomenys ir tikslai", bullets: ["vardas, el. paštas, įmonė ir projekto aprašymas užklausai administruoti", "sąskaitos gavėjo rekvizitai dokumentams parengti", "pasiūlymo patvirtinimo data ir IP sukčiavimo prevencijai bei patvirtinimo įrodymui", "mokėjimo būsena, bet ne pilni kortelės duomenys"] },
       { heading: "Teisiniai pagrindai ir gavėjai", paragraphs: ["Duomenys tvarkomi siekiant imtis veiksmų prieš sudarant sutartį, vykdyti sutartį, laikytis teisinių prievolių ir užtikrinti teisėtą sistemos saugumą. Duomenis pagal būtinybę gali tvarkyti Stripe, el. pašto, prieglobos ir duomenų bazės paslaugų teikėjai."] },
-      { heading: "Saugojimas ir teisės", paragraphs: ["Užklausos ir projekto duomenys saugomi tik tiek, kiek reikia projektui, ginčų prevencijai ir taikomoms prievolėms. Galite prašyti susipažinti, ištaisyti, apriboti ar, kai taikoma, ištrinti duomenis, parašę rokas@stilloak-studio.com."] },
+      { heading: "Saugojimas ir teisės", paragraphs: [`Užklausos ir projekto duomenys saugomi tik tiek, kiek reikia projektui, ginčų prevencijai ir taikomoms prievolėms. Galite prašyti susipažinti, ištaisyti, apriboti ar, kai taikoma, ištrinti duomenis, parašę ${webServiceContactEmail}.`] },
     ],
     cta: { label: "Grįžti į pradžią", to: "/" },
   },
@@ -484,7 +484,7 @@ export const infoPages = {
       { heading: "Kliento ir teikėjo pareigos", bullets: ["klientas laiku pateikia turinį, prieigas ir grįžtamąjį ryšį", "teikėjas vykdo patvirtintą apimtį ir informuoja apie reikšmingus pokyčius", "papildomi darbai pradedami tik suderinus kainą ir terminą"] },
       { heading: "Perdavimas, garantija ir atsakomybė", paragraphs: ["Po pilno atsiskaitymo perduodama pasiūlyme numatyta svetainė ir sutarti elementai. Garantijos laikotarpis bei priežiūros planas nurodomi perdavimo informacijoje. Slaptažodžiai el. paštu nesiunčiami."] },
       { heading: "Mokesčiai ir sąskaitos", paragraphs: [`${webServiceVatStatus} Tiksli mokėtina suma visada rodoma individualiame pasiūlyme ir išrašytame dokumente.`] },
-      { heading: "Ginčai", paragraphs: ["Pirmiausia prašome kreiptis rokas@stilloak-studio.com. Vartotojo prašymas nagrinėjamas teisės aktuose nustatyta tvarka. Vartotojas taip pat gali kreiptis į Valstybinę vartotojų teisių apsaugos tarnybą teisės aktuose nustatyta tvarka."] },
+      { heading: "Ginčai", paragraphs: [`Pirmiausia prašome kreiptis ${webServiceContactEmail}. Vartotojo prašymas nagrinėjamas teisės aktuose nustatyta tvarka. Vartotojas taip pat gali kreiptis į Valstybinę vartotojų teisių apsaugos tarnybą teisės aktuose nustatyta tvarka.`] },
     ],
     cta: { label: "Peržiūrėti privatumo informaciją", to: "/web-services-privacy" },
   },
@@ -497,7 +497,7 @@ export const infoPages = {
     sections: [
       { heading: "Prieš darbų pradžią", paragraphs: ["Jei projektas dar nepradėtas, kreipkitės kuo greičiau. Galimas grąžinimas vertinamas pagal faktines mokėjimo išlaidas, individualaus užsakymo pobūdį ir privalomas vartotojų teises."] },
       { heading: "Darbams prasidėjus", paragraphs: ["Jei klientas aiškiai prašo pradėti paslaugą nepasibaigus galimam atsisakymo terminui, nutraukimo atveju gali tekti apmokėti proporcingai iki pranešimo suteiktą paslaugos dalį. Individualiai parengti ir jau perduoti rezultatai vertinami atskirai."] },
-      { heading: "Kaip pateikti prašymą", paragraphs: ["Parašykite rokas@stilloak-studio.com, nurodykite užsakymo numerį ir prašymą. Atsakysime raštu ir pateiksime sprendimo bei, jei taikoma, grąžinamos sumos apskaičiavimą."] },
+      { heading: "Kaip pateikti prašymą", paragraphs: [`Parašykite ${webServiceContactEmail}, nurodykite užsakymo numerį ir prašymą. Atsakysime raštu ir pateiksime sprendimo bei, jei taikoma, grąžinamos sumos apskaičiavimą.`] },
     ],
     cta: { label: "Peržiūrėti paslaugų sąlygas", to: "/web-services-terms" },
   },
