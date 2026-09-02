@@ -88,6 +88,7 @@ test("operations routes, encrypted backups, error alerts and legal pages stay wi
   assert.match(webIndex, /site\.webmanifest/);
   assert.match(webIndex, /icon-512\.png/);
   assert.match(webIndex, /rel="preload" as="image"/);
+  assert.match(webIndex, /MEwdzzI8EMGH3lIrv4y4UNIfhoKsz2vx89u7t82jzeM/);
   assert.match(webManifest, /"purpose": "any maskable"/);
   assert.match(webApp, /loading=\{index === 0 \? "eager" : "lazy"\}/);
   assert.match(webApp, /fetchPriority=\{index === 0 \? "high" : "low"\}/);
