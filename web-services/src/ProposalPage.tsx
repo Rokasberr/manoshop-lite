@@ -17,6 +17,7 @@ import {
   ThumbsUp,
   RotateCcw,
 } from "lucide-react";
+import "./styles/proposal.css";
 
 type InvoiceInfo = { number: string; status: string; sentAt: string | null; downloadPath: string } | null;
 

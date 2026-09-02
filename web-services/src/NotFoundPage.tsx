@@ -1,4 +1,5 @@
 import { ArrowLeft, Home, Mail } from "lucide-react";
+import "./styles/proposal.css";
 
 const NotFoundPage = () => <main className="proposal-shell proposal-centered">
   <section className="proposal-card web-not-found">

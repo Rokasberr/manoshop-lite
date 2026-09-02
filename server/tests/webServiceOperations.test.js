@@ -55,6 +55,11 @@ test("operations routes, encrypted backups, error alerts and legal pages stay wi
   const proposal = readRepoFile("web-services", "src", "ProposalPage.tsx");
   const proposalEmail = readRepoFile("server", "services", "webServiceProposalEmailService.js");
   const requestEmail = readRepoFile("server", "services", "webServiceRequestEmailService.js");
+  const webIndex = readRepoFile("web-services", "index.html");
+  const webApp = readRepoFile("web-services", "src", "App.tsx");
+  const webStyles = readRepoFile("web-services", "src", "styles", "main.css");
+  const webManifest = readRepoFile("web-services", "public", "site.webmanifest");
+  const webMain = readRepoFile("web-services", "src", "main.tsx");
   assert.match(routes, /\/operations\/backup/);
   assert.match(backup, /aes-256-gcm/);
   assert.match(backup, /DATABASE_BACKUP_UPLOAD_URL/);
@@ -78,6 +83,17 @@ test("operations routes, encrypted backups, error alerts and legal pages stay wi
   assert.match(proposalEmail, /buildWebServiceEmail/);
   assert.match(proposalEmail, /Peržiūrėti ir patvirtinti pasiūlymą/);
   assert.match(requestEmail, /text-align:left/);
+  assert.match(webIndex, /favicon-48\.png/);
+  assert.match(webIndex, /apple-touch-icon\.png/);
+  assert.match(webIndex, /site\.webmanifest/);
+  assert.match(webIndex, /icon-512\.png/);
+  assert.match(webIndex, /rel="preload" as="image"/);
+  assert.match(webManifest, /"purpose": "any maskable"/);
+  assert.match(webApp, /loading=\{index === 0 \? "eager" : "lazy"\}/);
+  assert.match(webApp, /fetchPriority=\{index === 0 \? "high" : "low"\}/);
+  assert.doesNotMatch(webStyles, /fonts\.googleapis\.com/);
+  assert.match(webMain, /lazy\(\(\) => import\("\.\/ProposalPage"\)\)/);
+  assert.doesNotMatch(webMain, /import ProposalPage from/);
 });
 
 test("both public sites keep their section and contact navigation wired", () => {

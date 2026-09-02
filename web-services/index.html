@@ -12,6 +12,7 @@
     <meta name="theme-color" content="#f6f0e8" />
     <meta name="google-site-verification" content="UZI2lu9P-nxjFZQjvD0qw4jeALqNDwtHo3EdRyz6h40" />
     <link rel="canonical" href="https://web.stilloak-studio.com/" />
+    <link rel="preload" as="image" href="/stilloak-premium-hero.webp" type="image/webp" fetchpriority="high" />
 
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="lt_LT" />
@@ -35,7 +36,10 @@
     />
     <meta name="twitter:image" content="https://web.stilloak-studio.com/og-stilloak-web.svg" />
 
-    <link rel="icon" type="image/svg+xml" href="/stilloak-logo.svg" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
+    <link rel="icon" type="image/svg+xml" sizes="any" href="/stilloak-logo.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
 
     <script type="application/ld+json">
       {
@@ -43,7 +47,12 @@
         "@type": "ProfessionalService",
         "name": "Stilloak Web",
         "url": "https://web.stilloak-studio.com/",
-        "logo": "https://web.stilloak-studio.com/stilloak-logo.svg",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://web.stilloak-studio.com/icon-512.png",
+          "width": 512,
+          "height": 512
+        },
         "email": "hello@stilloak-studio.com",
         "areaServed": {
           "@type": "Country",
