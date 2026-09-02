@@ -535,7 +535,15 @@ function App() {
             >
               {heroSlides.map((slide, index) => (
                 <article className="hero-slide" key={slide.image} aria-hidden={activeHeroSlide !== index}>
-                  <img src={slide.image} alt={slide.alt} fetchPriority={index === 0 ? "high" : "auto"} />
+                  <img
+                    src={slide.image}
+                    alt={slide.alt}
+                    width="1600"
+                    height="900"
+                    loading={index === 0 ? "eager" : "lazy"}
+                    decoding="async"
+                    fetchPriority={index === 0 ? "high" : "low"}
+                  />
                   <div className="hero-media-caption">
                     <p><strong>{slide.title}</strong><small>{slide.text}</small></p>
                   </div>
