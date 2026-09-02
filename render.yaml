@@ -51,7 +51,7 @@ services:
       - key: WEB_SERVICE_VAT_CODE
         sync: false
       - key: WEB_SERVICE_VAT_SCHEME
-        value: svs_pending
+        value: svs
       - key: WEB_SERVICE_OFFICIAL_DOCUMENTS_ENABLED
         value: "false"
       - key: DATABASE_BACKUP_ENABLED

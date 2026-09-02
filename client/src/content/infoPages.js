@@ -1,12 +1,17 @@
 const webServiceBusinessAddress = import.meta.env.VITE_WEB_SERVICE_BUSINESS_ADDRESS?.trim() || "";
 const webServiceActivityCertificateNumber = import.meta.env.VITE_WEB_SERVICE_ACTIVITY_CERTIFICATE_NUMBER?.trim() || "";
 const webServiceActivityCode = import.meta.env.VITE_WEB_SERVICE_ACTIVITY_CODE?.trim() || "";
+const webServiceVatCode = import.meta.env.VITE_WEB_SERVICE_VAT_CODE?.trim() || "";
+const webServiceVatScheme = import.meta.env.VITE_WEB_SERVICE_VAT_SCHEME?.trim().toLowerCase() || "svs_pending";
 const webServiceRegistration = webServiceActivityCertificateNumber && webServiceActivityCode
   ? `individualios veiklos pažymos Nr. ${webServiceActivityCertificateNumber}, veiklos kodas ${webServiceActivityCode}`
   : "registruota individuali veikla";
 const webServiceProvider = webServiceBusinessAddress
   ? `Paslaugų teikėjas – Rokas Bernotas, ${webServiceRegistration}, adresas: ${webServiceBusinessAddress}.`
   : `Paslaugų teikėjas – Rokas Bernotas, ${webServiceRegistration}. Galutiniam aktyvavimui dar neįvestas veiklos adresas.`;
+const webServiceVatStatus = webServiceVatScheme === "svs" && webServiceVatCode
+  ? `PVM mokėtojo kodas ${webServiceVatCode}; Lietuvoje taikoma smulkiojo verslo schema (SVS).`
+  : "Galutiniam aktyvavimui dar reikalinga privati PVM / SVS konfigūracija.";
 
 export const serviceLinks = [
   { label: "Saugus apmokėjimas", to: "/secure-checkout" },
@@ -461,14 +466,15 @@ export const infoPages = {
   webServicesTerms: {
     title: "Stilloak Web paslaugų sąlygos",
     eyebrow: "Stilloak Web · sąlygų projektas",
-    summary: `Šios sąlygos aprašo pasiūlymo, mokėjimų, darbų, pakeitimų ir perdavimo procesą. ${webServiceProvider} Galutiniam aktyvavimui dar reikalingas VMI patvirtintas PVM statusas.`,
-    lastUpdated: "2026 m. rugsėjo 1 d.",
+    summary: `Šios sąlygos aprašo pasiūlymo, mokėjimų, darbų, pakeitimų ir perdavimo procesą. ${webServiceProvider} ${webServiceVatStatus}`,
+    lastUpdated: "2026 m. rugsėjo 2 d.",
     highlights: ["Kaina ir apimtis nustatomos individualiame pasiūlyme", "Pagrindinis pasirinkimas – visa suma iškart", "Galima pasirinkti mokėjimą dviem dalimis"],
     sections: [
       { heading: "Pasiūlymas ir mokėjimai", paragraphs: ["Konkreti darbų apimtis, kaina, terminas ir pasiūlymo galiojimas pateikiami privačiame pasiūlyme. Pagrindinis mokėjimo pasirinkimas yra visa projekto suma iškart. Klientas taip pat gali pasirinkti du mokėjimus – pasiūlyme nurodytą avansą ir likutį užbaigus projektą. Testavimo metu mokėjimai ir dokumentai neturi būti laikomi tikromis sąskaitomis ar galutine teisine sutartimi."] },
       { heading: "Kliento ir teikėjo pareigos", bullets: ["klientas laiku pateikia turinį, prieigas ir grįžtamąjį ryšį", "teikėjas vykdo patvirtintą apimtį ir informuoja apie reikšmingus pokyčius", "papildomi darbai pradedami tik suderinus kainą ir terminą"] },
       { heading: "Perdavimas, garantija ir atsakomybė", paragraphs: ["Po pilno atsiskaitymo perduodama pasiūlyme numatyta svetainė ir sutarti elementai. Garantijos laikotarpis bei priežiūros planas nurodomi perdavimo informacijoje. Slaptažodžiai el. paštu nesiunčiami."] },
-      { heading: "Ginčai", paragraphs: ["Pirmiausia prašome kreiptis rokas@stilloak-studio.com. Vartotojo prašymas nagrinėjamas teisės aktuose nustatyta tvarka. Prieš galutinai aktyvuojant sąlygas bus įrašytas veiklos adresas ir kompetentinga ginčų institucija."] },
+      { heading: "Mokesčiai ir sąskaitos", paragraphs: [`${webServiceVatStatus} Tiksli mokėtina suma visada rodoma individualiame pasiūlyme ir išrašytame dokumente.`] },
+      { heading: "Ginčai", paragraphs: ["Pirmiausia prašome kreiptis rokas@stilloak-studio.com. Vartotojo prašymas nagrinėjamas teisės aktuose nustatyta tvarka. Vartotojas taip pat gali kreiptis į Valstybinę vartotojų teisių apsaugos tarnybą teisės aktuose nustatyta tvarka."] },
     ],
     cta: { label: "Peržiūrėti privatumo informaciją", to: "/web-services-privacy" },
   },
