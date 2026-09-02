@@ -94,6 +94,7 @@ const App = () => (
         <Route path="/digital-download-policy" element={<InfoPage page={infoPages.digitalDownloadPolicy} />} />
         <Route path="/terms" element={<InfoPage page={infoPages.terms} />} />
         <Route path="/web-services-privacy" element={<InfoPage page={infoPages.webServicesPrivacy} />} />
+        <Route path="/web-services-details" element={<InfoPage page={infoPages.webServicesDetails} />} />
         <Route path="/web-services-terms" element={<InfoPage page={infoPages.webServicesTerms} />} />
         <Route path="/web-services-refunds" element={<InfoPage page={infoPages.webServicesRefunds} />} />
 
