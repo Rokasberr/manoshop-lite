@@ -33,15 +33,17 @@ Pagrindinės svetainės Vercel projekte:
 VITE_WEB_SERVICE_ACTIVITY_CERTIFICATE_NUMBER=<individualios veiklos pažymos numeris>
 VITE_WEB_SERVICE_ACTIVITY_CODE=<veiklos kodas>
 VITE_WEB_SERVICE_BUSINESS_ADDRESS=<teisinėje informacijoje rodomas adresas>
+VITE_WEB_SERVICE_VAT_CODE=<VMI suteiktas kodas>
+VITE_WEB_SERVICE_VAT_SCHEME=svs
 ```
 
-## Gavus VMI sprendimą
+## VMI sprendimas gautas 2026-09-02
 
-1. Patikrinti PVM kodo įsigaliojimo datą ir SVS statusą Mano VMI.
-2. Įvesti adresą ir PVM kodą į Render, paliekant oficialių dokumentų jungiklį `false`.
-3. Paleisti testinį PDF su fiktyviais duomenimis ir vizualiai patikrinti vieną A4 puslapį.
-4. Atnaujinti Vercel teisinės informacijos adreso kintamąjį.
-5. Patikrinti privatumo, sąlygų ir grąžinimų puslapius telefone.
+1. [x] Gautas PVM mokėtojo kodas ir patvirtinta SVS registracija.
+2. [ ] Įvesti pažymos numerį, veiklos kodą, adresą ir PVM kodą į Render, paliekant oficialių dokumentų jungiklį `false`.
+3. [ ] Paleisti testinį PDF su fiktyviais duomenimis ir vizualiai patikrinti vieną A4 puslapį.
+4. [ ] Įvesti veiklos ir PVM informaciją į pagrindinės svetainės Vercel kintamuosius.
+5. [ ] Patikrinti privatumo, sąlygų ir grąžinimų puslapius telefone.
 
 ## Prieš pirmą realų mokėjimą
 
