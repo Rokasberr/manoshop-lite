@@ -50,6 +50,8 @@ test("operations routes, encrypted backups, error alerts and legal pages stay wi
   const backup = readRepoFile("server", "services", "databaseBackupService.js");
   const errors = readRepoFile("server", "middleware", "errorMiddleware.js");
   const legal = readRepoFile("client", "src", "content", "infoPages.js");
+  const clientRoutes = readRepoFile("client", "src", "App.jsx");
+  const webFooter = readRepoFile("web-services", "src", "components", "FooterLinksPortal.tsx");
   const proposal = readRepoFile("web-services", "src", "ProposalPage.tsx");
   const proposalEmail = readRepoFile("server", "services", "webServiceProposalEmailService.js");
   const requestEmail = readRepoFile("server", "services", "webServiceRequestEmailService.js");
@@ -60,6 +62,15 @@ test("operations routes, encrypted backups, error alerts and legal pages stay wi
   assert.match(legal, /webServicesPrivacy/);
   assert.match(legal, /webServicesTerms/);
   assert.match(legal, /webServicesRefunds/);
+  assert.match(legal, /webServicesDetails/);
+  assert.match(legal, /\+370 638 43445/);
+  assert.match(legal, /LT100020711618/);
+  assert.doesNotMatch(legal, /Rokas Bernotas/);
+  assert.doesNotMatch(legal, /VITE_WEB_SERVICE_BUSINESS_ADDRESS/);
+  assert.doesNotMatch(legal, /VITE_WEB_SERVICE_ACTIVITY_CERTIFICATE_NUMBER/);
+  assert.match(clientRoutes, /\/web-services-details/);
+  assert.match(webFooter, /Rekvizitai/);
+  assert.match(webFooter, /web-services-details/);
   assert.match(proposal, /web-services-terms/);
   assert.match(proposalEmail, /buildWebServiceEmail/);
   assert.match(proposalEmail, /Peržiūrėti ir patvirtinti pasiūlymą/);

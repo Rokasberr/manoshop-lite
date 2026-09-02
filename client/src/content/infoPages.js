@@ -1,17 +1,8 @@
-const webServiceBusinessAddress = import.meta.env.VITE_WEB_SERVICE_BUSINESS_ADDRESS?.trim() || "";
-const webServiceActivityCertificateNumber = import.meta.env.VITE_WEB_SERVICE_ACTIVITY_CERTIFICATE_NUMBER?.trim() || "";
-const webServiceActivityCode = import.meta.env.VITE_WEB_SERVICE_ACTIVITY_CODE?.trim() || "";
-const webServiceVatCode = import.meta.env.VITE_WEB_SERVICE_VAT_CODE?.trim() || "";
-const webServiceVatScheme = import.meta.env.VITE_WEB_SERVICE_VAT_SCHEME?.trim().toLowerCase() || "svs_pending";
-const webServiceRegistration = webServiceActivityCertificateNumber && webServiceActivityCode
-  ? `individualios veiklos pažymos Nr. ${webServiceActivityCertificateNumber}, veiklos kodas ${webServiceActivityCode}`
-  : "registruota individuali veikla";
-const webServiceProvider = webServiceBusinessAddress
-  ? `Paslaugų teikėjas – Rokas Bernotas, ${webServiceRegistration}, adresas: ${webServiceBusinessAddress}.`
-  : `Paslaugų teikėjas – Rokas Bernotas, ${webServiceRegistration}. Galutiniam aktyvavimui dar neįvestas veiklos adresas.`;
-const webServiceVatStatus = webServiceVatScheme === "svs" && webServiceVatCode
-  ? `PVM mokėtojo kodas ${webServiceVatCode}; Lietuvoje taikoma smulkiojo verslo schema (SVS).`
-  : "Galutiniam aktyvavimui dar reikalinga privati PVM / SVS konfigūracija.";
+const webServiceContactEmail = "rokas@stilloak-studio.com";
+const webServiceContactPhone = "+370 638 43445";
+const webServiceVatCode = "LT100020711618";
+const webServiceProvider = `Paslaugos teikiamos su „Stilloak Studio“ prekės ženklu. Kontaktai: ${webServiceContactEmail}, tel. ${webServiceContactPhone}.`;
+const webServiceVatStatus = `PVM mokėtojo kodas ${webServiceVatCode}; Lietuvoje taikoma smulkiojo verslo schema (SVS).`;
 
 export const serviceLinks = [
   { label: "Saugus apmokėjimas", to: "/secure-checkout" },
@@ -462,6 +453,25 @@ export const infoPages = {
       { heading: "Saugojimas ir teisės", paragraphs: ["Užklausos ir projekto duomenys saugomi tik tiek, kiek reikia projektui, ginčų prevencijai ir taikomoms prievolėms. Galite prašyti susipažinti, ištaisyti, apriboti ar, kai taikoma, ištrinti duomenis, parašę rokas@stilloak-studio.com."] },
     ],
     cta: { label: "Grįžti į pradžią", to: "/" },
+  },
+  webServicesDetails: {
+    title: "Stilloak Web rekvizitai",
+    eyebrow: "Stilloak Web · rekvizitai",
+    summary: "Vieši Stilloak Web paslaugų kontaktiniai ir PVM rekvizitai.",
+    lastUpdated: "2026 m. rugsėjo 2 d.",
+    highlights: ["Stilloak Studio", `PVM kodas ${webServiceVatCode}`, "Smulkiojo verslo schema (SVS)"],
+    sections: [
+      {
+        heading: "Rekvizitai",
+        bullets: [
+          "Prekės ženklas – Stilloak Studio",
+          `PVM mokėtojo kodas – ${webServiceVatCode}`,
+          `El. paštas – ${webServiceContactEmail}`,
+          `Telefonas – ${webServiceContactPhone}`,
+        ],
+      },
+    ],
+    cta: { label: "Peržiūrėti paslaugų sąlygas", to: "/web-services-terms" },
   },
   webServicesTerms: {
     title: "Stilloak Web paslaugų sąlygos",
