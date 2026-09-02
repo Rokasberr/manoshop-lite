@@ -65,6 +65,7 @@ test("operations routes, encrypted backups, error alerts and legal pages stay wi
   assert.match(legal, /webServicesDetails/);
   assert.match(legal, /\+370 638 43445/);
   assert.match(legal, /LT100020711618/);
+  assert.doesNotMatch(legal, /smulkiojo verslo schema/i);
   assert.doesNotMatch(legal, /Rokas Bernotas/);
   assert.doesNotMatch(legal, /VITE_WEB_SERVICE_BUSINESS_ADDRESS/);
   assert.doesNotMatch(legal, /VITE_WEB_SERVICE_ACTIVITY_CERTIFICATE_NUMBER/);
