@@ -920,6 +920,7 @@ function App() {
                 onChange={(event) => updateForm("consent", event.target.checked)}
                 aria-invalid={Boolean(errors.consent)}
               />
+              <span className="consent-check" aria-hidden="true" />
               <span>Sutinku, kad Stilloak Web susisiektų dėl šios užklausos.</span>
             </label>
             {errors.consent ? <small className="field-error consent-error">{errors.consent}</small> : null}
