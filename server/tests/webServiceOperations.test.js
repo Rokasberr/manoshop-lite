@@ -60,6 +60,7 @@ test("operations routes, encrypted backups, error alerts and legal pages stay wi
   const webStyles = readRepoFile("web-services", "src", "styles", "main.css");
   const webManifest = readRepoFile("web-services", "public", "site.webmanifest");
   const webMain = readRepoFile("web-services", "src", "main.tsx");
+  const webAnalytics = readRepoFile("web-services", "src", "lib", "analytics.ts");
   assert.match(routes, /\/operations\/backup/);
   assert.match(backup, /aes-256-gcm/);
   assert.match(backup, /DATABASE_BACKUP_UPLOAD_URL/);
@@ -95,6 +96,11 @@ test("operations routes, encrypted backups, error alerts and legal pages stay wi
   assert.doesNotMatch(webStyles, /fonts\.googleapis\.com/);
   assert.match(webMain, /lazy\(\(\) => import\("\.\/ProposalPage"\)\)/);
   assert.doesNotMatch(webMain, /import ProposalPage from/);
+  assert.match(webAnalytics, /ad_user_data: "denied"/);
+  assert.match(webAnalytics, /ad_personalization: "denied"/);
+  assert.match(webAnalytics, /VITE_GOOGLE_ADS_ID/);
+  assert.match(webAnalytics, /trackGoogleAdsLead/);
+  assert.match(webAnalytics, /send_to: `\$\{googleAdsId\}\/\$\{googleAdsLeadLabel\}`/);
 });
 
 test("both public sites keep their section and contact navigation wired", () => {
