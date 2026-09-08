@@ -128,7 +128,7 @@ Kvalifikuota užklausa: pateikti galiojantys kontaktai, aiškus verslo poreikis 
 - [x] Svetainėje paskelbti patvirtinti vieši rekvizitai: kontaktinis el. paštas ir telefonas, neviešinant asmens vardo, pažymos numerio ir adreso.
 - [ ] Patvirtintas reklamos biudžetas ir mokėjimo kortelė.
 - [ ] Google Ads ID ir užklausos konversijos label įrašyti Vercel aplinkoje, jei leidžiama Google Ads kampanija.
-- [ ] Meta Pixel ID įrašytas Vercel aplinkoje ir ištestuotas su sutikimu.
+- [x] Meta Pixel ID `2570919046710332` prijungtas prie svetainės; Pixel įkeliamas tik gavus rinkodaros sutikimą.
 - [ ] Užklausa iš telefono pasiekia administravimą ir el. paštą.
 - [ ] Patikrinti privatumo ir slapukų tekstai.
 - [ ] Pirmą savaitę tikrinamos užklausos kasdien; biudžetas nedidinamas be duomenų.
