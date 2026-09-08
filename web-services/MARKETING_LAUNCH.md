@@ -87,9 +87,10 @@ Kataloge `marketing-assets/drafts` palikti ankstesni techniniai juodraščiai ne
 - `cta_click` – pagrindinio mygtuko, el. pašto arba telefono paspaudimas.
 - `select_package` – paketo pasirinkimas.
 - `generate_lead`, `lead_submit` ir Meta `Lead` – sėkmingai priimta užklausa.
+- Google Ads `conversion` – sėkmingai priimta užklausa, kai nustatyti `VITE_GOOGLE_ADS_ID` ir `VITE_GOOGLE_ADS_LEAD_LABEL`.
 - UTM, `gclid` ir `fbclid` išsaugomi kartu su užklausa administravime.
 
-Meta Pixel įkeliamas tik nustačius `VITE_META_PIXEL_ID` ir lankytojui sutikus su rinkodaros slapukais.
+Google Ads ir Meta Pixel įkeliami tik nustačius atitinkamus identifikatorius ir lankytojui sutikus su rinkodaros slapukais. GA4 įkeliamas tik gavus analitikos sutikimą. Google Consent Mode v2 signalai iki pasirinkimo yra `denied`.
 
 ## Pagrindiniai rodikliai
 
@@ -123,10 +124,10 @@ Kvalifikuota užklausa: pateikti galiojantys kontaktai, aiškus verslo poreikis 
 
 ## Paleidimo vartai
 
-- [ ] VMI individualios veiklos pažyma aktyvi.
-- [ ] Sutvarkyta PVM/SVS registracija užsienio reklamos ir platformų paslaugoms.
-- [ ] Svetainėje ir sąskaitose įrašyti oficialūs rekvizitai.
+- [x] VMI registracija ir užsienio platformų PVM/SVS situacija sutvarkyta.
+- [x] Svetainėje paskelbti patvirtinti vieši rekvizitai: kontaktinis el. paštas ir telefonas, neviešinant asmens vardo, pažymos numerio ir adreso.
 - [ ] Patvirtintas reklamos biudžetas ir mokėjimo kortelė.
+- [ ] Google Ads ID ir užklausos konversijos label įrašyti Vercel aplinkoje, jei leidžiama Google Ads kampanija.
 - [ ] Meta Pixel ID įrašytas Vercel aplinkoje ir ištestuotas su sutikimu.
 - [ ] Užklausa iš telefono pasiekia administravimą ir el. paštą.
 - [ ] Patikrinti privatumo ir slapukų tekstai.
