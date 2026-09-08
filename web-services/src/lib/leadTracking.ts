@@ -1,4 +1,4 @@
-import { trackAnalyticsEvent, trackMetaEvent } from "./analytics";
+import { trackAnalyticsEvent, trackGoogleAdsLead, trackMetaEvent } from "./analytics";
 import { getLeadAttribution } from "./leadAttribution";
 
 let installed = false;
@@ -44,6 +44,7 @@ export const installLeadTracking = () => {
       trackAnalyticsEvent("generate_lead", parameters);
       // Custom funnel event kept for straightforward Stilloak reporting.
       trackAnalyticsEvent("lead_submit", parameters);
+      trackGoogleAdsLead();
       trackMetaEvent("Lead", {
         content_name: "Svetainės kūrimo užklausa",
         content_category: "web_services"

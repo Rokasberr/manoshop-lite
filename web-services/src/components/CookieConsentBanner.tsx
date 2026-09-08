@@ -146,7 +146,7 @@ export default function CookieConsentBanner() {
 
             <div className="cookie-modal-footer">
               <div className="cookie-policy-links">
-                <a href="https://stilloak-studio.com/privacy">Privatumo politika</a>
+                <a href="https://stilloak-studio.com/web-services-privacy">Privatumo politika</a>
                 <a href="https://stilloak-studio.com/cookie-policy">Slapukų politika</a>
               </div>
               <div className="cookie-actions">
