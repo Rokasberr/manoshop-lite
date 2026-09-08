@@ -99,6 +99,7 @@ test("operations routes, encrypted backups, error alerts and legal pages stay wi
   assert.match(webAnalytics, /ad_user_data: "denied"/);
   assert.match(webAnalytics, /ad_personalization: "denied"/);
   assert.match(webAnalytics, /VITE_GOOGLE_ADS_ID/);
+  assert.match(webAnalytics, /DEFAULT_META_PIXEL_ID = "2570919046710332"/);
   assert.match(webAnalytics, /trackGoogleAdsLead/);
   assert.match(webAnalytics, /send_to: `\$\{googleAdsId\}\/\$\{googleAdsLeadLabel\}`/);
 });
