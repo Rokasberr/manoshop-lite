@@ -1,10 +1,11 @@
 const CONSENT_STORAGE_KEY = "stilloak-web-cookie-consent-v1";
 const CONSENT_EVENT = "stilloak-cookie-consent-changed";
 const DEFAULT_MEASUREMENT_ID = "G-3LZW2H0BL5";
+const DEFAULT_META_PIXEL_ID = "2570919046710332";
 const measurementId = String(import.meta.env.VITE_GA_MEASUREMENT_ID || DEFAULT_MEASUREMENT_ID).trim();
 const googleAdsId = String(import.meta.env.VITE_GOOGLE_ADS_ID || "").trim();
 const googleAdsLeadLabel = String(import.meta.env.VITE_GOOGLE_ADS_LEAD_LABEL || "").trim();
-const metaPixelId = String(import.meta.env.VITE_META_PIXEL_ID || "").trim();
+const metaPixelId = String(import.meta.env.VITE_META_PIXEL_ID || DEFAULT_META_PIXEL_ID).trim();
 const siteVerification = String(import.meta.env.VITE_GOOGLE_SITE_VERIFICATION || "").trim();
 
 let initialized = false;
