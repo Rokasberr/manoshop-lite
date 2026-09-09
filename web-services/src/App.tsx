@@ -21,7 +21,7 @@ import {
   X
 } from "lucide-react";
 import { pricePlans } from "./data/pricing";
-import { trackAnalyticsEvent } from "./lib/analytics";
+import { trackAnalyticsEvent, trackGoogleAdsLead, trackMetaEvent } from "./lib/analytics";
 import { getLeadAttribution } from "./lib/leadAttribution";
 
 type FormState = {
@@ -436,6 +436,8 @@ function App() {
         throw new Error(data.message || "Lead endpoint returned an error");
       }
 
+      trackMetaEvent("Lead", { content_name: "web_service_request", package_id: form.packageId });
+      trackGoogleAdsLead();
       setRequestNumber(data.requestNumber || "");
       setStatus("sent");
     } catch {
