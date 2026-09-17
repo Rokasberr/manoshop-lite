@@ -40,7 +40,7 @@ test("both websites render helpful 404 pages instead of redirecting silently", (
   const webPage = readRepoFile("web-services", "src", "NotFoundPage.tsx");
   assert.match(clientApp, /path="\*" element=\{<NotFoundPage/);
   assert.match(clientPage, /404 · Puslapis nerastas/);
-  assert.match(webMain, /isHomePage \? <App \/> : <NotFoundPage/);
+  assert.match(webMain, /<NotFoundPage \/>/);
   assert.match(webPage, /Kontaktai/);
 });
 
