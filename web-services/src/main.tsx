@@ -21,6 +21,9 @@ import "./styles/footer-mobile-polish.css";
 import "./styles/marketing-upgrade.css";
 import "./styles/premium-site.css";
 import "./styles/detail-pages.css";
+import "./styles/redesign-2026.css";
+import "./styles/redesign-2026-polish.css";
+import "./styles/redesign-2026-visibility.css";
 
 captureLeadAttribution();
 initializeAnalytics();

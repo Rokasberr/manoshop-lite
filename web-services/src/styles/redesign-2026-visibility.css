@@ -1,0 +1,122 @@
+/* Stilloak Web 2.0 — final visibility + social pass. */
+
+/* Make the oversized STILLOAK footer signature intentionally visible. */
+.site-shell .site-footer::after {
+  position: absolute;
+  z-index: 0;
+  right: -0.03em;
+  bottom: -0.12em;
+  left: -0.03em;
+  content: "STILLOAK";
+  overflow: hidden;
+  color: rgba(240, 236, 228, 0.105);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(7.5rem, 18vw, 18rem);
+  font-weight: 400;
+  line-height: 0.72;
+  letter-spacing: -0.078em;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.site-shell .site-footer > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Raise contrast on dark surfaces without flattening the premium hierarchy. */
+.site-shell .hero-copy-block > p,
+.site-shell .section-intro p,
+.site-shell .benefit-card p,
+.site-shell .process-step p,
+.site-shell .concept-meta p,
+.site-shell .contact-copy > p,
+.site-shell .client-experience-copy > p,
+.site-shell .trust-heading p {
+  color: #b7b8b2;
+}
+
+.site-shell .hero-proof small,
+.site-shell .client-experience-card p,
+.site-shell .trust-item small,
+.site-shell .faq-item p {
+  color: #aeb0a9;
+}
+
+.site-shell .footer-brand-block > p,
+.site-shell .site-footer > div > p {
+  color: #a7aaa3;
+}
+
+.site-shell .site-footer a {
+  color: #d2d0ca;
+}
+
+.site-shell .site-footer a:hover {
+  color: #fffaf3;
+}
+
+/* Social links are part of the footer information architecture, not floating badges. */
+.site-shell .footer-social-links {
+  display: grid;
+  gap: 8px;
+}
+
+.site-shell .footer-social-links a {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 38px;
+  gap: 9px;
+  align-items: center;
+  padding: 0 11px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 5px;
+  color: #dedbd4;
+  background: rgba(255, 255, 255, 0.035);
+  text-decoration: none;
+  transition: color 180ms ease, border-color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.site-shell .footer-social-links a:hover {
+  color: #fffaf3;
+  border-color: rgba(223, 200, 170, 0.42);
+  background: rgba(195, 162, 123, 0.09);
+  transform: translateY(-1px);
+}
+
+.site-shell .footer-social-links a:focus-visible {
+  outline: 2px solid #dfc8aa;
+  outline-offset: 3px;
+}
+
+.site-shell .footer-social-links svg {
+  color: #dfc8aa;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 700px) {
+  .site-shell .site-footer::after {
+    right: -0.02em;
+    bottom: -0.04em;
+    left: -0.02em;
+    color: rgba(240, 236, 228, 0.09);
+    font-size: clamp(5.4rem, 25vw, 9rem);
+  }
+
+  .site-shell .footer-social-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .site-shell .footer-social-links a {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell .footer-social-links a {
+    transition: none;
+  }
+}

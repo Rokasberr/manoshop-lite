@@ -4,8 +4,8 @@
   "description": "Modernių verslo svetainių kūrimas Lietuvoje.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f6f0e8",
-  "theme_color": "#f6f0e8",
+  "background_color": "#0b0d0c",
+  "theme_color": "#0b0d0c",
   "icons": [
     {
       "src": "/icon-192.png",
