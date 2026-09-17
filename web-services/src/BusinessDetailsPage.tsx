@@ -47,9 +47,9 @@ export default function BusinessDetailsPage() {
             <h2>Prieš užsakymą susipažinkite su paslaugų informacija.</h2>
           </div>
           <div className="legal-link-list">
-            <a href="https://www.stilloak-studio.com/web-services-privacy">Privatumo informacija <ArrowRight size={17} /></a>
-            <a href="https://www.stilloak-studio.com/web-services-terms">Paslaugų sąlygos <ArrowRight size={17} /></a>
-            <a href="https://www.stilloak-studio.com/web-services-refunds">Atsisakymas ir grąžinimai <ArrowRight size={17} /></a>
+            <a href="/web-services-privacy">Privatumo informacija <ArrowRight size={17} /></a>
+            <a href="/web-services-terms">Paslaugų sąlygos <ArrowRight size={17} /></a>
+            <a href="/web-services-refunds">Atsisakymas ir grąžinimai <ArrowRight size={17} /></a>
           </div>
         </section>
       </main>
