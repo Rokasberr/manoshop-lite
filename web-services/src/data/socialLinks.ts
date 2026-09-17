@@ -5,6 +5,6 @@ export const socialLinks = [
   },
   {
     label: "Instagram",
-    href: "https://www.instagram.com/stilloak.studio/"
+    href: "https://www.instagram.com/stilloakstudio/"
   }
 ] as const;
