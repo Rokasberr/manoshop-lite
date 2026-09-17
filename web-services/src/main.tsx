@@ -22,6 +22,7 @@ import "./styles/marketing-upgrade.css";
 import "./styles/premium-site.css";
 import "./styles/detail-pages.css";
 import "./styles/redesign-2026.css";
+import "./styles/redesign-2026-polish.css";
 
 captureLeadAttribution();
 initializeAnalytics();
