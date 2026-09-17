@@ -1,5 +1,318 @@
 /* Final Stilloak Web 2.0 homepage polish. */
 
+/* Optical rhythm + interaction layer */
+.site-shell .site-header,
+.site-shell .price-card,
+.site-shell .benefit-card,
+.site-shell .process-step,
+.site-shell .concept-card,
+.site-shell .trust-item,
+.site-shell .client-experience-card,
+.site-shell .faq-item,
+.site-shell .contact-form {
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 220ms ease,
+    transform 220ms ease;
+}
+
+.site-shell .site-header {
+  box-shadow:
+    0 18px 60px rgba(0, 0, 0, 0.23),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.site-shell .site-header .nav-cta,
+.site-shell .button-primary {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.site-shell .site-header .nav-cta:hover {
+  background: #fffaf2;
+  transform: translateY(-1px);
+}
+
+/* Hero: tighter editorial balance and stronger media framing */
+.site-shell .hero h1 {
+  max-width: 10.5ch;
+  text-wrap: balance;
+}
+
+.site-shell .hero-copy-block > p {
+  max-width: 54ch;
+}
+
+.site-shell .hero-premium-media {
+  box-shadow:
+    0 48px 110px rgba(0, 0, 0, 0.36),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+}
+
+.site-shell .hero-premium-media::before {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  content: "";
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(223, 200, 170, 0.48), transparent);
+  opacity: 0.72;
+}
+
+.site-shell .hero-media-caption p {
+  max-width: 430px;
+}
+
+.site-shell .hero-carousel-controls button:focus-visible,
+.site-shell .mobile-menu-button:focus-visible,
+.site-shell .button:focus-visible,
+.site-shell .nav a:focus-visible,
+.site-shell .concept-link:focus-visible,
+.site-shell .contact-email:focus-visible,
+.site-shell .faq-item summary:focus-visible {
+  outline: 2px solid #dfc8aa;
+  outline-offset: 3px;
+}
+
+/* Capabilities: subtle studio-like response, not cardy */
+@media (hover: hover) {
+  .site-shell .benefit-card:hover {
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .site-shell .benefit-card:hover .benefit-icon {
+    border-color: rgba(223, 200, 170, 0.42);
+    transform: translateY(-2px);
+  }
+
+  .site-shell .benefit-icon {
+    transition: transform 220ms ease, border-color 180ms ease, background 180ms ease;
+  }
+}
+
+/* Section typography: keep large type elegant on wide screens */
+.site-shell .section-intro h2,
+.site-shell .client-experience-copy h2,
+.site-shell .trust-heading h2,
+.site-shell .contact-copy h2 {
+  text-wrap: balance;
+}
+
+.site-shell .section-intro p,
+.site-shell .client-experience-copy > p,
+.site-shell .trust-heading p,
+.site-shell .contact-copy > p {
+  text-wrap: pretty;
+}
+
+/* Pricing: more intentional hierarchy and hover depth */
+.site-shell .pricing-grid {
+  overflow: hidden;
+}
+
+.site-shell .price-card {
+  isolation: isolate;
+}
+
+.site-shell .price-card::after {
+  position: absolute;
+  z-index: -1;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  content: "";
+  background: #9a7856;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 220ms ease;
+}
+
+@media (hover: hover) {
+  .site-shell .price-card:not(.price-card-featured):hover {
+    background: rgba(255, 255, 255, 0.34);
+  }
+
+  .site-shell .price-card:hover::after {
+    transform: scaleX(1);
+  }
+
+  .site-shell .price-card-featured:hover {
+    background: #171b17;
+  }
+}
+
+.site-shell .price-card-featured .badge {
+  letter-spacing: 0.11em;
+}
+
+.site-shell .price-button {
+  width: 100%;
+}
+
+/* Process: refined line interaction */
+@media (hover: hover) {
+  .site-shell .process-step:hover {
+    border-top-color: rgba(223, 200, 170, 0.5);
+    background: linear-gradient(180deg, rgba(195, 162, 123, 0.035), transparent 72%);
+  }
+
+  .site-shell .process-step:hover .step-number {
+    color: #efe2d2;
+    border-color: rgba(223, 200, 170, 0.52);
+  }
+}
+
+.site-shell .step-number {
+  transition: color 180ms ease, border-color 180ms ease;
+}
+
+/* Client portal panel: crisp inner edge */
+.site-shell .client-experience-panel,
+.site-shell .trust-panel {
+  box-shadow:
+    0 38px 100px rgba(0, 0, 0, 0.27),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+}
+
+@media (hover: hover) {
+  .site-shell .client-experience-card:hover,
+  .site-shell .trust-item:hover {
+    border-color: rgba(223, 200, 170, 0.28);
+    background: rgba(255, 255, 255, 0.045);
+  }
+}
+
+/* Portfolio: give previews a premium physical feel */
+.site-shell .concept-card {
+  overflow: hidden;
+}
+
+.site-shell .portfolio-browser,
+.site-shell .portfolio-page {
+  transform: translateZ(0);
+}
+
+@media (hover: hover) {
+  .site-shell .concept-card:hover {
+    border-color: rgba(223, 200, 170, 0.26);
+    box-shadow: 0 38px 88px rgba(0, 0, 0, 0.29);
+    transform: translateY(-4px);
+  }
+
+  .site-shell .concept-card:hover .portfolio-page {
+    transform: scale(1.008);
+  }
+
+  .site-shell .portfolio-page {
+    transition: transform 420ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .site-shell .concept-link:hover {
+    color: #f2dfc7;
+  }
+}
+
+/* FAQ: better scanning and active state */
+.site-shell .faq-item[open] {
+  border-color: rgba(223, 200, 170, 0.28);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.site-shell .faq-item summary {
+  transition: color 180ms ease;
+}
+
+.site-shell .faq-item summary:hover {
+  color: #fffaf3;
+}
+
+.site-shell .faq-item[open] summary span {
+  color: #dfc8aa;
+  transform: rotate(45deg);
+}
+
+.site-shell .faq-item summary span {
+  transition: transform 180ms ease, color 180ms ease;
+}
+
+/* Contact: stronger field hierarchy and focus treatment */
+.site-shell .contact-form {
+  box-shadow:
+    0 34px 90px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.site-shell .contact-form input,
+.site-shell .contact-form select,
+.site-shell .contact-form textarea {
+  transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.site-shell .contact-form input:hover,
+.site-shell .contact-form select:hover,
+.site-shell .contact-form textarea:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.site-shell .contact-form input:focus,
+.site-shell .contact-form select:focus,
+.site-shell .contact-form textarea:focus {
+  border-color: rgba(223, 200, 170, 0.58);
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow: 0 0 0 3px rgba(195, 162, 123, 0.08);
+  outline: none;
+}
+
+.site-shell .form-submit svg {
+  transition: transform 180ms ease;
+}
+
+@media (hover: hover) {
+  .site-shell .form-submit:hover svg {
+    transform: translateX(3px);
+  }
+}
+
+.site-shell .contact-email {
+  transition: color 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.site-shell .contact-email:hover {
+  color: #fff7ec;
+  border-color: rgba(223, 200, 170, 0.32);
+  background: rgba(195, 162, 123, 0.055);
+}
+
+/* Footer: quieter luxury finish */
+.site-shell .site-footer {
+  position: relative;
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+
+.site-shell .site-footer::before {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: min(1280px, calc(100% - 48px));
+  height: 1px;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(223, 200, 170, 0.26), transparent);
+  transform: translateX(-50%);
+}
+
+.site-shell .footer-brand-block > p {
+  max-width: 34ch;
+}
+
+.site-shell .footer-wordmark strong {
+  letter-spacing: -0.045em;
+}
+
+/* Mobile navigation follows the dark studio system. */
 @media (max-width: 900px) {
   .site-shell .mobile-menu-button {
     min-width: 92px;
@@ -20,8 +333,9 @@
     border-color: rgba(255, 255, 255, 0.13);
     border-radius: 7px;
     color: #f3efe8;
-    background: rgba(10, 12, 10, 0.98);
+    background: rgba(10, 12, 10, 0.985);
     box-shadow: 0 28px 62px rgba(0, 0, 0, 0.38);
+    backdrop-filter: blur(20px);
   }
 
   .site-shell .nav > a,
@@ -33,6 +347,88 @@
   .site-shell .nav > a:hover,
   .site-shell .nav > a:not(.nav-cta):hover {
     color: #fff;
+  }
+
+  .site-shell .hero h1 {
+    max-width: 11ch;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-shell .section {
+    width: min(100% - 28px, 1280px);
+  }
+
+  .site-shell .site-header {
+    width: calc(100% - 24px);
+  }
+
+  .site-shell .hero.section {
+    padding-top: 124px;
+    padding-bottom: 64px;
+  }
+
+  .site-shell .hero.section::before {
+    top: 96px;
+    max-width: calc(100% - 100px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .site-shell .hero h1 {
+    max-width: 9.5ch;
+    font-size: clamp(3.4rem, 15vw, 5rem);
+    line-height: 0.91;
+    letter-spacing: -0.06em;
+  }
+
+  .site-shell .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .site-shell .hero-actions .button {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .site-shell .hero-proof {
+    margin-top: 32px;
+  }
+
+  .site-shell .hero-premium-media,
+  .site-shell .hero-carousel,
+  .site-shell .hero-slide,
+  .site-shell .hero-premium-media img {
+    min-height: 470px;
+  }
+
+  .site-shell .hero-media-caption {
+    right: 18px;
+    bottom: 18px;
+    left: 18px;
+  }
+
+  .site-shell .pricing-section {
+    width: calc(100% - 20px);
+  }
+
+  .site-shell .section-intro h2,
+  .site-shell .client-experience-copy h2,
+  .site-shell .trust-heading h2,
+  .site-shell .contact-copy h2 {
+    font-size: clamp(2.65rem, 13vw, 4rem);
+    line-height: 0.96;
+  }
+
+  .site-shell .contact-form {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .site-shell .site-footer::before {
+    width: calc(100% - 28px);
   }
 }
 
@@ -90,5 +486,16 @@ body:has(.site-shell) .cookie-reopen {
 
   .site-shell .mobile-menu-button {
     min-width: 86px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell *,
+  .site-shell *::before,
+  .site-shell *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }
