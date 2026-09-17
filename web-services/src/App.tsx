@@ -439,7 +439,7 @@ function App() {
         throw new Error(data.message || "Lead endpoint returned an error");
       }
 
-      trackMetaEvent("Lead", { content_name: "web_service_request", package_id: form.packageId });
+      const metaLeadParameters = { content_name: "web_service_request", package_id: form.packageId };\n      trackMetaEvent("Lead", metaLeadParameters);\n      trackMetaEvent("Contact", metaLeadParameters);
       trackGoogleAdsLead();
       setRequestNumber(data.requestNumber || "");
       setStatus("sent");
