@@ -107,6 +107,7 @@ const processSteps = [
 const conceptProjects = [
   {
     className: "concept-architecture",
+    href: "/demo/home-services",
     kicker: "ARCHITEKTŪRA",
     brand: "NORTH / FORM",
     domain: "northform.lt",
@@ -124,6 +125,7 @@ const conceptProjects = [
   },
   {
     className: "concept-industry",
+    href: "/demo/auto-detailing",
     kicker: "INDUSTRIJA",
     brand: "FERRO / LT",
     domain: "ferro-industries.lt",
@@ -141,6 +143,7 @@ const conceptProjects = [
   },
   {
     className: "concept-balance",
+    href: "/demo/beauty-studio",
     kicker: "GROŽIS",
     brand: "ÉLAN / STUDIO",
     domain: "elan-studio.lt",
@@ -715,6 +718,7 @@ function App() {
                   <span>{project.direction}</span>
                   <h3>{project.title}</h3>
                   <p>{project.meta}</p>
+                  <a className="concept-link" href={project.href}>Peržiūrėti koncepciją →</a>
                 </div>
               </article>
             ))}

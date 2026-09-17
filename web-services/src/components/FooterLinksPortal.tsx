@@ -9,7 +9,7 @@ const navigationLinks = [
 ] as const;
 
 const legalLinks = [
-  ["Rekvizitai", "https://www.stilloak-studio.com/web-services-details"],
+  ["Rekvizitai", "/web-services-details"],
   ["Privatumo politika", "https://stilloak-studio.com/web-services-privacy"],
   ["Slapukų politika", "https://stilloak-studio.com/cookie-policy"],
   ["Paslaugų sąlygos", "https://stilloak-studio.com/web-services-terms"],
