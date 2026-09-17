@@ -559,6 +559,47 @@ body {
   stroke-width: 2.2;
 }
 
+.contact-social-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.contact-social-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid rgba(239, 190, 151, .34);
+  border-radius: 999px;
+  color: #fffaf6;
+  background: rgba(10, 10, 9, .34);
+  font-size: .84rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease;
+}
+
+.contact-social-links svg {
+  color: #efbd92;
+  stroke-width: 2;
+}
+
+@media (hover: hover) {
+  .contact-social-links a:hover {
+    transform: translateY(-2px);
+    border-color: rgba(239, 190, 151, .62);
+    background: rgba(168, 117, 80, .24);
+  }
+}
+
+.contact-social-links a:focus-visible {
+  outline: 2px solid #efbd92;
+  outline-offset: 3px;
+}
+
 @media (hover: hover) {
   .contact-panel .response-time:hover,
   .contact-panel .contact-email:hover {
