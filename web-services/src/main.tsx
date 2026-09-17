@@ -4,6 +4,7 @@ import App from "./App";
 import BusinessDetailsPage from "./BusinessDetailsPage";
 import CookieConsentBanner from "./components/CookieConsentBanner";
 import FooterLinksPortal from "./components/FooterLinksPortal";
+import LegalInfoPage from "./LegalInfoPage";
 import PortfolioDetailPage from "./PortfolioDetailPage";
 import { initializeAnalytics } from "./lib/analytics";
 import { captureLeadAttribution } from "./lib/leadAttribution";
@@ -37,6 +38,13 @@ const projectPaths = new Set([
 ]);
 const isProjectPage = projectPaths.has(normalizedPath);
 const isBusinessDetailsPage = normalizedPath === "/web-services-details";
+const legalPaths = new Set([
+  "/web-services-privacy",
+  "/cookie-policy",
+  "/web-services-terms",
+  "/web-services-refunds"
+]);
+const isLegalInfoPage = legalPaths.has(normalizedPath);
 const ProposalPage = lazy(() => import("./ProposalPage"));
 const NotFoundPage = lazy(() => import("./NotFoundPage"));
 
@@ -51,6 +59,8 @@ createRoot(document.getElementById("root") as HTMLElement).render(
         <PortfolioDetailPage path={normalizedPath} />
       ) : isBusinessDetailsPage ? (
         <BusinessDetailsPage />
+      ) : isLegalInfoPage ? (
+        <LegalInfoPage path={normalizedPath} />
       ) : (
         <NotFoundPage />
       )}

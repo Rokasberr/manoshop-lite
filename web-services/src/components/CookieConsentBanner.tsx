@@ -77,7 +77,7 @@ export default function CookieConsentBanner() {
               <strong>Jūsų privatumas mums svarbus</strong>
               <p>
                 Naudojame būtinus slapukus svetainės veikimui. Analitikos ir rinkodaros slapukai naudojami tik
-                gavus jūsų sutikimą. Daugiau informacijos rasite mūsų <a href="https://stilloak-studio.com/cookie-policy">slapukų politikoje</a>.
+                gavus jūsų sutikimą. Daugiau informacijos rasite mūsų <a href="/cookie-policy">slapukų politikoje</a>.
               </p>
             </div>
             <div className="cookie-actions">
@@ -146,8 +146,8 @@ export default function CookieConsentBanner() {
 
             <div className="cookie-modal-footer">
               <div className="cookie-policy-links">
-                <a href="https://stilloak-studio.com/web-services-privacy">Privatumo politika</a>
-                <a href="https://stilloak-studio.com/cookie-policy">Slapukų politika</a>
+                <a href="/web-services-privacy">Privatumo politika</a>
+                <a href="/cookie-policy">Slapukų politika</a>
               </div>
               <div className="cookie-actions">
                 <button className="cookie-button cookie-button-ghost" type="button" onClick={rejectNonEssential}>Tik būtini</button>
