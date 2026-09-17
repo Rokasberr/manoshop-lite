@@ -6,8 +6,10 @@ import {
   ChevronRight,
   Clock3,
   Code2,
+  Facebook,
   Globe2,
   Headphones,
+  Instagram,
   LayoutDashboard,
   Mail,
   Menu,
@@ -21,6 +23,7 @@ import {
   X
 } from "lucide-react";
 import { pricePlans } from "./data/pricing";
+import { socialLinks } from "./data/socialLinks";
 import { trackAnalyticsEvent, trackGoogleAdsLead, trackMetaEvent } from "./lib/analytics";
 import { getLeadAttribution } from "./lib/leadAttribution";
 
@@ -784,6 +787,26 @@ function App() {
             <a className="contact-email" href={contactPhoneHref} onClick={() => trackCta("contact", "phone")}>
               <Phone size={18} aria-hidden="true" /> {contactPhone}
             </a>
+            <div className="contact-social-links" aria-label="Stilloak Studio socialiniai tinklai">
+              <a
+                href={socialLinks[0].href}
+                target="_blank"
+                rel="noreferrer noopener"
+                onClick={() => trackCta("contact", "facebook")}
+                aria-label="Stilloak Studio Facebook (atsidarys naujame lange)"
+              >
+                <Facebook size={18} aria-hidden="true" /> Facebook
+              </a>
+              <a
+                href={socialLinks[1].href}
+                target="_blank"
+                rel="noreferrer noopener"
+                onClick={() => trackCta("contact", "instagram")}
+                aria-label="Stilloak Studio Instagram (atsidarys naujame lange)"
+              >
+                <Instagram size={18} aria-hidden="true" /> Instagram
+              </a>
+            </div>
           </div>
 
           <form className="contact-form" onSubmit={submitLead} noValidate data-reveal>
