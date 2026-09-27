@@ -13,6 +13,11 @@ export const dateKey = (date = new Date(), timeZone = "UTC") => {
   }
 };
 
+export const isDateKey = (date, key, timeZone = "UTC") => {
+  const value = date instanceof Date ? date : new Date(date);
+  return !Number.isNaN(value.getTime()) && dateKey(value, timeZone) === key;
+};
+
 export const localParts = (date = new Date(), timeZone = "UTC") => {
   try {
     const parts = new Intl.DateTimeFormat("en-GB", {
