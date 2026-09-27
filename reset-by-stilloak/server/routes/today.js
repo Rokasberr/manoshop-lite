@@ -8,7 +8,7 @@ import SmokingEvent from "../models/SmokingEvent.js";
 import { requireAuth } from "../middleware/auth.js";
 import { buildProgramDay, getCurrentProgramDay } from "../services/programService.js";
 import { boredomSuggestions, buildRoutine, completionPercent } from "../services/routineService.js";
-import { dateKey } from "../utils/dates.js";
+import { dateKey, isDateKey } from "../utils/dates.js";
 import { asyncRoute, clamp, cleanText, httpError } from "../utils/http.js";
 
 const router = express.Router();
@@ -43,10 +43,13 @@ router.get(
     const day = getCurrentProgramDay(request.user, now);
     const override = await ProgramDay.findOne({ duration: request.user.resetDuration, day, active: true }).lean();
     const podcast = await Podcast.findOne({ active: true }).sort({ sortOrder: 1, createdAt: -1 }).lean();
-    const [cravings, smokingEvents] = await Promise.all([
-      Craving.find({ userId: request.user._id, startedAt: { $gte: new Date(`${entry.date}T00:00:00.000Z`) } }).sort({ startedAt: -1 }).lean(),
+    const [recentCravings, smokingEvents] = await Promise.all([
+      Craving.find({ userId: request.user._id, startedAt: { $gte: new Date(now.getTime() - 48 * 60 * 60 * 1000) } })
+        .sort({ startedAt: -1 })
+        .lean(),
       SmokingEvent.find({ userId: request.user._id, date: entry.date }).sort({ smokedAt: 1 }).lean()
     ]);
+    const cravings = recentCravings.filter((item) => isDateKey(item.startedAt, entry.date, request.user.preferences.timeZone));
     const intervals = smokingEvents.slice(1).map((event, index) => (new Date(event.smokedAt) - new Date(smokingEvents[index].smokedAt)) / 60_000);
     const averageIntervalMinutes = intervals.length ? Math.round(intervals.reduce((sum, value) => sum + value, 0) / intervals.length) : null;
     response.json({
