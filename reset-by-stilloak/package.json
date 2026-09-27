@@ -1,0 +1,46 @@
+{
+  "name": "reset-by-stilloak",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env.local scripts/dev.mjs",
+    "dev:web": "vite",
+    "dev:api": "node --env-file-if-exists=.env.local --watch server/dev.js",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/*.test.js",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "admin:promote": "node --env-file-if-exists=.env.local scripts/promote-admin.mjs"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.1.2",
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "express": "^4.22.2",
+    "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.561.0",
+    "mongoose": "^8.24.3",
+    "nodemailer": "^7.0.10",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "react-router-dom": "^7.10.1",
+    "stripe": "^22.6.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.2",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "typescript-eslint": "^8.50.0"
+  }
+}
