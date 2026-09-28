@@ -42,6 +42,13 @@ npm run build
 
 Use separate preview and production environment values. Keep Stripe in a sandbox/test environment until preview verification is complete. Never commit `.env` values.
 
+### Environment separation
+
+- Preview: a dedicated MongoDB database user and database, a long Preview-only JWT secret, `reset_session`, a Stripe restricted **test** key, test Price and test webhook, and `RESET_STRIPE_LIVE_ENABLED=false`.
+- Production: a separate least-privilege MongoDB user/database, a different JWT secret, `__Host-reset_session`, a Stripe restricted **live** key, live Price and live webhook, and `RESET_STRIPE_LIVE_ENABLED=true`.
+- Both: verified email sender, `CRON_SECRET`, and `RESET_ADMIN_EMAIL`. Vercel Cron calls the due-email route every five minutes; delivery records prevent duplicate sends.
+- Never copy a live Stripe secret into Preview or local development. The server rejects that configuration.
+
 ## Release gates
 
 1. Local lint, typecheck, tests, and build are green.
@@ -49,4 +56,5 @@ Use separate preview and production environment values. Keep Stripe in a sandbox
 3. Forgot-password email and cron email rendering are verified.
 4. Stripe sandbox Checkout and signed webhook are verified; access is not granted by the redirect page.
 5. Admin data and podcast management are protected by the server-side admin guard.
-6. Only then can the same verified artifact be promoted to production and assigned to the domain.
+6. Production secrets, cookie prefix, database isolation, email sender, DNS, and webhook endpoint are verified.
+7. Only then can the same verified artifact be promoted to production and assigned to the domain.

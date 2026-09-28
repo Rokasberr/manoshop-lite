@@ -6,7 +6,7 @@
   "outputDirectory": "dist",
   "functions": {
     "api/[...path].js": {
-      "maxDuration": 30
+      "maxDuration": 60
     }
   },
   "routes": [
@@ -17,7 +17,7 @@
   "crons": [
     {
       "path": "/api/cron/hourly",
-      "schedule": "0 * * * *"
+      "schedule": "*/5 * * * *"
     }
   ],
   "headers": [
