@@ -85,17 +85,34 @@ export const sendEmail = async ({ to, subject, html, text }) => {
 
 export const sendTrackedEmail = async ({ user, type, dedupeKey, subject, content }) => {
   let delivery;
-  try {
-    delivery = await EmailDelivery.create({
-      userId: user._id,
-      type,
-      dedupeKey,
-      recipient: user.email,
-      status: "pending"
-    });
-  } catch (error) {
-    if (error?.code === 11000) return { sent: false, duplicate: true };
-    throw error;
+  const identity = { userId: user._id, type, dedupeKey };
+  const existing = await EmailDelivery.findOne(identity);
+  if (existing) {
+    const staleBefore = new Date(Date.now() - 5 * 60 * 1000);
+    delivery = await EmailDelivery.findOneAndUpdate(
+      {
+        _id: existing._id,
+        $or: [{ status: "failed" }, { status: "pending", updatedAt: { $lte: staleBefore } }]
+      },
+      {
+        $set: {
+          recipient: user.email,
+          status: "pending",
+          providerMessageId: "",
+          error: "",
+          sentAt: null
+        }
+      },
+      { new: true }
+    );
+    if (!delivery) return { sent: false, duplicate: true };
+  } else {
+    try {
+      delivery = await EmailDelivery.create({ ...identity, recipient: user.email, status: "pending" });
+    } catch (error) {
+      if (error?.code === 11000) return { sent: false, duplicate: true };
+      throw error;
+    }
   }
 
   try {

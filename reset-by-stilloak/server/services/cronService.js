@@ -3,13 +3,11 @@ import DailyEntry from "../models/DailyEntry.js";
 import Habit from "../models/Habit.js";
 import Podcast from "../models/Podcast.js";
 import User from "../models/User.js";
-import { dateKey, localParts } from "../utils/dates.js";
+import { dateKey, isTimeInWindow, localParts } from "../utils/dates.js";
 import { buildProgress } from "./analyticsService.js";
 import { buildResetEmail, sendTrackedEmail } from "./emailService.js";
 import { buildProgramDay, getCurrentProgramDay } from "./programService.js";
 import { buildRoutine } from "./routineService.js";
-
-const matchesHour = (configuredTime, hour) => Number(String(configuredTime || "").split(":")[0]) === hour;
 
 const sendMorning = async ({ user, now, forceKey = "" }) => {
   const key = dateKey(now, user.preferences.timeZone);
@@ -91,21 +89,25 @@ const sendWeekly = async ({ user, now, forceKey = "" }) => {
 };
 
 export const runHourlyEmails = async (now = new Date()) => {
-  const users = await User.find({ onboardingComplete: true, deletedAt: null }).limit(500);
+  const users = await User.find({
+    onboardingComplete: true,
+    deletedAt: null,
+    $or: [{ "lifetime.active": true }, { role: "admin" }]
+  }).limit(500);
   const result = { checked: users.length, morning: 0, evening: 0, weekly: 0, failed: 0 };
 
   for (const user of users) {
     const parts = localParts(now, user.preferences.timeZone);
     try {
-      if (user.emailPreferences.morningEnabled && matchesHour(user.emailPreferences.morningTime, parts.hour)) {
+      if (user.emailPreferences.morningEnabled && isTimeInWindow(user.emailPreferences.morningTime, parts, 5)) {
         const sent = await sendMorning({ user, now });
         if (sent.sent) result.morning += 1;
       }
-      if (user.emailPreferences.eveningEnabled && matchesHour(user.emailPreferences.eveningTime, parts.hour)) {
+      if (user.emailPreferences.eveningEnabled && isTimeInWindow(user.emailPreferences.eveningTime, parts, 5)) {
         const sent = await sendEvening({ user, now });
         if (sent.sent) result.evening += 1;
       }
-      if (user.emailPreferences.weeklyEnabled && parts.weekday === "Sun" && parts.hour === 18) {
+      if (user.emailPreferences.weeklyEnabled && parts.weekday === "Sun" && isTimeInWindow("18:00", parts, 5)) {
         const sent = await sendWeekly({ user, now });
         if (sent.sent) result.weekly += 1;
       }
