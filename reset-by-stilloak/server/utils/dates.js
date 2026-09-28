@@ -34,6 +34,14 @@ export const localParts = (date = new Date(), timeZone = "UTC") => {
   }
 };
 
+export const isTimeInWindow = (configuredTime, parts, windowMinutes = 5) => {
+  const match = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(String(configuredTime || ""));
+  if (!match || !Number.isFinite(parts?.hour) || !Number.isFinite(parts?.minute)) return false;
+  const configuredMinutes = Number(match[1]) * 60 + Number(match[2]);
+  const currentMinutes = Number(parts.hour) * 60 + Number(parts.minute);
+  return currentMinutes >= configuredMinutes && currentMinutes < configuredMinutes + windowMinutes;
+};
+
 export const startOfDayUtc = (key) => new Date(`${key}T00:00:00.000Z`);
 
 export const daysBetween = (fromKey, toKey) => {
