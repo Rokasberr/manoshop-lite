@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { getConfig } from "../config.js";
 import User from "../models/User.js";
+import { hasLifetimeAccess } from "../utils/access.js";
 import { asyncRoute, httpError } from "../utils/http.js";
 
 export const requireAuth = asyncRoute(async (request, _response, next) => {
@@ -29,7 +30,7 @@ export const requireAuth = asyncRoute(async (request, _response, next) => {
 });
 
 export const requireLifetime = (request, _response, next) => {
-  if (request.user?.role === "admin" || request.user?.lifetime?.active) return next();
+  if (hasLifetimeAccess(request.user)) return next();
   return next(httpError("Founding Lifetime access is required.", 403, "LIFETIME_REQUIRED"));
 };
 

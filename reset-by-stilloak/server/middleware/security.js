@@ -1,4 +1,6 @@
+import crypto from "node:crypto";
 import { getConfig } from "../config.js";
+import RateLimitBucket from "../models/RateLimitBucket.js";
 
 export const securityHeaders = (_request, response, next) => {
   response.setHeader("X-Content-Type-Options", "nosniff");
@@ -16,24 +18,43 @@ export const securityHeaders = (_request, response, next) => {
   next();
 };
 
-const buckets = new Map();
+export const apiSecurity = (request, response, next) => {
+  response.setHeader("Cache-Control", "no-store");
+  if (!["GET", "HEAD", "OPTIONS"].includes(request.method)) {
+    const fetchSite = String(request.headers["sec-fetch-site"] || "").toLowerCase();
+    const origin = String(request.headers.origin || "");
+    const requestOrigin = `${request.protocol}://${request.get("host")}`;
+    const configuredOrigin = getConfig().appUrl;
+    if (fetchSite === "cross-site" || (origin && origin !== requestOrigin && origin !== configuredOrigin)) {
+      return response.status(403).json({ error: "Cross-site request blocked.", code: "ORIGIN_BLOCKED" });
+    }
+  }
+  return next();
+};
 
 export const rateLimit = ({ windowMs = 60_000, max = 30, key = "default" } = {}) =>
-  (request, response, next) => {
+  async (request, response, next) => {
     const now = Date.now();
     const address = request.ip || request.headers["x-forwarded-for"] || "unknown";
-    const bucketKey = `${key}:${address}`;
-    const current = buckets.get(bucketKey);
-
-    if (!current || current.resetAt <= now) {
-      buckets.set(bucketKey, { count: 1, resetAt: now + windowMs });
+    const windowId = Math.floor(now / windowMs);
+    const secret = getConfig().jwtSecret || "reset-development-rate-limit";
+    const bucketId = crypto.createHmac("sha256", secret).update(`${key}:${address}:${windowId}`).digest("hex");
+    const resetAt = (windowId + 1) * windowMs;
+    try {
+      const current = await RateLimitBucket.findOneAndUpdate(
+        { _id: bucketId },
+        { $inc: { count: 1 }, $setOnInsert: { expiresAt: new Date(resetAt + windowMs) } },
+        { new: true, upsert: true, setDefaultsOnInsert: true }
+      ).lean();
+      response.setHeader("RateLimit-Limit", String(max));
+      response.setHeader("RateLimit-Remaining", String(Math.max(0, max - current.count)));
+      response.setHeader("RateLimit-Reset", String(Math.ceil(resetAt / 1000)));
+      if (current.count > max) {
+        response.setHeader("Retry-After", String(Math.max(1, Math.ceil((resetAt - now) / 1000))));
+        return response.status(429).json({ error: "Too many requests. Try again shortly." });
+      }
       return next();
+    } catch (error) {
+      return next(error);
     }
-
-    current.count += 1;
-    if (current.count > max) {
-      response.setHeader("Retry-After", String(Math.ceil((current.resetAt - now) / 1000)));
-      return response.status(429).json({ error: "Too many requests. Try again shortly." });
-    }
-    return next();
   };
