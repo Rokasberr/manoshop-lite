@@ -18,7 +18,7 @@ declare global {
   }
 }
 
-export const registerTodayTools = () => {
+export const registerTodayTools = (premium = false) => {
   const context = document.modelContext;
   if (!context?.registerTool) return () => undefined;
   const lifecycle = new AbortController();
@@ -59,23 +59,25 @@ export const registerTodayTools = () => {
     }
   });
 
-  void register({
-    name: "get_no_scroll_activity_options",
-    title: "Get no-scroll activity options",
-    description: "Get short alternative activities for a chosen available time window without changing user data.",
-    inputSchema: {
-      type: "object",
-      properties: { minutes: { type: "integer", enum: [5, 15, 30, 60, 120] } },
-      required: ["minutes"],
-      additionalProperties: false
-    },
-    annotations: { readOnlyHint: true, untrustedContentHint: false },
-    async execute(input) {
-      const minutes = Number((input as { minutes?: number }).minutes);
-      if (![5, 15, 30, 60, 120].includes(minutes)) throw new Error("Choose 5, 15, 30, 60, or 120 minutes.");
-      return api(`/today/bored/${minutes}`);
-    }
-  });
+  if (premium) {
+    void register({
+      name: "get_no_scroll_activity_options",
+      title: "Get no-scroll activity options",
+      description: "Get short alternative activities for a chosen available time window without changing user data.",
+      inputSchema: {
+        type: "object",
+        properties: { minutes: { type: "integer", enum: [5, 15, 30, 60, 120] } },
+        required: ["minutes"],
+        additionalProperties: false
+      },
+      annotations: { readOnlyHint: true, untrustedContentHint: false },
+      async execute(input) {
+        const minutes = Number((input as { minutes?: number }).minutes);
+        if (![5, 15, 30, 60, 120].includes(minutes)) throw new Error("Choose 5, 15, 30, 60, or 120 minutes.");
+        return api(`/today/bored/${minutes}`);
+      }
+    });
+  }
 
   return () => lifecycle.abort();
 };
