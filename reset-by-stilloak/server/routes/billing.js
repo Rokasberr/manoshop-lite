@@ -16,6 +16,9 @@ router.post(
   asyncRoute(async (request, response) => {
     if (request.user.lifetime?.active) throw httpError("Lifetime access is already active.", 409);
     const session = await createLifetimeCheckout({ user: request.user });
+    request.user.lifetime.paymentStatus = "pending";
+    request.user.lifetime.stripeCheckoutSessionId = session.id;
+    await request.user.save();
     response.json({ url: session.url });
   })
 );
@@ -94,6 +97,9 @@ export const stripeWebhook = async (request, response) => {
     const config = getConfig();
     if (!config.stripeWebhookSecret) throw httpError("Stripe webhook is not configured.", 503);
     const event = getStripe().webhooks.constructEvent(request.body, signature, config.stripeWebhookSecret);
+    if (Boolean(event.livemode) !== config.stripeLiveEnabled) {
+      throw httpError("Stripe webhook mode does not match this environment.", 400);
+    }
     const started = await beginEvent(event);
     eventRecord = started.record;
     if (!started.process) return response.json({ received: true, duplicate: true });

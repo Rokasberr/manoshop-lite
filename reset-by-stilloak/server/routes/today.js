@@ -5,10 +5,11 @@ import Habit from "../models/Habit.js";
 import Podcast from "../models/Podcast.js";
 import ProgramDay from "../models/ProgramDay.js";
 import SmokingEvent from "../models/SmokingEvent.js";
-import { requireAuth } from "../middleware/auth.js";
+import { requireAuth, requireLifetime } from "../middleware/auth.js";
 import { buildProgramDay, getCurrentProgramDay } from "../services/programService.js";
 import { boredomSuggestions, buildRoutine, completionPercent } from "../services/routineService.js";
 import { dateKey, isDateKey } from "../utils/dates.js";
+import { hasLifetimeAccess } from "../utils/access.js";
 import { asyncRoute, clamp, cleanText, httpError } from "../utils/http.js";
 
 const router = express.Router();
@@ -43,12 +44,15 @@ router.get(
     const day = getCurrentProgramDay(request.user, now);
     const override = await ProgramDay.findOne({ duration: request.user.resetDuration, day, active: true }).lean();
     const podcast = await Podcast.findOne({ active: true }).sort({ sortOrder: 1, createdAt: -1 }).lean();
-    const [recentCravings, smokingEvents] = await Promise.all([
-      Craving.find({ userId: request.user._id, startedAt: { $gte: new Date(now.getTime() - 48 * 60 * 60 * 1000) } })
-        .sort({ startedAt: -1 })
-        .lean(),
-      SmokingEvent.find({ userId: request.user._id, date: entry.date }).sort({ smokedAt: 1 }).lean()
-    ]);
+    const premium = hasLifetimeAccess(request.user);
+    const [recentCravings, smokingEvents] = premium
+      ? await Promise.all([
+          Craving.find({ userId: request.user._id, startedAt: { $gte: new Date(now.getTime() - 48 * 60 * 60 * 1000) } })
+            .sort({ startedAt: -1 })
+            .lean(),
+          SmokingEvent.find({ userId: request.user._id, date: entry.date }).sort({ smokedAt: 1 }).lean()
+        ])
+      : [[], []];
     const cravings = recentCravings.filter((item) => isDateKey(item.startedAt, entry.date, request.user.preferences.timeZone));
     const intervals = smokingEvents.slice(1).map((event, index) => (new Date(event.smokedAt) - new Date(smokingEvents[index].smokedAt)) / 60_000);
     const averageIntervalMinutes = intervals.length ? Math.round(intervals.reduce((sum, value) => sum + value, 0) / intervals.length) : null;
@@ -90,8 +94,10 @@ router.post(
   requireAuth,
   asyncRoute(async (request, response) => {
     const entry = await ensureToday(request.user);
-    entry.cigarettes = request.body.cigarettes === "" ? null : clamp(request.body.cigarettes, 0, 200);
-    entry.screenTimeMinutes = request.body.screenTimeMinutes === "" ? null : clamp(request.body.screenTimeMinutes, 0, 1440);
+    if (hasLifetimeAccess(request.user)) {
+      entry.cigarettes = request.body.cigarettes === "" ? null : clamp(request.body.cigarettes, 0, 200);
+      entry.screenTimeMinutes = request.body.screenTimeMinutes === "" ? null : clamp(request.body.screenTimeMinutes, 0, 1440);
+    }
     entry.workout = typeof request.body.workout === "boolean" ? request.body.workout : null;
     entry.readingMinutes = request.body.readingMinutes === "" ? null : clamp(request.body.readingMinutes, 0, 600);
     entry.mood = request.body.mood === "" ? null : clamp(request.body.mood, 1, 5);
@@ -105,6 +111,7 @@ router.post(
 router.post(
   "/smoking",
   requireAuth,
+  requireLifetime,
   asyncRoute(async (request, response) => {
     const entry = await ensureToday(request.user);
     entry.cigarettes = clamp(request.body.cigarettes, 0, 200);
@@ -118,6 +125,7 @@ router.post(
 router.post(
   "/smoking/cigarette",
   requireAuth,
+  requireLifetime,
   asyncRoute(async (request, response) => {
     const entry = await ensureToday(request.user);
     const smokedAt = request.body.smokedAt ? new Date(request.body.smokedAt) : new Date();
@@ -138,6 +146,7 @@ router.post(
 router.post(
   "/smoking/cravings",
   requireAuth,
+  requireLifetime,
   asyncRoute(async (request, response) => {
     const craving = await Craving.create({
       userId: request.user._id,
@@ -151,6 +160,7 @@ router.post(
 router.patch(
   "/smoking/cravings/:id",
   requireAuth,
+  requireLifetime,
   asyncRoute(async (request, response) => {
     if (typeof request.body.stillWanted !== "boolean") throw httpError("Choose yes or no.", 400);
     const craving = await Craving.findOne({ _id: request.params.id, userId: request.user._id });
@@ -166,6 +176,7 @@ router.patch(
 router.post(
   "/screen",
   requireAuth,
+  requireLifetime,
   asyncRoute(async (request, response) => {
     const entry = await ensureToday(request.user);
     entry.screenTimeMinutes = clamp(request.body.screenTimeMinutes, 0, 1440);
@@ -178,7 +189,7 @@ router.post(
   })
 );
 
-router.get("/bored/:minutes", requireAuth, (request, response) => {
+router.get("/bored/:minutes", requireAuth, requireLifetime, (request, response) => {
   const minutes = [5, 15, 30, 60, 120].includes(Number(request.params.minutes)) ? Number(request.params.minutes) : 15;
   response.json({ minutes, suggestions: boredomSuggestions[minutes] });
 });

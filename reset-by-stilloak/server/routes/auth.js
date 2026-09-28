@@ -1,5 +1,10 @@
 import crypto from "node:crypto";
 import express from "express";
+import Craving from "../models/Craving.js";
+import DailyEntry from "../models/DailyEntry.js";
+import EmailDelivery from "../models/EmailDelivery.js";
+import Habit from "../models/Habit.js";
+import SmokingEvent from "../models/SmokingEvent.js";
 import User from "../models/User.js";
 import { requireAuth } from "../middleware/auth.js";
 import { rateLimit } from "../middleware/security.js";
@@ -116,8 +121,15 @@ router.get(
   requireAuth,
   asyncRoute(async (request, response) => {
     const user = serializeUser(request.user);
+    const [habits, dailyEntries, cravings, smokingEvents, emailDeliveries] = await Promise.all([
+      Habit.find({ userId: request.user._id }).lean(),
+      DailyEntry.find({ userId: request.user._id }).sort({ date: 1 }).lean(),
+      Craving.find({ userId: request.user._id }).sort({ createdAt: 1 }).lean(),
+      SmokingEvent.find({ userId: request.user._id }).sort({ smokedAt: 1 }).lean(),
+      EmailDelivery.find({ userId: request.user._id }).sort({ createdAt: 1 }).lean()
+    ]);
     response.setHeader("Content-Disposition", `attachment; filename="reset-data-${new Date().toISOString().slice(0, 10)}.json"`);
-    response.json({ exportedAt: new Date().toISOString(), account: user });
+    response.json({ exportedAt: new Date().toISOString(), account: user, habits, dailyEntries, cravings, smokingEvents, emailDeliveries });
   })
 );
 
@@ -136,7 +148,23 @@ router.delete(
     user.deletedAt = new Date();
     user.authVersion += 1;
     user.password = crypto.randomBytes(32).toString("hex");
+    user.role = "user";
+    user.plan = "free";
+    user.lifetime.active = false;
+    user.lifetime.paymentStatus = "deleted";
+    user.lifetime.stripeCustomerId = "";
+    user.lifetime.stripePaymentIntentId = "";
+    user.lifetime.stripeCheckoutSessionId = "";
+    user.preferences = { goals: [] };
+    user.emailPreferences = { morningEnabled: false, eveningEnabled: false, weeklyEnabled: false };
     await user.save();
+    await Promise.all([
+      Habit.deleteMany({ userId: user._id }),
+      DailyEntry.deleteMany({ userId: user._id }),
+      Craving.deleteMany({ userId: user._id }),
+      SmokingEvent.deleteMany({ userId: user._id }),
+      EmailDelivery.deleteMany({ userId: user._id })
+    ]);
     clearSessionCookie(response);
     response.json({ ok: true });
   })

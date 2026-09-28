@@ -40,11 +40,11 @@ router.post(
     };
     request.user.emailPreferences = {
       ...request.user.emailPreferences.toObject?.(),
-      morningEnabled: input.morningEmailEnabled !== false,
+      morningEnabled: Boolean(input.morningEmailEnabled),
       morningTime: timePattern.test(input.morningEmailTime) ? input.morningEmailTime : wakeTime,
       eveningEnabled: Boolean(input.eveningEmailEnabled),
       eveningTime: timePattern.test(input.eveningEmailTime) ? input.eveningEmailTime : "21:30",
-      weeklyEnabled: true
+      weeklyEnabled: Boolean(input.weeklyEmailEnabled)
     };
     request.user.onboardingComplete = true;
     request.user.resetDuration = request.user.lifetime?.active && [30, 60, 90].includes(Number(input.resetDuration)) ? Number(input.resetDuration) : 7;
