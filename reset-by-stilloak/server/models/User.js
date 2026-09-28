@@ -3,11 +3,11 @@ import mongoose from "mongoose";
 
 const emailPreferencesSchema = new mongoose.Schema(
   {
-    morningEnabled: { type: Boolean, default: true },
+    morningEnabled: { type: Boolean, default: false },
     morningTime: { type: String, default: "07:30" },
     eveningEnabled: { type: Boolean, default: false },
     eveningTime: { type: String, default: "21:30" },
-    weeklyEnabled: { type: Boolean, default: true }
+    weeklyEnabled: { type: Boolean, default: false }
   },
   { _id: false }
 );
