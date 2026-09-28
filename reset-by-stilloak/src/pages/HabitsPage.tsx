@@ -1,0 +1,20 @@
+import { Flame, MoreVertical, Plus, Trash2 } from "lucide-react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { EmptyState, Modal, Notice, PageHeader } from "../components/Ui";
+import { useAuth } from "../context/AuthContext";
+import { api } from "../lib/api";
+import type { Habit } from "../types";
+
+export function HabitsPage() {
+  const { user } = useAuth(); const [habits, setHabits] = useState<Habit[]>([]); const [open, setOpen] = useState(false); const [error, setError] = useState("");
+  const load = useCallback(async () => { try { const result = await api<{ habits: Habit[] }>("/habits"); setHabits(result.habits); } catch (requestError) { setError(requestError instanceof Error ? requestError.message : "Could not load habits."); } }, []);
+  useEffect(() => { void load(); }, [load]);
+  const remove = async (habit: Habit) => { if (!confirm(`Remove “${habit.title}”?`)) return; await api(`/habits/${habit._id}`, { method: "DELETE" }); await load(); };
+  return <div className="product-page"><PageHeader eyebrow="BUILD THE SYSTEM" title="Habits" description={user?.lifetime.active ? "Create the actions that make your reset repeatable." : `${habits.length} of 5 free habits used.`} action={<button className="button button-primary" onClick={() => setOpen(true)} disabled={!user?.lifetime.active && habits.length >= 5}><Plus size={17} /> Add habit</button>} />{error && <Notice tone="error">{error}</Notice>}<section className="habit-grid">{habits.map(habit => <article className="habit-card" key={habit._id}><header><span className="habit-symbol">{habit.title.slice(0,1).toUpperCase()}</span><button aria-label={`Actions for ${habit.title}`}><MoreVertical size={18} /></button></header><h2>{habit.title}</h2><p>{habit.scheduleMode === "exact" ? habit.time : habit.anchor} · {habit.frequency}</p><div className="habit-stats"><span><Flame size={17} />Streak<strong>{habit.stats.streak} days</strong></span><span>Completion<strong>{habit.stats.completion}%</strong></span></div><div className="habit-bar"><i style={{ width: `${habit.stats.completion}%` }} /></div><button className="delete-habit" onClick={() => remove(habit)}><Trash2 size={15} /> Remove</button></article>)}</section>{!habits.length && <EmptyState title="No habits yet" text="Create one small action you can complete today." />}<HabitModal open={open} onClose={() => setOpen(false)} onSaved={async () => { setOpen(false); await load(); }} /></div>;
+}
+
+function HabitModal({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: () => void }) {
+  const [mode, setMode] = useState<"flexible"|"exact">("flexible"); const [error, setError] = useState("");
+  const submit = async (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); setError(""); const body = Object.fromEntries(new FormData(event.currentTarget)); try { await api("/habits", { method: "POST", body: { ...body, scheduleMode: mode } }); onSaved(); } catch (requestError) { setError(requestError instanceof Error ? requestError.message : "Could not add habit."); } };
+  return <Modal open={open} title="Add a habit" onClose={onClose}><form className="habit-form" onSubmit={submit}>{error && <Notice tone="error">{error}</Notice>}<label>Habit<input name="title" maxLength={100} required placeholder="e.g. Read for 20 minutes" /></label><div className="segmented"><button type="button" className={mode === "flexible" ? "active" : ""} onClick={() => setMode("flexible")}>Flexible</button><button type="button" className={mode === "exact" ? "active" : ""} onClick={() => setMode("exact")}>Exact time</button></div>{mode === "exact" ? <label>Time<input name="time" type="time" defaultValue="09:00" /></label> : <label>Day anchor<select name="anchor"><option>Morning</option><option>Midday</option><option>Afternoon</option><option>Evening</option><option>Before bed</option></select></label>}<label>Frequency<select name="frequency"><option value="daily">Every day</option><option value="weekdays">Weekdays</option></select></label><button className="button button-primary">Add habit</button></form></Modal>;
+}
