@@ -1,4 +1,18 @@
-const requiredProductionKeys = ["RESET_MONGO_URI", "RESET_JWT_SECRET", "RESET_APP_URL"];
+const requiredRuntimeKeys = ["RESET_MONGO_URI", "RESET_JWT_SECRET", "RESET_APP_URL"];
+const requiredReleaseKeys = [
+  "CRON_SECRET",
+  "EMAIL_FROM",
+  "RESET_ADMIN_EMAIL",
+  "RESET_STRIPE_SECRET_KEY",
+  "RESET_STRIPE_WEBHOOK_SECRET",
+  "RESET_STRIPE_LIFETIME_PRICE_ID"
+];
+
+const keyMode = (value = "") => {
+  if (/^[sr]k_live_/.test(value)) return "live";
+  if (/^[sr]k_test_/.test(value)) return "test";
+  return "unknown";
+};
 
 export const getConfig = () => ({
   appUrl: (process.env.RESET_APP_URL || "http://localhost:5173").replace(/\/+$/, ""),
@@ -11,12 +25,17 @@ export const getConfig = () => ({
   stripeWebhookSecret: process.env.RESET_STRIPE_WEBHOOK_SECRET || "",
   stripeLifetimePriceId: process.env.RESET_STRIPE_LIFETIME_PRICE_ID || "",
   stripeLiveEnabled: String(process.env.RESET_STRIPE_LIVE_ENABLED || "").toLowerCase() === "true",
-  cronSecret: process.env.CRON_SECRET || ""
+  cronSecret: process.env.CRON_SECRET || "",
+  adminEmail: String(process.env.RESET_ADMIN_EMAIL || "").trim().toLowerCase(),
+  vercelEnv: process.env.VERCEL_ENV || "",
+  isProductionRelease:
+    process.env.VERCEL_ENV === "production" ||
+    (!process.env.VERCEL && (process.env.NODE_ENV || "development") === "production")
 });
 
 export const validateRuntimeConfig = () => {
   const config = getConfig();
-  const missing = requiredProductionKeys.filter((key) => !process.env[key]);
+  const missing = requiredRuntimeKeys.filter((key) => !process.env[key]);
 
   if (config.nodeEnv === "production" && missing.length) {
     throw new Error(`Missing required environment configuration: ${missing.join(", ")}`);
@@ -24,6 +43,28 @@ export const validateRuntimeConfig = () => {
 
   if (config.nodeEnv === "production" && config.jwtSecret.length < 32) {
     throw new Error("RESET_JWT_SECRET must contain at least 32 characters in production.");
+  }
+
+  const stripeMode = keyMode(config.stripeSecretKey);
+  if (!config.isProductionRelease && stripeMode === "live") {
+    throw new Error("Live Stripe keys are blocked outside the production environment.");
+  }
+
+  if (config.isProductionRelease) {
+    const missingRelease = requiredReleaseKeys.filter((key) => !process.env[key]);
+    if (!process.env.BREVO_API_KEY && !(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS)) {
+      missingRelease.push("BREVO_API_KEY or complete SMTP credentials");
+    }
+    if (missingRelease.length) {
+      throw new Error(`Missing production release configuration: ${missingRelease.join(", ")}`);
+    }
+    if (!config.appUrl.startsWith("https://")) throw new Error("RESET_APP_URL must use HTTPS in production.");
+    if (!config.cookieName.startsWith("__Host-")) throw new Error("RESET_COOKIE_NAME must use the __Host- prefix in production.");
+    if (!config.stripeLiveEnabled || stripeMode !== "live") {
+      throw new Error("Production requires an explicitly enabled live Stripe key.");
+    }
+    if (!config.stripeWebhookSecret.startsWith("whsec_")) throw new Error("RESET_STRIPE_WEBHOOK_SECRET is invalid.");
+    if (!config.stripeLifetimePriceId.startsWith("price_")) throw new Error("RESET_STRIPE_LIFETIME_PRICE_ID is invalid.");
   }
 
   return config;

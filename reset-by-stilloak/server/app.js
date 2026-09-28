@@ -2,7 +2,7 @@ import cookieParser from "cookie-parser";
 import express from "express";
 import { getConfig, validateRuntimeConfig } from "./config.js";
 import { connectDatabase } from "./db.js";
-import { securityHeaders } from "./middleware/security.js";
+import { apiSecurity, securityHeaders } from "./middleware/security.js";
 import adminRoutes from "./routes/admin.js";
 import authRoutes from "./routes/auth.js";
 import billingRoutes, { stripeWebhook } from "./routes/billing.js";
@@ -24,23 +24,20 @@ app.use(securityHeaders);
 
 app.post("/api/billing/webhook", express.raw({ type: "application/json", limit: "1mb" }), stripeWebhook);
 
+app.use("/api", apiSecurity);
 app.use(express.json({ limit: "256kb" }));
 app.use(express.urlencoded({ extended: false, limit: "64kb" }));
 app.use(cookieParser());
 
-app.get("/api/health", (_request, response) => {
-  const config = getConfig();
-  response.json({
-    status: "ok",
-    service: "reset-by-stilloak",
-    configured: {
-      database: Boolean(config.mongoUri),
-      sessions: config.jwtSecret.length >= 32,
-      stripe: Boolean(config.stripeSecretKey && config.stripeWebhookSecret),
-      email: Boolean(process.env.BREVO_API_KEY || process.env.SMTP_HOST)
-    }
-  });
-});
+app.get(
+  "/api/health",
+  asyncRoute(async (_request, response) => {
+    validateRuntimeConfig();
+    const connection = await connectDatabase();
+    await connection.db.admin().ping();
+    response.json({ status: "ok", service: "reset-by-stilloak" });
+  })
+);
 
 app.use(
   "/api",
