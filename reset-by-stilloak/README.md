@@ -10,7 +10,7 @@ Mobile-first 7/30/60/90 day routine and behaviour tracking product for `reset.st
 - Signed JWT in an HttpOnly, Secure, SameSite cookie
 - Stripe Checkout for the €19 one-time Founding Lifetime purchase
 - Brevo transactional email API with SMTP fallback
-- Vercel Cron for due morning, evening, and weekly emails
+- GitHub Actions scheduler for due morning, evening, and weekly emails
 
 RESET is isolated in this directory so the existing Stilloak membership and Web products are not coupled to its release cycle. It reuses their proven security patterns and email infrastructure conventions.
 
@@ -46,7 +46,8 @@ Use separate preview and production environment values. Keep Stripe in a sandbox
 
 - Preview: a dedicated MongoDB database user and database, a long Preview-only JWT secret, `reset_session`, a Stripe restricted **test** key, test Price and test webhook, and `RESET_STRIPE_LIVE_ENABLED=false`.
 - Production: a separate least-privilege MongoDB user/database, a different JWT secret, `__Host-reset_session`, a Stripe restricted **live** key, live Price and live webhook, and `RESET_STRIPE_LIVE_ENABLED=true`.
-- Both: verified email sender, `CRON_SECRET`, and `RESET_ADMIN_EMAIL`. Vercel Cron calls the due-email route every five minutes; delivery records prevent duplicate sends.
+- Both: verified email sender, `CRON_SECRET`, and `RESET_ADMIN_EMAIL`. The GitHub Actions scheduler calls the due-email route every five minutes; delivery records prevent duplicate sends.
+- GitHub: add the repository secret `RESET_CRON_SECRET` with exactly the same value as Production `CRON_SECRET`. Scheduled workflows run only from the default branch; use `workflow_dispatch` for a controlled manual check after the production endpoint is ready.
 - Never copy a live Stripe secret into Preview or local development. The server rejects that configuration.
 
 ## Release gates

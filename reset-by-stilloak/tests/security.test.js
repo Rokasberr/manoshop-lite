@@ -74,9 +74,15 @@ test("Health response verifies storage without exposing configuration", async ()
   assert.doesNotMatch(source, /configured:/);
 });
 
-test("Cron checks due email windows every five minutes", async () => {
-  const source = await read("../vercel.json");
-  const config = JSON.parse(source);
-  assert.equal(config.crons[0].schedule, "*/5 * * * *");
+test("GitHub Actions checks due email windows every five minutes", async () => {
+  const [vercelSource, workflow] = await Promise.all([
+    read("../vercel.json"),
+    read("../../.github/workflows/reset-email-cron.yml")
+  ]);
+  const config = JSON.parse(vercelSource);
+  assert.equal(config.crons, undefined);
   assert.equal(config.functions["api/[...path].js"].maxDuration, 60);
+  assert.match(workflow, /cron: ["']\*\/5 \* \* \* \*["']/);
+  assert.match(workflow, /secrets\.RESET_CRON_SECRET/);
+  assert.match(workflow, /https:\/\/reset\.stilloak-studio\.com\/api\/cron\/hourly/);
 });

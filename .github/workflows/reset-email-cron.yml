@@ -1,0 +1,48 @@
+name: RESET email scheduler
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: reset-email-cron
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    name: Dispatch due emails
+    if: github.repository == 'Rokasberr/manoshop-lite'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Call RESET scheduler endpoint
+        env:
+          CRON_SECRET: ${{ secrets.RESET_CRON_SECRET }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${CRON_SECRET:-}" ]; then
+            echo "Missing required GitHub secret: RESET_CRON_SECRET" >&2
+            exit 1
+          fi
+
+          http_code="$(curl \
+            --silent \
+            --show-error \
+            --retry 2 \
+            --retry-all-errors \
+            --max-time 45 \
+            --output /dev/null \
+            --write-out "%{http_code}" \
+            --header "Authorization: Bearer ${CRON_SECRET}" \
+            "https://reset.stilloak-studio.com/api/cron/hourly")"
+
+          if [ "$http_code" != "200" ]; then
+            echo "RESET email scheduler failed with HTTP ${http_code}." >&2
+            exit 1
+          fi
+
+          echo "RESET email scheduler completed successfully."
