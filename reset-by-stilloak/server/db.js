@@ -8,7 +8,7 @@ export const connectDatabase = async () => {
     return mongoose.connection;
   }
 
-  const { mongoUri } = getConfig();
+  const { mongoUri, mongoDbName } = getConfig();
 
   if (!mongoUri) {
     throw Object.assign(new Error("Database is not configured."), { statusCode: 503 });
@@ -17,6 +17,7 @@ export const connectDatabase = async () => {
   if (!connectionPromise) {
     connectionPromise = mongoose
       .connect(mongoUri, {
+        dbName: mongoDbName || undefined,
         serverSelectionTimeoutMS: 7000,
         maxPoolSize: 8
       })

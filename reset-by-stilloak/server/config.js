@@ -3,9 +3,10 @@ const requiredReleaseKeys = [
   "CRON_SECRET",
   "EMAIL_FROM",
   "RESET_ADMIN_EMAIL",
-  "RESET_STRIPE_SECRET_KEY",
   "RESET_STRIPE_WEBHOOK_SECRET",
-  "RESET_STRIPE_LIFETIME_PRICE_ID"
+  "RESET_STRIPE_LIFETIME_PRICE_ID",
+  "RESET_STRIPE_PAYMENT_LINK_URL",
+  "RESET_MONGO_DB_NAME"
 ];
 
 const keyMode = (value = "") => {
@@ -18,12 +19,14 @@ export const getConfig = () => ({
   appUrl: (process.env.RESET_APP_URL || "http://localhost:5173").replace(/\/+$/, ""),
   apiUrl: (process.env.RESET_API_URL || "http://localhost:4000").replace(/\/+$/, ""),
   mongoUri: process.env.RESET_MONGO_URI || "",
+  mongoDbName: process.env.RESET_MONGO_DB_NAME || "",
   jwtSecret: process.env.RESET_JWT_SECRET || "",
   cookieName: process.env.RESET_COOKIE_NAME || "reset_session",
   nodeEnv: process.env.NODE_ENV || "development",
   stripeSecretKey: process.env.RESET_STRIPE_SECRET_KEY || "",
   stripeWebhookSecret: process.env.RESET_STRIPE_WEBHOOK_SECRET || "",
   stripeLifetimePriceId: process.env.RESET_STRIPE_LIFETIME_PRICE_ID || "",
+  stripePaymentLinkUrl: process.env.RESET_STRIPE_PAYMENT_LINK_URL || "",
   stripeLiveEnabled: String(process.env.RESET_STRIPE_LIVE_ENABLED || "").toLowerCase() === "true",
   cronSecret: process.env.CRON_SECRET || "",
   adminEmail: String(process.env.RESET_ADMIN_EMAIL || "").trim().toLowerCase(),
@@ -60,11 +63,17 @@ export const validateRuntimeConfig = () => {
     }
     if (!config.appUrl.startsWith("https://")) throw new Error("RESET_APP_URL must use HTTPS in production.");
     if (!config.cookieName.startsWith("__Host-")) throw new Error("RESET_COOKIE_NAME must use the __Host- prefix in production.");
-    if (!config.stripeLiveEnabled || stripeMode !== "live") {
-      throw new Error("Production requires an explicitly enabled live Stripe key.");
+    if (!config.stripeLiveEnabled) {
+      throw new Error("Production requires explicitly enabled live Stripe payments.");
+    }
+    if (config.stripeSecretKey && stripeMode !== "live") {
+      throw new Error("Production Stripe API credentials must use live mode.");
     }
     if (!config.stripeWebhookSecret.startsWith("whsec_")) throw new Error("RESET_STRIPE_WEBHOOK_SECRET is invalid.");
     if (!config.stripeLifetimePriceId.startsWith("price_")) throw new Error("RESET_STRIPE_LIFETIME_PRICE_ID is invalid.");
+    if (!config.stripePaymentLinkUrl.startsWith("https://buy.stripe.com/")) {
+      throw new Error("RESET_STRIPE_PAYMENT_LINK_URL is invalid.");
+    }
   }
 
   return config;

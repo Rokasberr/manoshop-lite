@@ -8,11 +8,13 @@ const managedKeys = [
   "VERCEL_ENV",
   "RESET_APP_URL",
   "RESET_MONGO_URI",
+  "RESET_MONGO_DB_NAME",
   "RESET_JWT_SECRET",
   "RESET_COOKIE_NAME",
   "RESET_STRIPE_SECRET_KEY",
   "RESET_STRIPE_WEBHOOK_SECRET",
   "RESET_STRIPE_LIFETIME_PRICE_ID",
+  "RESET_STRIPE_PAYMENT_LINK_URL",
   "RESET_STRIPE_LIVE_ENABLED",
   "CRON_SECRET",
   "EMAIL_FROM",
@@ -62,9 +64,10 @@ test("Production requires a host-only cookie and explicit live mode", () => {
     VERCEL_ENV: "production",
     RESET_APP_URL: "https://reset.example.com",
     RESET_COOKIE_NAME: "reset_session",
-    RESET_STRIPE_SECRET_KEY: "rk_live_example",
     RESET_STRIPE_WEBHOOK_SECRET: "whsec_example",
     RESET_STRIPE_LIFETIME_PRICE_ID: "price_example",
+    RESET_STRIPE_PAYMENT_LINK_URL: "https://buy.stripe.com/example",
+    RESET_MONGO_DB_NAME: "reset_production",
     RESET_STRIPE_LIVE_ENABLED: "true",
     CRON_SECRET: "cron-secret",
     EMAIL_FROM: "RESET <hello@example.com>",
@@ -73,7 +76,7 @@ test("Production requires a host-only cookie and explicit live mode", () => {
   };
   withEnvironment(production, () => assert.throws(validateRuntimeConfig, /__Host-/));
   withEnvironment({ ...production, RESET_COOKIE_NAME: "__Host-reset_session", RESET_STRIPE_LIVE_ENABLED: "false" }, () => {
-    assert.throws(validateRuntimeConfig, /explicitly enabled live Stripe key/);
+    assert.throws(validateRuntimeConfig, /explicitly enabled live Stripe payments/);
   });
   withEnvironment({ ...production, RESET_COOKIE_NAME: "__Host-reset_session" }, () => {
     assert.equal(validateRuntimeConfig().isProductionRelease, true);

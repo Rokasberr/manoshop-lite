@@ -40,6 +40,12 @@ export const getStripe = () => {
 
 export const createLifetimeCheckout = async ({ user }) => {
   const config = getConfig();
+  if (config.isProductionRelease && config.stripePaymentLinkUrl) {
+    const checkoutUrl = new URL(config.stripePaymentLinkUrl);
+    checkoutUrl.searchParams.set("client_reference_id", String(user._id));
+    checkoutUrl.searchParams.set("prefilled_email", user.email);
+    return { id: `payment-link-${String(user._id)}`, url: checkoutUrl.toString() };
+  }
   const stripe = getStripe();
   const integrationSuffix = randomLetters(8);
   const lineItem = config.stripeLifetimePriceId
@@ -74,3 +80,6 @@ export const createLifetimeCheckout = async ({ user }) => {
     idempotencyKey: `reset-lifetime-${String(user._id)}-${Math.floor(Date.now() / 300_000)}`
   });
 };
+
+export const constructStripeEvent = (payload, signature, secret) =>
+  Stripe.webhooks.constructEvent(payload, signature, secret);

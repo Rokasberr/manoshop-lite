@@ -12,7 +12,7 @@ test("Stripe webhook receives raw body before JSON parsing", async () => {
 
 test("Lifetime fulfillment is server-side, signed, paid-only, and idempotent", async () => {
   const source = await read("../server/routes/billing.js");
-  assert.match(source, /constructEvent/);
+  assert.match(source, /constructStripeEvent/);
   assert.match(source, /payment_status === "unpaid"/);
   assert.match(source, /event\.livemode/);
   assert.match(source, /stripeLiveEnabled/);
@@ -21,12 +21,15 @@ test("Lifetime fulfillment is server-side, signed, paid-only, and idempotent", a
   assert.match(source, /lifetime\.active = true/);
 });
 
-test("Checkout is server-created with a short-lived idempotency key", async () => {
+test("Checkout is server-created in Preview and Production uses a user-bound live Payment Link", async () => {
   const source = await read("../server/services/stripeService.js");
   assert.match(source, /mode: "payment"/);
   assert.match(source, /idempotencyKey/);
   assert.match(source, /Math\.floor\(Date\.now\(\) \/ 300_000\)/);
   assert.match(source, /mode === "test" && config\.isProductionRelease/);
+  assert.match(source, /client_reference_id/);
+  assert.match(source, /prefilled_email/);
+  assert.match(source, /Stripe\.webhooks\.constructEvent/);
 });
 
 test("client success page only polls server billing status", async () => {

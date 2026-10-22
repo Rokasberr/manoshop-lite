@@ -4,7 +4,7 @@ import User from "../models/User.js";
 import WebhookEvent from "../models/WebhookEvent.js";
 import { requireAuth } from "../middleware/auth.js";
 import { emailTemplates, sendTrackedEmail } from "../services/emailService.js";
-import { createLifetimeCheckout, getStripe } from "../services/stripeService.js";
+import { constructStripeEvent, createLifetimeCheckout } from "../services/stripeService.js";
 import { asyncRoute, httpError } from "../utils/http.js";
 import { getConfig } from "../config.js";
 
@@ -96,7 +96,7 @@ export const stripeWebhook = async (request, response) => {
     if (!signature) throw httpError("Missing Stripe signature.", 400);
     const config = getConfig();
     if (!config.stripeWebhookSecret) throw httpError("Stripe webhook is not configured.", 503);
-    const event = getStripe().webhooks.constructEvent(request.body, signature, config.stripeWebhookSecret);
+    const event = constructStripeEvent(request.body, signature, config.stripeWebhookSecret);
     if (Boolean(event.livemode) !== config.stripeLiveEnabled) {
       throw httpError("Stripe webhook mode does not match this environment.", 400);
     }
