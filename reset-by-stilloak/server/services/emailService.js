@@ -19,6 +19,26 @@ const parseSender = (value) => {
     : { name: "RESET by Stilloak", email: String(value).trim() };
 };
 
+export const redactEmailLogValue = (value) =>
+  String(value || "Email provider request failed.")
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[redacted-email]")
+    .replace(/(api[-_ ]?key|authorization|bearer|token)(\s*[:=]?\s*)[^\s,;]+/gi, "$1$2[redacted]")
+    .replace(/https?:\/\/[^\s]+/gi, "[redacted-url]")
+    .slice(0, 300);
+
+const reportEmailFailure = (error) => {
+  const provider = error?.provider === "brevo" || error?.provider === "smtp" ? error.provider : "unknown";
+  const statusCode = Number.isInteger(error?.providerStatus) ? error.providerStatus : undefined;
+  console.error(
+    JSON.stringify({
+      event: "email_delivery_failed",
+      provider,
+      ...(statusCode ? { statusCode } : {}),
+      message: redactEmailLogValue(error?.message)
+    })
+  );
+};
+
 export const buildResetEmail = ({ preheader, eyebrow = "RESET BY STILLOAK", title, intro, rows = [], cta, note = "" }) => {
   const rowHtml = rows
     .filter((row) => row?.label && row?.value !== undefined && row?.value !== null && row?.value !== "")
@@ -54,7 +74,12 @@ const sendWithBrevo = async ({ to, subject, html, text }) => {
       signal: controller.signal
     });
     const body = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(body.message || "Brevo email request failed.");
+    if (!response.ok) {
+      const error = new Error(body.message || "Brevo email request failed.");
+      error.provider = "brevo";
+      error.providerStatus = response.status;
+      throw error;
+    }
     return body.messageId || "";
   } finally {
     clearTimeout(timeout);
@@ -72,15 +97,25 @@ const sendWithSmtp = async ({ to, subject, html, text }) => {
     greetingTimeout: 8_000,
     socketTimeout: 15_000
   });
-  const result = await transport.sendMail({ from: sender(), to, subject, html, text });
-  return result.messageId || "";
+  try {
+    const result = await transport.sendMail({ from: sender(), to, subject, html, text });
+    return result.messageId || "";
+  } catch (error) {
+    error.provider = "smtp";
+    throw error;
+  }
 };
 
 export const sendEmail = async ({ to, subject, html, text }) => {
-  if (process.env.NODE_ENV === "test") return { messageId: "test-email" };
-  if (process.env.BREVO_API_KEY) return { messageId: await sendWithBrevo({ to, subject, html, text }) };
-  if (process.env.SMTP_HOST) return { messageId: await sendWithSmtp({ to, subject, html, text }) };
-  throw Object.assign(new Error("Email delivery is not configured."), { statusCode: 503 });
+  try {
+    if (process.env.NODE_ENV === "test") return { messageId: "test-email" };
+    if (process.env.BREVO_API_KEY) return { messageId: await sendWithBrevo({ to, subject, html, text }) };
+    if (process.env.SMTP_HOST) return { messageId: await sendWithSmtp({ to, subject, html, text }) };
+    throw Object.assign(new Error("Email delivery is not configured."), { statusCode: 503 });
+  } catch (error) {
+    reportEmailFailure(error);
+    throw error;
+  }
 };
 
 export const sendTrackedEmail = async ({ user, type, dedupeKey, subject, content }) => {
