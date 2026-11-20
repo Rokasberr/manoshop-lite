@@ -45,7 +45,7 @@ Kopijuokite `.env.example` į lokalią `.env.local` tik jei reikia lokalaus test
 ```text
 VITE_API_URL=
 VITE_WEB_LEAD_ENDPOINT=
-VITE_WEB_CONTACT_EMAIL=labas@stilloak-studio.com
+VITE_WEB_CONTACT_EMAIL=labas@stilloak.com
 VITE_GA_MEASUREMENT_ID=
 VITE_GOOGLE_ADS_ID=
 VITE_GOOGLE_ADS_LEAD_LABEL=

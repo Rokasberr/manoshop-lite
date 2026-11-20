@@ -6,7 +6,7 @@ const NotFoundPage = () => <main className="proposal-shell proposal-centered">
     <p className="proposal-eyebrow">404 · Puslapis nerastas</p>
     <h1>Šios nuorodos nėra</h1>
     <p>Nuoroda galėjo pasikeisti arba būti įvesta neteisingai. Grįžkite į Stilloak Web pradžią arba susisiekite.</p>
-    <div className="web-not-found-actions"><a className="proposal-primary-button" href="/"><Home size={18} /> Į pradžią</a><button className="proposal-secondary-button" type="button" onClick={() => window.history.back()}><ArrowLeft size={18} /> Grįžti</button><a className="proposal-secondary-button" href="mailto:labas@stilloak-studio.com"><Mail size={18} /> Kontaktai</a></div>
+    <div className="web-not-found-actions"><a className="proposal-primary-button" href="/"><Home size={18} /> Į pradžią</a><button className="proposal-secondary-button" type="button" onClick={() => window.history.back()}><ArrowLeft size={18} /> Grįžti</button><a className="proposal-secondary-button" href="mailto:labas@stilloak.com"><Mail size={18} /> Kontaktai</a></div>
   </section>
 </main>;
 
