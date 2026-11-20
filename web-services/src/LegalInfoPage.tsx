@@ -16,7 +16,7 @@ type LegalPageContent = {
   sections: LegalSection[];
 };
 
-const contactEmail = "hello@stilloak-studio.com";
+const contactEmail = "labas@stilloak.com";
 
 const legalPages: Record<string, LegalPageContent> = {
   "/web-services-privacy": {

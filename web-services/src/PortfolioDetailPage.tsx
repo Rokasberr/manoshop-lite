@@ -112,7 +112,7 @@ export default function PortfolioDetailPage({ path }: { path: string }) {
             <p>{project.description}</p>
             <div className="detail-actions">
               <a className="button button-primary" href="/#kontaktai">Aptarti panašų projektą <ArrowRight size={18} /></a>
-              <a className="button button-secondary" href="mailto:hello@stilloak-studio.com">Parašyti el. paštu <ExternalLink size={17} /></a>
+              <a className="button button-secondary" href="mailto:labas@stilloak.com">Parašyti el. paštu <ExternalLink size={17} /></a>
             </div>
           </div>
           <div className="detail-hero-media">
