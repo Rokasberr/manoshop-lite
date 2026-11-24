@@ -518,12 +518,14 @@ function ProposalPage({ token }: ProposalPageProps) {
               <span><strong>Du mokėjimai</strong><small>{proposal.paymentOptions.splitPercent}% avansas dabar, likutis užbaigus projektą</small></span>
             </label>
           </fieldset>
+          <h3>Sąskaitos duomenys</h3>
+          <p>Jei perkate kaip fizinis asmuo, įrašykite savo vardą, pavardę ir gyvenamosios vietos adresą. Jei perkate įmonės vardu, nurodykite įmonės rekvizitus ir registracijos adresą.</p>
           <label className="proposal-label">
             Patvirtinančio asmens vardas ir pavardė
             <input value={acceptedName} onChange={(event) => setAcceptedName(event.target.value)} minLength={2} required />
           </label>
           <label className="proposal-label">
-            Sąskaitos gavėjas / įmonės pavadinimas
+            Pirkėjo vardas ir pavardė arba įmonės pavadinimas
             <input value={billingName} onChange={(event) => setBillingName(event.target.value)} minLength={2} required />
           </label>
           <div className="proposal-grid">
@@ -537,8 +539,9 @@ function ProposalPage({ token }: ProposalPageProps) {
             </label>
           </div>
           <label className="proposal-label">
-            Sąskaitos adresas
-            <input value={billingAddress} onChange={(event) => setBillingAddress(event.target.value)} minLength={5} required />
+            Pirkėjo adresas sąskaitai
+            <input autoComplete="street-address" placeholder="Pvz., Parko g. 12-3, LT-55180 Jonava, Lietuva" value={billingAddress} onChange={(event) => setBillingAddress(event.target.value)} minLength={5} required />
+            <small>Įrašykite gatvę, namo ir buto numerį (jei yra), pašto kodą, miestą ir šalį.</small>
           </label>
           <div className="proposal-notice">
             Patvirtinus bus atsiųsta testinė sutarties PDF versija. Ji negalioja ir nėra teisinė sutartis.
