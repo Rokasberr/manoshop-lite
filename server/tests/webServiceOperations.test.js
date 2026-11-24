@@ -11,7 +11,7 @@ const readRepoFile = (...parts) => fs.readFileSync(path.resolve(__dirname, "..",
 test("Web service email template has branding, support contact and escaped customer content", () => {
   const email = buildWebServiceEmail({ subject: "Testas", name: "<Testas>", title: "Pasiūlymas", intro: "Paruošta", rows: [{ label: "Suma", value: "10 €" }] });
   assert.match(email.html, /stilloak-logo\.svg/);
-  assert.match(email.html, /hello@stilloak-studio\.com/);
+  assert.match(email.html, /labas@stilloak-studio\.com/);
   assert.match(email.html, /&lt;Testas&gt;/);
   assert.doesNotMatch(email.html, /Sveiki, <Testas>/);
   assert.match(email.html, /text-align:center/);
@@ -71,7 +71,7 @@ test("operations routes, encrypted backups, error alerts and legal pages stay wi
   assert.match(legal, /webServicesDetails/);
   assert.match(legal, /\+370 638 43445/);
   assert.match(legal, /LT100020711618/);
-  assert.match(legal, /hello@stilloak-studio\.com/);
+  assert.match(legal, /labas@stilloak-studio\.com/);
   assert.doesNotMatch(legal, /rokas@stilloak-studio\.com/);
   assert.doesNotMatch(legal, /smulkiojo verslo schema/i);
   assert.doesNotMatch(legal, /Rokas Bernotas/);

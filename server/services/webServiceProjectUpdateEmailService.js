@@ -2,7 +2,7 @@ const { getEmailTransport, getTransportConfig, isEmailTransportConfigured, norma
 const { isBrevoEmailConfigured, sendBrevoTransactionalEmail } = require("../utils/brevoEmail");
 const { buildWebServiceEmail } = require("./webServiceEmailTemplate");
 
-const FROM = process.env.WEB_ORDERS_FROM_EMAIL?.trim() || "Stilloak Studio <hello@stilloak-studio.com>";
+const FROM = process.env.WEB_ORDERS_FROM_EMAIL?.trim() || "Stilloak Studio <labas@stilloak-studio.com>";
 const statusLabels = { pending: "Laukia", in_progress: "Vykdoma", completed: "Atlikta" };
 
 const buildProjectUpdateEmail = ({ request, changedTasks, projectUrl = "" }) => {

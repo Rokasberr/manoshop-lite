@@ -1,4 +1,4 @@
-const webServiceContactEmail = "hello@stilloak-studio.com";
+const webServiceContactEmail = "labas@stilloak-studio.com";
 const webServiceContactPhone = "+370 638 43445";
 const webServiceVatCode = "LT100020711618";
 const webServiceProvider = `Paslaugos teikiamos su „Stilloak Studio“ prekės ženklu. Kontaktai: ${webServiceContactEmail}, tel. ${webServiceContactPhone}.`;
@@ -149,7 +149,7 @@ export const infoPages = {
       {
         heading: "Kaip susisiekti",
         paragraphs: [
-"Rašyk mums el. paštu hello@stilloak-studio.com ir pridėk savo užsakymo numerį, jei klausimas susijęs su konkrečiu pirkimu.",
+"Rašyk mums el. paštu labas@stilloak-studio.com ir pridėk savo užsakymo numerį, jei klausimas susijęs su konkrečiu pirkimu.",
           "Standartinis atsakymo laikas yra per 1–2 darbo dienas. Sudėtingesniais atvejais galime paprašyti papildomos informacijos, kad problemą išspręstume tiksliai.",
         ],
       },
@@ -186,7 +186,7 @@ export const infoPages = {
       {
         heading: "Pagrindinis kontaktas",
         paragraphs: [
-"Rašyk mums el. paštu hello@stilloak-studio.com. Jei klausimas susijęs su konkrečiu pirkimu, pridėk užsakymo numerį ir trumpą situacijos aprašymą.",
+"Rašyk mums el. paštu labas@stilloak-studio.com. Jei klausimas susijęs su konkrečiu pirkimu, pridėk užsakymo numerį ir trumpą situacijos aprašymą.",
           "Jei kreipiesi dėl skaitmeninio produkto, mums ypač padeda nurodyti, kuris failas neatsidaro arba kurio atsisiuntimo nerandi.",
         ],
       },

@@ -11,7 +11,7 @@ const {
 const { buildWebServiceEmail } = require("./webServiceEmailTemplate");
 
 const WEB_ORDERS_FROM_EMAIL =
-  process.env.WEB_ORDERS_FROM_EMAIL?.trim() || "Stilloak Studio <hello@stilloak-studio.com>";
+  process.env.WEB_ORDERS_FROM_EMAIL?.trim() || "Stilloak Studio <labas@stilloak-studio.com>";
 
 const formatPrice = (value) =>
   `${new Intl.NumberFormat("lt-LT", { maximumFractionDigits: 2 }).format(Number(value || 0))} €`;

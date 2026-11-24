@@ -12,7 +12,7 @@ const {
 const { buildWebServiceEmail } = require("./webServiceEmailTemplate");
 
 const WEB_ORDERS_FROM_EMAIL =
-  process.env.WEB_ORDERS_FROM_EMAIL?.trim() || "Stilloak Studio <hello@stilloak-studio.com>";
+  process.env.WEB_ORDERS_FROM_EMAIL?.trim() || "Stilloak Studio <labas@stilloak-studio.com>";
 
 const sendWebServiceTestInvoiceEmail = async ({ request, paymentType = "deposit" }) => {
   const invoiceNumber = buildTestInvoiceNumber(request, paymentType);

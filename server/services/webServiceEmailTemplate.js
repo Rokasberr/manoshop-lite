@@ -1,7 +1,7 @@
 const escapeHtml = (value) => String(value ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 
 const LOGO_URL = process.env.EMAIL_LOGO_URL?.trim() || "https://web.stilloak-studio.com/stilloak-logo.svg";
-const SUPPORT_EMAIL = "hello@stilloak-studio.com";
+const SUPPORT_EMAIL = "labas@stilloak-studio.com";
 
 const buildDetailRows = (rows) => rows.map(({ label, value }) => `
   <tr>

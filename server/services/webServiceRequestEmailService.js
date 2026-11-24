@@ -14,7 +14,7 @@ const {
 
 const COMPANY_NAME = process.env.COMPANY_NAME?.trim() || "Stilloak Studio";
 const WEB_ORDERS_FROM_EMAIL =
-  process.env.WEB_ORDERS_FROM_EMAIL?.trim() || "Stilloak Studio <hello@stilloak-studio.com>";
+  process.env.WEB_ORDERS_FROM_EMAIL?.trim() || "Stilloak Studio <labas@stilloak-studio.com>";
 const WEB_PUBLIC_URL = (process.env.WEB_PUBLIC_URL?.trim() || "https://web.stilloak-studio.com").replace(/\/+$/, "");
 const WEB_ADMIN_ORDERS_URL =
   process.env.WEB_ORDERS_ADMIN_URL?.trim() || "https://stilloak-studio.com/admin/web-orders";
