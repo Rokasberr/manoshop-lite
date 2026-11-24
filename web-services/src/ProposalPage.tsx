@@ -128,7 +128,11 @@ function ProposalPage({ token }: ProposalPageProps) {
   const [billingName, setBillingName] = useState("");
   const [companyCode, setCompanyCode] = useState("");
   const [vatCode, setVatCode] = useState("");
-  const [billingAddress, setBillingAddress] = useState("");
+  const [streetAddress, setStreetAddress] = useState("");
+  const [apartment, setApartment] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [city, setCity] = useState("");
+  const [country, setCountry] = useState("Lietuva");
   const [paymentPlan, setPaymentPlan] = useState<"full" | "split">("full");
   const [accepting, setAccepting] = useState(false);
   const [paying, setPaying] = useState(false);
@@ -199,7 +203,6 @@ function ProposalPage({ token }: ProposalPageProps) {
             setBillingName(confirmed.customer.billingName || confirmed.customer.company || confirmed.customer.name || "");
             setCompanyCode(confirmed.customer.companyCode || "");
             setVatCode(confirmed.customer.vatCode || "");
-            setBillingAddress(confirmed.customer.billingAddress || "");
             setPaymentPlan(confirmed.paymentPlan || "full");
             setPaymentMessage(payment === "final-success"
               ? (confirmed.finalPayment.status === "paid" ? "Galutinis mokėjimas sėkmingai gautas. Ačiū!" : "Stripe mokėjimas dar tvirtinamas.")
@@ -221,7 +224,6 @@ function ProposalPage({ token }: ProposalPageProps) {
         setBillingName(data.customer.billingName || data.customer.company || data.customer.name || "");
         setCompanyCode(data.customer.companyCode || "");
         setVatCode(data.customer.vatCode || "");
-        setBillingAddress(data.customer.billingAddress || "");
         setPaymentPlan(data.paymentPlan || "full");
       } catch (loadError) {
         setError(loadError instanceof Error ? loadError.message : "Pasiūlymo nepavyko užkrauti.");
@@ -248,7 +250,11 @@ function ProposalPage({ token }: ProposalPageProps) {
           billingName: billingName.trim(),
           companyCode: companyCode.trim(),
           vatCode: vatCode.trim(),
-          billingAddress: billingAddress.trim(),
+          billingAddress: [
+            [streetAddress.trim(), apartment.trim()].filter(Boolean).join(", "),
+            [postalCode.trim(), city.trim()].filter(Boolean).join(" "),
+            country.trim(),
+          ].filter(Boolean).join(", "),
         } : {
           acceptedName: acceptedName.trim(),
           acceptedTerms,
@@ -508,9 +514,26 @@ function ProposalPage({ token }: ProposalPageProps) {
                 </label>
               </div>
               <label className="proposal-label">
-                Pirkėjo adresas sąskaitai
-                <input autoComplete="street-address" placeholder="Pvz., Parko g. 12-3, LT-55180 Jonava, Lietuva" value={billingAddress} onChange={(event) => setBillingAddress(event.target.value)} minLength={5} required />
-                <small>Įrašykite gatvę, namo ir buto numerį (jei yra), pašto kodą, miestą ir šalį.</small>
+                Gatvė ir namo numeris
+                <input autoComplete="address-line1" placeholder="Pvz., Parko g. 12" value={streetAddress} onChange={(event) => setStreetAddress(event.target.value)} pattern={String.raw`.*\S.*`} maxLength={100} required />
+              </label>
+              <label className="proposal-label">
+                Buto ar patalpos numeris (jei yra)
+                <input autoComplete="address-line2" placeholder="Pvz., 3" value={apartment} onChange={(event) => setApartment(event.target.value)} maxLength={25} />
+              </label>
+              <div className="proposal-grid">
+                <label className="proposal-label">
+                  Pašto kodas
+                  <input autoComplete="postal-code" placeholder="Pvz., LT-55180" value={postalCode} onChange={(event) => setPostalCode(event.target.value)} pattern={String.raw`.*\S.*`} maxLength={20} required />
+                </label>
+                <label className="proposal-label">
+                  Miestas ar gyvenvietė
+                  <input autoComplete="address-level2" placeholder="Pvz., Jonava" value={city} onChange={(event) => setCity(event.target.value)} pattern={String.raw`.*\S.*`} maxLength={70} required />
+                </label>
+              </div>
+              <label className="proposal-label">
+                Šalis
+                <input autoComplete="country-name" value={country} onChange={(event) => setCountry(event.target.value)} pattern={String.raw`.*\S.*`} maxLength={75} required />
               </label>
               <button className="proposal-primary-button" type="submit" disabled={accepting}>
                 {accepting ? "Išsaugoma..." : "Išsaugoti sąskaitos duomenis"}
