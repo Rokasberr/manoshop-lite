@@ -3,7 +3,7 @@ const { isBrevoEmailConfigured, sendBrevoTransactionalEmail } = require("../util
 const { buildTestContractNumber, createWebServiceTestContractPdfBuffer } = require("../utils/webServiceTestContractPdf");
 const { buildWebServiceEmail } = require("./webServiceEmailTemplate");
 
-const FROM = process.env.WEB_ORDERS_FROM_EMAIL?.trim() || "Stilloak Studio <hello@stilloak-studio.com>";
+const FROM = process.env.WEB_ORDERS_FROM_EMAIL?.trim() || "Stilloak Studio <labas@stilloak-studio.com>";
 
 const sendWebServiceTestContractEmail = async (request) => {
   const contractNumber = buildTestContractNumber(request);

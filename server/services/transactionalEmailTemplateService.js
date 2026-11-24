@@ -1,7 +1,7 @@
 const { getPrimaryClientUrl } = require("../utils/originMatcher");
 
 const COMPANY_NAME = process.env.COMPANY_NAME?.trim() || "Stilloak Studio";
-const SUPPORT_EMAIL = "hello@stilloak-studio.com";
+const SUPPORT_EMAIL = "labas@stilloak-studio.com";
 const TRUSTED_PRODUCTION_URL = "https://www.stilloak-studio.com";
 
 const escapeHtml = (value) =>

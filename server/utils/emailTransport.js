@@ -49,7 +49,7 @@ const normalizeEmailTransportError = (error) => {
   if (/sender.*not.*verified|sender has not been verified|from address.*not verified/.test(combined)) {
     error.statusCode = 400;
     error.message =
-      "Siuntėjas dar nepatvirtintas. Brevo pusėje patvirtink domeną arba senderį hello@stilloak-studio.com.";
+      "Siuntėjas dar nepatvirtintas. Brevo pusėje patvirtink domeną arba senderį labas@stilloak-studio.com.";
     return error;
   }
 

@@ -106,7 +106,7 @@ export function LandingPage() {
         <section className="final-cta"><div><p className="eyebrow">YOUR NEXT DAY CAN START DIFFERENTLY</p><h2>Stop scrolling.<br /><em>Start living.</em></h2><p>Begin with seven days. Keep the system only if it earns its place.</p><Link className="button button-primary button-large" to="/signup">Start Your Reset <ArrowRight size={18} /></Link></div></section>
       </main>
 
-      <footer className="marketing-footer"><Logo /><p>Habit and behaviour tracking for real life.</p><nav><Link to="/privacy">Privacy</Link><Link to="/terms">Terms</Link><Link to="/cookies">Cookies</Link><a href="mailto:hello@stilloak-studio.com">Contact</a></nav><small>© {new Date().getFullYear()} Stilloak Studio</small></footer>
+      <footer className="marketing-footer"><Logo /><p>Habit and behaviour tracking for real life.</p><nav><Link to="/privacy">Privacy</Link><Link to="/terms">Terms</Link><Link to="/cookies">Cookies</Link><a href="mailto:labas@stilloak-studio.com">Contact</a></nav><small>© {new Date().getFullYear()} Stilloak Studio</small></footer>
     </div>
   );
 }

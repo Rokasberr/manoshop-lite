@@ -84,7 +84,7 @@ test("visible footer and contact content do not expose demo contact details", ()
   const infoPagesSource = readProjectFile("client", "src", "content", "infoPages.js");
   const visibleContactSources = [footerSource, translationsSource, infoPagesSource].join("\n");
 
-  assert.match(footerSource, /hello@stilloak-studio\.com/);
+  assert.match(footerSource, /labas@stilloak-studio\.com/);
   assert.match(footerSource, /copy\.links\.contactPrompt/);
   assert.match(translationsSource, /contactPrompt: "Susisiekite el\. paštu"/);
   assert.doesNotMatch(visibleContactSources, /\+370 600 12345/);

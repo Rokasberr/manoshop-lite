@@ -2,7 +2,7 @@ const OperationalEvent = require("../models/OperationalEvent");
 const { isBrevoEmailConfigured, sendBrevoTransactionalEmail } = require("../utils/brevoEmail");
 
 const ALERT_EMAIL = process.env.OPERATIONS_ALERT_EMAIL?.trim() || "projects@stilloak-studio.com";
-const FROM = process.env.WEB_ORDERS_FROM_EMAIL?.trim() || "Stilloak Studio <hello@stilloak-studio.com>";
+const FROM = process.env.WEB_ORDERS_FROM_EMAIL?.trim() || "Stilloak Studio <labas@stilloak-studio.com>";
 const recentlySent = new Map();
 
 const sanitize = (value) => String(value || "").replace(/sk_(live|test)_[A-Za-z0-9_]+|whsec_[A-Za-z0-9_]+/g, "[paslėpta]").slice(0, 500);

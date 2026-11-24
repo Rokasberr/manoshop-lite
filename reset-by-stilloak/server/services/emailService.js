@@ -10,7 +10,7 @@ const escapeHtml = (value) =>
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 
-const sender = () => process.env.EMAIL_FROM || "RESET by Stilloak <hello@stilloak-studio.com>";
+const sender = () => process.env.EMAIL_FROM || "RESET by Stilloak <labas@stilloak-studio.com>";
 
 const parseSender = (value) => {
   const match = String(value).match(/^(.*?)<([^>]+)>$/);

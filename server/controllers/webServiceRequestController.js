@@ -207,7 +207,7 @@ const serializePublicProposal = (request) => ({
     })),
   },
   contact: {
-    email: process.env.WEB_SERVICES_CONTACT_EMAIL?.trim() || "hello@stilloak-studio.com",
+    email: "labas@stilloak-studio.com",
     phone: process.env.WEB_SERVICES_CONTACT_PHONE?.trim() || "+370 638 43445",
   },
 });

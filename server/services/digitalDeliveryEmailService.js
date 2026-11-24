@@ -8,7 +8,7 @@ const {
 const { buildTrustedFrontendUrl, escapeHtml, sanitizePublicText } = require("./transactionalEmailTemplateService");
 
 const COMPANY_NAME = process.env.COMPANY_NAME?.trim() || "Stilloak Studio";
-const SUPPORT_EMAIL = "hello@stilloak-studio.com";
+const SUPPORT_EMAIL = "labas@stilloak-studio.com";
 
 const getDigitalOrderItems = (order) =>
   (order.items || []).filter((item) => item.productType === "digital");

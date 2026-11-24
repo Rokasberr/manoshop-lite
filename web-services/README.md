@@ -45,7 +45,6 @@ Kopijuokite `.env.example` į lokalią `.env.local` tik jei reikia lokalaus test
 ```text
 VITE_API_URL=
 VITE_WEB_LEAD_ENDPOINT=
-VITE_WEB_CONTACT_EMAIL=labas@stilloak-studio.com
 VITE_GA_MEASUREMENT_ID=
 VITE_GOOGLE_ADS_ID=
 VITE_GOOGLE_ADS_LEAD_LABEL=
@@ -80,7 +79,6 @@ Kuriant projektą:
 Vercel environment variables:
 
 - `VITE_API_URL` — pagrindinio Stilloak backend `/api` URL
-- `VITE_WEB_CONTACT_EMAIL` — viešas Stilloak Web kontaktinis el. paštas
 - `VITE_GA_MEASUREMENT_ID` — GA4 matavimo identifikatorius
 - `VITE_GOOGLE_ADS_ID` — Google Ads žymos identifikatorius (`AW-...`)
 - `VITE_GOOGLE_ADS_LEAD_LABEL` — Google Ads užklausos konversijos label

@@ -1,7 +1,7 @@
 const { getEmailTransport, getTransportConfig, isEmailTransportConfigured, normalizeEmailTransportError } = require("../utils/emailTransport");
 const { isBrevoEmailConfigured, sendBrevoTransactionalEmail } = require("../utils/brevoEmail");
 
-const FROM = process.env.WEB_ORDERS_FROM_EMAIL?.trim() || "Stilloak Studio <hello@stilloak-studio.com>";
+const FROM = process.env.WEB_ORDERS_FROM_EMAIL?.trim() || "Stilloak Studio <labas@stilloak-studio.com>";
 const { buildWebServiceEmail } = require("./webServiceEmailTemplate");
 const money = (value) => `${new Intl.NumberFormat("lt-LT", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value || 0))} €`;
 
