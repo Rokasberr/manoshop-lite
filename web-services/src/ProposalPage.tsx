@@ -125,7 +125,9 @@ function ProposalPage({ token }: ProposalPageProps) {
   const [error, setError] = useState("");
   const [acceptedName, setAcceptedName] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [billingName, setBillingName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [billingCompany, setBillingCompany] = useState("");
   const [companyCode, setCompanyCode] = useState("");
   const [vatCode, setVatCode] = useState("");
   const [streetAddress, setStreetAddress] = useState("");
@@ -200,7 +202,7 @@ function ProposalPage({ token }: ProposalPageProps) {
             const confirmed = (await confirmResponse.json()) as PublicProposal;
             setProposal(confirmed);
             setAcceptedName(confirmed.proposal.acceptedName || confirmed.customer.name || "");
-            setBillingName(confirmed.customer.billingName || confirmed.customer.company || confirmed.customer.name || "");
+            setBillingCompany(confirmed.customer.company || "");
             setCompanyCode(confirmed.customer.companyCode || "");
             setVatCode(confirmed.customer.vatCode || "");
             setPaymentPlan(confirmed.paymentPlan || "full");
@@ -221,7 +223,7 @@ function ProposalPage({ token }: ProposalPageProps) {
 
         setProposal(data);
         setAcceptedName(data.proposal.acceptedName || data.customer.name || "");
-        setBillingName(data.customer.billingName || data.customer.company || data.customer.name || "");
+        setBillingCompany(data.customer.company || "");
         setCompanyCode(data.customer.companyCode || "");
         setVatCode(data.customer.vatCode || "");
         setPaymentPlan(data.paymentPlan || "full");
@@ -247,7 +249,7 @@ function ProposalPage({ token }: ProposalPageProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(proposal.proposal.status === "accepted" ? {
           step: "billing",
-          billingName: billingName.trim(),
+          billingName: billingCompany.trim() || [firstName.trim(), lastName.trim()].join(" "),
           companyCode: companyCode.trim(),
           vatCode: vatCode.trim(),
           billingAddress: [
@@ -499,9 +501,19 @@ function ProposalPage({ token }: ProposalPageProps) {
             <form className="proposal-action-card" onSubmit={acceptProposal}>
               <h3>Sąskaitos duomenys prieš mokėjimą</h3>
               <p>Jei perkate kaip fizinis asmuo, įrašykite savo vardą, pavardę ir gyvenamosios vietos adresą. Jei perkate įmonės vardu, nurodykite įmonės rekvizitus ir registracijos adresą.</p>
+              <div className="proposal-grid">
+                <label className="proposal-label">
+                  Vardas
+                  <input autoComplete="given-name" value={firstName} onChange={(event) => setFirstName(event.target.value)} pattern={String.raw`.*\S.*`} maxLength={90} required={!billingCompany.trim()} />
+                </label>
+                <label className="proposal-label">
+                  Pavardė
+                  <input autoComplete="family-name" value={lastName} onChange={(event) => setLastName(event.target.value)} pattern={String.raw`.*\S.*`} maxLength={90} required={!billingCompany.trim()} />
+                </label>
+              </div>
               <label className="proposal-label">
-                Pirkėjo vardas ir pavardė arba įmonės pavadinimas
-                <input value={billingName} onChange={(event) => setBillingName(event.target.value)} minLength={2} required />
+                Įmonės pavadinimas (jei perkate įmonės vardu)
+                <input autoComplete="organization" value={billingCompany} onChange={(event) => setBillingCompany(event.target.value)} minLength={2} maxLength={200} />
               </label>
               <div className="proposal-grid">
                 <label className="proposal-label">
