@@ -527,7 +527,7 @@ function ProposalPage({ token }: ProposalPageProps) {
               </div>
               <label className="proposal-label">
                 Gatvė ir namo numeris
-                <input autoComplete="address-line1" placeholder="Pvz., Parko g. 12" value={streetAddress} onChange={(event) => setStreetAddress(event.target.value)} pattern={String.raw`.*\S.*`} maxLength={100} required />
+                <input autoComplete="address-line1" placeholder="Pvz., Laisvės al. 10" value={streetAddress} onChange={(event) => setStreetAddress(event.target.value)} pattern={String.raw`.*\S.*`} maxLength={100} required />
               </label>
               <label className="proposal-label">
                 Buto ar patalpos numeris (jei yra)
@@ -536,11 +536,11 @@ function ProposalPage({ token }: ProposalPageProps) {
               <div className="proposal-grid">
                 <label className="proposal-label">
                   Pašto kodas
-                  <input autoComplete="postal-code" placeholder="Pvz., LT-55180" value={postalCode} onChange={(event) => setPostalCode(event.target.value)} pattern={String.raw`.*\S.*`} maxLength={20} required />
+                  <input autoComplete="postal-code" placeholder="Pvz., LT-44215" value={postalCode} onChange={(event) => setPostalCode(event.target.value)} pattern={String.raw`.*\S.*`} maxLength={20} required />
                 </label>
                 <label className="proposal-label">
                   Miestas ar gyvenvietė
-                  <input autoComplete="address-level2" placeholder="Pvz., Jonava" value={city} onChange={(event) => setCity(event.target.value)} pattern={String.raw`.*\S.*`} maxLength={70} required />
+                  <input autoComplete="address-level2" placeholder="Pvz., Kaunas" value={city} onChange={(event) => setCity(event.target.value)} pattern={String.raw`.*\S.*`} maxLength={70} required />
                 </label>
               </div>
               <label className="proposal-label">
