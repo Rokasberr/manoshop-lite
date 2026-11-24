@@ -689,16 +689,32 @@ const acceptPublicWebServiceProposal = async (req, res) => {
     throw createHttpError("Šis pasiūlymas buvo atmestas.", 409);
   }
 
-  if (request.proposalStatus !== "accepted") {
+  const billingName = cleanString(req.body?.billingName, 200);
+  const billingAddress = cleanString(req.body?.billingAddress, 300);
+  const hasBillingDetails = billingName.length >= 2 && billingAddress.length >= 5;
+  const saveBillingDetails = () => {
+    if (!hasBillingDetails) {
+      throw createHttpError("Įrašykite sąskaitos gavėją ir adresą.", 400);
+    }
+    request.billingName = billingName;
+    request.companyCode = cleanString(req.body?.companyCode, 50);
+    request.vatCode = cleanString(req.body?.vatCode, 50);
+    request.billingAddress = billingAddress;
+  };
+
+  if (req.body?.step === "billing") {
+    if (request.proposalStatus !== "accepted") {
+      throw createHttpError("Pirmiausia patvirtinkite pasiūlymą.", 409);
+    }
+    if (request.billingName && request.billingAddress) {
+      return res.json(serializePublicProposal(request));
+    }
+    saveBillingDetails();
+  } else if (request.proposalStatus !== "accepted") {
     const acceptedName = cleanString(req.body?.acceptedName, 160);
-    const billingName = cleanString(req.body?.billingName, 200);
-    const billingAddress = cleanString(req.body?.billingAddress, 300);
     const paymentPlan = cleanString(req.body?.paymentPlan, 20) || "full";
     if (acceptedName.length < 2 || req.body?.acceptedTerms !== true) {
       throw createHttpError("Patvirtinkite vardą ir sutikimą su pasiūlymo sąlygomis.", 400);
-    }
-    if (billingName.length < 2 || billingAddress.length < 5) {
-      throw createHttpError("Įrašykite sąskaitos gavėją ir adresą.", 400);
     }
     if (!PAYMENT_PLAN_OPTIONS.includes(paymentPlan)) {
       throw createHttpError("Pasirinkite pilną mokėjimą arba mokėjimą dviem dalimis.", 400);
@@ -709,10 +725,7 @@ const acceptPublicWebServiceProposal = async (req, res) => {
     request.proposalAcceptedAt = now;
     request.proposalAcceptedName = acceptedName;
     request.proposalAcceptedIp = cleanString(req.ip, 100);
-    request.billingName = billingName;
-    request.companyCode = cleanString(req.body?.companyCode, 50);
-    request.vatCode = cleanString(req.body?.vatCode, 50);
-    request.billingAddress = billingAddress;
+    if (hasBillingDetails) saveBillingDetails();
     request.paymentPlan = paymentPlan;
     request.depositPercent = paymentPlan === "full" ? 100 : request.splitPaymentPercent;
     request.depositAmount = calculateDeposit(request.proposalPrice, request.depositPercent);
@@ -725,7 +738,12 @@ const acceptPublicWebServiceProposal = async (req, res) => {
       note: `Klientas ${acceptedName} patvirtino pasiūlymą ir pasirinko ${paymentPlan === "full" ? "pilną apmokėjimą" : "mokėjimą dviem dalimis"}.`,
       happenedAt: now,
     });
-    await request.save();
+  } else {
+    return res.json(serializePublicProposal(request));
+  }
+
+  await request.save();
+  if (hasBillingDetails) {
     try {
       await deliverWebServiceTestContract(request);
     } catch (error) {
@@ -744,6 +762,9 @@ const createPublicWebServiceDepositSession = async (req, res) => {
   }
   if (request.depositStatus === "paid") {
     return res.json({ alreadyPaid: true, proposal: serializePublicProposal(request) });
+  }
+  if (!request.billingName || !request.billingAddress) {
+    throw createHttpError("Prieš apmokėdami užpildykite sąskaitos duomenis.", 400);
   }
   if (!request.depositAmount || request.depositAmount <= 0) {
     throw createHttpError("Mokėjimo suma nenustatyta.", 409);
