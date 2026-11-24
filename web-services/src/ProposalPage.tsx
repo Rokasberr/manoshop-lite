@@ -476,7 +476,7 @@ function ProposalPage({ token }: ProposalPageProps) {
         <section className="proposal-card proposal-action-card">
           <h2>Pasiūlymo galiojimas baigėsi</h2>
           <p>Susisiekite su Stilloak Web ir paruošime atnaujintą pasiūlymą.</p>
-          <a className="proposal-secondary-button" href="mailto:labas@stilloak.com">Susisiekti</a>
+          <a className="proposal-secondary-button" href="mailto:labas@stilloak-studio.com">Susisiekti</a>
         </section>
       ) : isAccepted ? (
         <section className="proposal-card proposal-action-card">
@@ -556,7 +556,7 @@ function ProposalPage({ token }: ProposalPageProps) {
 
       <footer className="proposal-footer">
         <span>Stilloak Web</span>
-        <a href="mailto:labas@stilloak.com">labas@stilloak.com</a>
+        <a href="mailto:labas@stilloak-studio.com">labas@stilloak-studio.com</a>
       </footer>
     </main>
   );

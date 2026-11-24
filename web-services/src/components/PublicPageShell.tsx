@@ -5,7 +5,7 @@ type PublicPageShellProps = {
   children: ReactNode;
 };
 
-const contactEmail = "labas@stilloak.com";
+const contactEmail = "labas@stilloak-studio.com";
 const contactPhone = "+370 638 43445";
 
 export default function PublicPageShell({ children }: PublicPageShellProps) {

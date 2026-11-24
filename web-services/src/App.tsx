@@ -58,7 +58,7 @@ const initialFormState: FormState = {
   website: ""
 };
 
-const contactEmail = import.meta.env.VITE_WEB_CONTACT_EMAIL || "labas@stilloak.com";
+const contactEmail = import.meta.env.VITE_WEB_CONTACT_EMAIL || "labas@stilloak-studio.com";
 const contactPhone = "+370 638 43445";
 const contactPhoneHref = "tel:+37063843445";
 const apiBaseUrl = String(import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");

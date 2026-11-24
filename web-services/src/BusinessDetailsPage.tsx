@@ -36,7 +36,7 @@ export default function BusinessDetailsPage() {
 
           <article className="legal-contact-card">
             <span>Kontaktai</span>
-            <a href="mailto:labas@stilloak.com"><Mail size={20} /><div><small>El. paštas</small><strong>labas@stilloak.com</strong></div></a>
+            <a href="mailto:labas@stilloak-studio.com"><Mail size={20} /><div><small>El. paštas</small><strong>labas@stilloak-studio.com</strong></div></a>
             <a href="tel:+37063843445"><Phone size={20} /><div><small>Telefonas</small><strong>+370 638 43445</strong></div></a>
           </article>
         </section>
