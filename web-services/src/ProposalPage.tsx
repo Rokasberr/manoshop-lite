@@ -243,13 +243,15 @@ function ProposalPage({ token }: ProposalPageProps) {
       const response = await fetch(`${endpoint}/accept`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          acceptedName: acceptedName.trim(),
-          acceptedTerms,
+        body: JSON.stringify(proposal.proposal.status === "accepted" ? {
+          step: "billing",
           billingName: billingName.trim(),
           companyCode: companyCode.trim(),
           vatCode: vatCode.trim(),
           billingAddress: billingAddress.trim(),
+        } : {
+          acceptedName: acceptedName.trim(),
+          acceptedTerms,
           paymentPlan,
         }),
       });
@@ -487,7 +489,34 @@ function ProposalPage({ token }: ProposalPageProps) {
             {proposal.proposal.acceptedAt ? ` · ${new Date(proposal.proposal.acceptedAt).toLocaleString("lt-LT")}` : ""}.
           </p>
 
-          {isPaid ? (
+          {!isPaid && (!proposal.customer.billingName || !proposal.customer.billingAddress) ? (
+            <form className="proposal-action-card" onSubmit={acceptProposal}>
+              <h3>Sąskaitos duomenys prieš mokėjimą</h3>
+              <p>Jei perkate kaip fizinis asmuo, įrašykite savo vardą, pavardę ir gyvenamosios vietos adresą. Jei perkate įmonės vardu, nurodykite įmonės rekvizitus ir registracijos adresą.</p>
+              <label className="proposal-label">
+                Pirkėjo vardas ir pavardė arba įmonės pavadinimas
+                <input value={billingName} onChange={(event) => setBillingName(event.target.value)} minLength={2} required />
+              </label>
+              <div className="proposal-grid">
+                <label className="proposal-label">
+                  Įmonės kodas (jei taikoma)
+                  <input value={companyCode} onChange={(event) => setCompanyCode(event.target.value)} />
+                </label>
+                <label className="proposal-label">
+                  PVM kodas (jei taikoma)
+                  <input value={vatCode} onChange={(event) => setVatCode(event.target.value)} />
+                </label>
+              </div>
+              <label className="proposal-label">
+                Pirkėjo adresas sąskaitai
+                <input autoComplete="street-address" placeholder="Pvz., Parko g. 12-3, LT-55180 Jonava, Lietuva" value={billingAddress} onChange={(event) => setBillingAddress(event.target.value)} minLength={5} required />
+                <small>Įrašykite gatvę, namo ir buto numerį (jei yra), pašto kodą, miestą ir šalį.</small>
+              </label>
+              <button className="proposal-primary-button" type="submit" disabled={accepting}>
+                {accepting ? "Išsaugoma..." : "Išsaugoti sąskaitos duomenis"}
+              </button>
+            </form>
+          ) : isPaid ? (
             <>
               <div className="proposal-paid-box"><CheckCircle2 size={22} /><div><strong>{isFullPayment ? "Projektas apmokėtas pilnai" : "Avansas apmokėtas"}</strong><span>{formatCurrency(proposal.deposit.amount)}</span></div></div>
               {!isFullPayment && finalRequested ? (finalPaid ?
@@ -518,39 +547,15 @@ function ProposalPage({ token }: ProposalPageProps) {
               <span><strong>Du mokėjimai</strong><small>{proposal.paymentOptions.splitPercent}% avansas dabar, likutis užbaigus projektą</small></span>
             </label>
           </fieldset>
-          <h3>Sąskaitos duomenys</h3>
-          <p>Jei perkate kaip fizinis asmuo, įrašykite savo vardą, pavardę ir gyvenamosios vietos adresą. Jei perkate įmonės vardu, nurodykite įmonės rekvizitus ir registracijos adresą.</p>
           <label className="proposal-label">
             Patvirtinančio asmens vardas ir pavardė
             <input value={acceptedName} onChange={(event) => setAcceptedName(event.target.value)} minLength={2} required />
           </label>
-          <label className="proposal-label">
-            Pirkėjo vardas ir pavardė arba įmonės pavadinimas
-            <input value={billingName} onChange={(event) => setBillingName(event.target.value)} minLength={2} required />
-          </label>
-          <div className="proposal-grid">
-            <label className="proposal-label">
-              Įmonės kodas (jei taikoma)
-              <input value={companyCode} onChange={(event) => setCompanyCode(event.target.value)} />
-            </label>
-            <label className="proposal-label">
-              PVM kodas (jei taikoma)
-              <input value={vatCode} onChange={(event) => setVatCode(event.target.value)} />
-            </label>
-          </div>
-          <label className="proposal-label">
-            Pirkėjo adresas sąskaitai
-            <input autoComplete="street-address" placeholder="Pvz., Parko g. 12-3, LT-55180 Jonava, Lietuva" value={billingAddress} onChange={(event) => setBillingAddress(event.target.value)} minLength={5} required />
-            <small>Įrašykite gatvę, namo ir buto numerį (jei yra), pašto kodą, miestą ir šalį.</small>
-          </label>
-          <div className="proposal-notice">
-            Patvirtinus bus atsiųsta testinė sutarties PDF versija. Ji negalioja ir nėra teisinė sutartis.
-          </div>
           <label className="proposal-checkbox">
             <input type="checkbox" checked={acceptedTerms} onChange={(event) => setAcceptedTerms(event.target.checked)} required />
             <span>Sutinku su šio pasiūlymo apimtimi, kaina, sąlygomis ir pasirinktu mokėjimo planu. Susipažinau su <a href="https://stilloak-studio.com/web-services-terms" target="_blank" rel="noreferrer">paslaugų sąlygomis</a> ir <a href="https://stilloak-studio.com/web-services-privacy" target="_blank" rel="noreferrer">privatumo informacija</a>.</span>
           </label>
-          <button className="proposal-primary-button" type="submit" disabled={accepting || !acceptedTerms || acceptedName.trim().length < 2 || billingName.trim().length < 2 || billingAddress.trim().length < 5}>
+          <button className="proposal-primary-button" type="submit" disabled={accepting || !acceptedTerms || acceptedName.trim().length < 2}>
             {accepting ? <Loader2 className="proposal-spinner" size={19} /> : <FileCheck2 size={19} />}
             {accepting ? "Patvirtinama..." : "Patvirtinti pasiūlymą"}
           </button>

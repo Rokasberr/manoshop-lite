@@ -180,12 +180,12 @@ test("accepted Web proposals collect billing data and automate test contracts an
   assert.match(modelSource, /projectLiveUrl:/);
   assert.match(modelSource, /handoverItems:/);
   assert.match(controllerSource, /deliverWebServiceTestContract\(request\)/);
-  assert.match(controllerSource, /billingAddress\.length < 5/);
+  assert.match(controllerSource, /billingAddress\.length >= 5/);
   assert.match(lifecycleController, /resendAdminWebServiceTestContract/);
   assert.match(lifecycleController, /resendAdminWebServiceHandover/);
   assert.match(routesSource, /test-contract\/resend/);
   assert.match(routesSource, /handover\/resend/);
-  assert.match(proposalPageSource, /Sąskaitos gavėjas \/ įmonės pavadinimas/);
+  assert.match(proposalPageSource, /Sąskaitos duomenys prieš mokėjimą/);
   assert.match(proposalPageSource, /billingAddress/);
   assert.match(adminSource, /Perdavimo informacija/);
   assert.match(adminSource, /Siųsti sutartį dar kartą/);
